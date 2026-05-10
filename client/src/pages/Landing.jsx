@@ -44,7 +44,7 @@ export default function Landing() {
                 Criar Torneio Grátis <ArrowRight size={18} />
               </Link>
               <Link to="/explore" className="btn btn-secondary btn-lg" style={{ borderColor: 'var(--green)', color: 'var(--green)' }}>
-                ⚽ Explorar Torneios
+                <span className="spin-ball">⚽</span> Explorar Torneios
               </Link>
             </div>
 
@@ -95,7 +95,7 @@ export default function Landing() {
             padding: '64px 48px', textAlign: 'center',
           }}>
             <h2 className="font-syne" style={{ fontSize: 40, fontWeight: 800, marginBottom: 16 }}>
-              Pronto para apitar? ⚽
+              Pronto para apitar? <span className="spin-ball">⚽</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: 18, marginBottom: 40 }}>
               Cria o teu primeiro torneio em menos de 2 minutos.
@@ -111,7 +111,7 @@ export default function Landing() {
       <footer style={{ borderTop: '1px solid var(--border)', padding: '32px 0', textAlign: 'center' }}>
         <div className="container">
           <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-            © 2026 Bola na Zona · Feito com ⚽ para a comunidade
+            © 2026 Bola na Zona · Feito com <span className="spin-ball">⚽</span> para a comunidade
           </p>
         </div>
       </footer>

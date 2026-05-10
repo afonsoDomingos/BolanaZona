@@ -62,7 +62,7 @@ export default function Explore() {
               <Link key={t._id} to={`/t/${t.shareCode}`} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                   <div style={{ width: 50, height: 50, borderRadius: 12, background: 'var(--green-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
-                    ⚽
+                    <span className="spin-ball">⚽</span>
                   </div>
                   <span className={`badge ${statusBadge[t.status]}`}>{statusLabel[t.status]}</span>
                 </div>

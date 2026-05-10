@@ -32,7 +32,7 @@ export default function PublicTournament() {
 
   if (notFound) return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-      <div style={{ fontSize: 64 }}>⚽</div>
+      <div className="spin-ball" style={{ fontSize: 64 }}>⚽</div>
       <h1 style={{ fontSize: 24, fontWeight: 800 }}>Torneio não encontrado</h1>
       <p style={{ color: 'var(--text-secondary)' }}>O link pode estar incorreto ou o torneio foi removido.</p>
       <Link to="/" className="btn btn-primary">Ir para a página inicial</Link>
@@ -52,7 +52,7 @@ export default function PublicTournament() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 20 }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                <div style={{ width: 56, height: 56, borderRadius: 16, background: 'var(--green-subtle)', border: '2px solid rgba(0,200,83,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>⚽</div>
+                <div className="spin-ball" style={{ width: 56, height: 56, borderRadius: 16, background: 'var(--green-subtle)', border: '2px solid rgba(0,200,83,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>⚽</div>
                 <div>
                   <h1 className="font-syne" style={{ fontSize: 'clamp(22px, 5vw, 36px)', fontWeight: 800 }}>{tournament.name}</h1>
                   <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>📍 {tournament.neighborhood}, {tournament.city} · 🏟️ {tournament.location}</p>
@@ -240,7 +240,7 @@ export default function PublicTournament() {
                                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
                                     {m.events.map((e, i) => (
                                       <div key={i} style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.03)', padding: '2px 8px', borderRadius: 6 }}>
-                                        <span>{e.type === 'goal' ? '⚽' : e.type === 'yellow_card' ? '🟨' : '🟥'}</span>
+                                        <span className={e.type === 'goal' ? 'spin-ball' : ''}>{e.type === 'goal' ? '⚽' : e.type === 'yellow_card' ? '🟨' : '🟥'}</span>
                                         <span style={{ fontWeight: 600 }}>{e.playerName}</span>
                                       </div>
                                     ))}
