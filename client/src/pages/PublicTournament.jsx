@@ -68,6 +68,39 @@ export default function PublicTournament() {
             </button>
           </div>
 
+          {/* Hall of Fame / Winner Section */}
+          {tournament.status === 'finished' && (
+            <div className="animate-slide-up" style={{ 
+              background: 'linear-gradient(135deg, rgba(255,214,0,0.15) 0%, transparent 100%)',
+              border: '1px solid rgba(255,214,0,0.3)', borderRadius: 20, padding: 32, marginBottom: 32,
+              display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32, alignItems: 'center'
+            }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--yellow)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 12 }}>Campeão 🏆</div>
+                <div style={{ width: 100, height: 100, borderRadius: '50%', background: tournament.winner?.color || 'var(--yellow)', margin: '0 auto 16px', border: '4px solid var(--bg-secondary)', overflow: 'hidden', boxShadow: '0 0 30px rgba(255,214,0,0.3)' }}>
+                  {tournament.winner?.logo ? <img src={tournament.winner.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 40, lineHeight: '90px' }}>🥇</span>}
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: '#fff' }}>{tournament.winner?.name || 'Vencedor'}</div>
+              </div>
+
+              <div style={{ display: 'grid', gap: 16 }}>
+                {[
+                  { label: 'MVP do Torneio', value: tournament.mvp, icon: '🌟' },
+                  { label: 'Melhor Marcador', value: tournament.bestScorer, icon: '⚽' },
+                  { label: 'Melhor Guarda-redes', value: tournament.bestGoalkeeper, icon: '🧤' }
+                ].filter(a => a.value).map(a => (
+                  <div key={a.label} style={{ background: 'rgba(255,255,255,0.03)', padding: '12px 20px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontSize: 20 }}>{a.icon}</span>
+                    <div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase' }}>{a.label}</div>
+                      <div style={{ fontSize: 15, fontWeight: 700 }}>{a.value}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Stats row */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12, marginTop: 28 }}>
             {[

@@ -16,6 +16,10 @@ const tournamentSchema = new mongoose.Schema({
   prize: { type: String, default: '' },
   logo: { type: String, default: '' },
   coverImage: { type: String, default: '' },
+  winner: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
+  mvp: { type: String, default: '' },
+  bestScorer: { type: String, default: '' },
+  bestGoalkeeper: { type: String, default: '' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Tournament', tournamentSchema);

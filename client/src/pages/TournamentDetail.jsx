@@ -21,6 +21,7 @@ export default function TournamentDetail() {
   const [editTeamData, setEditTeamData] = useState(null);
   const [showResultModal, setShowResultModal] = useState(null);
   const [showShareModal, setShowShareModal] = useState(null);
+  const [showFinishModal, setShowFinishModal] = useState(false);
   const [generatingCalendar, setGeneratingCalendar] = useState(false);
 
   const load = useCallback(async () => {
@@ -53,9 +54,9 @@ export default function TournamentDetail() {
     finally { setGeneratingCalendar(false); }
   };
 
-  const changeStatus = async (status) => {
+  const changeStatus = async (status, awards = {}) => {
     try {
-      const res = await api.put(`/tournaments/${id}`, { status });
+      const res = await api.put(`/tournaments/${id}`, { status, ...awards });
       setTournament(res.data);
       toast.success('Estado atualizado.');
     } catch { toast.error('Erro ao atualizar estado.'); }
@@ -97,7 +98,7 @@ export default function TournamentDetail() {
                 </button>
               )}
               {tournament.status === 'active' && (
-                <button className="btn btn-secondary btn-sm" onClick={() => changeStatus('finished')}>Finalizar</button>
+                <button className="btn btn-secondary btn-sm" onClick={() => setShowFinishModal(true)}>Finalizar</button>
               )}
               <button className="btn btn-secondary btn-sm" onClick={copyShare}><Share2 size={14} /> Partilhar</button>
             </div>
@@ -372,6 +373,67 @@ export default function TournamentDetail() {
 
       {/* SHARE MODAL */}
       {showShareModal && <MatchShareModal match={showShareModal} tournament={tournament} onClose={() => setShowShareModal(null)} />}
+
+      {/* FINISH TOURNAMENT MODAL */}
+      {showFinishModal && (
+        <FinishTournamentModal 
+          teams={teams} 
+          onClose={() => setShowFinishModal(false)} 
+          onConfirm={(awards) => {
+            changeStatus('finished', awards);
+            setShowFinishModal(false);
+          }} 
+        />
+      )}
+    </div>
+  );
+}
+
+function FinishTournamentModal({ teams, onClose, onConfirm }) {
+  const [form, setForm] = useState({ winner: '', mvp: '', bestScorer: '', bestGoalkeeper: '' });
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal">
+        <div className="modal-header">
+          <h2 className="modal-title">Encerrar Torneio 🏆</h2>
+          <button className="modal-close" onClick={onClose}><X size={18} /></button>
+        </div>
+        
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 24, fontSize: 14 }}>
+          Parabéns pela conclusão do torneio! Define agora o quadro de honra oficial para imortalizar os vencedores.
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div className="form-group">
+            <label className="form-label">Equipa Campeã</label>
+            <select className="form-select" value={form.winner} onChange={e => setForm({ ...form, winner: e.target.value })}>
+              <option value="">Selecionar equipa...</option>
+              {teams.map(t => <option key={t._id} value={t._id}>{t.name}</option>)}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">MVP (Melhor Jogador)</label>
+            <input type="text" className="form-input" placeholder="Nome do jogador..." value={form.mvp} onChange={e => setForm({ ...form, mvp: e.target.value })} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Melhor Marcador</label>
+            <input type="text" className="form-input" placeholder="Nome do jogador..." value={form.bestScorer} onChange={e => setForm({ ...form, bestScorer: e.target.value })} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Melhor Guarda-redes</label>
+            <input type="text" className="form-input" placeholder="Nome do jogador..." value={form.bestGoalkeeper} onChange={e => setForm({ ...form, bestGoalkeeper: e.target.value })} />
+          </div>
+
+          <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+            <button className="btn btn-secondary" style={{ flex: 1 }} onClick={onClose}>Cancelar</button>
+            <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => onConfirm(form)}>Confirmar Encerramento</button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -17,7 +17,9 @@ exports.getAll = async (req, res) => {
 // GET /api/tournaments/:id
 exports.getOne = async (req, res) => {
   try {
-    const t = await Tournament.findById(req.params.id).populate('createdBy', 'name email');
+    const t = await Tournament.findById(req.params.id)
+      .populate('createdBy', 'name email')
+      .populate('winner', 'name logo color');
     if (!t) return res.status(404).json({ message: 'Torneio não encontrado.' });
     res.json(t);
   } catch (err) {
@@ -28,7 +30,8 @@ exports.getOne = async (req, res) => {
 // GET /api/tournaments/public/:shareCode
 exports.getPublic = async (req, res) => {
   try {
-    const t = await Tournament.findOne({ shareCode: req.params.shareCode });
+    const t = await Tournament.findOne({ shareCode: req.params.shareCode })
+      .populate('winner', 'name logo color');
     if (!t) return res.status(404).json({ message: 'Torneio não encontrado.' });
     const teams = await Team.find({ tournament: t._id });
     const matches = await Match.find({ tournament: t._id })
