@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true, minlength: 6 },
   role: { type: String, enum: ['superadmin', 'admin', 'captain', 'viewer'], default: 'admin' },
   avatar: { type: String, default: '' },
+  lastSeen: { type: Date, default: Date.now },
 }, { timestamps: true });
 
 userSchema.pre('save', async function () {

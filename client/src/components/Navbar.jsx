@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Trophy, LayoutDashboard, LogOut, LogIn, UserPlus, ShoppingBag } from 'lucide-react';
+import { Trophy, LayoutDashboard, LogOut, LogIn, UserPlus, ShoppingBag, Activity } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 
 export default function Navbar() {
@@ -43,6 +43,11 @@ export default function Navbar() {
                   <Trophy size={15} style={{ display: 'inline', marginRight: 4 }} />
                   Meus Torneios
                 </Link>
+                {(user.role === 'admin' || user.role === 'superadmin') && (
+                  <Link to="/dashboard/analytics" className={`nav-link ${isActive('/dashboard/analytics') ? 'active' : ''}`} style={{ color: 'var(--blue)' }}>
+                    <Activity size={15} style={{ display: 'inline', marginRight: 4 }} /> Analytics
+                  </Link>
+                )}
                 <NotificationCenter />
                 <button onClick={handleLogout} className="btn btn-secondary btn-sm" style={{ marginLeft: 8 }}>
                   <LogOut size={14} /> Sair

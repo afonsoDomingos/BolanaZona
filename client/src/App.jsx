@@ -13,6 +13,7 @@ import Dashboard from './pages/Dashboard';
 import Explore from './pages/Explore';
 import Talents from './pages/Talents';
 import Store from './pages/Store';
+import AdminAnalytics from './pages/AdminAnalytics';
 import TournamentList from './pages/TournamentList';
 import TournamentNew from './pages/TournamentNew';
 import TournamentDetail from './pages/TournamentDetail';
@@ -49,6 +50,7 @@ function AppRoutes() {
           <Route path="/dashboard/tournaments" element={<ProtectedRoute><TournamentList /></ProtectedRoute>} />
           <Route path="/dashboard/tournaments/new" element={<ProtectedRoute><TournamentNew /></ProtectedRoute>} />
           <Route path="/dashboard/tournaments/:id" element={<ProtectedRoute><TournamentDetail /></ProtectedRoute>} />
+          <Route path="/dashboard/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
