@@ -42,6 +42,17 @@ exports.getPublic = async (req, res) => {
   }
 };
 
+exports.getAllPublicTournaments = async (req, res) => {
+  try {
+    const tournaments = await Tournament.find({ 
+      status: { $in: ['registration', 'active'] } 
+    }).sort('-createdAt');
+    res.json(tournaments);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // POST /api/tournaments
 exports.create = async (req, res) => {
   try {

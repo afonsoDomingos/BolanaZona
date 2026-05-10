@@ -1,16 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const ctrl = require('../controllers/tournamentController');
+const { getAll, getOne, create, update, remove, generateCalendar, getStandings, getPublic, getAllPublicTournaments } = require('../controllers/tournamentController');
 const { protect } = require('../middleware/auth');
 
-router.get('/public/:shareCode', ctrl.getPublic);
+// Public routes (no auth needed)
+router.get('/public/all', getAllPublicTournaments);
+router.get('/public/:shareCode', getPublic);
+
+// Protected routes (auth needed)
 router.use(protect);
-router.get('/', ctrl.getAll);
-router.post('/', ctrl.create);
-router.get('/:id', ctrl.getOne);
-router.put('/:id', ctrl.update);
-router.delete('/:id', ctrl.remove);
-router.post('/:id/generate-calendar', ctrl.generateCalendar);
-router.get('/:id/standings', ctrl.getStandings);
+router.get('/', getAll);
+router.post('/', create);
+router.get('/:id', getOne);
+router.put('/:id', update);
+router.delete('/:id', remove);
+router.post('/:id/generate-calendar', generateCalendar);
+router.get('/:id/standings', getStandings);
 
 module.exports = router;

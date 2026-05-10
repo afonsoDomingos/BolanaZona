@@ -31,15 +31,18 @@ export default function Navbar() {
           </Link>
 
           <div className="navbar-nav">
+            <Link to="/explore" className={`nav-link ${isActive('/explore') ? 'active' : ''}`}>
+              Explorar
+            </Link>
+
             {user ? (
               <>
                 <Link to="/dashboard" className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}>
-                  <LayoutDashboard size={15} style={{ display: 'inline', marginRight: 4 }} />
                   Dashboard
                 </Link>
                 <Link to="/dashboard/tournaments" className={`nav-link ${isActive('/dashboard/tournaments') ? 'active' : ''}`}>
                   <Trophy size={15} style={{ display: 'inline', marginRight: 4 }} />
-                  Torneios
+                  Meus Torneios
                 </Link>
                 <NotificationCenter />
                 <button onClick={handleLogout} className="btn btn-secondary btn-sm" style={{ marginLeft: 8 }}>
