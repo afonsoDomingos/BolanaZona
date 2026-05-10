@@ -36,6 +36,28 @@ export default function PublicTournament() {
     const element = document.getElementById(elementId);
     if (!element) return;
     const toastId = toast.loading('A preparar imagem... 📸');
+
+    // Injetar marca d'água temporária
+    const watermark = document.createElement('div');
+    watermark.innerHTML = 'bolanazona.com';
+    watermark.style.position = 'absolute';
+    watermark.style.bottom = '12px';
+    watermark.style.right = '20px';
+    watermark.style.color = 'rgba(255, 255, 255, 0.4)';
+    watermark.style.fontSize = '13px';
+    watermark.style.fontWeight = '800';
+    watermark.style.letterSpacing = '1px';
+    watermark.style.zIndex = '9999';
+    watermark.style.pointerEvents = 'none';
+
+    // Garantir que o container permite posicionamento absoluto
+    const originalPosition = element.style.position;
+    if (window.getComputedStyle(element).position === 'static') {
+      element.style.position = 'relative';
+    }
+    
+    element.appendChild(watermark);
+
     try {
       const canvas = await html2canvas(element, { 
         backgroundColor: '#0f172a', // Cor de fundo do tema escuro
@@ -50,6 +72,10 @@ export default function PublicTournament() {
       toast.success('Imagem guardada com sucesso!', { id: toastId });
     } catch (err) {
       toast.error('Erro ao capturar imagem.', { id: toastId });
+    } finally {
+      // Limpar a marca d'água logo a seguir
+      if (element.contains(watermark)) element.removeChild(watermark);
+      element.style.position = originalPosition;
     }
   };
 
