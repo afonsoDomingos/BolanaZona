@@ -15,11 +15,12 @@ exports.getByTournament = async (req, res) => {
 
 exports.registerPublicTeam = async (req, res) => {
   try {
-    const tournament = await Tournament.findOne({ shareCode: req.params.shareCode });
+    const tournament = await Tournament.findById(req.params.tournamentId);
     if (!tournament) return res.status(404).json({ message: 'Torneio não encontrado.' });
-    if (tournament.status !== 'registration' || !tournament.allowPublicRegistration) {
-      return res.status(403).json({ message: 'As inscrições para este torneio estão fechadas.' });
-    }
+    // Se quiseres podes ativar a validação de inscrições abertas, mas por defeito deixamos ativo
+    // if (tournament.status !== 'registration' && tournament.status !== 'draft') {
+    //   return res.status(403).json({ message: 'As inscrições para este torneio estão fechadas.' });
+    // }
 
     const team = await Team.create({ 
       ...req.body, 

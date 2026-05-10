@@ -78,7 +78,7 @@ export default function TournamentDetail() {
 
   const handleApproveTeam = async (teamId) => {
     try {
-      await api.put(`/teams/${teamId}`, { status: 'approved' });
+      await api.put(`/tournaments/${id}/teams/${teamId}`, { status: 'approved' });
       toast.success('Equipa aprovada! 🎉');
       load();
     } catch { toast.error('Erro ao aprovar equipa.'); }
@@ -87,7 +87,7 @@ export default function TournamentDetail() {
   const handleRejectTeam = async (teamId) => {
     if (!window.confirm('Rejeitar esta inscrição?')) return;
     try {
-      await api.delete(`/teams/${teamId}`);
+      await api.delete(`/tournaments/${id}/teams/${teamId}`);
       toast.success('Inscrição rejeitada.');
       load();
     } catch { toast.error('Erro ao rejeitar equipa.'); }
