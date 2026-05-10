@@ -84,6 +84,15 @@ export default function TournamentDetail() {
     } catch { toast.error('Erro ao rejeitar equipa.'); }
   };
 
+  const handleDeleteTournament = async () => {
+    if (!window.confirm('Tens a certeza que desejas eliminar este torneio permanentemente? Esta ação não pode ser desfeita.')) return;
+    try {
+      await api.delete(`/tournaments/${id}`);
+      toast.success('Torneio eliminado com sucesso.');
+      navigate('/dashboard/tournaments');
+    } catch { toast.error('Erro ao eliminar torneio.'); }
+  };
+
   const shareUrl = `${window.location.origin}/t/${tournament?.shareCode}`;
 
   const copyShare = () => {
@@ -106,7 +115,10 @@ export default function TournamentDetail() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
                 <h1 className="font-syne" style={{ fontSize: 28, fontWeight: 800 }}>{tournament.name}</h1>
-                <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }} onClick={() => setShowEditTournamentModal(true)}><Edit2 size={13} /></button>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }} onClick={() => setShowEditTournamentModal(true)} title="Editar"><Edit2 size={13} /></button>
+                  <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px', color: 'var(--red)' }} onClick={handleDeleteTournament} title="Eliminar Torneio"><Trash2 size={13} /></button>
+                </div>
                 <span className={`badge ${statusBadge[tournament.status]}`}>{statusLabel[tournament.status]}</span>
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>📍 {tournament.neighborhood} · 🏟️ {tournament.location} · 👥 {teams.length}/{tournament.maxTeams} equipas</p>
