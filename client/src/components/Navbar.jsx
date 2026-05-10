@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Trophy, LayoutDashboard, LogOut, LogIn, UserPlus } from 'lucide-react';
+import { Trophy, LayoutDashboard, LogOut, LogIn, UserPlus, ShoppingBag } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 
 export default function Navbar() {
@@ -28,7 +28,10 @@ export default function Navbar() {
               Explorar
             </Link>
             <Link to="/talents" className={`nav-link ${isActive('/talents') ? 'active' : ''}`}>
-              Talentos <span className="badge badge-yellow" style={{ fontSize: 9, padding: '1px 5px', marginLeft: 4 }}>NOVO</span>
+              Talentos
+            </Link>
+            <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} title="Loja">
+              <ShoppingBag size={18} />
             </Link>
 
             {user ? (
