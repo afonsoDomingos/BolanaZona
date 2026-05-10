@@ -3,6 +3,8 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import AnalyticsTracker from './components/AnalyticsTracker';
+import ScrollToTop from './components/ScrollToTop';
+import InstallPrompt from './components/InstallPrompt';
 import Footer from './components/Footer';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -51,6 +53,8 @@ function AppRoutes() {
         </Routes>
       </div>
       <Footer />
+      <ScrollToTop />
+      <InstallPrompt />
       <Toaster
         position="top-right"
         toastOptions={{
