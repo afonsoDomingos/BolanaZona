@@ -2,6 +2,7 @@ import { ShoppingBag, Tag, Filter, Search, ShoppingCart, ArrowRight, Edit, Plus 
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import ProductEditModal from '../components/ProductEditModal';
+import LeadCaptureModal from '../components/LeadCaptureModal';
 
 const categories = [
   { id: '', name: 'Todos', icon: '⚽' },
@@ -20,6 +21,7 @@ export default function Store() {
   const [category, setCategory] = useState('');
   const [search, setSearch] = useState('');
   const [showEditModal, setShowEditModal] = useState(null);
+  const [showLeadModal, setShowLeadModal] = useState(null);
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
 
@@ -38,8 +40,13 @@ export default function Store() {
   const filtered = products.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
 
   const handleBuy = (product) => {
-    const message = `Olá! Tenho interesse no produto "${product.name}" que vi na loja Bola na Zona.`;
+    setShowLeadModal(product);
+  };
+
+  const finalizePurchase = (product, leadInfo) => {
+    const message = `Olá! Meu nome é ${leadInfo.name}. Tenho interesse no produto "${product.name}" que vi na loja Bola na Zona.`;
     window.open(`https://wa.me/244923000000?text=${encodeURIComponent(message)}`, '_blank');
+    setShowLeadModal(null);
   };
 
   return (
@@ -143,6 +150,14 @@ export default function Store() {
           product={showEditModal._id ? showEditModal : null} 
           onClose={() => setShowEditModal(null)} 
           onSaved={() => { setShowEditModal(null); loadProducts(); }} 
+        />
+      )}
+
+      {showLeadModal && (
+        <LeadCaptureModal 
+          product={showLeadModal} 
+          onClose={() => setShowLeadModal(null)} 
+          onCaptured={(leadInfo) => finalizePurchase(showLeadModal, leadInfo)} 
         />
       )}
     </div>

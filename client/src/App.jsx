@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
+import AnalyticsTracker from './components/AnalyticsTracker';
 import Footer from './components/Footer';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -32,7 +33,8 @@ function AppRoutes() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
-      <div style={{ flex: 1 }}>
+      <AnalyticsTracker />
+      <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/explore" element={<Explore />} />
