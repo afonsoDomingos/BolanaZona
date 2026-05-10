@@ -14,6 +14,8 @@ import Explore from './pages/Explore';
 import Talents from './pages/Talents';
 import Store from './pages/Store';
 import AdminAnalytics from './pages/AdminAnalytics';
+import ResetPassword from './pages/ResetPassword';
+import ForgotPassword from './pages/ForgotPassword';
 import TournamentList from './pages/TournamentList';
 import TournamentNew from './pages/TournamentNew';
 import TournamentDetail from './pages/TournamentDetail';
@@ -45,6 +47,8 @@ function AppRoutes() {
           <Route path="/shop" element={<Store />} />
           <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
           <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
+          <Route path="/forgot-password" element={<GuestRoute><ForgotPassword /></GuestRoute>} />
+          <Route path="/reset-password/:token" element={<GuestRoute><ResetPassword /></GuestRoute>} />
           <Route path="/t/:shareCode" element={<PublicTournament />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard/tournaments" element={<ProtectedRoute><TournamentList /></ProtectedRoute>} />
@@ -53,7 +57,7 @@ function AppRoutes() {
           <Route path="/dashboard/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
-      </div>
+      </main>
       <Footer />
       <ScrollToTop />
       <InstallPrompt />

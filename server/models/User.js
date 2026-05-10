@@ -8,6 +8,8 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['superadmin', 'admin', 'captain', 'viewer'], default: 'admin' },
   avatar: { type: String, default: '' },
   lastSeen: { type: Date, default: Date.now },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
 }, { timestamps: true });
 
 userSchema.pre('save', async function () {

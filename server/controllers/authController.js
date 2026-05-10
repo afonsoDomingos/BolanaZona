@@ -34,3 +34,48 @@ exports.login = async (req, res) => {
 exports.me = async (req, res) => {
   res.json({ user: req.user });
 };
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'Não existe utilizador com este email.' });
+
+    const crypto = require('crypto');
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hora
+    await user.save({ validateBeforeSave: false });
+
+    // Aqui enviaríamos o email. Por agora vamos retornar o token para teste.
+    const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
+    
+    res.json({ 
+      message: 'Token de recuperação gerado!', 
+      resetUrl, // No futuro isto será enviado por email
+      resetToken 
+    });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const crypto = require('crypto');
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) return res.status(400).json({ message: 'Token inválido ou expirado.' });
+
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    const token = signToken(user._id);
+    res.json({ token, user });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
