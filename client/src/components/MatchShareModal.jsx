@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { toPng } from 'html-to-image';
-import { X, Download, Share2, Instagram } from 'lucide-react';
+import { X, Download, Share2, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function MatchShareModal({ match, tournament, onClose }) {
@@ -77,7 +77,7 @@ export default function MatchShareModal({ match, tournament, onClose }) {
               <Download size={16} /> Baixar Imagem (PNG)
             </button>
             <button className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center' }} onClick={() => toast('Copia a imagem ou tira print para o Instagram!', { icon: '📸' })}>
-              <Instagram size={16} /> Instagram
+              <Camera size={16} /> Instagram
             </button>
           </div>
           <p style={{ marginTop: 16, fontSize: 12, color: 'var(--text-muted)', textAlign: 'center' }}>
