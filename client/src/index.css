@@ -257,6 +257,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 }
 .navbar-logo-text { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; }
 .navbar-nav { display: flex; align-items: center; gap: 4px; }
+.mobile-menu-btn { display: none; }
 .nav-link {
   padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 500;
   color: var(--text-secondary); transition: var(--transition);
@@ -272,10 +273,40 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .modal { padding: 24px 20px; }
-  .container { padding: 0 16px; }
+  html { font-size: 15px; }
+  .container { padding: 0 20px; }
+  .page { padding: 24px 0; }
+  
+  .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; gap: 16px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  
+  .modal { padding: 24px 16px; margin: 12px; max-height: 85vh; }
+  .btn { width: 100%; justify-content: center; height: 48px; }
+  .btn-sm { width: auto; height: 36px; padding: 0 16px; }
+  
+  .navbar-nav { display: none; }
+  .navbar-nav.mobile-open {
+    display: flex; position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
+    background: var(--bg-primary); flex-direction: column; padding: 24px; gap: 16px;
+    animation: slideUp 0.3s ease; z-index: 99;
+  }
+  .navbar-nav.mobile-open .nav-link { font-size: 18px; padding: 16px; border-bottom: 1px solid var(--border); width: 100%; }
+  
+  .mobile-menu-btn { display: flex; align-items: center; justify-content: center; background: none; color: var(--text-primary); }
+  
+  .table-wrapper table { min-width: 600px; } /* Force scroll for data integrity */
+  
+  .match-card { padding: 16px; flex-direction: column; text-align: center; gap: 12px; }
+  .match-team { text-align: center !important; }
+  .match-score { order: -1; margin-bottom: 8px; }
+  
+  .tabs { overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+  .tab { flex-shrink: 0; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .font-syne { font-size: 1.2em; }
 }
 
 /* ===== SHARE BOX ===== */
