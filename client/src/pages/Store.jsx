@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { ShoppingBag, Tag, Filter, Search, ShoppingCart, ArrowRight, Edit, Plus } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
