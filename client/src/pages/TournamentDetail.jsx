@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save, MapPin, Edit2, Camera } from 'lucide-react';
+import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save, MapPin, Edit2, Camera, MessageCircle } from 'lucide-react';
 import MatchShareModal from '../components/MatchShareModal';
 
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
@@ -102,6 +102,30 @@ export default function TournamentDetail() {
   const copyShare = () => {
     navigator.clipboard.writeText(shareUrl);
     toast.success('Link copiado!');
+  };
+
+  const shareMatchWhatsApp = (m) => {
+    const homeName = m.homeTeam?.name || 'Casa';
+    const awayName = m.awayTeam?.name || 'Fora';
+    const scoreText = m.status === 'finished' ? `*${m.homeScore} - ${m.awayScore}*` : 'v';
+    
+    let eventsText = '';
+    if (m.events?.length > 0) {
+      eventsText = '\n⚽ *Golos/Cartões:* \n' + m.events.map(e => {
+        const icon = e.type === 'goal' ? '⚽' : e.type === 'yellow_card' ? '🟨' : '🟥';
+        return `${icon} ${e.playerName} (${e.team === m.homeTeam?._id ? 'Casa' : 'Fora'})`;
+      }).join('\n');
+    }
+
+    const text = `🏆 *BOLA NA ZONA - RELATÓRIO* 🏆\n\n` +
+                 `🏟️ *Torneio:* ${tournament.name}\n` +
+                 `⚔️ *Jogo:* ${homeName} ${scoreText} ${awayName}\n` +
+                 `📍 *Local:* ${m.location || tournament.location}\n` +
+                 (m.referee ? `🏁 *Árbitro:* ${m.referee}\n` : '') +
+                 eventsText +
+                 `\n\n📊 *Ver Classificação:* ${shareUrl}`;
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   if (loading) return <div className="loading-center" style={{ minHeight: '80vh' }}><div className="spinner" /></div>;
@@ -340,6 +364,7 @@ export default function TournamentDetail() {
                               <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 14 }}>{m.awayTeam?.name || '—'}</div>
                               
                               <div style={{ display: 'flex', gap: 6 }}>
+                                <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px', color: '#25D366' }} onClick={() => shareMatchWhatsApp(m)} title="WhatsApp"><MessageCircle size={14} /></button>
                                 <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Agendar"><Calendar size={14} /></button>
                                 <button className="btn btn-primary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowResultModal(m)} title="Resultado"><Trophy size={14} /></button>
                                 <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowShareModal(m)} title="Partilhar"><Camera size={14} /></button>
