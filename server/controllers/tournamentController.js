@@ -90,7 +90,21 @@ exports.update = async (req, res) => {
 // DELETE /api/tournaments/:id
 exports.remove = async (req, res) => {
   try {
-    await Tournament.findOneAndDelete({ _id: req.params.id, createdBy: req.user._id });
+    const t = await Tournament.findById(req.params.id);
+    if (!t) return res.status(404).json({ message: 'Torneio não encontrado.' });
+
+    // Se o torneio terminou, apenas admins podem apagar
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
+    if (t.status === 'finished' && !isAdmin) {
+      return res.status(403).json({ message: 'Apenas o Administrador pode eliminar torneios finalizados (histórico).' });
+    }
+
+    // Garantir que quem apaga é o dono ou um admin
+    if (t.createdBy.toString() !== req.user._id.toString() && !isAdmin) {
+      return res.status(403).json({ message: 'Não tens permissão para eliminar este torneio.' });
+    }
+
+    await Tournament.findByIdAndDelete(req.params.id);
     await Team.deleteMany({ tournament: req.params.id });
     await Match.deleteMany({ tournament: req.params.id });
     res.json({ message: 'Torneio eliminado.' });

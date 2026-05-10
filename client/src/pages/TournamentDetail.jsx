@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save, MapPin, Edit2, Camera } from 'lucide-react';
@@ -26,6 +27,8 @@ export default function TournamentDetail() {
   const [showEditMatchModal, setShowEditMatchModal] = useState(null);
   const [showEditTournamentModal, setShowEditTournamentModal] = useState(false);
   const [generatingCalendar, setGeneratingCalendar] = useState(false);
+  const { user: currentUser } = useAuth();
+  const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
 
   const load = useCallback(async () => {
     try {
@@ -117,7 +120,9 @@ export default function TournamentDetail() {
                 <h1 className="font-syne" style={{ fontSize: 28, fontWeight: 800 }}>{tournament.name}</h1>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }} onClick={() => setShowEditTournamentModal(true)} title="Editar"><Edit2 size={13} /></button>
-                  <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px', color: 'var(--red)' }} onClick={handleDeleteTournament} title="Eliminar Torneio"><Trash2 size={13} /></button>
+                  {(tournament.status !== 'finished' || isAdmin) && (
+                    <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px', color: 'var(--red)' }} onClick={handleDeleteTournament} title="Eliminar Torneio"><Trash2 size={13} /></button>
+                  )}
                 </div>
                 <span className={`badge ${statusBadge[tournament.status]}`}>{statusLabel[tournament.status]}</span>
               </div>
