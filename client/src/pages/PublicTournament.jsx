@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
-import { Trophy, Calendar, BarChart2, Users, Share2, MapPin, ArrowLeft, Star, Clock } from 'lucide-react';
+import { Trophy, Calendar, BarChart2, Users, Share2, MapPin, ArrowLeft, Star, Clock, Camera } from 'lucide-react';
 import TeamRegistrationModal from '../components/TeamRegistrationModal';
 import SponsorProposalModal from '../components/SponsorProposalModal';
+import toast from 'react-hot-toast';
+import html2canvas from 'html2canvas';
 
 const formatLabel = { groups: 'Todos contra Todos', knockout: 'Mata-mata', groups_knockout: 'Grupos + Eliminatórias' };
 const statusLabel = { draft: 'Brevemente', registration: 'Inscrições Abertas', active: 'A Decorrer', finished: 'Concluído' };
@@ -27,7 +29,28 @@ export default function PublicTournament() {
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert('Link copiado! Partilha com a tua equipa. ⚽');
+    toast.success('Link copiado! Partilha com a tua equipa. ⚽');
+  };
+
+  const captureImage = async (elementId, fileName) => {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    const toastId = toast.loading('A preparar imagem... 📸');
+    try {
+      const canvas = await html2canvas(element, { 
+        backgroundColor: '#0f172a', // Cor de fundo do tema escuro
+        scale: 2, 
+        useCORS: true 
+      });
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${fileName}.png`;
+      a.click();
+      toast.success('Imagem guardada com sucesso!', { id: toastId });
+    } catch (err) {
+      toast.error('Erro ao capturar imagem.', { id: toastId });
+    }
   };
 
   if (loading) return <div className="loading-center" style={{ minHeight: '100vh' }}><div className="spinner" /></div>;
@@ -96,8 +119,14 @@ export default function PublicTournament() {
       <div className="container" style={{ padding: '40px 20px' }}>
         {/* Hall of Fame - Se Terminado */}
         {tournament.status === 'finished' && (
-          <div className="card-glass animate-slide-up" style={{ padding: 40, marginBottom: 48, borderRadius: 32, border: '1px solid rgba(255,214,0,0.2)', textAlign: 'center' }}>
-            <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--yellow)', textTransform: 'uppercase', letterSpacing: 4, marginBottom: 24 }}>Quadro de Honra 🏆</div>
+          <div style={{ position: 'relative', marginBottom: 48 }}>
+            <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }}>
+              <button onClick={() => captureImage('print-hall-of-fame', `Campeoes_${tournament.name}`)} className="btn btn-secondary btn-sm" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)' }}>
+                <Camera size={14} /> Guardar
+              </button>
+            </div>
+            <div id="print-hall-of-fame" className="card-glass animate-slide-up" style={{ padding: 40, borderRadius: 32, border: '1px solid rgba(255,214,0,0.2)', textAlign: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--yellow)', textTransform: 'uppercase', letterSpacing: 4, marginBottom: 24 }}>Quadro de Honra 🏆</div>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 40, flexWrap: 'wrap' }}>
               <div style={{ transform: 'scale(1.1)' }}>
                 <div style={{ width: 120, height: 120, borderRadius: '50%', background: tournament.winner?.color || 'var(--yellow)', margin: '0 auto 20px', border: '6px solid var(--bg-card)', boxShadow: '0 0 50px rgba(255,214,0,0.4)', overflow: 'hidden' }}>
@@ -147,8 +176,15 @@ export default function PublicTournament() {
             standings.length === 0 ? (
               <div className="empty-state"><h3>Tabela a ser preparada...</h3><p>Os dados aparecerão logo após o primeiro apito!</p></div>
             ) : (
-              <div className="table-wrapper card-glass" style={{ borderRadius: 24, padding: 20 }}>
-                <table>
+              <div style={{ position: 'relative' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <h3 className="font-syne" style={{ fontSize: 20, fontWeight: 800 }}>Classificação Oficial</h3>
+                  <button onClick={() => captureImage('print-standings', `Classificacao_${tournament.name}`)} className="btn btn-secondary btn-sm" style={{ border: '1px solid var(--green)', color: 'var(--green)' }}>
+                    <Camera size={14} /> Guardar Tabela
+                  </button>
+                </div>
+                <div id="print-standings" className="table-wrapper card-glass" style={{ borderRadius: 24, padding: 20 }}>
+                  <table>
                   <thead>
                     <tr>
                       <th style={{ width: 50 }}>#</th><th>Equipa</th>
@@ -198,8 +234,14 @@ export default function PublicTournament() {
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         {roundMatches.map(m => (
-                          <div key={m._id} className="match-card animate-slide-up" style={{ padding: 0, overflow: 'hidden' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', padding: '20px 32px', gap: 24, flexWrap: 'wrap' }}>
+                          <div key={m._id} style={{ position: 'relative' }}>
+                            <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }}>
+                              <button onClick={() => captureImage(`print-match-${m._id}`, `Jogo_${m.homeTeam?.name}_vs_${m.awayTeam?.name}`)} className="btn btn-secondary btn-sm" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', padding: 4 }} title="Guardar Resultado">
+                                <Camera size={16} />
+                              </button>
+                            </div>
+                            <div id={`print-match-${m._id}`} className="match-card animate-slide-up" style={{ padding: 0, overflow: 'hidden' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', padding: '20px 32px', gap: 24, flexWrap: 'wrap' }}>
                               <div style={{ flex: 1, textAlign: 'right', fontWeight: 800, fontSize: 18 }}>{m.homeTeam?.name}</div>
                               
                               <div style={{ 
