@@ -1,8 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save } from 'lucide-react';
+import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save, MapPin, Edit2, Camera } from 'lucide-react';
+import MatchShareModal from '../components/MatchShareModal';
 
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
 const statusBadge = { draft: 'badge-gray', registration: 'badge-blue', active: 'badge-green', finished: 'badge-yellow' };
@@ -17,7 +16,9 @@ export default function TournamentDetail() {
   const [standings, setStandings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showTeamModal, setShowTeamModal] = useState(false);
+  const [editTeamData, setEditTeamData] = useState(null);
   const [showResultModal, setShowResultModal] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(null);
   const [generatingCalendar, setGeneratingCalendar] = useState(false);
 
   const load = useCallback(async () => {
@@ -111,7 +112,12 @@ export default function TournamentDetail() {
 
         {/* Tabs */}
         <div className="tabs" style={{ marginBottom: 28 }}>
-          {[['teams', <Users size={14} />, 'Equipas'], ['calendar', <Calendar size={14} />, 'Calendário'], ['standings', <BarChart2 size={14} />, 'Classificação']].map(([key, icon, label]) => (
+          {[
+            ['teams', <Users size={14} />, 'Equipas'],
+            ['calendar', <Calendar size={14} />, 'Calendário'],
+            ['standings', <BarChart2 size={14} />, 'Classificação'],
+            ['info', <MapPin size={14} />, 'Localização']
+          ].map(([key, icon, label]) => (
             <button key={key} className={`tab ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)}>
               {icon} {label}
             </button>
@@ -148,12 +154,18 @@ export default function TournamentDetail() {
                           <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{t.captainName || 'Sem capitão'}</div>
                         </div>
                       </div>
-                      <button className="btn btn-danger btn-sm" style={{ padding: '6px 8px' }} onClick={async () => {
-                        if (!confirm(`Eliminar equipa "${t.name}"?`)) return;
-                        await api.delete(`/tournaments/${id}/teams/${t._id}`);
-                        setTeams(prev => prev.filter(x => x._id !== t._id));
-                        toast.success('Equipa eliminada.');
-                      }}><Trash2 size={13} /></button>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => {
+                          setEditTeamData(t);
+                          setShowTeamModal(true);
+                        }}><Edit2 size={13} /></button>
+                        <button className="btn btn-danger btn-sm" style={{ padding: '6px 8px' }} onClick={async () => {
+                          if (!confirm(`Eliminar equipa "${t.name}"?`)) return;
+                          await api.delete(`/tournaments/${id}/teams/${t._id}`);
+                          setTeams(prev => prev.filter(x => x._id !== t._id));
+                          toast.success('Equipa eliminada.');
+                        }}><Trash2 size={13} /></button>
+                      </div>
                     </div>
                     <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
                       <span className="badge badge-gray">👥 {t.players?.length || 0} jogadores</span>
@@ -230,6 +242,9 @@ export default function TournamentDetail() {
                               <div className="match-team-name">{m.awayTeam?.name || '—'}</div>
                             </div>
                             <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                              <button className="btn btn-secondary btn-sm" style={{ padding: '8px' }} title="Partilhar Jogo" onClick={() => setShowShareModal(m)}>
+                                <Camera size={14} />
+                              </button>
                               {m.status !== 'finished' ? (
                                 <button className="btn btn-primary btn-sm" onClick={() => setShowResultModal(m)}>Resultado</button>
                               ) : (
@@ -299,22 +314,75 @@ export default function TournamentDetail() {
             )}
           </div>
         )}
+
+        {/* INFO/MAP TAB */}
+        {tab === 'info' && (
+          <div className="animate-fade-in">
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>Localização do Torneio</h2>
+            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div style={{ padding: 20, borderBottom: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                  <MapPin size={18} color="var(--green)" />
+                  <span style={{ fontWeight: 700 }}>{tournament.location}</span>
+                </div>
+                <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginLeft: 28 }}>{tournament.neighborhood}, Luanda</p>
+              </div>
+              <div style={{ width: '100%', height: 400, background: 'var(--bg-secondary)' }}>
+                <iframe
+                  title="Tournament Location"
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  style={{ border: 0 }}
+                  src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY_HERE&q=${encodeURIComponent(tournament.location + ' ' + tournament.neighborhood)}`}
+                  allowFullScreen
+                ></iframe>
+                {/* Nota: Substituir YOUR_API_KEY_HERE por uma chave real ou usar Embed sem chave (limite menor) */}
+                <div style={{ padding: 20, textAlign: 'center', fontSize: 13, color: 'var(--text-muted)' }}>
+                  💡 Dica: Se o mapa não carregar, verifica o nome do campo nas configurações.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* ADD TEAM MODAL */}
-      {showTeamModal && <AddTeamModal tournamentId={id} onClose={() => setShowTeamModal(false)} onSaved={(team) => { setTeams(prev => [...prev, team]); setShowTeamModal(false); }} />}
+      {/* ADD/EDIT TEAM MODAL */}
+      {showTeamModal && (
+        <AddTeamModal
+          tournamentId={id}
+          initialData={editTeamData}
+          onClose={() => { setShowTeamModal(false); setEditTeamData(null); }}
+          onSaved={(team) => {
+            if (editTeamData) {
+              setTeams(prev => prev.map(x => x._id === team._id ? team : x));
+            } else {
+              setTeams(prev => [...prev, team]);
+            }
+            setShowTeamModal(false);
+            setEditTeamData(null);
+          }}
+        />
+      )}
 
       {/* RESULT MODAL */}
       {showResultModal && <ResultModal match={showResultModal} tournamentId={id} onClose={() => setShowResultModal(null)} onSaved={() => { setShowResultModal(null); load(); }} />}
+
+      {/* SHARE MODAL */}
+      {showShareModal && <MatchShareModal match={showShareModal} tournament={tournament} onClose={() => setShowShareModal(null)} />}
     </div>
   );
 }
 
-function AddTeamModal({ tournamentId, onClose, onSaved }) {
-  const [form, setForm] = useState({ name: '', captainName: '', contact: '', color: '#00C853', logo: '', players: [] });
+function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
+  const [form, setForm] = useState(initialData || { name: '', captainName: '', contact: '', color: '#00C853', logo: '', players: [] });
   const [playerName, setPlayerName] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (initialData) setForm(initialData);
+  }, [initialData]);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -342,10 +410,16 @@ function AddTeamModal({ tournamentId, onClose, onSaved }) {
     if (!form.name.trim()) return toast.error('Nome da equipa obrigatório.');
     setLoading(true);
     try {
-      const res = await api.post(`/tournaments/${tournamentId}/teams`, form);
-      toast.success('Equipa adicionada!');
+      let res;
+      if (initialData) {
+        res = await api.put(`/tournaments/${tournamentId}/teams/${initialData._id}`, form);
+        toast.success('Equipa atualizada!');
+      } else {
+        res = await api.post(`/tournaments/${tournamentId}/teams`, form);
+        toast.success('Equipa adicionada!');
+      }
       onSaved(res.data);
-    } catch (err) { toast.error(err.response?.data?.message || 'Erro ao adicionar equipa.'); }
+    } catch (err) { toast.error(err.response?.data?.message || 'Erro ao guardar equipa.'); }
     finally { setLoading(false); }
   };
 
@@ -353,7 +427,7 @@ function AddTeamModal({ tournamentId, onClose, onSaved }) {
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal">
         <div className="modal-header">
-          <h2 className="modal-title">Adicionar Equipa</h2>
+          <h2 className="modal-title">{initialData ? 'Editar Equipa' : 'Adicionar Equipa'}</h2>
           <button className="modal-close" onClick={onClose}><X size={18} /></button>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
