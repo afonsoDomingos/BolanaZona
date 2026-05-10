@@ -140,7 +140,9 @@ export default function TournamentDetail() {
                   <div key={t._id} className="card">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                        <div style={{ width: 40, height: 40, borderRadius: 10, background: t.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>👕</div>
+                        <div style={{ width: 40, height: 40, borderRadius: 10, background: t.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                          {t.logo ? <img src={t.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                        </div>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: 15 }}>{t.name}</div>
                           <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{t.captainName || 'Sem capitão'}</div>
@@ -273,7 +275,9 @@ export default function TournamentDetail() {
                         <td style={{ fontWeight: 700 }}>{i + 1}</td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <div style={{ width: 28, height: 28, borderRadius: 8, background: s.team.color || 'var(--green-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>👕</div>
+                            <div style={{ width: 28, height: 28, borderRadius: 8, background: s.team.color || 'var(--green-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', fontSize: 14 }}>
+                              {s.team.logo ? <img src={s.team.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                            </div>
                             <span style={{ fontWeight: 600 }}>{s.team.name}</span>
                           </div>
                         </td>
@@ -307,9 +311,24 @@ export default function TournamentDetail() {
 }
 
 function AddTeamModal({ tournamentId, onClose, onSaved }) {
-  const [form, setForm] = useState({ name: '', captainName: '', contact: '', color: '#00C853', players: [] });
+  const [form, setForm] = useState({ name: '', captainName: '', contact: '', color: '#00C853', logo: '', players: [] });
   const [playerName, setPlayerName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('image', file);
+    setUploading(true);
+    try {
+      const res = await api.post('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setForm(prev => ({ ...prev, logo: res.data.url }));
+      toast.success('Logotipo carregado!');
+    } catch { toast.error('Erro ao carregar imagem.'); }
+    finally { setUploading(false); }
+  };
 
   const addPlayer = () => {
     if (!playerName.trim()) return;
@@ -350,6 +369,21 @@ function AddTeamModal({ tournamentId, onClose, onSaved }) {
             <div className="form-group">
               <label className="form-label">Contacto</label>
               <input className="form-input" placeholder="Telemóvel" value={form.contact} onChange={e => setForm(p => ({ ...p, contact: e.target.value }))} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Logotipo da Equipa</label>
+            <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+              <div style={{ width: 64, height: 64, borderRadius: 14, background: form.color || 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                {form.logo ? <img src={form.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+              </div>
+              <div style={{ flex: 1 }}>
+                <input type="file" id="logo-upload" style={{ display: 'none' }} accept="image/*" onChange={handleFileUpload} />
+                <label htmlFor="logo-upload" className="btn btn-secondary btn-sm" style={{ cursor: 'pointer' }}>
+                  {uploading ? 'A carregar...' : 'Escolher Foto'}
+                </label>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>PNG, JPG até 5MB</p>
+              </div>
             </div>
           </div>
           <div className="form-group">

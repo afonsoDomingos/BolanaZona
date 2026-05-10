@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Trophy, LayoutDashboard, LogOut, LogIn, UserPlus } from 'lucide-react';
+import NotificationCenter from './NotificationCenter';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -31,6 +32,7 @@ export default function Navbar() {
                   <Trophy size={15} style={{ display: 'inline', marginRight: 4 }} />
                   Torneios
                 </Link>
+                <NotificationCenter />
                 <button onClick={handleLogout} className="btn btn-secondary btn-sm" style={{ marginLeft: 8 }}>
                   <LogOut size={14} /> Sair
                 </button>

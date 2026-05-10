@@ -114,7 +114,9 @@ export default function PublicTournament() {
                     <tr key={s.team._id} className={i < 3 ? `rank-${i + 1}` : ''}>
                       <td style={{ fontWeight: 700 }}>{i + 1}</td>
                       <td><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ width: 26, height: 26, borderRadius: 6, background: s.team.color || '#00C853', opacity: 0.8 }} />
+                        <div style={{ width: 26, height: 26, borderRadius: 6, background: s.team.color || '#00C853', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {s.team.logo ? <img src={s.team.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : null}
+                        </div>
                         <span style={{ fontWeight: 600 }}>{s.team.name}</span>
                       </div></td>
                       <td>{s.played}</td>
@@ -193,7 +195,9 @@ export default function PublicTournament() {
               {teams.map(t => (
                 <div key={t._id} className="card">
                   <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 10, background: t.color || '#00C853', opacity: 0.8 }} />
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: t.color || '#00C853', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {t.logo ? <img src={t.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                    </div>
                     <div>
                       <div style={{ fontWeight: 700 }}>{t.name}</div>
                       <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>👥 {t.players?.length || 0} jogadores</div>

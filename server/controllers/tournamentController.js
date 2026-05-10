@@ -1,6 +1,7 @@
-const Tournament = require('../models/Tournament');
 const Team = require('../models/Team');
 const Match = require('../models/Match');
+const Tournament = require('../models/Tournament');
+const { create: createNotification } = require('./notificationController');
 
 // GET /api/tournaments
 exports.getAll = async (req, res) => {
@@ -45,6 +46,13 @@ exports.getPublic = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     const tournament = await Tournament.create({ ...req.body, createdBy: req.user._id });
+    await createNotification(
+      req.user._id,
+      'Torneio Criado 🏆',
+      `O teu torneio "${tournament.name}" foi criado com sucesso.`,
+      'success',
+      `/dashboard/tournaments/${tournament._id}`
+    );
     res.status(201).json(tournament);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -142,6 +150,13 @@ exports.generateCalendar = async (req, res) => {
     }
 
     const created = await Match.insertMany(matches);
+    await createNotification(
+      req.user._id,
+      'Calendário Gerado 📅',
+      `Foram gerados ${created.length} jogos para o torneio "${tournament.name}".`,
+      'info',
+      `/dashboard/tournaments/${tournament._id}`
+    );
     res.status(201).json({ message: `${created.length} jogos gerados.`, matches: created });
   } catch (err) {
     res.status(500).json({ message: err.message });
