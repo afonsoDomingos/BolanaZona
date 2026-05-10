@@ -325,15 +325,17 @@ export default function TournamentDetail() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                               <div style={{ flex: 1, textAlign: 'right', fontWeight: 700, fontSize: 14 }}>{m.homeTeam?.name || '—'}</div>
                               
-                              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: 8, minWidth: 80, textAlign: 'center' }}>
-                                {m.status === 'finished' ? (
-                                  <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</div>
-                                ) : (
-                                  <div style={{ fontSize: 13, fontWeight: 600 }}>
-                                    {m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : '--:--'}
-                                  </div>
-                                )}
-                              </div>
+                                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: 8, minWidth: 80, textAlign: 'center' }}>
+                                  {m.status === 'finished' ? (
+                                    <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</div>
+                                  ) : m.status === 'cancelled' ? (
+                                    <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--red)' }}>CANCELADO</div>
+                                  ) : (
+                                    <div style={{ fontSize: 13, fontWeight: 600 }}>
+                                      {m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                                    </div>
+                                  )}
+                                </div>
 
                               <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 14 }}>{m.awayTeam?.name || '—'}</div>
                               
@@ -743,6 +745,7 @@ function MatchScheduleModal({ match, tournamentId, onClose, onSaved }) {
   const [time, setTime] = useState(match.date ? new Date(match.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }).replace('h', ':') : '');
   const [location, setLocation] = useState(match.location || '');
   const [referee, setReferee] = useState(match.referee || '');
+  const [status, setStatus] = useState(match.status || 'scheduled');
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
@@ -750,11 +753,11 @@ function MatchScheduleModal({ match, tournamentId, onClose, onSaved }) {
     try {
       const dateTime = date && time ? new Date(`${date}T${time}`) : null;
       await api.put(`/tournaments/${tournamentId}/matches/${match._id}`, {
-        date: dateTime, location, referee
+        date: dateTime, location, referee, status
       });
-      toast.success('Jogo agendado!');
+      toast.success('Jogo atualizado!');
       onSaved();
-    } catch { toast.error('Erro ao agendar jogo.'); }
+    } catch { toast.error('Erro ao atualizar jogo.'); }
     finally { setLoading(false); }
   };
 
@@ -762,11 +765,20 @@ function MatchScheduleModal({ match, tournamentId, onClose, onSaved }) {
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ maxWidth: 400 }}>
         <div className="modal-header">
-          <h2 className="modal-title">Agendar Jogo</h2>
+          <h2 className="modal-title">Agendar / Estado do Jogo</h2>
           <button className="modal-close" onClick={onClose}><X size={18} /></button>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <p style={{ textAlign: 'center', fontWeight: 700, fontSize: 14 }}>{match.homeTeam?.name} vs {match.awayTeam?.name}</p>
+          
+          <div className="form-group">
+            <label className="form-label">Estado da Partida</label>
+            <select className="form-select" value={status} onChange={e => setStatus(e.target.value)}>
+              <option value="scheduled">📅 Agendado</option>
+              <option value="cancelled">🚫 Cancelado / Anulado</option>
+            </select>
+          </div>
+
           <div className="form-grid form-grid-2">
             <div className="form-group">
               <label className="form-label">Data</label>
