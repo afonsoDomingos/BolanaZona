@@ -30,7 +30,7 @@ export default function Explore() {
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <h1 className="font-syne" style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 800, marginBottom: 16 }}>
             Explorar <span className="gradient-text">Torneios</span>
-          </div>
+          </h1>
           <p style={{ color: 'var(--text-secondary)', maxWidth: 600, margin: '0 auto 32px' }}>
             Descobre os melhores torneios de futebol na tua zona. Acompanha classificações, jogos e resultados em tempo real.
           </p>
