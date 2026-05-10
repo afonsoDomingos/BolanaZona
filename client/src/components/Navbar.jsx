@@ -25,13 +25,13 @@ export default function Navbar() {
 
           <div className="navbar-nav">
             <Link to="/explore" className={`nav-link ${isActive('/explore') ? 'active' : ''}`}>
-              Explorar
+              Torneios
             </Link>
             <Link to="/talents" className={`nav-link ${isActive('/talents') ? 'active' : ''}`}>
               Talentos
             </Link>
-            <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} title="Loja">
-              <ShoppingBag size={18} />
+            <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <ShoppingBag size={18} /> Loja
             </Link>
 
             {user ? (

@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import { ShoppingBag, Tag, Filter, Search, ShoppingCart, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Tag, Filter, Search, ShoppingCart, ArrowRight, Edit, Plus } from 'lucide-react';
 import api from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+import ProductEditModal from '../components/ProductEditModal';
 
 const categories = [
   { id: '', name: 'Todos', icon: '⚽' },
@@ -18,13 +19,20 @@ export default function Store() {
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('');
   const [search, setSearch] = useState('');
+  const [showEditModal, setShowEditModal] = useState(null);
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
 
-  useEffect(() => {
+  const loadProducts = () => {
     setLoading(true);
     api.get(`/products?category=${category}`)
       .then(res => setProducts(res.data))
       .catch(() => {})
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadProducts();
   }, [category]);
 
   const filtered = products.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
@@ -49,6 +57,12 @@ export default function Store() {
           <p style={{ color: 'var(--text-secondary)', maxWidth: 600, margin: '0 auto 32px' }}>
             Artigos de alta qualidade, personalização para equipas e equipamentos oficiais para o teu torneio.
           </p>
+
+          {isAdmin && (
+            <button className="btn btn-primary" style={{ margin: '0 auto 32px', borderRadius: 100 }} onClick={() => setShowEditModal({})}>
+              <Plus size={18} /> Adicionar Novo Produto
+            </button>
+          )}
 
           <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ position: 'relative' }}>
@@ -92,8 +106,15 @@ export default function Store() {
               <div key={p._id} className="card animate-slide-up" style={{ padding: 0, overflow: 'hidden', animationDelay: `${i * 0.05}s`, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ height: 200, overflow: 'hidden', position: 'relative' }}>
                   <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '4px 12px', borderRadius: 100, fontSize: 12, fontWeight: 700 }}>
-                    {p.category.toUpperCase()}
+                  <div style={{ position: 'absolute', top: 12, right: 12, display: 'flex', gap: 8 }}>
+                    {isAdmin && (
+                      <button onClick={() => setShowEditModal(p)} style={{ background: 'var(--blue)', color: '#fff', border: 'none', width: 32, height: 32, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
+                        <Edit size={14} />
+                      </button>
+                    )}
+                    <div style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '4px 12px', borderRadius: 100, fontSize: 12, fontWeight: 700 }}>
+                      {p.category.toUpperCase()}
+                    </div>
                   </div>
                 </div>
                 
@@ -116,6 +137,14 @@ export default function Store() {
           </div>
         )}
       </div>
+
+      {showEditModal && (
+        <ProductEditModal 
+          product={showEditModal._id ? showEditModal : null} 
+          onClose={() => setShowEditModal(null)} 
+          onSaved={() => { setShowEditModal(null); loadProducts(); }} 
+        />
+      )}
     </div>
   );
 }
