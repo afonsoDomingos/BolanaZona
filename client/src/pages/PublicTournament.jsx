@@ -181,6 +181,7 @@ export default function PublicTournament() {
               </div>
             </div>
           </div>
+          </div>
         )}
 
         {/* Navigation Tabs */}
@@ -240,6 +241,7 @@ export default function PublicTournament() {
                     ))}
                   </tbody>
                 </table>
+              </div>
               </div>
             )
           )}
@@ -314,6 +316,7 @@ export default function PublicTournament() {
                               </div>
                             )}
                           </div>
+                        </div>
                         ))}
                       </div>
                     </div>
