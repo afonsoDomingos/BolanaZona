@@ -45,7 +45,7 @@ export default function Store() {
 
   const finalizePurchase = (product, leadInfo) => {
     const message = `Olá! Meu nome é ${leadInfo.name}. Tenho interesse no produto "${product.name}" que vi na loja Bola na Zona.`;
-    window.open(`https://wa.me/244923000000?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/258847877405?text=${encodeURIComponent(message)}`, '_blank');
     setShowLeadModal(null);
   };
 
