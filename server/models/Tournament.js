@@ -14,6 +14,7 @@ const tournamentSchema = new mongoose.Schema({
   startDate: { type: Date },
   endDate: { type: Date },
   prize: { type: String, default: '' },
+  city: { type: String, default: 'Luanda' },
   logo: { type: String, default: '' },
   coverImage: { type: String, default: '' },
   winner: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },

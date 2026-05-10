@@ -11,6 +11,7 @@ const teamSchema = new mongoose.Schema({
   tournament: { type: mongoose.Schema.Types.ObjectId, ref: 'Tournament', required: true },
   captain: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   captainName: { type: String, default: '' },
+  coachName: { type: String, default: '' },
   contact: { type: String, default: '' },
   players: [playerSchema],
   color: { type: String, default: '#00C853' },

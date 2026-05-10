@@ -16,7 +16,7 @@ export default function TournamentNew() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    name: '', neighborhood: '', location: '', description: '',
+    name: '', neighborhood: '', location: '', city: 'Luanda', description: '',
     format: 'groups', maxTeams: 8, startDate: '', prize: '',
   });
 
@@ -64,7 +64,11 @@ export default function TournamentNew() {
                 <label className="form-label">Nome do Torneio *</label>
                 <input className="form-input" placeholder="Ex: Copa do Bairro 2026" value={form.name} onChange={e => set('name', e.target.value)} required />
               </div>
-              <div className="form-grid form-grid-2">
+              <div className="form-grid form-grid-3">
+                <div className="form-group">
+                  <label className="form-label">Cidade *</label>
+                  <input className="form-input" placeholder="Ex: Luanda" value={form.city} onChange={e => set('city', e.target.value)} required />
+                </div>
                 <div className="form-group">
                   <label className="form-label">Bairro *</label>
                   <input className="form-input" placeholder="Ex: Maianga" value={form.neighborhood} onChange={e => set('neighborhood', e.target.value)} required />

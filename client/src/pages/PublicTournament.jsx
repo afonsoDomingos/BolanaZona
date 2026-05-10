@@ -53,7 +53,7 @@ export default function PublicTournament() {
                 <div style={{ width: 56, height: 56, borderRadius: 16, background: 'var(--green-subtle)', border: '2px solid rgba(0,200,83,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>⚽</div>
                 <div>
                   <h1 className="font-syne" style={{ fontSize: 'clamp(22px, 5vw, 36px)', fontWeight: 800 }}>{tournament.name}</h1>
-                  <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>📍 {tournament.neighborhood} · 🏟️ {tournament.location}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>📍 {tournament.neighborhood}, {tournament.city} · 🏟️ {tournament.location}</p>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -210,8 +210,26 @@ export default function PublicTournament() {
                             {m.status === 'finished' ? 'Terminado' : 'Agendado'}
                           </span>
                         </div>
-                      ))}
-                    </div>
+                        {/* Match Events & Referee */}
+                        <div style={{ padding: '0 24px 16px', display: 'flex', flexDirection: 'column', gap: 12, marginTop: -8 }}>
+                          {m.referee && (
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                              🏁 Árbitro: {m.referee}
+                            </div>
+                          )}
+                          {m.events && m.events.length > 0 && (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                              {m.events.map((e, i) => (
+                                <div key={i} style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.03)', padding: '2px 8px', borderRadius: 6 }}>
+                                  <span>{e.type === 'goal' ? '⚽' : e.type === 'yellow_card' ? '🟨' : '🟥'}</span>
+                                  <span style={{ fontWeight: 600 }}>{e.playerName}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}</div>
                   </div>
                 );
               });
@@ -231,12 +249,15 @@ export default function PublicTournament() {
                     <div style={{ width: 40, height: 40, borderRadius: 10, background: t.color || '#00C853', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {t.logo ? <img src={t.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                     </div>
-                    <div>
-                      <div style={{ fontWeight: 700 }}>{t.name}</div>
-                      <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>👥 {t.players?.length || 0} jogadores</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, fontSize: 16 }}>{t.name}</div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Treinador: {t.coachName || '—'}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600 }}>{t.captainName || 'Sem Capitão'}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Capitão</div>
                     </div>
                   </div>
-                  {t.captainName && <div style={{ marginTop: 10, fontSize: 13, color: 'var(--text-secondary)' }}>🏅 Capitão: {t.captainName}</div>}
                 </div>
               ))}
             </div>

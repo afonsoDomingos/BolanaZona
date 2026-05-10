@@ -369,7 +369,7 @@ export default function TournamentDetail() {
       )}
 
       {/* RESULT MODAL */}
-      {showResultModal && <ResultModal match={showResultModal} tournamentId={id} onClose={() => setShowResultModal(null)} onSaved={() => { setShowResultModal(null); load(); }} />}
+      {showResultModal && <ResultModal match={showResultModal} tournamentId={id} teams={teams} onClose={() => setShowResultModal(null)} onSaved={() => { setShowResultModal(null); load(); }} />}
 
       {/* SHARE MODAL */}
       {showShareModal && <MatchShareModal match={showShareModal} tournament={tournament} onClose={() => setShowShareModal(null)} />}
@@ -439,7 +439,7 @@ function FinishTournamentModal({ teams, onClose, onConfirm }) {
 }
 
 function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
-  const [form, setForm] = useState(initialData || { name: '', captainName: '', contact: '', color: '#00C853', logo: '', players: [] });
+  const [form, setForm] = useState(initialData || { name: '', captainName: '', coachName: '', contact: '', color: '#00C853', logo: '', players: [] });
   const [playerName, setPlayerName] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -499,10 +499,14 @@ function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
             <label className="form-label">Nome da Equipa *</label>
             <input className="form-input" placeholder="Ex: FC Maianga" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
           </div>
-          <div className="form-grid form-grid-2">
+          <div className="form-grid form-grid-3">
             <div className="form-group">
               <label className="form-label">Capitão</label>
               <input className="form-input" placeholder="Nome do capitão" value={form.captainName} onChange={e => setForm(p => ({ ...p, captainName: e.target.value }))} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Treinador</label>
+              <input className="form-input" placeholder="Nome do treinador" value={form.coachName} onChange={e => setForm(p => ({ ...p, coachName: e.target.value }))} />
             </div>
             <div className="form-group">
               <label className="form-label">Contacto</label>
@@ -560,48 +564,124 @@ function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
   );
 }
 
-function ResultModal({ match, tournamentId, onClose, onSaved }) {
+function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
   const [home, setHome] = useState(match.homeScore ?? '');
   const [away, setAway] = useState(match.awayScore ?? '');
+  const [referee, setReferee] = useState(match.referee || '');
+  const [events, setEvents] = useState(match.events || []);
   const [loading, setLoading] = useState(false);
+
+  // Event form state
+  const [newEvent, setNewEvent] = useState({ type: 'goal', team: match.homeTeam._id, playerName: '' });
+
+  const homePlayers = teams.find(t => t._id === match.homeTeam._id)?.players || [];
+  const awayPlayers = teams.find(t => t._id === match.awayTeam._id)?.players || [];
+  const currentTeamPlayers = newEvent.team === match.homeTeam._id ? homePlayers : awayPlayers;
+
+  const handleAddEvent = () => {
+    if (!newEvent.playerName) return toast.error('Seleciona ou escreve o nome do jogador.');
+    setEvents([...events, { ...newEvent, id: Date.now() }]);
+    setNewEvent({ ...newEvent, playerName: '' });
+  };
+
+  const handleRemoveEvent = (id) => setEvents(events.filter(e => e.id !== id && e._id !== id));
 
   const handleSave = async () => {
     if (home === '' || away === '') return toast.error('Insere os dois resultados.');
     setLoading(true);
     try {
       await api.put(`/tournaments/${tournamentId}/matches/${match._id}/result`, {
-        homeScore: Number(home), awayScore: Number(away),
+        homeScore: Number(home), awayScore: Number(away), events, referee
       });
-      toast.success('Resultado guardado!');
+      toast.success('Resultado e eventos guardados!');
       onSaved();
     } catch { toast.error('Erro ao guardar resultado.'); }
     finally { setLoading(false); }
   };
 
+  const eventIcons = { goal: '⚽', yellow_card: '🟨', red_card: '🟥' };
+  const eventLabels = { goal: 'Golo', yellow_card: 'Cartão Amarelo', red_card: 'Cartão Vermelho' };
+
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal" style={{ maxWidth: 420 }}>
+      <div className="modal" style={{ maxWidth: 500 }}>
         <div className="modal-header">
-          <h2 className="modal-title">Inserir Resultado</h2>
+          <h2 className="modal-title">Registo de Jogo</h2>
           <button className="modal-close" onClick={onClose}><X size={18} /></button>
         </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>{match.roundName}</div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, marginBottom: 28 }}>
+        
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, marginBottom: 20 }}>
             <div style={{ flex: 1, textAlign: 'right' }}>
-              <div style={{ fontWeight: 700, marginBottom: 12 }}>{match.homeTeam?.name}</div>
+              <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 14 }}>{match.homeTeam?.name}</div>
               <input type="number" min="0" className="score-input" value={home} onChange={e => setHome(e.target.value)} />
             </div>
-            <div style={{ fontWeight: 700, color: 'var(--text-muted)', fontSize: 22 }}>×</div>
+            <div style={{ fontWeight: 700, color: 'var(--text-muted)', fontSize: 20 }}>×</div>
             <div style={{ flex: 1, textAlign: 'left' }}>
-              <div style={{ fontWeight: 700, marginBottom: 12 }}>{match.awayTeam?.name}</div>
+              <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 14 }}>{match.awayTeam?.name}</div>
               <input type="number" min="0" className="score-input" value={away} onChange={e => setAway(e.target.value)} />
             </div>
           </div>
-          <button className="btn btn-primary" onClick={handleSave} disabled={loading} style={{ width: '100%', justifyContent: 'center' }}>
-            {loading ? 'A guardar...' : <><Save size={15} /> Guardar Resultado</>}
-          </button>
+
+          <div className="form-group" style={{ marginBottom: 24 }}>
+            <label className="form-label">Árbitro da Partida</label>
+            <input className="form-input" placeholder="Nome do árbitro..." value={referee} onChange={e => setReferee(e.target.value)} />
+          </div>
+
+          <div className="divider" style={{ margin: '24px 0' }} />
+
+          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', letterSpacing: 0.5 }}>Eventos da Partida (Golos e Cartões)</h3>
+          
+          <div style={{ background: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 12, border: '1px solid var(--border)', marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+              <select className="form-select" value={newEvent.type} onChange={e => setNewEvent({...newEvent, type: e.target.value})}>
+                <option value="goal">⚽ Golo</option>
+                <option value="yellow_card">🟨 Cartão Amarelo</option>
+                <option value="red_card">🟥 Cartão Vermelho</option>
+              </select>
+              <select className="form-select" value={newEvent.team} onChange={e => setNewEvent({...newEvent, team: e.target.value})}>
+                <option value={match.homeTeam._id}>{match.homeTeam.name}</option>
+                <option value={match.awayTeam._id}>{match.awayTeam.name}</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <input 
+                list="players-list"
+                className="form-input" 
+                placeholder="Nome do jogador..." 
+                value={newEvent.playerName} 
+                onChange={e => setNewEvent({...newEvent, playerName: e.target.value})}
+              />
+              <datalist id="players-list">
+                {currentTeamPlayers.map((p, i) => <option key={i} value={p.name} />)}
+              </datalist>
+              <button className="btn btn-primary btn-sm" onClick={handleAddEvent}>Adicionar</button>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 200, overflowY: 'auto', paddingRight: 4 }}>
+            {events.length === 0 ? (
+              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, padding: '10px 0' }}>Nenhum evento registado.</p>
+            ) : (
+              events.map((e, i) => (
+                <div key={e.id || e._id || i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.02)', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 16 }}>{eventIcons[e.type]}</span>
+                    <div>
+                      <span style={{ fontWeight: 700, fontSize: 14 }}>{e.playerName}</span>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>({e.team === match.homeTeam._id ? 'Casa' : 'Fora'})</span>
+                    </div>
+                  </div>
+                  <button onClick={() => handleRemoveEvent(e.id || e._id)} style={{ background: 'none', color: 'var(--red)', opacity: 0.6 }}><X size={14} /></button>
+                </div>
+              ))
+            )}
+          </div>
         </div>
+
+        <button className="btn btn-primary" onClick={handleSave} disabled={loading} style={{ width: '100%', justifyContent: 'center', height: 48 }}>
+          {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><Save size={16} /> Finalizar e Guardar Tudo</>}
+        </button>
       </div>
     </div>
   );

@@ -12,10 +12,10 @@ exports.getByTournament = async (req, res) => {
 
 exports.updateResult = async (req, res) => {
   try {
-    const { homeScore, awayScore } = req.body;
+    const { homeScore, awayScore, events, referee } = req.body;
     const match = await Match.findByIdAndUpdate(
       req.params.id,
-      { homeScore, awayScore, status: 'finished', reportedBy: req.user._id },
+      { homeScore, awayScore, events, referee, status: 'finished', reportedBy: req.user._id },
       { new: true }
     ).populate('homeTeam', 'name color').populate('awayTeam', 'name color');
     if (!match) return res.status(404).json({ message: 'Jogo não encontrado.' });
