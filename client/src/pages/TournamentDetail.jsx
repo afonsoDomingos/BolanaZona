@@ -62,6 +62,23 @@ export default function TournamentDetail() {
     } catch { toast.error('Erro ao atualizar estado.'); }
   };
 
+  const handleApproveTeam = async (teamId) => {
+    try {
+      await api.put(`/teams/${teamId}`, { status: 'approved' });
+      toast.success('Equipa aprovada! 🎉');
+      load();
+    } catch { toast.error('Erro ao aprovar equipa.'); }
+  };
+
+  const handleRejectTeam = async (teamId) => {
+    if (!window.confirm('Rejeitar esta inscrição?')) return;
+    try {
+      await api.delete(`/teams/${teamId}`);
+      toast.success('Inscrição rejeitada.');
+      load();
+    } catch { toast.error('Erro ao rejeitar equipa.'); }
+  };
+
   const shareUrl = `${window.location.origin}/t/${tournament?.shareCode}`;
 
   const copyShare = () => {
@@ -150,22 +167,49 @@ export default function TournamentDetail() {
         {/* TEAMS TAB */}
         {tab === 'teams' && (
           <div>
+            {/* Pending Teams Section */}
+            {teams.filter(t => t.status === 'pending').length > 0 && (
+              <div style={{ marginBottom: 32 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: '#f59e0b', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  ⚠️ Inscrições Pendentes ({teams.filter(t => t.status === 'pending').length})
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+                  {teams.filter(t => t.status === 'pending').map(t => (
+                    <div key={t._id} className="card" style={{ border: '1px solid rgba(245, 158, 11, 0.3)', background: 'rgba(245, 158, 11, 0.05)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 16 }}>{t.name}</div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>👤 {t.captainName} · 📞 {t.contact}</div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>📋 {t.players?.length} jogadores</div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button className="btn btn-primary btn-sm" onClick={() => handleApproveTeam(t._id)} style={{ padding: '6px 12px' }}>Aprovar</button>
+                          <button className="btn btn-secondary btn-sm" onClick={() => handleRejectTeam(t._id)} style={{ color: 'var(--red)' }}><Trash2 size={14} /></button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="divider" style={{ margin: '32px 0' }} />
+              </div>
+            )}
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 700 }}>Equipas ({teams.length}/{tournament.maxTeams})</h2>
-              {teams.length < tournament.maxTeams && (
+              <h2 style={{ fontSize: 18, fontWeight: 700 }}>Equipas Confirmadas ({teams.filter(t => t.status === 'approved').length}/{tournament.maxTeams})</h2>
+              {teams.filter(t => t.status === 'approved').length < tournament.maxTeams && (
                 <button className="btn btn-primary btn-sm" onClick={() => setShowTeamModal(true)}><Plus size={14} /> Adicionar Equipa</button>
               )}
             </div>
-            {teams.length === 0 ? (
+            {teams.filter(t => t.status === 'approved').length === 0 ? (
               <div className="empty-state">
                 <div className="empty-state-icon"><Users size={48} strokeWidth={1} /></div>
-                <h3>Sem equipas ainda</h3>
-                <p style={{ marginBottom: 20 }}>Adiciona as equipas para começar</p>
+                <h3>Sem equipas confirmadas</h3>
+                <p style={{ marginBottom: 20 }}>Adiciona ou aprova equipas para começar</p>
                 <button className="btn btn-primary" onClick={() => setShowTeamModal(true)}><Plus size={16} /> Adicionar Equipa</button>
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-                {teams.map(t => (
+                {teams.filter(t => t.status === 'approved').map(t => (
                   <div key={t._id} className="card">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>

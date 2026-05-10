@@ -18,6 +18,7 @@ const teamSchema = new mongoose.Schema({
   logo: { type: String, default: '' },
   paymentStatus: { type: String, enum: ['pending', 'partial', 'paid'], default: 'pending' },
   amountPaid: { type: Number, default: 0 },
+  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'approved' },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });
 

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
-import { Trophy, Calendar, BarChart2, Users, Share2 } from 'lucide-react';
+import { Trophy, Calendar, BarChart2, Users, Share2, MapPin, X } from 'lucide-react';
+import TeamRegistrationModal from '../components/TeamRegistrationModal';
 
 const formatLabel = { groups: 'Fase de Grupos', knockout: 'Mata-mata', groups_knockout: 'Grupos + Mata-mata' };
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
@@ -12,6 +13,7 @@ export default function PublicTournament() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('standings');
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
@@ -72,8 +74,15 @@ export default function PublicTournament() {
                   💬 Entrar no Grupo
                 </a>
               )}
+              {tournament.status === 'registration' && tournament.allowPublicRegistration && (
+                <button onClick={() => setShowRegistrationModal(true)} className="btn btn-primary btn-sm">
+                  📝 Inscrever Equipa
+                </button>
+              )}
             </div>
           </div>
+
+          {showRegistrationModal && <TeamRegistrationModal tournament={tournament} onClose={() => setShowRegistrationModal(false)} />}
 
           {/* Hall of Fame / Winner Section */}
           {tournament.status === 'finished' && (

@@ -1,15 +1,39 @@
 const Team = require('../models/Team');
+const Tournament = require('../models/Tournament');
 
 exports.getByTournament = async (req, res) => {
   try {
-    const teams = await Team.find({ tournament: req.params.tournamentId });
+    const filter = { tournament: req.params.tournamentId };
+    // Se não houver user (rota pública), mostrar apenas aprovadas
+    if (!req.user) {
+      filter.status = 'approved';
+    }
+    const teams = await Team.find(filter);
     res.json(teams);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+exports.registerPublicTeam = async (req, res) => {
+  try {
+    const tournament = await Tournament.findOne({ shareCode: req.params.shareCode });
+    if (!tournament) return res.status(404).json({ message: 'Torneio não encontrado.' });
+    if (tournament.status !== 'registration' || !tournament.allowPublicRegistration) {
+      return res.status(403).json({ message: 'As inscrições para este torneio estão fechadas.' });
+    }
+
+    const team = await Team.create({ 
+      ...req.body, 
+      tournament: tournament._id, 
+      status: 'pending', 
+      createdBy: tournament.createdBy // Atribuímos ao dono do torneio para gestão
+    });
+    res.status(201).json({ message: 'Inscrição submetida com sucesso! Aguarda a aprovação do organizador.', team });
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
 exports.create = async (req, res) => {
   try {
-    const team = await Team.create({ ...req.body, tournament: req.params.tournamentId, createdBy: req.user._id });
+    const team = await Team.create({ ...req.body, tournament: req.params.tournamentId, status: 'approved', createdBy: req.user._id });
     res.status(201).json(team);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };

@@ -17,6 +17,7 @@ const tournamentSchema = new mongoose.Schema({
   city: { type: String, default: 'Luanda' },
   registrationFee: { type: Number, default: 0 },
   contactLink: { type: String, default: '' },
+  allowPublicRegistration: { type: Boolean, default: true },
   logo: { type: String, default: '' },
   coverImage: { type: String, default: '' },
   winner: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
