@@ -21,4 +21,8 @@ router.get('/:id/standings', getStandings);
 router.get('/:tournamentId/sponsor-proposals', sponsorCtrl.getByTournament);
 router.put('/sponsor-proposals/:id', sponsorCtrl.updateStatus);
 
+// Match management
+router.post('/:id/matches', require('../controllers/tournamentController').createMatch);
+router.delete('/:id/matches/:matchId', require('../controllers/tournamentController').removeMatch);
+
 module.exports = router;

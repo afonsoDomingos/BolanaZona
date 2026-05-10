@@ -241,3 +241,19 @@ function computeStandings(teams, matches) {
     b.points - a.points || (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst) || b.goalsFor - a.goalsFor
   );
 }
+
+exports.createMatch = async (req, res) => {
+  try {
+    const tournament = await Tournament.findById(req.params.id);
+    if (!tournament) return res.status(404).json({ message: 'Torneio não encontrado.' });
+    const match = await Match.create({ ...req.body, tournament: tournament._id, status: 'scheduled' });
+    res.status(201).json(match);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+exports.removeMatch = async (req, res) => {
+  try {
+    await Match.findByIdAndDelete(req.params.matchId);
+    res.json({ message: 'Jogo removido.' });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};

@@ -26,6 +26,7 @@ export default function TournamentDetail() {
   const [showFinishModal, setShowFinishModal] = useState(false);
   const [showEditMatchModal, setShowEditMatchModal] = useState(null);
   const [showEditTournamentModal, setShowEditTournamentModal] = useState(false);
+  const [showManualMatchModal, setShowManualMatchModal] = useState(false);
   const [generatingCalendar, setGeneratingCalendar] = useState(false);
   const { user: currentUser } = useAuth();
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
@@ -288,11 +289,16 @@ export default function TournamentDetail() {
         {/* CALENDAR TAB */}
         {tab === 'calendar' && (
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
               <h2 style={{ fontSize: 18, fontWeight: 700 }}>Calendário ({matches.length} jogos)</h2>
-              <button className="btn btn-secondary btn-sm" onClick={generateCalendar} disabled={generatingCalendar || teams.length < 2}>
-                <Calendar size={14} /> {matches.length > 0 ? 'Regenerar' : 'Gerar Calendário'}
-              </button>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button className="btn btn-secondary btn-sm" onClick={() => setShowManualMatchModal(true)}>
+                  <Plus size={14} /> Adicionar Jogo
+                </button>
+                <button className="btn btn-secondary btn-sm" onClick={generateCalendar} disabled={generatingCalendar || teams.length < 2}>
+                  <Calendar size={14} /> {matches.length > 0 ? 'Regenerar' : 'Gerar Calendário'}
+                </button>
+              </div>
             </div>
             {matches.length === 0 ? (
               <div className="empty-state">
@@ -533,6 +539,89 @@ export default function TournamentDetail() {
           }} 
         />
       )}
+
+      {/* MANUAL MATCH MODAL */}
+      {showManualMatchModal && (
+        <ManualMatchModal 
+          tournamentId={id} 
+          teams={teams.filter(t => t.status === 'approved')} 
+          onClose={() => setShowManualMatchModal(false)} 
+          onSaved={() => { setShowManualMatchModal(false); load(); }} 
+        />
+      )}
+    </div>
+  );
+}
+
+function ManualMatchModal({ tournamentId, teams, onClose, onSaved }) {
+  const [form, setForm] = useState({ homeTeam: '', awayTeam: '', round: 1, roundName: 'Jornada 1', date: '', location: '', referee: '' });
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    if (!form.homeTeam || !form.awayTeam) return toast.error('Seleciona as duas equipas.');
+    if (form.homeTeam === form.awayTeam) return toast.error('As equipas devem ser diferentes.');
+    
+    setLoading(true);
+    try {
+      await api.post(`/tournaments/${tournamentId}/matches`, form);
+      toast.success('Jogo adicionado!');
+      onSaved();
+    } catch { toast.error('Erro ao adicionar jogo.'); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{ maxWidth: 450 }}>
+        <div className="modal-header">
+          <h2 className="modal-title">Adicionar Jogo Manual ⚽</h2>
+          <button className="modal-close" onClick={onClose}><X size={18} /></button>
+        </div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="form-grid form-grid-2">
+            <div className="form-group">
+              <label className="form-label">Equipa Casa</label>
+              <select className="form-select" value={form.homeTeam} onChange={e => setForm({ ...form, homeTeam: e.target.value })}>
+                <option value="">Selecionar...</option>
+                {teams.map(t => <option key={t._id} value={t._id}>{t.name}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Equipa Fora</label>
+              <select className="form-select" value={form.awayTeam} onChange={e => setForm({ ...form, awayTeam: e.target.value })}>
+                <option value="">Selecionar...</option>
+                {teams.map(t => <option key={t._id} value={t._id}>{t.name}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="form-grid form-grid-2">
+            <div className="form-group">
+              <label className="form-label">Ronda (Número)</label>
+              <input type="number" className="form-input" value={form.round} onChange={e => setForm({ ...form, round: Number(e.target.value), roundName: `Jornada ${e.target.value}` })} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Nome da Ronda</label>
+              <input className="form-input" value={form.roundName} onChange={e => setForm({ ...form, roundName: e.target.value })} />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Data e Hora</label>
+            <input type="datetime-local" className="form-input" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Local</label>
+            <input className="form-input" placeholder="Ex: Campo A" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} />
+          </div>
+
+          <button className="btn btn-primary" onClick={handleSave} disabled={loading} style={{ width: '100%', justifyContent: 'center', height: 48, marginTop: 8 }}>
+            {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><Plus size={16} /> Adicionar ao Calendário</>}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
