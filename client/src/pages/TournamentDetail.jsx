@@ -292,7 +292,8 @@ export default function TournamentDetail() {
                         </div>
                         <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
                       </div>
-                        {roundMatches.map(m => (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          {roundMatches.map(m => (
                           <div key={m._id} className="match-card" style={{ padding: '12px 16px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                               <div style={{ flex: 1, textAlign: 'right', fontWeight: 700, fontSize: 14 }}>{m.homeTeam?.name || '—'}</div>
