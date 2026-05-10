@@ -22,6 +22,8 @@ export default function TournamentDetail() {
   const [showResultModal, setShowResultModal] = useState(null);
   const [showShareModal, setShowShareModal] = useState(null);
   const [showFinishModal, setShowFinishModal] = useState(false);
+  const [showEditMatchModal, setShowEditMatchModal] = useState(null);
+  const [showEditTournamentModal, setShowEditTournamentModal] = useState(false);
   const [generatingCalendar, setGeneratingCalendar] = useState(false);
 
   const load = useCallback(async () => {
@@ -101,6 +103,7 @@ export default function TournamentDetail() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
                 <h1 className="font-syne" style={{ fontSize: 28, fontWeight: 800 }}>{tournament.name}</h1>
+                <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }} onClick={() => setShowEditTournamentModal(true)}><Edit2 size={13} /></button>
                 <span className={`badge ${statusBadge[tournament.status]}`}>{statusLabel[tournament.status]}</span>
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>📍 {tournament.neighborhood} · 🏟️ {tournament.location} · 👥 {teams.length}/{tournament.maxTeams} equipas</p>
@@ -289,40 +292,36 @@ export default function TournamentDetail() {
                         </div>
                         <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         {roundMatches.map(m => (
-                          <div key={m._id} className="match-card">
-                            <div className="match-team">
-                              <div className="match-team-name">{m.homeTeam?.name || '—'}</div>
+                          <div key={m._id} className="match-card" style={{ padding: '12px 16px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                              <div style={{ flex: 1, textAlign: 'right', fontWeight: 700, fontSize: 14 }}>{m.homeTeam?.name || '—'}</div>
+                              
+                              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: 8, minWidth: 80, textAlign: 'center' }}>
+                                {m.status === 'finished' ? (
+                                  <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</div>
+                                ) : (
+                                  <div style={{ fontSize: 13, fontWeight: 600 }}>
+                                    {m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 14 }}>{m.awayTeam?.name || '—'}</div>
+                              
+                              <div style={{ display: 'flex', gap: 6 }}>
+                                <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Agendar"><Calendar size={14} /></button>
+                                <button className="btn btn-primary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowResultModal(m)} title="Resultado"><Trophy size={14} /></button>
+                                <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowShareModal(m)} title="Partilhar"><Camera size={14} /></button>
+                              </div>
                             </div>
-                            <div className="match-score">
-                              {m.status === 'finished' ? (
-                                <>
-                                  <div className="match-score-value" style={{ color: 'var(--green)' }}>{m.homeScore}</div>
-                                  <div className="match-divider">×</div>
-                                  <div className="match-score-value" style={{ color: 'var(--green)' }}>{m.awayScore}</div>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="match-score-value" style={{ color: 'var(--text-muted)', fontSize: 20 }}>—</div>
-                                  <div className="match-divider">vs</div>
-                                  <div className="match-score-value" style={{ color: 'var(--text-muted)', fontSize: 20 }}>—</div>
-                                </>
-                              )}
-                            </div>
-                            <div className="match-team" style={{ textAlign: 'left' }}>
-                              <div className="match-team-name">{m.awayTeam?.name || '—'}</div>
-                            </div>
-                            <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-                              <button className="btn btn-secondary btn-sm" style={{ padding: '8px' }} title="Partilhar Jogo" onClick={() => setShowShareModal(m)}>
-                                <Camera size={14} />
-                              </button>
-                              {m.status !== 'finished' ? (
-                                <button className="btn btn-primary btn-sm" onClick={() => setShowResultModal(m)}>Resultado</button>
-                              ) : (
-                                <button className="btn btn-secondary btn-sm" onClick={() => setShowResultModal(m)}>Editar</button>
-                              )}
-                            </div>
+                            {(m.location || m.date || m.referee) && (
+                              <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 8, fontSize: 11, color: 'var(--text-muted)' }}>
+                                {m.date && <span>📅 {new Date(m.date).toLocaleDateString()}</span>}
+                                {m.location && <span>🏟️ {m.location}</span>}
+                                {m.referee && <span>🏁 {m.referee}</span>}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -463,7 +462,7 @@ function FinishTournamentModal({ teams, onClose, onConfirm }) {
 
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal">
+      <div className="modal" style={{ maxWidth: 450 }}>
         <div className="modal-header">
           <h2 className="modal-title">Encerrar Torneio 🏆</h2>
           <button className="modal-close" onClick={onClose}><X size={18} /></button>
@@ -501,6 +500,125 @@ function FinishTournamentModal({ teams, onClose, onConfirm }) {
             <button className="btn btn-secondary" style={{ flex: 1 }} onClick={onClose}>Cancelar</button>
             <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => onConfirm(form)}>Confirmar Encerramento</button>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TournamentEditModal({ tournament, onClose, onSaved }) {
+  const [form, setForm] = useState({ ...tournament });
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      const res = await api.put(`/tournaments/${tournament._id}`, form);
+      toast.success('Torneio atualizado!');
+      onSaved(res.data);
+    } catch { toast.error('Erro ao atualizar torneio.'); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{ maxWidth: 500 }}>
+        <div className="modal-header">
+          <h2 className="modal-title">Editar Torneio</h2>
+          <button className="modal-close" onClick={onClose}><X size={18} /></button>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="form-group">
+            <label className="form-label">Nome do Torneio</label>
+            <input className="form-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+          </div>
+          <div className="form-grid form-grid-2">
+            <div className="form-group">
+              <label className="form-label">Cidade</label>
+              <input className="form-input" value={form.city} onChange={e => setForm({...form, city: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Bairro</label>
+              <input className="form-input" value={form.neighborhood} onChange={e => setForm({...form, neighborhood: e.target.value})} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Local / Campo</label>
+            <input className="form-input" value={form.location} onChange={e => setForm({...form, location: e.target.value})} />
+          </div>
+          <div className="form-grid form-grid-2">
+            <div className="form-group">
+              <label className="form-label">Taxa de Inscrição</label>
+              <input type="number" className="form-input" value={form.registrationFee} onChange={e => setForm({...form, registrationFee: Number(e.target.value)})} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Prémio</label>
+              <input className="form-input" value={form.prize} onChange={e => setForm({...form, prize: e.target.value})} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Link de Comunicação</label>
+            <input className="form-input" value={form.contactLink} onChange={e => setForm({...form, contactLink: e.target.value})} />
+          </div>
+          <button className="btn btn-primary" onClick={handleSave} disabled={loading} style={{ width: '100%', justifyContent: 'center' }}>
+            {loading ? 'A guardar...' : 'Guardar Alterações'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MatchScheduleModal({ match, tournamentId, onClose, onSaved }) {
+  const [date, setDate] = useState(match.date ? new Date(match.date).toISOString().substring(0, 10) : '');
+  const [time, setTime] = useState(match.date ? new Date(match.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }).replace('h', ':') : '');
+  const [location, setLocation] = useState(match.location || '');
+  const [referee, setReferee] = useState(match.referee || '');
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      const dateTime = date && time ? new Date(`${date}T${time}`) : null;
+      await api.put(`/tournaments/${tournamentId}/matches/${match._id}`, {
+        date: dateTime, location, referee
+      });
+      toast.success('Jogo agendado!');
+      onSaved();
+    } catch { toast.error('Erro ao agendar jogo.'); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{ maxWidth: 400 }}>
+        <div className="modal-header">
+          <h2 className="modal-title">Agendar Jogo</h2>
+          <button className="modal-close" onClick={onClose}><X size={18} /></button>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <p style={{ textAlign: 'center', fontWeight: 700, fontSize: 14 }}>{match.homeTeam?.name} vs {match.awayTeam?.name}</p>
+          <div className="form-grid form-grid-2">
+            <div className="form-group">
+              <label className="form-label">Data</label>
+              <input type="date" className="form-input" value={date} onChange={e => setDate(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Hora</label>
+              <input type="time" className="form-input" value={time} onChange={e => setTime(e.target.value)} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Local / Campo</label>
+            <input className="form-input" value={location} onChange={e => setLocation(e.target.value)} placeholder="Ex: Campo da Maianga" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Árbitro</label>
+            <input className="form-input" value={referee} onChange={e => setReferee(e.target.value)} placeholder="Nome do árbitro" />
+          </div>
+          <button className="btn btn-primary" onClick={handleSave} disabled={loading} style={{ width: '100%', justifyContent: 'center' }}>
+            {loading ? 'A guardar...' : 'Confirmar Agendamento'}
+          </button>
         </div>
       </div>
     </div>
