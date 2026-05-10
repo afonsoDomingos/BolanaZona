@@ -163,7 +163,7 @@ export default function TournamentDetail() {
                 <div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Arrecadado</div>
                   <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--green)' }}>
-                    {teams.reduce((acc, t) => acc + (t.amountPaid || 0), 0).toLocaleString()} Kz
+                    {teams.reduce((acc, t) => acc + (t.amountPaid || 0), 0).toLocaleString()} MT
                   </div>
                 </div>
                 <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />

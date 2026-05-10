@@ -16,7 +16,7 @@ export default function TournamentNew() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    name: '', neighborhood: '', location: '', city: 'Luanda', description: '',
+    name: '', neighborhood: '', location: '', city: 'Maputo', description: '',
     format: 'groups', maxTeams: 8, startDate: '', prize: '', registrationFee: 0, contactLink: '',
   });
 
@@ -67,15 +67,15 @@ export default function TournamentNew() {
               <div className="form-grid form-grid-3">
                 <div className="form-group">
                   <label className="form-label">Cidade *</label>
-                  <input className="form-input" placeholder="Ex: Luanda" value={form.city} onChange={e => set('city', e.target.value)} required />
+                  <input className="form-input" placeholder="Ex: Maputo" value={form.city} onChange={e => set('city', e.target.value)} required />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Bairro *</label>
-                  <input className="form-input" placeholder="Ex: Maianga" value={form.neighborhood} onChange={e => set('neighborhood', e.target.value)} required />
+                  <input className="form-input" placeholder="Ex: Maxaquene" value={form.neighborhood} onChange={e => set('neighborhood', e.target.value)} required />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Local / Campo *</label>
-                  <input className="form-input" placeholder="Ex: Campo do Maianga" value={form.location} onChange={e => set('location', e.target.value)} required />
+                  <input className="form-input" placeholder="Ex: Campo do Maxaquene" value={form.location} onChange={e => set('location', e.target.value)} required />
                 </div>
               </div>
               <div className="form-grid form-grid-2">
@@ -92,12 +92,12 @@ export default function TournamentNew() {
               </div>
               <div className="form-grid form-grid-2">
                 <div className="form-group">
-                  <label className="form-label">Taxa de Inscrição (Kz)</label>
-                  <input type="number" className="form-input" placeholder="Ex: 5000" value={form.registrationFee} onChange={e => set('registrationFee', Number(e.target.value))} />
+                  <label className="form-label">Taxa de Inscrição (MT)</label>
+                  <input type="number" className="form-input" placeholder="Ex: 500" value={form.registrationFee} onChange={e => set('registrationFee', Number(e.target.value))} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Prémio / Troféu</label>
-                  <input className="form-input" placeholder="Ex: Taça + 50.000 Kz" value={form.prize} onChange={e => set('prize', e.target.value)} />
+                  <input className="form-input" placeholder="Ex: Taça + 50.000 MT" value={form.prize} onChange={e => set('prize', e.target.value)} />
                 </div>
               </div>
               <div className="form-group">
