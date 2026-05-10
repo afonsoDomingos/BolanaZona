@@ -88,6 +88,26 @@ export default function TournamentDetail() {
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>📍 {tournament.neighborhood} · 🏟️ {tournament.location} · 👥 {teams.length}/{tournament.maxTeams} equipas</p>
             </div>
+            
+            {/* Financial Summary */}
+            {tournament.registrationFee > 0 && (
+              <div style={{ display: 'flex', gap: 24, background: 'rgba(0,200,83,0.05)', padding: '12px 24px', borderRadius: 16, border: '1px solid rgba(0,200,83,0.1)' }}>
+                <div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Arrecadado</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--green)' }}>
+                    {teams.reduce((acc, t) => acc + (t.amountPaid || 0), 0).toLocaleString()} Kz
+                  </div>
+                </div>
+                <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
+                <div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Expectativa</div>
+                  <div style={{ fontSize: 18, fontWeight: 800 }}>
+                    {(tournament.maxTeams * tournament.registrationFee).toLocaleString()} Kz
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {tournament.status === 'draft' && (
                 <button className="btn btn-secondary btn-sm" onClick={() => changeStatus('registration')}>Abrir Inscrições</button>
@@ -170,9 +190,14 @@ export default function TournamentDetail() {
                         }}><Trash2 size={13} /></button>
                       </div>
                     </div>
-                    <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+                    <div style={{ marginTop: 12, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                       <span className="badge badge-gray">👥 {t.players?.length || 0} jogadores</span>
                       {t.contact && <span className="badge badge-gray">📞 {t.contact}</span>}
+                      {tournament.registrationFee > 0 && (
+                        <span className={`badge ${t.paymentStatus === 'paid' ? 'badge-green' : t.paymentStatus === 'partial' ? 'badge-yellow' : 'badge-red'}`}>
+                          {t.paymentStatus === 'paid' ? '✅ Pago' : t.paymentStatus === 'partial' ? `⏳ ${t.amountPaid} Kz` : '❌ Pendente'}
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -439,7 +464,7 @@ function FinishTournamentModal({ teams, onClose, onConfirm }) {
 }
 
 function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
-  const [form, setForm] = useState(initialData || { name: '', captainName: '', coachName: '', contact: '', color: '#00C853', logo: '', players: [] });
+  const [form, setForm] = useState(initialData || { name: '', captainName: '', coachName: '', contact: '', color: '#00C853', logo: '', players: [], paymentStatus: 'pending', amountPaid: 0 });
   const [playerName, setPlayerName] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -511,6 +536,21 @@ function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
             <div className="form-group">
               <label className="form-label">Contacto</label>
               <input className="form-input" placeholder="Telemóvel" value={form.contact} onChange={e => setForm(p => ({ ...p, contact: e.target.value }))} />
+            </div>
+          </div>
+
+          <div className="form-grid form-grid-2" style={{ background: 'rgba(0,200,83,0.05)', padding: 16, borderRadius: 12, border: '1px solid rgba(0,200,83,0.1)' }}>
+            <div className="form-group">
+              <label className="form-label">Estado de Pagamento</label>
+              <select className="form-select" value={form.paymentStatus} onChange={e => setForm(p => ({ ...p, paymentStatus: e.target.value }))}>
+                <option value="pending">❌ Pendente</option>
+                <option value="partial">⏳ Parcial</option>
+                <option value="paid">✅ Pago</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Valor Pago (Kz)</label>
+              <input type="number" className="form-input" placeholder="0" value={form.amountPaid} onChange={e => setForm(p => ({ ...p, amountPaid: Number(e.target.value) }))} />
             </div>
           </div>
           <div className="form-group">

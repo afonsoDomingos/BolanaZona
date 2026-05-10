@@ -16,6 +16,8 @@ const teamSchema = new mongoose.Schema({
   players: [playerSchema],
   color: { type: String, default: '#00C853' },
   logo: { type: String, default: '' },
+  paymentStatus: { type: String, enum: ['pending', 'partial', 'paid'], default: 'pending' },
+  amountPaid: { type: Number, default: 0 },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });
 

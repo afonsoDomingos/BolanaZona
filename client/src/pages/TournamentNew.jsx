@@ -17,7 +17,7 @@ export default function TournamentNew() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: '', neighborhood: '', location: '', city: 'Luanda', description: '',
-    format: 'groups', maxTeams: 8, startDate: '', prize: '',
+    format: 'groups', maxTeams: 8, startDate: '', prize: '', registrationFee: 0,
   });
 
   const set = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
@@ -90,9 +90,15 @@ export default function TournamentNew() {
                   <input type="date" className="form-input" value={form.startDate} onChange={e => set('startDate', e.target.value)} />
                 </div>
               </div>
-              <div className="form-group">
-                <label className="form-label">Prémio / Troféu</label>
-                <input className="form-input" placeholder="Ex: Taça + Medalhas + 50.000 Kz" value={form.prize} onChange={e => set('prize', e.target.value)} />
+              <div className="form-grid form-grid-2">
+                <div className="form-group">
+                  <label className="form-label">Taxa de Inscrição (Kz)</label>
+                  <input type="number" className="form-input" placeholder="Ex: 5000" value={form.registrationFee} onChange={e => set('registrationFee', Number(e.target.value))} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Prémio / Troféu</label>
+                  <input className="form-input" placeholder="Ex: Taça + 50.000 Kz" value={form.prize} onChange={e => set('prize', e.target.value)} />
+                </div>
               </div>
               <div className="form-group">
                 <label className="form-label">Descrição</label>
