@@ -203,49 +203,53 @@ export default function PublicTournament() {
                       <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      {roundMatches.map(m => (
-                        <div key={m._id} className="match-card">
-                          <div className="match-team"><div className="match-team-name">{m.homeTeam?.name || '—'}</div></div>
-                          <div className="match-score">
-                            {m.status === 'finished' ? (
-                              <>
-                                <div className="match-score-value" style={{ color: 'var(--green)' }}>{m.homeScore}</div>
-                                <div className="match-divider">×</div>
-                                <div className="match-score-value" style={{ color: 'var(--green)' }}>{m.awayScore}</div>
-                              </>
-                            ) : (
-                              <>
-                                <div className="match-score-value" style={{ color: 'var(--text-muted)', fontSize: 18 }}>—</div>
-                                <div className="match-divider">vs</div>
-                                <div className="match-score-value" style={{ color: 'var(--text-muted)', fontSize: 18 }}>—</div>
-                              </>
+                        {roundMatches.map(m => (
+                          <div key={m._id} className="match-card" style={{ display: 'block', padding: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 24px' }}>
+                              <div className="match-team" style={{ flex: 1 }}><div className="match-team-name">{m.homeTeam?.name || '—'}</div></div>
+                              <div className="match-score">
+                                {m.status === 'finished' ? (
+                                  <>
+                                    <div className="match-score-value" style={{ color: 'var(--green)' }}>{m.homeScore}</div>
+                                    <div className="match-divider">×</div>
+                                    <div className="match-score-value" style={{ color: 'var(--green)' }}>{m.awayScore}</div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="match-score-value" style={{ color: 'var(--text-muted)', fontSize: 18 }}>—</div>
+                                    <div className="match-divider">vs</div>
+                                    <div className="match-score-value" style={{ color: 'var(--text-muted)', fontSize: 18 }}>—</div>
+                                  </>
+                                )}
+                              </div>
+                              <div className="match-team" style={{ textAlign: 'left', flex: 1 }}><div className="match-team-name">{m.awayTeam?.name || '—'}</div></div>
+                              <span className={`badge ${m.status === 'finished' ? 'badge-green' : 'badge-gray'}`} style={{ flexShrink: 0 }}>
+                                {m.status === 'finished' ? 'Terminado' : 'Agendado'}
+                              </span>
+                            </div>
+
+                            {/* Match Events & Referee */}
+                            {(m.referee || (m.events && m.events.length > 0)) && (
+                              <div style={{ padding: '0 24px 16px', display: 'flex', flexDirection: 'column', gap: 12, marginTop: -8 }}>
+                                {m.referee && (
+                                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                                    🏁 Árbitro: {m.referee}
+                                  </div>
+                                )}
+                                {m.events && m.events.length > 0 && (
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                                    {m.events.map((e, i) => (
+                                      <div key={i} style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.03)', padding: '2px 8px', borderRadius: 6 }}>
+                                        <span>{e.type === 'goal' ? '⚽' : e.type === 'yellow_card' ? '🟨' : '🟥'}</span>
+                                        <span style={{ fontWeight: 600 }}>{e.playerName}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
                             )}
                           </div>
-                          <div className="match-team" style={{ textAlign: 'left' }}><div className="match-team-name">{m.awayTeam?.name || '—'}</div></div>
-                          <span className={`badge ${m.status === 'finished' ? 'badge-green' : 'badge-gray'}`} style={{ flexShrink: 0 }}>
-                            {m.status === 'finished' ? 'Terminado' : 'Agendado'}
-                          </span>
-                        </div>
-                        {/* Match Events & Referee */}
-                        <div style={{ padding: '0 24px 16px', display: 'flex', flexDirection: 'column', gap: 12, marginTop: -8 }}>
-                          {m.referee && (
-                            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                              🏁 Árbitro: {m.referee}
-                            </div>
-                          )}
-                          {m.events && m.events.length > 0 && (
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-                              {m.events.map((e, i) => (
-                                <div key={i} style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.03)', padding: '2px 8px', borderRadius: 6 }}>
-                                  <span>{e.type === 'goal' ? '⚽' : e.type === 'yellow_card' ? '🟨' : '🟥'}</span>
-                                  <span style={{ fontWeight: 600 }}>{e.playerName}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}</div>
+                        ))}</div>
                   </div>
                 );
               });
