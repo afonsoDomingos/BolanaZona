@@ -66,7 +66,7 @@ export default function Dashboard() {
           <Link to="/dashboard/tournaments/new" className="btn btn-primary"><Plus size={16} /> Novo Torneio</Link>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 32, alignItems: 'flex-start' }}>
+        <div className="dashboard-grid">
           {/* Main Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             {/* Stats */}
@@ -112,14 +112,18 @@ export default function Dashboard() {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {tournaments.slice(0, 5).map(t => (
-                    <Link key={t._id} to={`/dashboard/tournaments/${t._id}`} className="card" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--green-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>⚽</div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 700, fontSize: 15 }}>{t.name}</div>
-                        <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>{t.neighborhood} · {t.maxTeams} equipas</div>
+                    <Link key={t._id} to={`/dashboard/tournaments/${t._id}`} className="card recent-tournament-card">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
+                        <div className="card-icon-sm">⚽</div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: 700, fontSize: 15 }}>{t.name}</div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>{t.neighborhood} · {t.maxTeams} equipas</div>
+                        </div>
                       </div>
-                      <span className={`badge ${statusBadge[t.status]}`}>{statusLabel[t.status]}</span>
-                      <ArrowRight size={16} color="var(--text-muted)" />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <span className={`badge ${statusBadge[t.status]}`}>{statusLabel[t.status]}</span>
+                        <ArrowRight size={16} color="var(--text-muted)" className="hide-mobile" />
+                      </div>
                     </Link>
                   ))}
                 </div>
@@ -128,11 +132,13 @@ export default function Dashboard() {
           </div>
 
           {/* Sidebar - Notifications */}
-          <div className="card-glass" style={{ padding: 24, position: 'sticky', top: 96 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Bell size={18} color="var(--green)" /> Atividades Recentes
-            </h3>
-            <RecentActivity />
+          <div className="dashboard-sidebar">
+            <div className="card-glass" style={{ padding: 24 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Bell size={18} color="var(--green)" /> Atividades Recentes
+              </h3>
+              <RecentActivity />
+            </div>
           </div>
         </div>
       </div>
