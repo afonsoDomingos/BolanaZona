@@ -20,8 +20,16 @@ exports.getOne = async (req, res) => {
     const t = await Tournament.findById(req.params.id)
       .populate('createdBy', 'name email')
       .populate('winner', 'name logo color');
+    
     if (!t) return res.status(404).json({ message: 'Torneio não encontrado.' });
-    res.json(t);
+
+    const teams = await Team.find({ tournament: t._id });
+    const matches = await Match.find({ tournament: t._id })
+      .populate('homeTeam', 'name color logo')
+      .populate('awayTeam', 'name color logo')
+      .sort({ round: 1, date: 1 });
+
+    res.json({ tournament: t, teams, matches });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
