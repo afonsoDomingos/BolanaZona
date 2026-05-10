@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Trophy, Users, Calendar, BarChart2, Share2, ArrowRight, CheckCircle } from 'lucide-react';
+import { Trophy, Users, Calendar, BarChart2, Share2, ArrowRight, CheckCircle, ClipboardList, Handshake, Camera } from 'lucide-react';
 
 const features = [
   { icon: <Trophy size={28} />, title: 'Criar Torneios', desc: 'Mata-mata ou fase de grupos. Configura em minutos.' },
@@ -7,6 +7,9 @@ const features = [
   { icon: <Calendar size={28} />, title: 'Calendário Automático', desc: 'Jogos gerados automaticamente com datas e horários.' },
   { icon: <BarChart2 size={28} />, title: 'Classificação ao Vivo', desc: 'Pontos, golos e vitórias atualizados em tempo real.' },
   { icon: <Share2 size={28} />, title: 'Partilhar Torneio', desc: 'Link público para todos acompanharem os resultados.' },
+  { icon: <ClipboardList size={28} />, title: 'Inscrições Públicas', desc: 'Partilha um link e deixa as equipas inscreverem-se sozinhas.' },
+  { icon: <Handshake size={28} />, title: 'Patrocínios e Apoios', desc: 'Atrai patrocinadores locais com um botão de contacto na página.' },
+  { icon: <Camera size={28} />, title: 'Prints Oficiais', desc: 'Gera imagens com qualidade da classificação e jogos para partilhar.' },
 ];
 
 export default function Landing() {
