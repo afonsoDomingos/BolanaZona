@@ -34,16 +34,18 @@ export default function TournamentDetail() {
 
   const load = useCallback(async () => {
     try {
-      const [tRes, sRes, subRes] = await Promise.all([
+      const [tRes, sRes, subRes, propRes] = await Promise.all([
         api.get(`/tournaments/${id}`),
         api.get(`/tournaments/${id}/standings`),
-        api.get(`/tournaments/${id}/subscribers`)
+        api.get(`/tournaments/${id}/subscribers`),
+        api.get(`/tournaments/${id}/sponsor-proposals`)
       ]);
       setTournament(tRes.data.tournament);
       setTeams(tRes.data.teams);
       setMatches(tRes.data.matches);
       setStandings(sRes.data);
       setSubscribers(subRes.data);
+      setProposals(propRes.data);
     } catch (err) {
       console.error(err);
       toast.error('Erro ao carregar detalhes do torneio.');
