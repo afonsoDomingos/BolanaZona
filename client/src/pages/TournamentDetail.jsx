@@ -16,6 +16,7 @@ export default function TournamentDetail() {
   const [teams, setTeams] = useState([]);
   const [matches, setMatches] = useState([]);
   const [standings, setStandings] = useState([]);
+  const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showTeamModal, setShowTeamModal] = useState(false);
   const [editTeamData, setEditTeamData] = useState(null);
@@ -28,16 +29,18 @@ export default function TournamentDetail() {
 
   const load = useCallback(async () => {
     try {
-      const [tRes, teamsRes, matchesRes, standRes] = await Promise.all([
+      const [tRes, teamsRes, matchesRes, standRes, propRes] = await Promise.all([
         api.get(`/tournaments/${id}`),
         api.get(`/tournaments/${id}/teams`),
         api.get(`/tournaments/${id}/matches`),
         api.get(`/tournaments/${id}/standings`),
+        api.get(`/tournaments/${id}/sponsor-proposals`),
       ]);
       setTournament(tRes.data);
       setTeams(teamsRes.data);
       setMatches(matchesRes.data);
       setStandings(standRes.data);
+      setProposals(propRes.data);
     } catch { toast.error('Erro ao carregar torneio.'); }
     finally { setLoading(false); }
   }, [id]);
@@ -159,7 +162,8 @@ export default function TournamentDetail() {
             ['teams', <Users size={14} />, 'Equipas'],
             ['calendar', <Calendar size={14} />, 'Calendário'],
             ['standings', <BarChart2 size={14} />, 'Classificação'],
-            ['info', <MapPin size={14} />, 'Localização']
+            ['info', <MapPin size={14} />, 'Localização'],
+            ['sponsors', <Share2 size={14} />, 'Patrocínios']
           ].map(([key, icon, label]) => (
             <button key={key} className={`tab ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)}>
               {icon} {label}
@@ -415,6 +419,64 @@ export default function TournamentDetail() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* SPONSORS TAB */}
+        {tab === 'sponsors' && (
+          <div className="animate-fade-in">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700 }}>Propostas de Patrocínio 🤝</h2>
+              <div className="badge badge-gray">{proposals.length} propostas</div>
+            </div>
+
+            {proposals.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-state-icon">🤝</div>
+                <h3>Ainda não há propostas</h3>
+                <p>As marcas que clicarem em "Apoiar" na página pública aparecerão aqui.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {proposals.map(p => (
+                  <div key={p._id} className="card" style={{ borderLeft: p.status === 'pending' ? '4px solid var(--yellow)' : '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <h3 style={{ fontSize: 16, fontWeight: 700 }}>{p.name}</h3>
+                          <span className={`badge ${p.status === 'pending' ? 'badge-yellow' : p.status === 'accepted' ? 'badge-green' : 'badge-gray'}`}>
+                            {p.status === 'pending' ? 'Pendente' : p.status === 'accepted' ? 'Aceite' : p.status}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
+                          📧 {p.email} {p.contact && `· 📞 ${p.contact}`}
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                        {new Date(p.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 12, fontSize: 14, color: 'var(--text-secondary)', marginBottom: 16, border: '1px solid var(--border)' }}>
+                      "{p.message}"
+                    </div>
+                    {p.status === 'pending' && (
+                      <div style={{ display: 'flex', gap: 10 }}>
+                        <button className="btn btn-primary btn-sm" onClick={async () => {
+                          await api.put(`/tournaments/sponsor-proposals/${p._id}`, { status: 'accepted' });
+                          toast.success('Proposta marcada como aceite!');
+                          load();
+                        }}>Aceitar</button>
+                        <button className="btn btn-secondary btn-sm" onClick={async () => {
+                          if(!window.confirm('Recusar esta proposta?')) return;
+                          await api.put(`/tournaments/sponsor-proposals/${p._id}`, { status: 'rejected' });
+                          load();
+                        }}>Recusar</button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

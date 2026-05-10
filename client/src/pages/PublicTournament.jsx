@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import { Trophy, Calendar, BarChart2, Users, Share2, MapPin, X } from 'lucide-react';
 import TeamRegistrationModal from '../components/TeamRegistrationModal';
+import SponsorProposalModal from '../components/SponsorProposalModal';
 
 const formatLabel = { groups: 'Fase de Grupos', knockout: 'Mata-mata', groups_knockout: 'Grupos + Mata-mata' };
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
@@ -14,6 +15,7 @@ export default function PublicTournament() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('standings');
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [showSponsorModal, setShowSponsorModal] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
@@ -69,6 +71,9 @@ export default function PublicTournament() {
               <button onClick={copyLink} className="btn btn-secondary btn-sm">
                 <Share2 size={14} /> Partilhar
               </button>
+              <button onClick={() => setShowSponsorModal(true)} className="btn btn-secondary btn-sm" style={{ borderColor: 'var(--yellow)', color: 'var(--yellow)' }}>
+                🤝 Apoiar
+              </button>
               {tournament.contactLink && (
                 <a href={tournament.contactLink} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm" style={{ background: '#25D366', borderColor: '#25D366', color: '#fff' }}>
                   💬 Entrar no Grupo
@@ -83,6 +88,7 @@ export default function PublicTournament() {
           </div>
 
           {showRegistrationModal && <TeamRegistrationModal tournament={tournament} onClose={() => setShowRegistrationModal(false)} />}
+          {showSponsorModal && <SponsorProposalModal tournament={tournament} onClose={() => setShowSponsorModal(false)} />}
 
           {/* Hall of Fame / Winner Section */}
           {tournament.status === 'finished' && (

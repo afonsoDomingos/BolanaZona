@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Explore from './pages/Explore';
+import Talents from './pages/Talents';
 import TournamentList from './pages/TournamentList';
 import TournamentNew from './pages/TournamentNew';
 import TournamentDetail from './pages/TournamentDetail';
@@ -34,6 +35,7 @@ function AppRoutes() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/explore" element={<Explore />} />
+          <Route path="/talents" element={<Talents />} />
           <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
           <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
           <Route path="/t/:shareCode" element={<PublicTournament />} />

@@ -17,6 +17,7 @@ app.use('/api/tournaments/:tournamentId/matches', require('./routes/matches'));
 app.use('/api/notifications', require('./routes/notifications'));
 
 app.use('/api/upload', require('./routes/upload'));
+app.use('/api/players', require('./routes/players'));
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'OK', platform: 'Bola na Zona' }));

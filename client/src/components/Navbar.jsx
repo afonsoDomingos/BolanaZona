@@ -27,6 +27,9 @@ export default function Navbar() {
             <Link to="/explore" className={`nav-link ${isActive('/explore') ? 'active' : ''}`}>
               Explorar
             </Link>
+            <Link to="/talents" className={`nav-link ${isActive('/talents') ? 'active' : ''}`}>
+              Talentos <span className="badge badge-yellow" style={{ fontSize: 9, padding: '1px 5px', marginLeft: 4 }}>NOVO</span>
+            </Link>
 
             {user ? (
               <>
