@@ -41,10 +41,10 @@ export default function Landing() {
 
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/register" className="btn btn-primary btn-lg">
-                Começar Grátis <ArrowRight size={18} />
+                Criar Torneio Grátis <ArrowRight size={18} />
               </Link>
-              <Link to="/login" className="btn btn-secondary btn-lg">
-                Já tenho conta
+              <Link to="/explore" className="btn btn-secondary btn-lg" style={{ borderColor: 'var(--green)', color: 'var(--green)' }}>
+                ⚽ Explorar Torneios
               </Link>
             </div>
 
