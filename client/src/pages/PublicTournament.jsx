@@ -63,9 +63,16 @@ export default function PublicTournament() {
                 {tournament.prize && <span className="badge badge-yellow">🥇 {tournament.prize}</span>}
               </div>
             </div>
-            <button onClick={copyLink} className="btn btn-secondary btn-sm">
-              <Share2 size={14} /> Partilhar
-            </button>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button onClick={copyLink} className="btn btn-secondary btn-sm">
+                <Share2 size={14} /> Partilhar
+              </button>
+              {tournament.contactLink && (
+                <a href={tournament.contactLink} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm" style={{ background: '#25D366', borderColor: '#25D366', color: '#fff' }}>
+                  💬 Entrar no Grupo
+                </a>
+              )}
+            </div>
           </div>
 
           {/* Hall of Fame / Winner Section */}

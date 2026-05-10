@@ -17,7 +17,7 @@ export default function TournamentNew() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: '', neighborhood: '', location: '', city: 'Luanda', description: '',
-    format: 'groups', maxTeams: 8, startDate: '', prize: '', registrationFee: 0,
+    format: 'groups', maxTeams: 8, startDate: '', prize: '', registrationFee: 0, contactLink: '',
   });
 
   const set = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
@@ -99,6 +99,10 @@ export default function TournamentNew() {
                   <label className="form-label">Prémio / Troféu</label>
                   <input className="form-input" placeholder="Ex: Taça + 50.000 Kz" value={form.prize} onChange={e => set('prize', e.target.value)} />
                 </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Link de Comunicação (WhatsApp / Telegram)</label>
+                <input className="form-input" placeholder="Ex: https://chat.whatsapp.com/..." value={form.contactLink} onChange={e => set('contactLink', e.target.value)} />
               </div>
               <div className="form-group">
                 <label className="form-label">Descrição</label>
