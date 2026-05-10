@@ -887,6 +887,7 @@ function MatchScheduleModal({ match, tournamentId, onClose, onSaved }) {
 function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
   const [form, setForm] = useState(initialData || { name: '', captainName: '', coachName: '', contact: '', color: '#00C853', logo: '', players: [], paymentStatus: 'pending', amountPaid: 0 });
   const [playerName, setPlayerName] = useState('');
+  const [playerNumber, setPlayerNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -910,8 +911,15 @@ function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
 
   const addPlayer = () => {
     if (!playerName.trim()) return;
-    setForm(prev => ({ ...prev, players: [...prev.players, { name: playerName.trim() }] }));
+    setForm(prev => ({ 
+      ...prev, 
+      players: [...prev.players, { 
+        name: playerName.trim(),
+        number: playerNumber ? Number(playerNumber) : null
+      }] 
+    }));
     setPlayerName('');
+    setPlayerNumber('');
   };
 
   const removePlayer = (i) => setForm(prev => ({ ...prev, players: prev.players.filter((_, idx) => idx !== i) }));
@@ -1000,6 +1008,7 @@ function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
           <div className="form-group">
             <label className="form-label">Jogadores</label>
             <div style={{ display: 'flex', gap: 8 }}>
+              <input className="form-input" style={{ width: '80px', textAlign: 'center' }} placeholder="Nº (Opc)" type="number" value={playerNumber} onChange={e => setPlayerNumber(e.target.value)} onKeyDown={e => e.key === 'Enter' && addPlayer()} />
               <input className="form-input" placeholder="Nome do jogador" value={playerName}
                 onChange={e => setPlayerName(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && addPlayer()} />
@@ -1009,7 +1018,7 @@ function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
                 {form.players.map((p, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 100, padding: '4px 12px', fontSize: 13 }}>
-                    {p.name}
+                    {p.number && <span style={{ color: 'var(--green)', fontWeight: 800 }}>#{p.number}</span>} {p.name}
                     <button onClick={() => removePlayer(i)} style={{ background: 'none', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}><X size={12} /></button>
                   </div>
                 ))}
