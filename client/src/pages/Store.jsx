@@ -104,7 +104,7 @@ export default function Store() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
                     <div>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>A partir de</div>
-                      <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--green)' }}>{p.price.toLocaleString()} Kz</div>
+                      <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--green)' }}>{p.price.toLocaleString()} MT</div>
                     </div>
                     <button className="btn btn-primary btn-sm" onClick={() => handleBuy(p)}>
                       <ShoppingCart size={16} /> Comprar
@@ -115,21 +115,6 @@ export default function Store() {
             ))}
           </div>
         )}
-
-        {/* Benefits Section */}
-        <div style={{ marginTop: 80, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 32 }}>
-          {[
-            { title: 'Qualidade Premium', desc: 'Materiais selecionados para durabilidade extrema no campo.' },
-            { title: 'Personalização', desc: 'Adiciona o nome, número e logo da tua equipa em minutos.' },
-            { title: 'Entrega na Zona', desc: 'Entregamos diretamente no campo do teu torneio.' }
-          ].map(b => (
-            <div key={b.title} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 32, marginBottom: 16 }}>✨</div>
-              <h4 style={{ fontWeight: 800, marginBottom: 8 }}>{b.title}</h4>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>{b.desc}</p>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );
