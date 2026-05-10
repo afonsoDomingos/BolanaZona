@@ -15,7 +15,7 @@ export default function PublicTournament() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('standings');
-  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(window.location.search.includes('action=register'));
   const [showSponsorModal, setShowSponsorModal] = useState(false);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [notFound, setNotFound] = useState(false);

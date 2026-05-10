@@ -172,7 +172,7 @@ export default function TournamentDetail() {
                 <div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Expectativa</div>
                   <div style={{ fontSize: 18, fontWeight: 800 }}>
-                    {(tournament.maxTeams * tournament.registrationFee).toLocaleString()} Kz
+                    {(tournament.maxTeams * tournament.registrationFee).toLocaleString()} MT
                   </div>
                 </div>
               </div>
@@ -195,12 +195,64 @@ export default function TournamentDetail() {
           </div>
         </div>
 
-        {/* Share Box */}
-        <div className="share-box" style={{ marginBottom: 24 }}>
-          <Share2 size={16} color="var(--green)" />
-          <span className="share-url">{shareUrl}</span>
-          <button className="btn btn-primary btn-sm" onClick={copyShare}><Copy size={13} /> Copiar</button>
-          <Link to={`/t/${tournament.shareCode}`} target="_blank" className="btn btn-secondary btn-sm">Ver Público</Link>
+        {/* Share & Registration Box */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16, marginBottom: 24 }}>
+          {/* Public Page Share */}
+          <div className="share-box" style={{ marginBottom: 0, flexDirection: 'column', alignItems: 'flex-start', padding: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <Share2 size={16} color="var(--green)" />
+              <strong style={{ fontSize: 14 }}>Página Pública do Torneio</strong>
+            </div>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>Partilha com os adeptos para acompanharem a classificação e resultados.</p>
+            <div style={{ display: 'flex', gap: 8, width: '100%', background: 'var(--bg-main)', padding: 8, borderRadius: 8 }}>
+              <span className="share-url" style={{ flex: 1, fontSize: 12 }}>{shareUrl}</span>
+              <button className="btn btn-secondary btn-sm" onClick={copyShare}><Copy size={13} /> Copiar</button>
+              <Link to={`/t/${tournament.shareCode}`} target="_blank" className="btn btn-primary btn-sm">Ver</Link>
+            </div>
+          </div>
+          
+          {/* Registration Toggle & Link */}
+          <div className="share-box" style={{ marginBottom: 0, flexDirection: 'column', alignItems: 'flex-start', padding: 20, border: tournament.allowPublicRegistration ? '1px solid var(--green)' : '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Users size={16} color={tournament.allowPublicRegistration ? "var(--green)" : "var(--text-muted)"} />
+                <strong style={{ fontSize: 14 }}>Inscrições de Equipas</strong>
+              </div>
+              <div 
+                onClick={async () => {
+                  try {
+                    const res = await api.put(`/tournaments/${id}`, { allowPublicRegistration: !tournament.allowPublicRegistration });
+                    setTournament(res.data);
+                    toast.success(res.data.allowPublicRegistration ? 'Inscrições Abertas!' : 'Inscrições Encerradas!');
+                  } catch { toast.error('Erro ao alterar permissão.'); }
+                }}
+                style={{ 
+                  width: 44, height: 24, borderRadius: 12, cursor: 'pointer', position: 'relative', transition: '0.3s',
+                  background: tournament.allowPublicRegistration ? 'var(--green)' : 'var(--bg-main)',
+                  border: '1px solid ' + (tournament.allowPublicRegistration ? 'var(--green)' : 'var(--border)')
+                }}
+              >
+                <div style={{ 
+                  width: 18, height: 18, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, 
+                  left: tournament.allowPublicRegistration ? 22 : 2, transition: '0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }} />
+              </div>
+            </div>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
+              {tournament.allowPublicRegistration 
+                ? 'As equipas podem inscrever-se de forma autónoma. Envia-lhes este link:' 
+                : 'As inscrições públicas estão fechadas. Apenas tu podes adicionar equipas.'}
+            </p>
+            {tournament.allowPublicRegistration && (
+              <div style={{ display: 'flex', gap: 8, width: '100%', background: 'var(--bg-main)', padding: 8, borderRadius: 8 }}>
+                <span className="share-url" style={{ flex: 1, fontSize: 12 }}>{shareUrl}?action=register</span>
+                <button className="btn btn-secondary btn-sm" onClick={() => {
+                  navigator.clipboard.writeText(`${shareUrl}?action=register`);
+                  toast.success('Link de Inscrição copiado!');
+                }}><Copy size={13} /> Copiar</button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Tabs */}
