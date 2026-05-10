@@ -28,25 +28,28 @@ export default function TournamentDetail() {
   const [showEditTournamentModal, setShowEditTournamentModal] = useState(false);
   const [showManualMatchModal, setShowManualMatchModal] = useState(false);
   const [generatingCalendar, setGeneratingCalendar] = useState(false);
+  const [subscribers, setSubscribers] = useState([]);
   const { user: currentUser } = useAuth();
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
 
   const load = useCallback(async () => {
     try {
-      const [tRes, teamsRes, matchesRes, standRes, propRes] = await Promise.all([
+      const [tRes, sRes, subRes] = await Promise.all([
         api.get(`/tournaments/${id}`),
-        api.get(`/tournaments/${id}/teams`),
-        api.get(`/tournaments/${id}/matches`),
         api.get(`/tournaments/${id}/standings`),
-        api.get(`/tournaments/${id}/sponsor-proposals`),
+        api.get(`/tournaments/${id}/subscribers`)
       ]);
-      setTournament(tRes.data);
-      setTeams(teamsRes.data);
-      setMatches(matchesRes.data);
-      setStandings(standRes.data);
-      setProposals(propRes.data);
-    } catch { toast.error('Erro ao carregar torneio.'); }
-    finally { setLoading(false); }
+      setTournament(tRes.data.tournament);
+      setTeams(tRes.data.teams);
+      setMatches(tRes.data.matches);
+      setStandings(sRes.data);
+      setSubscribers(subRes.data);
+    } catch (err) {
+      console.error(err);
+      toast.error('Erro ao carregar detalhes do torneio.');
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
@@ -205,7 +208,8 @@ export default function TournamentDetail() {
             ['calendar', <Calendar size={14} />, 'Calendário'],
             ['standings', <BarChart2 size={14} />, 'Classificação'],
             ['info', <MapPin size={14} />, 'Localização'],
-            ['sponsors', <Share2 size={14} />, 'Patrocínios']
+            ['sponsors', <Share2 size={14} />, 'Patrocínios'],
+            ['subscribers', <MessageCircle size={14} />, 'Seguidores']
           ].map(([key, icon, label]) => (
             <button key={key} className={`tab ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)}>
               {icon} {label}
@@ -525,6 +529,53 @@ export default function TournamentDetail() {
                     )}
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* SUBSCRIBERS TAB */}
+        {tab === 'subscribers' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700 }}>Seguidores do WhatsApp ({subscribers.length})</h2>
+              <button className="btn btn-secondary btn-sm" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('Olá seguidores do torneio ' + tournament.name)}`, '_blank')}>
+                <MessageCircle size={14} /> Mensagem para Todos
+              </button>
+            </div>
+            
+            {subscribers.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-state-icon"><MessageCircle size={48} strokeWidth={1} /></div>
+                <h3>Sem seguidores ainda</h3>
+                <p>O público pode clicar em "Seguir Torneio" na página pública para aparecer aqui.</p>
+              </div>
+            ) : (
+              <div className="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>WhatsApp</th>
+                      <th>Data de Subscrição</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {subscribers.map(s => (
+                      <tr key={s._id}>
+                        <td style={{ fontWeight: 700 }}>{s.name}</td>
+                        <td>{s.phone}</td>
+                        <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>{new Date(s.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          <a href={`https://wa.me/${s.phone.replace(/\s/g, '')}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm" style={{ color: '#25D366' }}>
+                            <MessageCircle size={14} /> Conversar
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>

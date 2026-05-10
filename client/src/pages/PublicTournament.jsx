@@ -15,6 +15,7 @@ export default function PublicTournament() {
   const [tab, setTab] = useState('standings');
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showSponsorModal, setShowSponsorModal] = useState(false);
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
@@ -82,6 +83,7 @@ export default function PublicTournament() {
 
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <button onClick={copyLink} className="btn btn-secondary" style={{ borderRadius: 12, height: 48 }}><Share2 size={18} /> Partilhar</button>
+              <button onClick={() => setShowSubscribeModal(true)} className="btn btn-secondary" style={{ borderRadius: 12, height: 48, borderColor: 'var(--green)', color: 'var(--green)' }}><Clock size={18} /> Seguir Torneio</button>
               <button onClick={() => setShowSponsorModal(true)} className="btn btn-secondary" style={{ borderRadius: 12, height: 48, borderColor: 'var(--yellow)', color: 'var(--yellow)' }}>🤝 Apoiar</button>
               {tournament.status === 'registration' && tournament.allowPublicRegistration && (
                 <button onClick={() => setShowRegistrationModal(true)} className="btn btn-primary" style={{ borderRadius: 12, height: 48, padding: '0 32px', fontWeight: 700 }}>Inscrever Equipa</button>
@@ -288,6 +290,50 @@ export default function PublicTournament() {
           Powered by <Link to="/" style={{ color: 'var(--green)', fontWeight: 800, textDecoration: 'none' }}>BOLA NA ZONA</Link>
         </p>
         <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 8 }}>O futebol do bairro, agora profissional.</p>
+      </div>
+      {showSubscribeModal && <SubscribeModal tournament={tournament} onClose={() => setShowSubscribeModal(false)} />}
+    </div>
+  );
+}
+
+function SubscribeModal({ tournament, onClose }) {
+  const [form, setForm] = useState({ name: '', phone: '' });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    if (!form.name || !form.phone) return toast.error('Preenche todos os campos.');
+    setLoading(true);
+    try {
+      await api.post(`/tournaments/${tournament._id}/subscribe`, form);
+      toast.success('Agora estás a seguir o torneio! ⚽');
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Erro ao seguir torneio.');
+    } finally { setLoading(false); }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal animate-slide-up" style={{ maxWidth: 400 }}>
+        <div className="modal-header">
+          <h2 className="modal-title">Seguir Torneio ⚽</h2>
+          <button className="modal-close" onClick={onClose}><X size={18} /></button>
+        </div>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 20 }}>Deixa o teu contacto para receberes os resultados e as próximas jornadas no teu WhatsApp!</p>
+        <form onSubmit={handleSubscribe} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="form-group">
+            <label className="form-label">O teu Nome</label>
+            <input className="form-input" placeholder="Ex: Afonso" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">O teu WhatsApp</label>
+            <input className="form-input" placeholder="Ex: 847877405" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
+          </div>
+          <button className="btn btn-primary" disabled={loading} style={{ width: '100%', justifyContent: 'center', height: 48 }}>
+            {loading ? 'A processar...' : 'Ativar Notificações 🚀'}
+          </button>
+        </form>
       </div>
     </div>
   );
