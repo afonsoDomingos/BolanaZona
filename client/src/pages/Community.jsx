@@ -63,10 +63,14 @@ export default function Community() {
         
         {/* HEADER */}
         <header style={{ marginBottom: 40, textAlign: 'center' }}>
-          <h1 className="font-syne" style={{ fontSize: 32, fontWeight: 900, marginBottom: 8 }}>
-            Mural da <span className="gradient-text">Comunidade</span> 🏟️
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(0,200,83,0.1)', border: '1px solid rgba(0,200,83,0.25)', borderRadius: 100, padding: '6px 16px', marginBottom: 16 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--green)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+            <span style={{ fontSize: 12, color: 'var(--green)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1 }}>Mundo do Futebol Live</span>
+          </div>
+          <h1 className="font-syne" style={{ fontSize: 36, fontWeight: 900, marginBottom: 8, letterSpacing: -1 }}>
+            Mural da <span className="gradient-text">Malta</span> 🏟️
           </h1>
-          <p style={{ color: 'var(--text-secondary)' }}>A vibração do futebol de bairro em tempo real.</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 16 }}>Onde o futebol nunca para. Comenta jogos, partilha placares e vibra com a comunidade.</p>
         </header>
 
         {/* POST CREATOR */}
@@ -99,7 +103,7 @@ export default function Community() {
             {activeMode === 'text' && (
               <textarea 
                 className="form-input" 
-                placeholder="O que estás a achar do torneio? ⚽"
+                placeholder="Como está o jogo? Alguém a ver o Barça? Fala aqui! ⚽🔥"
                 style={{ minHeight: 80, borderRadius: 16, padding: 16, fontSize: 15 }}
                 value={content}
                 onChange={e => setContent(e.target.value)}
