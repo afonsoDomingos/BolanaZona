@@ -20,6 +20,8 @@ import TournamentList from './pages/TournamentList';
 import TournamentNew from './pages/TournamentNew';
 import TournamentDetail from './pages/TournamentDetail';
 import PublicTournament from './pages/PublicTournament';
+import Profile from './pages/Profile';
+import UserManagement from './pages/UserManagement';
 import './index.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -55,6 +57,8 @@ function AppRoutes() {
           <Route path="/dashboard/tournaments/new" element={<ProtectedRoute><TournamentNew /></ProtectedRoute>} />
           <Route path="/dashboard/tournaments/:id" element={<ProtectedRoute><TournamentDetail /></ProtectedRoute>} />
           <Route path="/dashboard/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>

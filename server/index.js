@@ -21,6 +21,7 @@ app.use('/api/players', require('./routes/players'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/leads', require('./routes/leads'));
+app.use('/api/users', require('./routes/users'));
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'OK', platform: 'Bola na Zona' }));

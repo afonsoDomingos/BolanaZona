@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Trophy, LayoutDashboard, LogOut, LogIn, UserPlus, ShoppingBag, Activity, Menu, X } from 'lucide-react';
+import { Trophy, LayoutDashboard, LogOut, LogIn, UserPlus, ShoppingBag, Activity, Menu, X, User, Settings } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 
 export default function Navbar() {
@@ -12,13 +12,13 @@ export default function Navbar() {
 
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
 
-  const handleLogout = () => { logout(); navigate('/'); };
+  const handleLogout = () => { logout(); navigate('/'); setIsMenuOpen(false); };
 
   return (
     <nav className="navbar">
       <div className="container">
         <div className="navbar-inner">
-          <Link to="/" className="navbar-logo">
+          <Link to="/" className="navbar-logo" onClick={() => setIsMenuOpen(false)}>
             <div className="navbar-logo-icon spin-ball" style={{ background: 'none', fontSize: 24 }}>
               ⚽
             </div>
@@ -35,9 +35,16 @@ export default function Navbar() {
             {user ? (
               <>
                 <Link to="/dashboard" className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
-                <Link to="/dashboard/tournaments" className={`nav-link ${isActive('/dashboard/tournaments') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Meus Torneios</Link>
+                <Link to="/profile" className={`nav-link ${isActive('/profile') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <User size={18} /> Perfil
+                </Link>
+                {(user.role === 'admin' || user.role === 'superadmin') && (
+                  <Link to="/admin/users" className={`nav-link ${isActive('/admin/users') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Settings size={18} /> Gestão
+                  </Link>
+                )}
                 <NotificationCenter />
-                <button onClick={handleLogout} className="btn btn-secondary btn-sm">Sair</button>
+                <button onClick={handleLogout} className="btn btn-secondary btn-sm" style={{ color: 'var(--red)', borderColor: 'rgba(255,0,0,0.2)' }}>Sair</button>
               </>
             ) : (
               <>
