@@ -82,7 +82,16 @@ export default function Explore() {
           <div className="empty-state">
             <div className="empty-state-icon">⚽</div>
             <h3>Nenhum torneio encontrado</h3>
-            <p>Tenta pesquisar por outro nome ou bairro.</p>
+            <p style={{ marginBottom: 24 }}>{search || cityFilter || neighborhoodFilter ? 'Tenta ajustar os teus filtros ou pesquisa.' : 'Ainda não existem torneios ativos nesta zona.'}</p>
+            {search || cityFilter || neighborhoodFilter ? (
+              <button className="btn btn-secondary" onClick={() => { setSearch(''); setCityFilter(''); setNeighborhoodFilter(''); }}>
+                Limpar Todos os Filtros
+              </button>
+            ) : (
+              <Link to="/dashboard/tournaments/new" className="btn btn-primary">
+                <Trophy size={16} /> Criar o Meu Torneio
+              </Link>
+            )}
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24 }}>

@@ -158,7 +158,13 @@ export default function TournamentNew() {
               <ArrowLeft size={15} /> Anterior
             </button>
             {step < STEPS.length - 1 ? (
-              <button className="btn btn-primary" onClick={() => setStep(s => s + 1)}
+              <button className="btn btn-primary" onClick={() => {
+                const today = new Date().toISOString().split('T')[0];
+                if (form.startDate && form.startDate < today) {
+                  return toast.error('A data de início não pode ser no passado.');
+                }
+                setStep(s => s + 1);
+              }}
                 disabled={step === 0 && (!form.name || !form.neighborhood || !form.location)}>
                 Próximo <ArrowRight size={15} />
               </button>
