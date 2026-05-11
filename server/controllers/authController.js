@@ -54,40 +54,41 @@ exports.me = async (req, res) => {
 
 exports.forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: 'Não existe utilizador com este email.' });
+    const { identifier } = req.body;
+    const user = await User.findOne({ 
+      $or: [{ email: identifier?.toLowerCase() }, { phone: identifier }] 
+    });
+    
+    if (!user) return res.status(404).json({ message: 'Utilizador não encontrado.' });
 
-    const crypto = require('crypto');
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 hora
+    // Gerar código de 6 dígitos
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    user.resetPasswordToken = resetCode; 
+    user.resetPasswordExpires = Date.now() + 600000; // 10 minutos
     await user.save({ validateBeforeSave: false });
 
-    // Aqui enviaríamos o email. Por agora vamos retornar o token para teste.
-    const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
-    
+    // Aqui integraríamos a API do WhatsApp. Por agora, retornamos o código.
     res.json({ 
-      message: 'Token de recuperação gerado!', 
-      resetUrl, // No futuro isto será enviado por email
-      resetToken 
+      message: 'Código de recuperação gerado!', 
+      phone: user.phone,
+      code: resetCode 
     });
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
 exports.resetPassword = async (req, res) => {
   try {
-    const crypto = require('crypto');
-    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
-
+    const { code, password } = req.body;
+    
     const user = await User.findOne({
-      resetPasswordToken: hashedToken,
+      resetPasswordToken: code,
       resetPasswordExpires: { $gt: Date.now() }
     });
 
-    if (!user) return res.status(400).json({ message: 'Token inválido ou expirado.' });
+    if (!user) return res.status(400).json({ message: 'Código inválido ou expirado.' });
 
-    user.password = req.body.password;
+    user.password = password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
