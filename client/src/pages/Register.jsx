@@ -7,7 +7,7 @@ import { UserPlus, Eye, EyeOff } from 'lucide-react';
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirm: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -18,7 +18,7 @@ export default function Register() {
     if (form.password.length < 6) return setError('A senha deve ter pelo menos 6 caracteres.');
     setLoading(true); setError('');
     try {
-      await register(form.name, form.email, form.password);
+      await register(form.name, form.email, form.phone, form.password);
       toast.success('Conta criada! Bem-vindo à Bola na Zona 🎉');
       navigate('/dashboard');
     } catch (err) {
@@ -41,15 +41,21 @@ export default function Register() {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div className="form-group">
-              <label className="form-label">Nome</label>
+              <label className="form-label">Nome Completo</label>
               <input id="reg-name" type="text" className="form-input" placeholder="O teu nome"
                 value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Email</label>
+              <label className="form-label">Número de Telemóvel</label>
+              <input id="reg-phone" type="tel" className="form-input" placeholder="Ex: 841234567"
+                value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Email (Opcional)</label>
               <input id="reg-email" type="email" className="form-input" placeholder="teu@email.com"
-                value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
+                value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
             </div>
 
             <div className="form-group">

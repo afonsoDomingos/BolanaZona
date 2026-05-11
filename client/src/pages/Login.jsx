@@ -7,7 +7,7 @@ import { LogIn, Eye, EyeOff } from 'lucide-react';
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ identifier: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -16,7 +16,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true); setError('');
     try {
-      await login(form.email, form.password);
+      await login(form.identifier, form.password);
       toast.success('Bem-vindo de volta!');
       navigate('/dashboard');
     } catch (err) {
@@ -39,9 +39,9 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div className="form-group">
-              <label className="form-label">Email</label>
-              <input id="login-email" type="email" className="form-input" placeholder="teu@email.com"
-                value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
+              <label className="form-label">Email ou Telemóvel</label>
+              <input id="login-identifier" type="text" className="form-input" placeholder="teu@email.com ou 84..."
+                value={form.identifier} onChange={e => setForm({ ...form, identifier: e.target.value })} required />
             </div>
 
             <div className="form-group">

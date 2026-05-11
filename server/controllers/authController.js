@@ -5,10 +5,20 @@ const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: 
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
-    const exists = await User.findOne({ email });
-    if (exists) return res.status(400).json({ message: 'Email já registado.' });
-    const user = await User.create({ name, email, password, role: role || 'admin' });
+    const { name, email, phone, password, role } = req.body;
+    if (!phone) return res.status(400).json({ message: 'Número de telefone é obrigatório.' });
+
+    const exists = await User.findOne({ $or: [
+      { email: email ? email.toLowerCase() : undefined },
+      { phone }
+    ].filter(q => q.email || q.phone) });
+
+    if (exists) {
+      const field = (email && exists.email === email.toLowerCase()) ? 'Email' : 'Telefone';
+      return res.status(400).json({ message: `${field} já registado.` });
+    }
+
+    const user = await User.create({ name, email, phone, password, role: role || 'admin' });
     const token = signToken(user._id);
     res.status(201).json({ token, user });
   } catch (err) {
@@ -18,9 +28,16 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: 'Email e senha obrigatórios.' });
-    const user = await User.findOne({ email }).select('+password');
+    const { identifier, password } = req.body;
+    if (!identifier || !password) return res.status(400).json({ message: 'Utilizador e senha obrigatórios.' });
+
+    const user = await User.findOne({ 
+      $or: [
+        { email: identifier.toLowerCase() },
+        { phone: identifier }
+      ]
+    }).select('+password');
+
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: 'Credenciais inválidas.' });
     }
