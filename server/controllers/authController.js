@@ -9,16 +9,19 @@ exports.register = async (req, res) => {
     if (!phone) return res.status(400).json({ message: 'Número de telefone é obrigatório.' });
 
     const exists = await User.findOne({ $or: [
-      { email: email ? email.toLowerCase() : undefined },
+      { email: email && email.trim() !== '' ? email.toLowerCase() : '---non-existent-email---' },
       { phone }
-    ].filter(q => q.email || q.phone) });
+    ].filter(q => q.email !== '---non-existent-email---') });
 
     if (exists) {
-      const field = (email && exists.email === email.toLowerCase()) ? 'Email' : 'Telefone';
+      const field = (email && email.trim() !== '' && exists.email === email.toLowerCase()) ? 'Email' : 'Telefone';
       return res.status(400).json({ message: `${field} já registado.` });
     }
 
-    const user = await User.create({ name, email, phone, password, role: role || 'admin' });
+    const userData = { name, phone, password, role: role || 'admin' };
+    if (email && email.trim() !== '') userData.email = email.toLowerCase();
+
+    const user = await User.create(userData);
     const token = signToken(user._id);
     res.status(201).json({ token, user });
   } catch (err) {
