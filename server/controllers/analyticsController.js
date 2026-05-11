@@ -2,12 +2,14 @@ const Analytics = require('../models/Analytics');
 
 exports.track = async (req, res) => {
   try {
-    const { type, page, targetId, targetName } = req.body;
+    const { type, page, targetId, targetName, deviceType, os } = req.body;
     await Analytics.create({
       type, page, targetId, targetName,
       user: req.user?._id,
       ip: req.ip,
-      userAgent: req.headers['user-agent']
+      userAgent: req.headers['user-agent'],
+      deviceType,
+      os
     });
 
     if (req.user) {
@@ -49,6 +51,17 @@ exports.getStats = async (req, res) => {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     const onlineUsers = await User.find({ lastSeen: { $gte: fiveMinutesAgo } }).select('name email role lastSeen');
 
-    res.json({ totalVisits, totalPurchases, topProducts, pageVisits, recentEvents, onlineUsers });
+    // Dispositivos e OS
+    const deviceStats = await Analytics.aggregate([
+      { $match: { type: 'visit', deviceType: { $ne: null } } },
+      { $group: { _id: '$deviceType', count: { $sum: 1 } } }
+    ]);
+
+    const osStats = await Analytics.aggregate([
+      { $match: { type: 'visit', os: { $ne: null } } },
+      { $group: { _id: '$os', count: { $sum: 1 } } }
+    ]);
+
+    res.json({ totalVisits, totalPurchases, topProducts, pageVisits, recentEvents, onlineUsers, deviceStats, osStats });
   } catch (err) { res.status(500).json({ message: err.message }); }
 };

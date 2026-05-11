@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Users, ShoppingCart, Eye, Activity, Clock, MousePointer2, ShieldCheck, Mail, MessageSquare } from 'lucide-react';
+import { Users, ShoppingCart, Eye, Activity, Clock, MousePointer2, ShieldCheck, Mail, MessageSquare, Smartphone } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminAnalytics() {
@@ -72,6 +72,7 @@ export default function AdminAnalytics() {
           {[
             { id: 'overview', label: 'Visão Geral', icon: <Eye size={16} /> },
             { id: 'suggestions', label: 'Sugestões', icon: <MessageSquare size={16} /> },
+            { id: 'tech', label: 'Tecnologia', icon: <Smartphone size={16} /> },
             { id: 'online', label: 'Utilizadores Online', icon: <Activity size={16} /> },
             { id: 'logs', label: 'Log de Atividade', icon: <Clock size={16} /> },
             { id: 'products', label: 'Top Produtos', icon: <ShoppingCart size={16} /> },
@@ -132,6 +133,43 @@ export default function AdminAnalytics() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {activeTab === 'tech' && (
+            <div style={{ padding: 24, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 32 }}>
+              <div>
+                <h3 style={{ marginBottom: 20 }}>Dispositivos</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {stats.deviceStats?.map(ds => (
+                    <div key={ds._id} style={{ background: 'rgba(255,255,255,0.02)', padding: 16, borderRadius: 12 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <span style={{ fontWeight: 700, textTransform: 'capitalize' }}>{ds._id}</span>
+                        <span style={{ color: 'var(--green)' }}>{ds.count}</span>
+                      </div>
+                      <div style={{ height: 6, background: 'rgba(255,255,255,0.05)', borderRadius: 3 }}>
+                        <div style={{ width: `${(ds.count / stats.totalVisits) * 100}%`, height: '100%', background: 'var(--green)', borderRadius: 3 }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 style={{ marginBottom: 20 }}>Sistemas Operativos</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {stats.osStats?.map(os => (
+                    <div key={os._id} style={{ background: 'rgba(255,255,255,0.02)', padding: 16, borderRadius: 12 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <span style={{ fontWeight: 700 }}>{os._id}</span>
+                        <span style={{ color: 'var(--blue)' }}>{os.count}</span>
+                      </div>
+                      <div style={{ height: 6, background: 'rgba(255,255,255,0.05)', borderRadius: 3 }}>
+                        <div style={{ width: `${(os.count / stats.totalVisits) * 100}%`, height: '100%', background: 'var(--blue)', borderRadius: 3 }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 

@@ -12,6 +12,8 @@ const analyticsSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   ip: { type: String },
   userAgent: { type: String },
+  deviceType: { type: String }, // mobile, desktop, tablet
+  os: { type: String }, // windows, android, ios, macos, etc
 }, { timestamps: true });
 
 module.exports = mongoose.model('Analytics', analyticsSchema);
