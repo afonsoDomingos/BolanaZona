@@ -255,12 +255,13 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   background: var(--green); display: flex; align-items: center; justify-content: center;
   font-size: 18px;
 }
-.navbar-logo-text { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; }
-.navbar-nav { display: flex; align-items: center; gap: 4px; }
+.navbar-logo-text { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; white-space: nowrap; }
+.navbar-nav { display: flex; align-items: center; gap: 2px; }
 .mobile-menu-btn { display: none; }
 .nav-link {
-  padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 500;
+  padding: 6px 10px; border-radius: 8px; font-size: 13px; font-weight: 500;
   color: var(--text-secondary); transition: var(--transition);
+  white-space: nowrap;
 }
 .nav-link:hover, .nav-link.active { background: var(--bg-card); color: var(--text-primary); }
 .nav-link.active { color: var(--green); }

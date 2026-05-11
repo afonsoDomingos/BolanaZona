@@ -18,7 +18,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="container">
         <div className="navbar-inner">
-          <Link to="/" className="navbar-logo" onClick={() => setIsMenuOpen(false)}>
+          <Link to="/" className="navbar-logo" onClick={() => setIsMenuOpen(false)} style={{ flexShrink: 0 }}>
             <div className="navbar-logo-icon spin-ball" style={{ background: 'none', fontSize: 24 }}>
               ⚽
             </div>
