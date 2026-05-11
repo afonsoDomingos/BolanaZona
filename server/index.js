@@ -21,6 +21,7 @@ app.use('/api/players', require('./routes/players'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/leads', require('./routes/leads'));
+app.use('/api/suggestions', require('./routes/suggestions'));
 app.use('/api/users', require('./routes/users'));
 
 // Health check

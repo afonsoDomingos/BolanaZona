@@ -15,6 +15,7 @@ import Explore from './pages/Explore';
 import Talents from './pages/Talents';
 import Store from './pages/Store';
 import AdminAnalytics from './pages/AdminAnalytics';
+import Support from './pages/Support';
 import ResetPassword from './pages/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword';
 import TournamentList from './pages/TournamentList';
@@ -55,6 +56,7 @@ function AppRoutes() {
           <Route path="/dashboard/analytics" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminAnalytics /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['superadmin']}><UserManagement /></ProtectedRoute>} />
+          <Route path="/support" element={<Support />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>

@@ -31,6 +31,9 @@ export default function Navbar() {
             <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <ShoppingBag size={18} /> Loja
             </Link>
+            <Link to="/support" className={`nav-link ${isActive('/support') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Heart size={18} color="var(--red)" /> Apoiar
+            </Link>
 
             {user ? (
               <>

@@ -1,4 +1,5 @@
 import { Linkedin, Heart } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
@@ -15,15 +16,18 @@ export default function Footer() {
             Vibe
           </a>
         </p>
-        <a 
-          href="https://www.linkedin.com/in/afonso-domingos-6b59361a5/" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          style={{ color: 'var(--text-muted)', transition: 'var(--transition)' }}
-          className="hover-green"
-        >
-          <Linkedin size={18} />
-        </a>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+          <Link to="/support" style={{ color: 'var(--text-muted)', fontSize: 13, textDecoration: 'none' }} className="hover-green">Apoiar & Sugerir</Link>
+          <a 
+            href="https://www.linkedin.com/in/afonso-domingos-6b59361a5/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ color: 'var(--text-muted)', transition: 'var(--transition)' }}
+            className="hover-green"
+          >
+            <Linkedin size={18} />
+          </a>
+        </div>
         <p style={{ fontSize: 11, color: 'var(--text-muted)', opacity: 0.5 }}>
           © {new Date().getFullYear()} Bola na Zona · Todos os direitos reservados.
         </p>
