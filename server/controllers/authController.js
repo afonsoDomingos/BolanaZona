@@ -32,7 +32,12 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { identifier, password } = req.body;
-    if (!identifier || !password) return res.status(400).json({ message: 'Utilizador e senha obrigatórios.' });
+    console.log('🔑 Tentativa de login para:', identifier);
+
+    if (!identifier || !password) {
+      console.log('⚠️ Falha: Identificador ou senha ausentes');
+      return res.status(400).json({ message: 'Utilizador e senha obrigatórios.' });
+    }
 
     // Normalizar identificador se for telemóvel
     let normalizedIdentifier = identifier.trim();
@@ -40,6 +45,7 @@ exports.login = async (req, res) => {
       const digits = normalizedIdentifier.replace(/\D/g, '');
       normalizedIdentifier = digits.length > 9 ? digits.slice(-9) : digits;
     }
+    console.log('🔍 Identificador normalizado:', normalizedIdentifier);
 
     const user = await User.findOne({ 
       $or: [
@@ -48,12 +54,22 @@ exports.login = async (req, res) => {
       ]
     }).select('+password');
 
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user) {
+      console.log('❌ Utilizador não encontrado no DB');
       return res.status(401).json({ message: 'Credenciais inválidas.' });
     }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      console.log('❌ Senha incorreta para o utilizador:', user.phone || user.email);
+      return res.status(401).json({ message: 'Credenciais inválidas.' });
+    }
+
+    console.log('✅ Login bem-sucedido para:', user.name);
     const token = signToken(user._id);
     res.json({ token, user });
   } catch (err) {
+    console.error('🔥 Erro no processo de login:', err.message);
     res.status(500).json({ message: err.message });
   }
 };

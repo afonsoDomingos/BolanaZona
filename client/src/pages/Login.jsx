@@ -15,6 +15,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); setError('');
+    console.log('🚀 Submetendo formulário de login...');
     
     // Se for telemóvel, normalizar para 9 dígitos
     let sanitizedIdentifier = form.identifier.trim();
@@ -22,12 +23,15 @@ export default function Login() {
       const digits = sanitizedIdentifier.replace(/\D/g, '');
       sanitizedIdentifier = digits.length > 9 ? digits.slice(-9) : digits;
     }
+    console.log('📱 Identificador a enviar:', sanitizedIdentifier);
 
     try {
-      await login(sanitizedIdentifier, form.password);
+      const result = await login(sanitizedIdentifier, form.password);
+      console.log('✅ Login context resolvido com sucesso');
       toast.success('Bem-vindo de volta!');
       navigate('/dashboard');
     } catch (err) {
+      console.error('❌ Erro capturado no Login.jsx:', err);
       setError(err.response?.data?.message || 'Credenciais inválidas.');
     } finally { setLoading(false); }
   };
