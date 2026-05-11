@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { Trophy, Calendar, BarChart2, Users, Share2, MapPin, ArrowLeft, Star, Clock, Camera } from 'lucide-react';
 import TeamRegistrationModal from '../components/TeamRegistrationModal';
@@ -12,6 +12,9 @@ const statusLabel = { draft: 'Brevemente', registration: 'Inscrições Abertas',
 
 export default function PublicTournament() {
   const { shareCode } = useParams();
+  const [searchParams] = useSearchParams();
+  const showRegisterAction = searchParams.get('reg') === 'true';
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('standings');
@@ -134,7 +137,7 @@ export default function PublicTournament() {
               <button onClick={copyLink} className="btn btn-secondary" style={{ borderRadius: 12, height: 48 }}><Share2 size={18} /> Partilhar</button>
               <button onClick={() => setShowSubscribeModal(true)} className="btn btn-secondary" style={{ borderRadius: 12, height: 48, borderColor: 'var(--green)', color: 'var(--green)' }}><Clock size={18} /> Seguir Torneio</button>
               <button onClick={() => setShowSponsorModal(true)} className="btn btn-secondary" style={{ borderRadius: 12, height: 48, borderColor: 'var(--yellow)', color: 'var(--yellow)' }}>🤝 Apoiar</button>
-              {tournament.status === 'registration' && tournament.allowPublicRegistration && (
+              {tournament.status === 'registration' && tournament.allowPublicRegistration && showRegisterAction && (
                 <button onClick={() => setShowRegistrationModal(true)} className="btn btn-primary" style={{ borderRadius: 12, height: 48, padding: '0 32px', fontWeight: 700 }}>Inscrever Equipa</button>
               )}
             </div>

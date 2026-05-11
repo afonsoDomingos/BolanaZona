@@ -266,11 +266,11 @@ export default function TournamentDetail() {
             </p>
             {tournament.allowPublicRegistration && (
               <div style={{ display: 'flex', gap: 8, width: '100%', background: 'var(--bg-main)', padding: 8, borderRadius: 8 }}>
-                <span className="share-url" style={{ flex: 1, fontSize: 12 }}>{shareUrl}?action=register</span>
+                <span className="share-url" style={{ flex: 1, fontSize: 12 }}>{shareUrl}?reg=true</span>
                 <button className="btn btn-secondary btn-sm" onClick={() => {
-                  navigator.clipboard.writeText(`${shareUrl}?action=register`);
-                  toast.success('Link de Inscrição copiado!');
-                }}><Copy size={13} /> Copiar</button>
+                  navigator.clipboard.writeText(`${shareUrl}?reg=true`);
+                  toast.success('Link de Inscrição copiado! 🔗');
+                }}><Copy size={13} /> Copiar Link Privado</button>
               </div>
             )}
           </div>
