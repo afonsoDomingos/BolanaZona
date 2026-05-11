@@ -8,16 +8,24 @@ export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirm: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirm: '', role: 'player' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPw, setShowPw] = useState(false);
 
+  const roles = [
+    { id: 'admin', title: 'Organizador', desc: 'Criar e gerir torneios', icon: '🏆' },
+    { id: 'player', title: 'Jogador', desc: 'Participar em equipas', icon: '⚽' },
+    { id: 'viewer', title: 'Torcedor', desc: 'Seguir classificações', icon: '📣' },
+  ];
+
   const handleNext = (e) => {
     e.preventDefault();
-    if (!form.name || !form.phone) return setError('Nome e Telemóvel são obrigatórios.');
+    if (step === 2) {
+      if (!form.name || !form.phone) return setError('Nome e Telemóvel são obrigatórios.');
+    }
     setError('');
-    setStep(2);
+    setStep(step + 1);
   };
 
   const handleSubmit = async (e) => {
@@ -30,11 +38,14 @@ export default function Register() {
     const sanitizedPhone = digits.length > 9 ? digits.slice(-9) : digits;
     
     setLoading(true); setError('');
+    console.log('🚀 Iniciando registo com role:', form.role);
+    
     try {
-      await register(form.name, form.email, sanitizedPhone, form.password);
+      await register(form.name, form.email, sanitizedPhone, form.password, form.role);
       toast.success('Conta criada! Bem-vindo 🎉');
       navigate('/dashboard');
     } catch (err) {
+      console.error('❌ Erro no registo:', err);
       setError(err.response?.data?.message || 'Erro ao criar conta.');
     } finally { setLoading(false); }
   };
@@ -42,12 +53,12 @@ export default function Register() {
   return (
     <div className="auth-page-wrapper" style={{ minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 20px 40px',
       background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,200,83,0.1) 0%, transparent 70%)' }}>
-      <div style={{ width: '100%', maxWidth: 440 }} className="animate-slide-up">
+      <div style={{ width: '100%', maxWidth: 460 }} className="animate-slide-up">
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
           <div className="spin-ball" style={{ fontSize: 40, marginBottom: 12 }}>⚽</div>
           <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Criar Conta</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
-            Passo {step} de 2 — {step === 1 ? 'Identificação' : 'Segurança'}
+            Passo {step} de 3 — {step === 1 ? 'O teu perfil' : step === 2 ? 'Identificação' : 'Segurança'}
           </p>
         </div>
 
@@ -55,6 +66,34 @@ export default function Register() {
           {error && <div className="alert alert-error" style={{ marginBottom: 16, padding: '8px 12px', fontSize: 13 }}>{error}</div>}
 
           {step === 1 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <label className="form-label" style={{ textAlign: 'center', marginBottom: 8 }}>Como pretendes usar a plataforma?</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {roles.map(r => (
+                  <div key={r.id} 
+                    onClick={() => setForm({ ...form, role: r.id })}
+                    style={{ 
+                      padding: '16px 20px', borderRadius: 16, cursor: 'pointer', transition: '0.2s',
+                      background: form.role === r.id ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.03)',
+                      border: '1px solid ' + (form.role === r.id ? 'var(--green)' : 'rgba(255,255,255,0.1)'),
+                      display: 'flex', alignItems: 'center', gap: 16
+                    }}>
+                    <div style={{ fontSize: 24 }}>{r.icon}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, fontSize: 15, color: form.role === r.id ? 'var(--green)' : '#fff' }}>{r.title}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{r.desc}</div>
+                    </div>
+                    <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid ' + (form.role === r.id ? 'var(--green)' : 'rgba(255,255,255,0.2)'), position: 'relative' }}>
+                      {form.role === r.id && <div style={{ position: 'absolute', top: 4, left: 4, width: 8, height: 8, borderRadius: '50%', background: 'var(--green)' }} />}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setStep(2)} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 16, height: 48 }}>
+                Continuar <ArrowRight size={18} />
+              </button>
+            </div>
+          ) : step === 2 ? (
             <form onSubmit={handleNext} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div className="form-group">
                 <label className="form-label">Nome Completo</label>
@@ -74,9 +113,14 @@ export default function Register() {
                   value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
               </div>
 
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 8 }}>
-                Próximo Passo <ArrowRight size={16} />
-              </button>
+              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                <button type="button" onClick={() => setStep(1)} className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center' }}>
+                  Voltar
+                </button>
+                <button type="submit" className="btn btn-primary" style={{ flex: 2, justifyContent: 'center' }}>
+                  Próximo <ArrowRight size={16} />
+                </button>
+              </div>
             </form>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -101,7 +145,7 @@ export default function Register() {
               </div>
 
               <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-                <button type="button" onClick={() => setStep(1)} className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center' }}>
+                <button type="button" onClick={() => setStep(2)} className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center' }}>
                   Voltar
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={loading} style={{ flex: 2, justifyContent: 'center' }}>

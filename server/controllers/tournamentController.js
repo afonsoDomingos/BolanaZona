@@ -1,6 +1,7 @@
 const Team = require('../models/Team');
 const Match = require('../models/Match');
 const Tournament = require('../models/Tournament');
+const User = require('../models/User');
 const { create: createNotification } = require('./notificationController');
 
 // GET /api/tournaments
@@ -68,10 +69,17 @@ exports.getAllPublicTournaments = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     const tournament = await Tournament.create({ ...req.body, createdBy: req.user._id });
+    
+    // Promoção automática: se o utilizador não for admin/superadmin, torna-se admin
+    if (req.user.role !== 'admin' && req.user.role !== 'superadmin') {
+      await User.findByIdAndUpdate(req.user._id, { role: 'admin' });
+      console.log(`🚀 Utilizador ${req.user.name} promovido a ORGANIZADOR (admin) por criar um torneio.`);
+    }
+
     await createNotification(
       req.user._id,
       'Torneio Criado 🏆',
-      `O teu torneio "${tournament.name}" foi criado com sucesso.`,
+      `O teu torneio "${tournament.name}" foi criado com sucesso. Agora és um ORGANIZADOR!`,
       'success',
       `/dashboard/tournaments/${tournament._id}`
     );

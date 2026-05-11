@@ -6,6 +6,8 @@ const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: 
 exports.register = async (req, res) => {
   try {
     const { name, email, phone, password, role } = req.body;
+    console.log('📝 Nova tentativa de registo:', { name, phone, role });
+
     if (!phone) return res.status(400).json({ message: 'Número de telefone é obrigatório.' });
 
     const exists = await User.findOne({ $or: [
@@ -14,17 +16,21 @@ exports.register = async (req, res) => {
     ].filter(q => q.email !== '---non-existent-email---') });
 
     if (exists) {
+      console.log('⚠️ Registo falhou: Email ou Telefone já existe');
       const field = (email && email.trim() !== '' && exists.email === email.toLowerCase()) ? 'Email' : 'Telefone';
       return res.status(400).json({ message: `${field} já registado.` });
     }
 
-    const userData = { name, phone, password, role: role || 'admin' };
+    const userData = { name, phone, password, role: role || 'viewer' };
     if (email && email.trim() !== '') userData.email = email.toLowerCase();
 
     const user = await User.create(userData);
+    console.log('✅ Utilizador criado com sucesso:', user._id, 'Role:', user.role);
+    
     const token = signToken(user._id);
     res.status(201).json({ token, user });
   } catch (err) {
+    console.error('🔥 Erro no registo:', err.message);
     res.status(500).json({ message: err.message });
   }
 };
