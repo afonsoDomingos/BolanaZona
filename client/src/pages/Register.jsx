@@ -27,19 +27,19 @@ export default function Register() {
   };
 
   return (
-    <div style={{ minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+    <div style={{ height: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, overflow: 'hidden',
       background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,200,83,0.1) 0%, transparent 70%)' }}>
       <div style={{ width: '100%', maxWidth: 440 }} className="animate-slide-up">
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div className="spin-ball" style={{ fontSize: 48, marginBottom: 16 }}>⚽</div>
-          <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8 }}>Criar Conta</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Começa a criar torneios hoje</p>
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <div className="spin-ball" style={{ fontSize: 40, marginBottom: 12 }}>⚽</div>
+          <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>Criar Conta</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Começa a criar torneios hoje</p>
         </div>
 
-        <div className="card-glass" style={{ padding: 32 }}>
-          {error && <div className="alert alert-error" style={{ marginBottom: 20 }}>{error}</div>}
+        <div className="card-glass" style={{ padding: '24px 32px' }}>
+          {error && <div className="alert alert-error" style={{ marginBottom: 16, padding: '8px 12px', fontSize: 13 }}>{error}</div>}
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div className="form-group">
               <label className="form-label">Nome Completo</label>
               <input id="reg-name" type="text" className="form-input" placeholder="O teu nome"

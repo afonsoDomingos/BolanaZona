@@ -25,9 +25,9 @@ export default function Login() {
   };
 
   return (
-    <div style={{ minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+    <div style={{ height: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, overflow: 'hidden',
       background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,200,83,0.1) 0%, transparent 70%)' }}>
-      <div style={{ width: '100%', maxWidth: 420 }} className="animate-slide-up">
+      <div style={{ width: '100%', maxWidth: 400 }} className="animate-slide-up">
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div className="spin-ball" style={{ fontSize: 48, marginBottom: 16 }}>⚽</div>
           <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8 }}>Entrar na Zona</h1>
