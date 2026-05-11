@@ -301,10 +301,27 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .navbar-nav { display: none; }
   .navbar-nav.mobile-open {
     display: flex; position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
-    background: var(--bg-primary); flex-direction: column; padding: 24px; gap: 16px;
-    animation: slideUp 0.3s ease; z-index: 99;
+    background: rgba(8, 13, 26, 0.98); 
+    backdrop-filter: blur(20px);
+    flex-direction: column; padding: 32px 24px; gap: 16px;
+    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 99;
+    border-top: 1px solid var(--border);
   }
-  .navbar-nav.mobile-open .nav-link { font-size: 18px; padding: 16px; border-bottom: 1px solid var(--border); width: 100%; }
+  .navbar-nav.mobile-open .nav-link { 
+    font-size: 20px; 
+    font-weight: 700;
+    padding: 18px; 
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    width: 100%; 
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .navbar-nav.mobile-open .nav-link:hover {
+    background: var(--bg-card-hover);
+    color: var(--green);
+  }
   
   .mobile-menu-btn { display: flex; align-items: center; justify-content: center; background: none; color: var(--text-primary); }
   
