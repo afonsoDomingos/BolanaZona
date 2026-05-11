@@ -46,30 +46,56 @@ export default function MatchShareModal({ match, tournament, onClose }) {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 20, width: '100%', justifyContent: 'center' }}>
               <div style={{ flex: 1, textAlign: 'center' }}>
-                <div style={{ width: 80, height: 80, borderRadius: 20, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', overflow: 'hidden' }}>
+                <div style={{ 
+                  width: 80, height: 80, borderRadius: 22, 
+                  background: 'rgba(255,255,255,0.05)', 
+                  border: '2px solid ' + (match.status === 'finished' && match.homeScore > match.awayScore ? 'var(--green)' : 'rgba(255,255,255,0.1)'),
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', overflow: 'hidden',
+                  boxShadow: match.status === 'finished' && match.homeScore > match.awayScore ? '0 0 20px rgba(0,200,83,0.3)' : 'none'
+                }}>
                   {match.homeTeam.logo ? <img src={match.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 32 }}>👕</span>}
                 </div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>{match.homeTeam.name}</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', maxWidth: 120, margin: '0 auto', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.homeTeam.name}</div>
               </div>
 
-              <div style={{ fontSize: 24, fontWeight: 900, color: 'rgba(255,255,255,0.2)', fontStyle: 'italic' }}>VS</div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 100 }}>
+                {match.status === 'finished' ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 48, fontWeight: 900, color: '#fff' }}>{match.homeScore}</span>
+                    <span style={{ fontSize: 24, fontWeight: 300, color: 'rgba(255,255,255,0.3)' }}>-</span>
+                    <span style={{ fontSize: 48, fontWeight: 900, color: '#fff' }}>{match.awayScore}</span>
+                  </div>
+                ) : (
+                  <div style={{ fontSize: 32, fontWeight: 900, color: 'rgba(255,255,255,0.1)', fontStyle: 'italic', letterSpacing: 4 }}>VS</div>
+                )}
+                <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--green)', marginTop: 4, letterSpacing: 2 }}>{match.status === 'finished' ? 'FINAL' : 'BREVEMENTE'}</div>
+              </div>
 
               <div style={{ flex: 1, textAlign: 'center' }}>
-                <div style={{ width: 80, height: 80, borderRadius: 20, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', overflow: 'hidden' }}>
+                <div style={{ 
+                  width: 80, height: 80, borderRadius: 22, 
+                  background: 'rgba(255,255,255,0.05)', 
+                  border: '2px solid ' + (match.status === 'finished' && match.awayScore > match.homeScore ? 'var(--green)' : 'rgba(255,255,255,0.1)'),
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', overflow: 'hidden',
+                  boxShadow: match.status === 'finished' && match.awayScore > match.homeScore ? '0 0 20px rgba(0,200,83,0.3)' : 'none'
+                }}>
                   {match.awayTeam.logo ? <img src={match.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 32 }}>👕</span>}
                 </div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>{match.awayTeam.name}</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', maxWidth: 120, margin: '0 auto', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.awayTeam.name}</div>
               </div>
             </div>
 
             <div style={{ marginTop: 40, textAlign: 'center' }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--green)' }}>{match.roundName}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>
-                {match.date ? new Date(match.date).toLocaleDateString('pt-PT') : 'Data a definir'}
+              <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', background: 'rgba(255,255,255,0.05)', padding: '4px 16px', borderRadius: 100, border: '1px solid var(--border)' }}>{match.roundName}</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 12, fontWeight: 500 }}>
+                {match.date ? new Date(match.date).toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Data a anunciar'}
               </div>
             </div>
 
-            <div style={{ position: 'absolute', bottom: 20, fontSize: 8, color: 'rgba(255,255,255,0.2)', letterSpacing: 1 }}>BOLANAZONA.PLATFORM</div>
+            <div style={{ position: 'absolute', bottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
+               <div style={{ width: 16, height: 16, background: 'var(--green)', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>⚽</div>
+               <span style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.3)', letterSpacing: 2 }}>BOLANAZONA</span>
+            </div>
           </div>
 
           <div style={{ marginTop: 32, display: 'flex', gap: 12, width: '100%' }}>
