@@ -26,6 +26,8 @@ import Profile from './pages/Profile';
 import UserManagement from './pages/UserManagement';
 import './index.css';
 
+// Bola na Zona - Plataforma Oficial ⚽
+
 // Helper route for guests only
 const GuestRoute = ({ children }) => {
   const { user, loading } = useAuth();
