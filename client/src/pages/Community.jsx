@@ -217,14 +217,40 @@ export default function Community() {
               {post.type === 'goal' && (
                 <div style={{ 
                   textAlign: 'center', 
-                  padding: '32px 0', 
-                  background: post.content.includes('MADRID') ? 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)' : 
-                              post.content.includes('BARÇA') ? 'linear-gradient(135deg, rgba(255,77,77,0.1) 0%, transparent 100%)' :
-                              'linear-gradient(135deg, rgba(0,200,83,0.1) 0%, transparent 100%)',
-                  borderRadius: 16
+                  padding: '40px 20px', 
+                  position: 'relative',
+                  overflow: 'hidden',
+                  background: post.content.includes('MADRID') ? 'linear-gradient(135deg, #fff 0%, #f0f0f0 100%)' : 
+                              post.content.includes('BARÇA') ? 'linear-gradient(135deg, #a50044 0%, #004d98 100%)' :
+                              'linear-gradient(135deg, #00C853 0%, #007a33 100%)',
+                  borderRadius: 16,
+                  boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
                 }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--green)', letterSpacing: 4, marginBottom: 8 }}>VIBRAÇÃO TOTAL</div>
-                  <h2 className="font-syne" style={{ fontSize: 32, fontWeight: 900, color: '#fff', letterSpacing: -1 }}>{post.content}</h2>
+                  {/* Floating Particles */}
+                  <div className="celebration-particles">
+                    <span>⚽</span><span>🔥</span><span>✨</span><span>⚽</span><span>🔥</span>
+                  </div>
+
+                  <div style={{ 
+                    fontSize: 14, 
+                    fontWeight: 800, 
+                    color: post.content.includes('MADRID') ? '#0044aa' : '#fff', 
+                    letterSpacing: 4, 
+                    marginBottom: 12,
+                    opacity: 0.8
+                  }}>VIBRAÇÃO TOTAL</div>
+                  
+                  <h2 className="font-syne pulse-text" style={{ 
+                    fontSize: 38, 
+                    fontWeight: 900, 
+                    color: post.content.includes('MADRID') ? '#000' : '#fff', 
+                    letterSpacing: -1,
+                    textShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                  }}>
+                    {post.content}
+                  </h2>
+
+                  <div style={{ marginTop: 16, fontSize: 24 }} className="bounce-animation">🙌🏆🔥</div>
                 </div>
               )}
 
@@ -246,6 +272,46 @@ export default function Community() {
           ))}
         </div>
       </div>
+      <style>{`
+        .spin-slow { animation: spin 8s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .pulse-text { animation: pulse-text 2s ease-in-out infinite; }
+        @keyframes pulse-text {
+          0%, 100% { transform: scale(1); text-shadow: 0 0 10px rgba(255,255,255,0); }
+          50% { transform: scale(1.05); text-shadow: 0 0 20px rgba(255,255,255,0.4); }
+        }
+
+        .bounce-animation { animation: bounce 2s infinite; }
+        @keyframes bounce {
+          0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+          40% {transform: translateY(-10px);}
+          60% {transform: translateY(-5px);}
+        }
+
+        .celebration-particles {
+          position: absolute; inset: 0; pointer-events: none;
+          display: flex; justify-content: space-around; align-items: flex-end;
+        }
+        .celebration-particles span {
+          font-size: 24px;
+          animation: float-up var(--d, 3s) linear infinite;
+          opacity: 0;
+          transform: translateY(100%);
+        }
+        .celebration-particles span:nth-child(1) { --d: 3s; animation-delay: 0s; left: 10%; }
+        .celebration-particles span:nth-child(2) { --d: 4s; animation-delay: 1s; left: 30%; }
+        .celebration-particles span:nth-child(3) { --d: 2.5s; animation-delay: 0.5s; left: 50%; }
+        .celebration-particles span:nth-child(4) { --d: 3.5s; animation-delay: 1.5s; left: 70%; }
+        .celebration-particles span:nth-child(5) { --d: 4.5s; animation-delay: 2s; left: 90%; }
+
+        @keyframes float-up {
+          0% { transform: translateY(100%) rotate(0deg); opacity: 0; }
+          20% { opacity: 1; }
+          80% { opacity: 1; }
+          100% { transform: translateY(-200%) rotate(360deg); opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }
