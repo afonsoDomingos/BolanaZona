@@ -28,7 +28,6 @@ export default function Navbar() {
           <div className={`navbar-nav ${isMenuOpen ? 'mobile-open' : ''}`}>
             <Link to="/explore" className={`nav-link ${isActive('/explore') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Torneios</Link>
             <Link to="/talents" className={`nav-link ${isActive('/talents') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Talentos</Link>
-            <Link to="/community" className={`nav-link ${isActive('/community') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>Comunidade <span className="badge badge-green" style={{ fontSize: 8, padding: '2px 6px' }}>NOVO</span></Link>
             <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <ShoppingBag size={18} /> Loja
             </Link>
