@@ -2,12 +2,13 @@ const Feedback = require('../models/Feedback');
 
 exports.create = async (req, res) => {
   try {
-    const { experience, source, rating } = req.body;
+    const { experience, source, rating, comment } = req.body;
     const feedback = await Feedback.create({
       user: req.user?._id,
       experience,
       source,
       rating,
+      comment,
       ip: req.ip
     });
     res.status(201).json(feedback);

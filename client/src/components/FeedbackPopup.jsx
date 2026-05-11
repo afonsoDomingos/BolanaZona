@@ -139,6 +139,17 @@ export default function FeedbackPopup() {
               </div>
             </div>
 
+            <div>
+              <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 8 }}>Algum comentário extra? (Opcional)</label>
+              <textarea 
+                className="form-input" 
+                placeholder="Ex: Adorei os prints dos jogos!"
+                style={{ fontSize: 13, minHeight: 60, borderRadius: 12, padding: 12 }}
+                value={form.comment || ''}
+                onChange={e => setForm({ ...form, comment: e.target.value })}
+              />
+            </div>
+
             <button onClick={handleSubmit} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', height: 44, borderRadius: 12 }}>
               Enviar Feedback <Send size={16} />
             </button>
