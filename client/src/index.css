@@ -301,12 +301,14 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .navbar-nav { display: none; }
   .navbar-nav.mobile-open {
     display: flex; position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
-    background: rgba(8, 13, 26, 0.98); 
+    background: #080d1a; /* Fundo 100% sólido para máxima visibilidade */
     backdrop-filter: blur(20px);
-    flex-direction: column; padding: 32px 24px; gap: 16px;
-    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 99;
+    flex-direction: column; padding: 40px 24px; gap: 12px;
+    animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1001; /* Acima de tudo */
     border-top: 1px solid var(--border);
+    overflow-y: auto;
   }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
   .navbar-nav.mobile-open .nav-link { 
     font-size: 20px; 
     font-weight: 700;
