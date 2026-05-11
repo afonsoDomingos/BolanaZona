@@ -23,6 +23,7 @@ app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/suggestions', require('./routes/suggestions'));
 app.use('/api/feedbacks', require('./routes/feedbacks'));
+app.use('/api/posts', require('./routes/posts'));
 app.use('/api/users', require('./routes/users'));
 
 // Health check

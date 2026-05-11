@@ -25,6 +25,7 @@ import TournamentDetail from './pages/TournamentDetail';
 import PublicTournament from './pages/PublicTournament';
 import Profile from './pages/Profile';
 import UserManagement from './pages/UserManagement';
+import Community from './pages/Community';
 import './index.css';
 
 // Bola na Zona - Plataforma Oficial ⚽
@@ -60,6 +61,7 @@ function AppRoutes() {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['superadmin']}><UserManagement /></ProtectedRoute>} />
           <Route path="/support" element={<Support />} />
+          <Route path="/community" element={<Community />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
