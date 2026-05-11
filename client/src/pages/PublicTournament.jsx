@@ -18,17 +18,23 @@ export default function PublicTournament() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('standings');
-  const [showRegistrationModal, setShowRegistrationModal] = useState(window.location.search.includes('action=register'));
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showSponsorModal, setShowSponsorModal] = useState(false);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     api.get(`/tournaments/public/${shareCode}`)
-      .then(res => setData(res.data))
+      .then(res => {
+        setData(res.data);
+        // Só abrir o modal automaticamente se estiver em inscrições e tiver o parâmetro reg=true
+        if (res.data.tournament.status === 'registration' && showRegisterAction) {
+          setShowRegistrationModal(true);
+        }
+      })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
-  }, [shareCode]);
+  }, [shareCode, showRegisterAction]);
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
