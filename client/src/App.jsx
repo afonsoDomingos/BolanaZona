@@ -6,6 +6,7 @@ import AnalyticsTracker from './components/AnalyticsTracker';
 import ScrollToTop from './components/ScrollToTop';
 import InstallPrompt from './components/InstallPrompt';
 import Footer from './components/Footer';
+import FeedbackPopup from './components/FeedbackPopup';
 import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -63,6 +64,7 @@ function AppRoutes() {
         </Routes>
       </main>
       <Footer />
+      <FeedbackPopup />
       <ScrollToTop />
       <InstallPrompt />
       <Toaster
