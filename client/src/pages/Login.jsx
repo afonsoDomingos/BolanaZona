@@ -16,8 +16,12 @@ export default function Login() {
     e.preventDefault();
     setLoading(true); setError('');
     
-    // Se for telemóvel, remover espaços
-    const sanitizedIdentifier = form.identifier.includes('@') ? form.identifier : form.identifier.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+    // Se for telemóvel, normalizar para 9 dígitos
+    let sanitizedIdentifier = form.identifier.trim();
+    if (!sanitizedIdentifier.includes('@')) {
+      const digits = sanitizedIdentifier.replace(/\D/g, '');
+      sanitizedIdentifier = digits.length > 9 ? digits.slice(-9) : digits;
+    }
 
     try {
       await login(sanitizedIdentifier, form.password);

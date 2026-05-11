@@ -12,9 +12,15 @@ export default function ForgotPassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    // Se for telemóvel, normalizar para 9 dígitos
+    let sanitizedIdentifier = identifier.trim();
+    if (!sanitizedIdentifier.includes('@')) {
+      const digits = sanitizedIdentifier.replace(/\D/g, '');
+      sanitizedIdentifier = digits.length > 9 ? digits.slice(-9) : digits;
+    }
+
     try {
-      const res = await api.post('/auth/forgot-password', { identifier });
+      const res = await api.post('/auth/forgot-password', { identifier: sanitizedIdentifier });
       setSentData(res.data);
       toast.success('Código gerado com sucesso!');
     } catch (err) {

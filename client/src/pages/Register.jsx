@@ -25,8 +25,9 @@ export default function Register() {
     if (form.password !== form.confirm) return setError('As senhas não coincidem.');
     if (form.password.length < 6) return setError('A senha deve ter pelo menos 6 caracteres.');
     
-    // Sanitizar número de telefone (remover espaços, traços, etc)
-    const sanitizedPhone = form.phone.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+    // Normalizar para 9 dígitos (padrão Moçambique)
+    const digits = form.phone.replace(/\D/g, '');
+    const sanitizedPhone = digits.length > 9 ? digits.slice(-9) : digits;
     
     setLoading(true); setError('');
     try {

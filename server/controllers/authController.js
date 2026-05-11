@@ -34,10 +34,17 @@ exports.login = async (req, res) => {
     const { identifier, password } = req.body;
     if (!identifier || !password) return res.status(400).json({ message: 'Utilizador e senha obrigatórios.' });
 
+    // Normalizar identificador se for telemóvel
+    let normalizedIdentifier = identifier.trim();
+    if (!normalizedIdentifier.includes('@')) {
+      const digits = normalizedIdentifier.replace(/\D/g, '');
+      normalizedIdentifier = digits.length > 9 ? digits.slice(-9) : digits;
+    }
+
     const user = await User.findOne({ 
       $or: [
-        { email: identifier.toLowerCase() },
-        { phone: identifier }
+        { email: normalizedIdentifier.toLowerCase() },
+        { phone: normalizedIdentifier }
       ]
     }).select('+password');
 
@@ -58,8 +65,20 @@ exports.me = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   try {
     const { identifier } = req.body;
+    if (!identifier) return res.status(400).json({ message: 'Identificador obrigatório.' });
+
+    // Normalizar identificador se for telemóvel
+    let normalizedIdentifier = identifier.trim();
+    if (!normalizedIdentifier.includes('@')) {
+      const digits = normalizedIdentifier.replace(/\D/g, '');
+      normalizedIdentifier = digits.length > 9 ? digits.slice(-9) : digits;
+    }
+
     const user = await User.findOne({ 
-      $or: [{ email: identifier?.toLowerCase() }, { phone: identifier }] 
+      $or: [
+        { email: normalizedIdentifier.toLowerCase() },
+        { phone: normalizedIdentifier }
+      ]
     });
     
     if (!user) return res.status(404).json({ message: 'Utilizador não encontrado.' });
