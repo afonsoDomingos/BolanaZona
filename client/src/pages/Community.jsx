@@ -81,91 +81,78 @@ export default function Community() {
         </header>
 
         {/* POST CREATOR */}
-        {user ? (
-          <div className="card" style={{ padding: 20, marginBottom: 40, border: '1px solid rgba(255, 255, 255, 0.05)', background: 'rgba(255,255,255,0.02)' }}>
-            <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-              <button 
-                onClick={() => setActiveMode('text')}
-                className={`tab ${activeMode === 'text' ? 'active' : ''}`}
-                style={{ flex: 1, borderRadius: 12, fontSize: 13 }}
-              >
-                <MessageSquare size={16} /> Texto
-              </button>
-              <button 
-                onClick={() => setActiveMode('score')}
-                className={`tab ${activeMode === 'score' ? 'active' : ''}`}
-                style={{ flex: 1, borderRadius: 12, fontSize: 13 }}
-              >
-                <Trophy size={16} /> Placar
-              </button>
-              <button 
-                onClick={() => setActiveMode('goal')}
-                className={`tab ${activeMode === 'goal' ? 'active' : ''}`}
-                style={{ flex: 1, borderRadius: 12, fontSize: 13 }}
-              >
-                <Zap size={16} /> GOLO!
-              </button>
-            </div>
-
-            {activeMode === 'text' && (
-              <textarea 
-                className="form-input" 
-                placeholder="Como está o jogo? Alguém a ver o Barça? Fala aqui! ⚽🔥"
-                style={{ minHeight: 80, borderRadius: 16, padding: 16, fontSize: 15 }}
-                value={content}
-                onChange={e => setContent(e.target.value)}
-              />
-            )}
-
-            {activeMode === 'score' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <input className="form-input" placeholder="Equipa A" value={scoreData.teamA} onChange={e => setScoreData({...scoreData, teamA: e.target.value})} />
-                  <input type="number" className="form-input" style={{ width: 70, textAlign: 'center' }} value={scoreData.scoreA} onChange={e => setScoreData({...scoreData, scoreA: parseInt(e.target.value)})} />
-                  <span style={{ fontWeight: 800, color: 'var(--text-muted)' }}>VS</span>
-                  <input type="number" className="form-input" style={{ width: 70, textAlign: 'center' }} value={scoreData.scoreB} onChange={e => setScoreData({...scoreData, scoreB: parseInt(e.target.value)})} />
-                  <input className="form-input" placeholder="Equipa B" value={scoreData.teamB} onChange={e => setScoreData({...scoreData, teamB: e.target.value})} />
-                </div>
+        <div className="card" style={{ padding: 20, marginBottom: 40, border: '1px solid rgba(255, 255, 255, 0.05)', background: 'rgba(255,255,255,0.02)' }}>
+          {!user ? (
+            <div style={{ textAlign: 'center', padding: '10px 0' }}>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: 16, fontSize: 14 }}>Queres participar na conversa? Junta-te à malta!</p>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+                <Link to="/login" className="btn btn-secondary btn-sm">Entrar</Link>
+                <Link to="/register" className="btn btn-primary btn-sm">Criar Conta 🚀</Link>
               </div>
-            )}
-
-            {activeMode === 'goal' && (
-              <div style={{ padding: '20px', textAlign: 'center', background: 'rgba(0, 200, 83, 0.05)', borderRadius: 16, border: '1px dashed var(--green)' }}>
-                <div style={{ fontSize: 40, marginBottom: 16 }} className="spin-slow">⚽🔥</div>
-                <h3 style={{ fontWeight: 800, color: 'var(--green)', marginBottom: 16 }}>ESCOLHE A TUA CELEBRAÇÃO!</h3>
-                <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <button onClick={() => handleCreatePost('GOOOOOOOOOLO! ⚽🔥')} className="btn btn-secondary" style={{ borderRadius: 100 }}>Padrão ⚽</button>
-                  <button onClick={() => handleCreatePost('HALA MADRID! ⚪👑')} className="btn btn-secondary" style={{ borderRadius: 100, borderColor: '#fff', color: '#fff' }}>Hala Madrid ⚪</button>
-                  <button onClick={() => handleCreatePost('VISCA BARÇA! 🔴🔵')} className="btn btn-secondary" style={{ borderRadius: 100, borderColor: '#ff4d4d', color: '#ff4d4d' }}>Visca Barça 🔵</button>
-                </div>
-              </div>
-            )}
-
-            <div style={{ marginTop: 20, display: 'flex', justifyContent: 'flex-end' }}>
-              <button 
-                onClick={() => handleCreatePost()} 
-                className="btn btn-primary" 
-                disabled={sending}
-                style={{ padding: '14px 28px', borderRadius: 16, alignSelf: 'flex-end' }}
-              >
-                {sending ? 'A publicar...' : (
-                  <>Publicar no Mural <Send size={18} /></>
-                )}
-              </button>
             </div>
-          </div>
-        ) : (
-          <div className="card" style={{ padding: 32, marginBottom: 40, textAlign: 'center', border: '1px dashed var(--green)', background: 'rgba(0, 200, 83, 0.05)' }}>
-            <div style={{ fontSize: 40, marginBottom: 16 }}>🤝⚽</div>
-            <h3 className="font-syne" style={{ fontSize: 24, fontWeight: 800, marginBottom: 12 }}>JUNTA-TE À CONVERSA!</h3>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: 24, maxWidth: 400, marginInline: 'auto' }}>
-              Cria a tua conta em segundos para poderes publicar resultados, celebrar golos e interagir com outros torcedores.
-            </p>
-            <Link to="/register" className="btn btn-primary" style={{ padding: '14px 40px', borderRadius: 100 }}>
-              Criar Conta Grátis 🚀
-            </Link>
-          </div>
-        )}
+          ) : (
+            <>
+              <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+                <button onClick={() => setActiveMode('text')} className={`tab ${activeMode === 'text' ? 'active' : ''}`} style={{ flex: 1, borderRadius: 12, fontSize: 13 }}>
+                  <MessageSquare size={16} /> Texto
+                </button>
+                <button onClick={() => setActiveMode('score')} className={`tab ${activeMode === 'score' ? 'active' : ''}`} style={{ flex: 1, borderRadius: 12, fontSize: 13 }}>
+                  <Trophy size={16} /> Placar
+                </button>
+                <button onClick={() => setActiveMode('goal')} className={`tab ${activeMode === 'goal' ? 'active' : ''}`} style={{ flex: 1, borderRadius: 12, fontSize: 13 }}>
+                  <Zap size={16} /> GOLO!
+                </button>
+              </div>
+
+              {activeMode === 'text' && (
+                <textarea 
+                  className="form-input" 
+                  placeholder="Como está o jogo? Alguém a ver o Barça? Fala aqui! ⚽🔥"
+                  style={{ minHeight: 80, borderRadius: 16, padding: 16, fontSize: 15 }}
+                  value={content}
+                  onChange={e => setContent(e.target.value)}
+                />
+              )}
+
+              {activeMode === 'score' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <input className="form-input" placeholder="Equipa A" value={scoreData.teamA} onChange={e => setScoreData({...scoreData, teamA: e.target.value})} />
+                    <input type="number" className="form-input" style={{ width: 70, textAlign: 'center' }} value={scoreData.scoreA} onChange={e => setScoreData({...scoreData, scoreA: parseInt(e.target.value)})} />
+                    <span style={{ fontWeight: 800, color: 'var(--text-muted)' }}>VS</span>
+                    <input type="number" className="form-input" style={{ width: 70, textAlign: 'center' }} value={scoreData.scoreB} onChange={e => setScoreData({...scoreData, scoreB: parseInt(e.target.value)})} />
+                    <input className="form-input" placeholder="Equipa B" value={scoreData.teamB} onChange={e => setScoreData({...scoreData, teamB: e.target.value})} />
+                  </div>
+                </div>
+              )}
+
+              {activeMode === 'goal' && (
+                <div style={{ padding: '20px', textAlign: 'center', background: 'rgba(0, 200, 83, 0.05)', borderRadius: 16, border: '1px dashed var(--green)' }}>
+                  <div style={{ fontSize: 40, marginBottom: 16 }} className="spin-slow">⚽🔥</div>
+                  <h3 style={{ fontWeight: 800, color: 'var(--green)', marginBottom: 16 }}>ESCOLHE A TUA CELEBRAÇÃO!</h3>
+                  <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <button onClick={() => handleCreatePost('GOOOOOOOOOLO! ⚽🔥')} className="btn btn-secondary" style={{ borderRadius: 100 }}>Padrão ⚽</button>
+                    <button onClick={() => handleCreatePost('HALA MADRID! ⚪👑')} className="btn btn-secondary" style={{ borderRadius: 100, borderColor: '#fff', color: '#fff' }}>Hala Madrid ⚪</button>
+                    <button onClick={() => handleCreatePost('VISCA BARÇA! 🔴🔵')} className="btn btn-secondary" style={{ borderRadius: 100, borderColor: '#ff4d4d', color: '#ff4d4d' }}>Visca Barça 🔵</button>
+                  </div>
+                </div>
+              )}
+
+              <div style={{ marginTop: 20, display: 'flex', justifyContent: 'flex-end' }}>
+                <button 
+                  onClick={() => handleCreatePost()} 
+                  className="btn btn-primary" 
+                  disabled={sending}
+                  style={{ padding: '14px 28px', borderRadius: 16, alignSelf: 'flex-end' }}
+                >
+                  {sending ? 'A publicar...' : (
+                    <>Publicar no Mural <Send size={18} /></>
+                  )}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
 
         {/* FEED */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
