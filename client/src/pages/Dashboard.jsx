@@ -63,7 +63,12 @@ export default function Dashboard() {
             <h1 className="font-syne" style={{ fontSize: 32, fontWeight: 800 }}>Olá, {user?.name?.split(' ')[0]} 👋</h1>
             <p style={{ color: 'var(--text-secondary)', marginTop: 6 }}>Resumo dos teus torneios</p>
           </div>
-          <Link to="/dashboard/tournaments/new" className="btn btn-primary"><Plus size={16} /> Novo Torneio</Link>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {(user.role === 'admin' || user.role === 'superadmin') && (
+              <Link to="/admin/users" className="btn btn-secondary"><Users size={16} /> Gerir Utilizadores</Link>
+            )}
+            <Link to="/dashboard/tournaments/new" className="btn btn-primary"><Plus size={16} /> Novo Torneio</Link>
+          </div>
         </div>
 
         <div className="dashboard-grid">
