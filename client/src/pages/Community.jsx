@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { MessageSquare, Trophy, Star, Heart, Send, Plus, Users, Zap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
@@ -51,11 +52,16 @@ export default function Community() {
   };
 
   const toggleLike = async (postId) => {
-    if (!user) return toast.error('Faz login para dar like! ❤️');
+    if (!user) {
+      toast('Faz login para poderes reagir! ❤️', { icon: '🤝' });
+      return;
+    }
     try {
       await api.post(`/posts/${postId}/like`);
       fetchPosts();
-    } catch { toast.error('Erro ao reagir.'); }
+    } catch {
+      toast.error('Erro ao reagir.');
+    }
   };
 
   return (
@@ -75,8 +81,8 @@ export default function Community() {
         </header>
 
         {/* POST CREATOR */}
-        {user && (
-          <div className="card" style={{ padding: 20, marginBottom: 40, border: '1px solid rgba(0, 200, 83, 0.2)' }}>
+        {user ? (
+          <div className="card" style={{ padding: 20, marginBottom: 40, border: '1px solid rgba(255, 255, 255, 0.05)', background: 'rgba(255,255,255,0.02)' }}>
             <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
               <button 
                 onClick={() => setActiveMode('text')}
@@ -147,6 +153,17 @@ export default function Community() {
                 )}
               </button>
             </div>
+          </div>
+        ) : (
+          <div className="card" style={{ padding: 32, marginBottom: 40, textAlign: 'center', border: '1px dashed var(--green)', background: 'rgba(0, 200, 83, 0.05)' }}>
+            <div style={{ fontSize: 40, marginBottom: 16 }}>🤝⚽</div>
+            <h3 className="font-syne" style={{ fontSize: 24, fontWeight: 800, marginBottom: 12 }}>JUNTA-TE À CONVERSA!</h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: 24, maxWidth: 400, marginInline: 'auto' }}>
+              Cria a tua conta em segundos para poderes publicar resultados, celebrar golos e interagir com outros torcedores.
+            </p>
+            <Link to="/register" className="btn btn-primary" style={{ padding: '14px 40px', borderRadius: 100 }}>
+              Criar Conta Grátis 🚀
+            </Link>
           </div>
         )}
 
