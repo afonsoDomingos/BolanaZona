@@ -12,13 +12,15 @@ export default function Login() {
   const [error, setError] = useState('');
   const [showPw, setShowPw] = useState(false);
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); setError('');
     console.log('🚀 Submetendo formulário de login...');
     
-    // Se for telemóvel, normalizar para 9 dígitos
+    // Limpeza profunda de espaços e normalização
     let sanitizedIdentifier = form.identifier.trim();
+    const cleanPassword = form.password.trim();
+
     if (!sanitizedIdentifier.includes('@')) {
       const digits = sanitizedIdentifier.replace(/\D/g, '');
       sanitizedIdentifier = digits.length > 9 ? digits.slice(-9) : digits;
@@ -26,7 +28,7 @@ export default function Login() {
     console.log('📱 Identificador a enviar:', sanitizedIdentifier);
 
     try {
-      const result = await login(sanitizedIdentifier, form.password);
+      const result = await login(sanitizedIdentifier, cleanPassword);
       console.log('✅ Login context resolvido com sucesso');
       
       // Saudação personalizada baseada no role
@@ -62,8 +64,18 @@ export default function Login() {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div className="form-group">
               <label className="form-label">Email ou Telemóvel</label>
-              <input id="login-identifier" type="text" className="form-input" placeholder="teu@email.com ou 84..."
-                value={form.identifier} onChange={e => setForm({ ...form, identifier: e.target.value })} required />
+              <input 
+                id="login-identifier" 
+                type="text" 
+                className="form-input" 
+                placeholder="teu@email.com ou 84..."
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck="false"
+                value={form.identifier} 
+                onChange={e => setForm({ ...form, identifier: e.target.value })} 
+                required 
+              />
             </div>
 
             <div className="form-group">

@@ -103,14 +103,28 @@ export default function Register() {
 
               <div className="form-group">
                 <label className="form-label">Número de Telemóvel</label>
-                <input type="tel" className="form-input" placeholder="Ex: +258 8x xxx xxxx"
-                  value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required />
+                <input 
+                  type="tel" 
+                  className="form-input" 
+                  placeholder="Ex: +258 8x xxx xxxx"
+                  autoComplete="tel"
+                  value={form.phone} 
+                  onChange={e => setForm({ ...form, phone: e.target.value })} 
+                  required 
+                />
               </div>
 
               <div className="form-group">
                 <label className="form-label">Email (Opcional)</label>
-                <input type="email" className="form-input" placeholder="teu@email.com"
-                  value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+                <input 
+                  type="email" 
+                  className="form-input" 
+                  placeholder="teu@email.com"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  value={form.email} 
+                  onChange={e => setForm({ ...form, email: e.target.value })} 
+                />
               </div>
 
               <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
