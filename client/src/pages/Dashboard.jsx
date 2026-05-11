@@ -64,7 +64,7 @@ export default function Dashboard() {
               Olá, {
                 user?.role === 'superadmin' ? 'Chefe ' : 
                 user?.role === 'admin' ? 'Organizador ' : 
-                user?.role === 'player' ? 'Craque ' : 'Fã '
+                user?.role === 'player' ? 'Craque ' : 'Torcedor '
               }{user?.name?.split(' ')[0]} 👋
             </h1>
             <p style={{ color: 'var(--text-secondary)', marginTop: 6 }}>Resumo dos teus torneios</p>
