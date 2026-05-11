@@ -24,9 +24,13 @@ export default function Register() {
     e.preventDefault();
     if (form.password !== form.confirm) return setError('As senhas não coincidem.');
     if (form.password.length < 6) return setError('A senha deve ter pelo menos 6 caracteres.');
+    
+    // Sanitizar número de telefone (remover espaços, traços, etc)
+    const sanitizedPhone = form.phone.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+    
     setLoading(true); setError('');
     try {
-      await register(form.name, form.email, form.phone, form.password);
+      await register(form.name, form.email, sanitizedPhone, form.password);
       toast.success('Conta criada! Bem-vindo 🎉');
       navigate('/dashboard');
     } catch (err) {
@@ -35,7 +39,7 @@ export default function Register() {
   };
 
   return (
-    <div style={{ height: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, overflow: 'hidden',
+    <div className="auth-page-wrapper" style={{ minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 20px 40px',
       background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,200,83,0.1) 0%, transparent 70%)' }}>
       <div style={{ width: '100%', maxWidth: 440 }} className="animate-slide-up">
         <div style={{ textAlign: 'center', marginBottom: 20 }}>

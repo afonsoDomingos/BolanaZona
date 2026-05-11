@@ -15,17 +15,21 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); setError('');
+    
+    // Se for telemóvel, remover espaços
+    const sanitizedIdentifier = form.identifier.includes('@') ? form.identifier : form.identifier.replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+
     try {
-      await login(form.identifier, form.password);
+      await login(sanitizedIdentifier, form.password);
       toast.success('Bem-vindo de volta!');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Erro ao entrar. Verifica as credenciais.');
+      setError(err.response?.data?.message || 'Credenciais inválidas.');
     } finally { setLoading(false); }
   };
 
   return (
-    <div style={{ height: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, overflow: 'hidden',
+    <div className="auth-page-wrapper" style={{ minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 20px 40px',
       background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,200,83,0.1) 0%, transparent 70%)' }}>
       <div style={{ width: '100%', maxWidth: 400 }} className="animate-slide-up">
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
