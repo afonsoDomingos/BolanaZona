@@ -12,7 +12,7 @@ export default function Support() {
     if (!form.message) return toast.error('Escreve a tua sugestão.');
     setLoading(true);
     try {
-      await api.post('/api/suggestions', form);
+      await api.post('/suggestions', form);
       toast.success('Obrigado! A tua sugestão foi enviada. 🚀');
       setForm({ category: 'feature', message: '', name: '', email: '' });
     } catch {
