@@ -283,6 +283,14 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .container { padding: 0 20px; }
   .page { padding: 24px 0; }
   
+  /* Garantir que as telas fixas permitem scroll no mobile se necessário */
+  div[style*="height: calc(100vh - 64px)"] { 
+    height: auto !important; 
+    min-height: calc(100vh - 64px); 
+    overflow-y: auto !important;
+    padding: 40px 20px !important;
+  }
+
   .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; gap: 16px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   
@@ -318,6 +326,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr; }
   .font-syne { font-size: 1.2em; }
+  .card-glass { padding: 24px 20px !important; }
 }
 
 /* ===== SHARE BOX ===== */
