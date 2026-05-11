@@ -45,7 +45,12 @@ export default function Store() {
   };
 
   const finalizePurchase = (product, leadInfo) => {
-    const message = `Olá! Meu nome é ${leadInfo.name}. Tenho interesse no produto "${product.name}" que vi na loja Bola na Zona.`;
+    let details = '';
+    if (leadInfo.size) details += `\n- *Tamanho:* ${leadInfo.size}`;
+    if (leadInfo.color) details += `\n- *Cor:* ${leadInfo.color}`;
+    if (leadInfo.province) details += `\n- *Província:* ${leadInfo.province}`;
+
+    const message = `Olá! Meu nome é *${leadInfo.name}*. Tenho interesse no produto "*${product.name}*" que vi na loja Bola na Zona.${details}\n\nPor favor, confirmem a disponibilidade.`;
     window.open(`https://wa.me/258847877405?text=${encodeURIComponent(message)}`, '_blank');
     setShowLeadModal(null);
   };
