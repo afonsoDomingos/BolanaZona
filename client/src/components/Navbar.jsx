@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Trophy, LayoutDashboard, LogOut, LogIn, UserPlus, ShoppingBag, Activity, Menu, X, User, Settings } from 'lucide-react';
+import { Trophy, LayoutDashboard, LogOut, LogIn, UserPlus, ShoppingBag, Activity, Menu, X, User, Settings, Heart } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 
 export default function Navbar() {
