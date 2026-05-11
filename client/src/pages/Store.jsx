@@ -24,7 +24,7 @@ export default function Store() {
   const [showEditModal, setShowEditModal] = useState(null);
   const [showLeadModal, setShowLeadModal] = useState(null);
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+  const isAdmin = user?.role === 'superadmin';
 
   const loadProducts = () => {
     setLoading(true);

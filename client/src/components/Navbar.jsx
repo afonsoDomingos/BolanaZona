@@ -38,7 +38,7 @@ export default function Navbar() {
                 <Link to="/profile" className={`nav-link ${isActive('/profile') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <User size={18} /> Perfil
                 </Link>
-                {(user.role === 'admin' || user.role === 'superadmin') && (
+                {user.role === 'superadmin' && (
                   <Link to="/admin/users" className={`nav-link ${isActive('/admin/users') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <Settings size={18} /> Gestão
                   </Link>
