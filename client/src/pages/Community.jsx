@@ -27,16 +27,17 @@ export default function Community() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleCreatePost = async () => {
+  const handleCreatePost = async (overrideContent = null) => {
+    const finalContent = overrideContent || content;
     if (!user) return toast.error('Faz login para participar no mural! ⚽');
-    if (activeMode === 'text' && !content) return toast.error('Escreve alguma coisa!');
+    if (activeMode === 'text' && !finalContent) return toast.error('Escreve alguma coisa!');
     if (activeMode === 'score' && (!scoreData.teamA || !scoreData.teamB)) return toast.error('Preenche as equipas!');
 
     setSending(true);
     try {
       await api.post('/posts', {
         type: activeMode,
-        content: content || (activeMode === 'goal' ? 'GOOOOOOOOOLO! ⚽🔥' : ''),
+        content: finalContent || (activeMode === 'goal' ? 'GOOOOOOOOOLO! ⚽🔥' : ''),
         scoreData: activeMode === 'score' ? scoreData : null
       });
       setContent('');
@@ -127,9 +128,9 @@ export default function Community() {
                 <div style={{ fontSize: 40, marginBottom: 16 }} className="spin-slow">⚽🔥</div>
                 <h3 style={{ fontWeight: 800, color: 'var(--green)', marginBottom: 16 }}>ESCOLHE A TUA CELEBRAÇÃO!</h3>
                 <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <button onClick={() => { setContent('GOOOOOOOOOLO! ⚽🔥'); handleCreatePost(); }} className="btn btn-secondary" style={{ borderRadius: 100 }}>Padrão ⚽</button>
-                  <button onClick={() => { setContent('HALA MADRID! ⚪👑'); handleCreatePost(); }} className="btn btn-secondary" style={{ borderRadius: 100, borderColor: '#fff', color: '#fff' }}>Hala Madrid ⚪</button>
-                  <button onClick={() => { setContent('VISCA BARÇA! 🔴🔵'); handleCreatePost(); }} className="btn btn-secondary" style={{ borderRadius: 100, borderColor: '#ff4d4d', color: '#ff4d4d' }}>Visca Barça 🔵</button>
+                  <button onClick={() => handleCreatePost('GOOOOOOOOOLO! ⚽🔥')} className="btn btn-secondary" style={{ borderRadius: 100 }}>Padrão ⚽</button>
+                  <button onClick={() => handleCreatePost('HALA MADRID! ⚪👑')} className="btn btn-secondary" style={{ borderRadius: 100, borderColor: '#fff', color: '#fff' }}>Hala Madrid ⚪</button>
+                  <button onClick={() => handleCreatePost('VISCA BARÇA! 🔴🔵')} className="btn btn-secondary" style={{ borderRadius: 100, borderColor: '#ff4d4d', color: '#ff4d4d' }}>Visca Barça 🔵</button>
                 </div>
               </div>
             )}
