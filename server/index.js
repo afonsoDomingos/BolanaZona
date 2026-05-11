@@ -35,13 +35,26 @@ if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 5000;
   mongoose.connect(process.env.MONGO_URI)
     .then(() => {
-      console.log('✅ MongoDB conectado');
+      console.log('✅ MongoDB conectado localmente');
       app.listen(PORT, () => console.log(`🚀 Servidor a correr em http://localhost:${PORT}`));
     })
     .catch(err => {
-      console.error('❌ Erro MongoDB:', err.message);
+      console.error('❌ Erro MongoDB Local:', err.stack);
     });
 } else {
-  // On Vercel, just connect to DB
-  mongoose.connect(process.env.MONGO_URI);
+  // On Vercel, connect and log
+  mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('✅ MongoDB conectado em Produção'))
+    .catch(err => console.error('❌ Falha Crítica MongoDB Produção:', err.stack));
 }
+
+// Global Error Handler Middleware (Deve ser o último)
+app.use((err, req, res, next) => {
+  console.error(`[ERRO NO SERVIDOR] ${new Date().toISOString()}`);
+  console.error(`Path: ${req.path}`);
+  console.error(`Stack: ${err.stack}`);
+  res.status(err.status || 500).json({
+    message: err.message || 'Erro interno no servidor',
+    error: process.env.NODE_ENV === 'development' ? err.stack : {}
+  });
+});
