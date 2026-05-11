@@ -346,7 +346,7 @@ export default function TournamentDetail() {
                       {t.contact && <span className="badge badge-gray">📞 {t.contact}</span>}
                       {tournament.registrationFee > 0 && (
                         <span className={`badge ${t.paymentStatus === 'paid' ? 'badge-green' : t.paymentStatus === 'partial' ? 'badge-yellow' : 'badge-red'}`}>
-                          {t.paymentStatus === 'paid' ? '✅ Pago' : t.paymentStatus === 'partial' ? `⏳ ${t.amountPaid} Kz` : '❌ Pendente'}
+                          {t.paymentStatus === 'paid' ? '✅ Pago' : t.paymentStatus === 'partial' ? `⏳ ${t.amountPaid} MT` : '❌ Pendente'}
                         </span>
                       )}
                     </div>
@@ -1030,7 +1030,7 @@ function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
               </select>
             </div>
             <div className="form-group">
-              <label className="form-label">Valor Pago (Kz)</label>
+              <label className="form-label">Valor Pago (MT)</label>
               <input type="number" className="form-input" placeholder="0" value={form.amountPaid} onChange={e => setForm(p => ({ ...p, amountPaid: Number(e.target.value) }))} />
             </div>
           </div>
