@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Users, ShoppingCart, Eye, Activity, Clock, MousePointer2, ShieldCheck, Mail } from 'lucide-react';
+import { Users, ShoppingCart, Eye, Activity, Clock, MousePointer2, ShieldCheck, Mail, MessageSquare } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminAnalytics() {
   const [stats, setStats] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -16,11 +17,24 @@ export default function AdminAnalytics() {
     finally { setLoading(false); }
   };
 
+  const fetchSuggestions = async () => {
+    try {
+      const res = await api.get('/suggestions');
+      setSuggestions(res.data);
+    } catch { toast.error('Erro ao carregar sugestões.'); }
+  };
+
   useEffect(() => {
     fetchData();
     const interval = setInterval(fetchData, 30000); // Atualiza a cada 30s
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'suggestions') {
+      fetchSuggestions();
+    }
+  }, [activeTab]);
 
   if (loading) return <div className="loading-center"><div className="spinner" /></div>;
 
@@ -57,6 +71,7 @@ export default function AdminAnalytics() {
         <div style={{ display: 'flex', gap: 8, marginBottom: 24, overflowX: 'auto', paddingBottom: 8 }}>
           {[
             { id: 'overview', label: 'Visão Geral', icon: <Eye size={16} /> },
+            { id: 'suggestions', label: 'Sugestões', icon: <MessageSquare size={16} /> },
             { id: 'online', label: 'Utilizadores Online', icon: <Activity size={16} /> },
             { id: 'logs', label: 'Log de Atividade', icon: <Clock size={16} /> },
             { id: 'products', label: 'Top Produtos', icon: <ShoppingCart size={16} /> },
@@ -88,6 +103,35 @@ export default function AdminAnalytics() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {activeTab === 'suggestions' && (
+            <div style={{ padding: 24 }}>
+              <h3 style={{ marginBottom: 20 }}>Sugestões de Melhoria ({suggestions.length})</h3>
+              {suggestions.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>
+                  Ainda não existem sugestões.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {suggestions.map(s => (
+                    <div key={s._id} className="card" style={{ background: 'rgba(255,255,255,0.02)', padding: 20 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 16 }}>{s.name}</div>
+                          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{s.email}</div>
+                        </div>
+                        <span className="badge badge-blue">{s.category}</span>
+                      </div>
+                      <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>"{s.message}"</p>
+                      <div style={{ marginTop: 12, fontSize: 11, color: 'var(--text-muted)', textAlign: 'right' }}>
+                        {new Date(s.createdAt).toLocaleString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
