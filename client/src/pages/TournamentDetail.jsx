@@ -18,6 +18,7 @@ export default function TournamentDetail() {
   const [matches, setMatches] = useState([]);
   const [standings, setStandings] = useState([]);
   const [proposals, setProposals] = useState([]);
+  const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showTeamModal, setShowTeamModal] = useState(false);
   const [editTeamData, setEditTeamData] = useState(null);
@@ -39,11 +40,12 @@ export default function TournamentDetail() {
 
   const load = useCallback(async () => {
     try {
-      const [tRes, sRes, subRes, propRes] = await Promise.all([
+      const [tRes, sRes, subRes, propRes, leadRes] = await Promise.all([
         api.get(`/tournaments/${id}`),
         api.get(`/tournaments/${id}/standings`),
         api.get(`/tournaments/${id}/subscribers`),
-        api.get(`/tournaments/${id}/sponsor-proposals`)
+        api.get(`/tournaments/${id}/sponsor-proposals`),
+        api.get(`/leads?tournamentId=${id}`)
       ]);
       setTournament(tRes.data.tournament);
       setTeams(tRes.data.teams);
@@ -59,6 +61,7 @@ export default function TournamentDetail() {
       setStandings(sRes.data);
       setSubscribers(subRes.data);
       setProposals(propRes.data);
+      setLeads(leadRes.data);
     } catch (err) {
       console.error(err);
       toast.error('Erro ao carregar detalhes do torneio.');
@@ -284,7 +287,8 @@ export default function TournamentDetail() {
             ['standings', <BarChart2 size={14} />, 'Classificação'],
             ['info', <MapPin size={14} />, 'Localização'],
             ['sponsors', <Share2 size={14} />, 'Patrocínios'],
-            ['subscribers', <MessageCircle size={14} />, 'Seguidores']
+            ['subscribers', <MessageCircle size={14} />, 'Seguidores'],
+            ['leads', <Users size={14} />, 'Interessados']
           ].map(([key, icon, label]) => (
             <button key={key} className={`tab ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)}>
               {icon} {label}
@@ -659,6 +663,54 @@ export default function TournamentDetail() {
                         <td>
                           <a href={`https://wa.me/${s.phone.replace(/\s/g, '')}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm" style={{ color: '#25D366' }}>
                             <MessageCircle size={14} /> Conversar
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* LEADS TAB */}
+        {tab === 'leads' && (
+          <div className="animate-fade-in">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700 }}>Tentativas de Inscrição ({leads.length}) ⚡</h2>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Equipas que começaram o processo mas não finalizaram.</p>
+            </div>
+            
+            {leads.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-state-icon">⚡</div>
+                <h3>Sem interessados ainda</h3>
+                <p>Quando alguém começar a inscrever uma equipa, os dados aparecerão aqui.</p>
+              </div>
+            ) : (
+              <div className="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Equipa / Capitão</th>
+                      <th>Contacto</th>
+                      <th>Data</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leads.map(l => (
+                      <tr key={l._id}>
+                        <td>
+                          <div style={{ fontWeight: 700 }}>{l.teamName || '—'}</div>
+                          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{l.name}</div>
+                        </td>
+                        <td>{l.contact}</td>
+                        <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>{new Date(l.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          <a href={`https://wa.me/${l.contact.replace(/\s/g, '')}?text=${encodeURIComponent('Olá ' + l.name + ', vimos que tentaste inscrever a equipa ' + l.teamName + ' no torneio ' + tournament.name + '. Precisas de ajuda?')}`} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm" style={{ background: '#25D366', color: '#fff' }}>
+                            <MessageCircle size={14} /> WhatsApp
                           </a>
                         </td>
                       </tr>

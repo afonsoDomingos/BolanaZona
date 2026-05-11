@@ -58,6 +58,24 @@ export default function TeamRegistrationModal({ tournament, onClose }) {
     } finally { setLoading(false); }
   };
 
+  const captureLead = async () => {
+    try {
+      await api.post('/leads', {
+        tournamentId: selectedTournament,
+        name: form.captainName || 'Capitão Interessado',
+        contact: form.contact,
+        teamName: form.name,
+        source: 'tournament_reg'
+      });
+    } catch (err) { console.error('Lead capture error:', err); }
+  };
+
+  const handleNext = () => {
+    if(!form.name.trim() || !form.contact.trim()) return toast.error('Preenche o nome e o contacto.');
+    captureLead();
+    setStep(1);
+  };
+
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ maxWidth: 500, padding: 0, overflow: 'hidden' }}>
@@ -148,10 +166,7 @@ export default function TeamRegistrationModal({ tournament, onClose }) {
             {step === 0 ? (
               <button 
                 className="btn btn-primary" 
-                onClick={() => {
-                  if(!form.name.trim() || !form.contact.trim()) return toast.error('Preenche o nome e o contacto.');
-                  setStep(1);
-                }} 
+                onClick={handleNext} 
                 style={{ flex: 1, justifyContent: 'center' }}
               >
                 Próximo: Plantel
