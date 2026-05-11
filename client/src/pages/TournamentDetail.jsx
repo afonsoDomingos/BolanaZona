@@ -30,7 +30,12 @@ export default function TournamentDetail() {
   const [generatingCalendar, setGeneratingCalendar] = useState(false);
   const [subscribers, setSubscribers] = useState([]);
   const { user: currentUser } = useAuth();
-  const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
+  const isOwner = currentUser && tournament && (
+    (typeof tournament.createdBy === 'string' && tournament.createdBy === currentUser._id) ||
+    (tournament.createdBy?._id === currentUser._id)
+  );
+  const isSuperAdmin = currentUser?.role === 'superadmin';
+  const canManage = isOwner || isSuperAdmin;
 
   const load = useCallback(async () => {
     try {
@@ -148,12 +153,14 @@ export default function TournamentDetail() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
                 <h1 className="font-syne" style={{ fontSize: 28, fontWeight: 800 }}>{tournament.name}</h1>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }} onClick={() => setShowEditTournamentModal(true)} title="Editar"><Edit2 size={13} /></button>
-                  {(tournament.status !== 'finished' || isAdmin) && (
-                    <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px', color: 'var(--red)' }} onClick={handleDeleteTournament} title="Eliminar Torneio"><Trash2 size={13} /></button>
-                  )}
-                </div>
+                {canManage && (
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }} onClick={() => setShowEditTournamentModal(true)} title="Editar"><Edit2 size={13} /></button>
+                    {(tournament.status !== 'finished' || isSuperAdmin) && (
+                      <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px', color: 'var(--red)' }} onClick={handleDeleteTournament} title="Eliminar Torneio"><Trash2 size={13} /></button>
+                    )}
+                  </div>
+                )}
                 <span className={`badge ${statusBadge[tournament.status]}`}>{statusLabel[tournament.status]}</span>
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>📍 {tournament.neighborhood} · 🏟️ {tournament.location} · 👥 {teams.length}/{tournament.maxTeams} equipas</p>
@@ -179,16 +186,20 @@ export default function TournamentDetail() {
             )}
 
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {tournament.status === 'draft' && (
-                <button className="btn btn-secondary btn-sm" onClick={() => changeStatus('registration')}>Abrir Inscrições</button>
-              )}
-              {tournament.status === 'registration' && (
-                <button className="btn btn-primary btn-sm" onClick={() => changeStatus('active')}>
-                  <Play size={14} /> Iniciar Torneio
-                </button>
-              )}
-              {tournament.status === 'active' && (
-                <button className="btn btn-secondary btn-sm" onClick={() => setShowFinishModal(true)}>Finalizar</button>
+              {canManage && (
+                <>
+                  {tournament.status === 'draft' && (
+                    <button className="btn btn-secondary btn-sm" onClick={() => changeStatus('registration')}>Abrir Inscrições</button>
+                  )}
+                  {tournament.status === 'registration' && (
+                    <button className="btn btn-primary btn-sm" onClick={() => changeStatus('active')}>
+                      <Play size={14} /> Iniciar Torneio
+                    </button>
+                  )}
+                  {tournament.status === 'active' && (
+                    <button className="btn btn-secondary btn-sm" onClick={() => setShowFinishModal(true)}>Finalizar</button>
+                  )}
+                </>
               )}
               <button className="btn btn-secondary btn-sm" onClick={copyShare}><Share2 size={14} /> Partilhar</button>
             </div>
@@ -218,25 +229,27 @@ export default function TournamentDetail() {
                 <Users size={16} color={tournament.allowPublicRegistration ? "var(--green)" : "var(--text-muted)"} />
                 <strong style={{ fontSize: 14 }}>Inscrições de Equipas</strong>
               </div>
-              <div 
-                onClick={async () => {
-                  try {
-                    const res = await api.put(`/tournaments/${id}`, { allowPublicRegistration: !tournament.allowPublicRegistration });
-                    setTournament(res.data);
-                    toast.success(res.data.allowPublicRegistration ? 'Inscrições Abertas!' : 'Inscrições Encerradas!');
-                  } catch { toast.error('Erro ao alterar permissão.'); }
-                }}
-                style={{ 
-                  width: 44, height: 24, borderRadius: 12, cursor: 'pointer', position: 'relative', transition: '0.3s',
-                  background: tournament.allowPublicRegistration ? 'var(--green)' : 'var(--bg-main)',
-                  border: '1px solid ' + (tournament.allowPublicRegistration ? 'var(--green)' : 'var(--border)')
-                }}
-              >
-                <div style={{ 
-                  width: 18, height: 18, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, 
-                  left: tournament.allowPublicRegistration ? 22 : 2, transition: '0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                }} />
-              </div>
+              {canManage && (
+                <div 
+                  onClick={async () => {
+                    try {
+                      const res = await api.put(`/tournaments/${id}`, { allowPublicRegistration: !tournament.allowPublicRegistration });
+                      setTournament(res.data);
+                      toast.success(res.data.allowPublicRegistration ? 'Inscrições Abertas!' : 'Inscrições Encerradas!');
+                    } catch { toast.error('Erro ao alterar permissão.'); }
+                  }}
+                  style={{ 
+                    width: 44, height: 24, borderRadius: 12, cursor: 'pointer', position: 'relative', transition: '0.3s',
+                    background: tournament.allowPublicRegistration ? 'var(--green)' : 'var(--bg-main)',
+                    border: '1px solid ' + (tournament.allowPublicRegistration ? 'var(--green)' : 'var(--border)')
+                  }}
+                >
+                  <div style={{ 
+                    width: 18, height: 18, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, 
+                    left: tournament.allowPublicRegistration ? 22 : 2, transition: '0.3s', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }} />
+                </div>
+              )}
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
               {tournament.allowPublicRegistration 
@@ -280,30 +293,34 @@ export default function TournamentDetail() {
                 <h3 style={{ fontSize: 14, fontWeight: 700, color: '#f59e0b', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
                   ⚠️ Inscrições Pendentes ({teams.filter(t => t.status === 'pending').length})
                 </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
-                  {teams.filter(t => t.status === 'pending').map(t => (
-                    <div key={t._id} className="card" style={{ border: '1px solid rgba(245, 158, 11, 0.3)', background: 'rgba(245, 158, 11, 0.05)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: 16 }}>{t.name}</div>
-                          <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>👤 {t.captainName} · 📞 {t.contact}</div>
-                          <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>📋 {t.players?.length} jogadores</div>
-                        </div>
-                        <div style={{ display: 'flex', gap: 8 }}>
-                          <button className="btn btn-primary btn-sm" onClick={() => handleApproveTeam(t._id)} style={{ padding: '6px 12px' }}>Aprovar</button>
-                          <button className="btn btn-secondary btn-sm" onClick={() => handleRejectTeam(t._id)} style={{ color: 'var(--red)' }}><Trash2 size={14} /></button>
+                {canManage ? (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+                    {teams.filter(t => t.status === 'pending').map(t => (
+                      <div key={t._id} className="card" style={{ border: '1px solid rgba(245, 158, 11, 0.3)', background: 'rgba(245, 158, 11, 0.05)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: 16 }}>{t.name}</div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>👤 {t.captainName} · 📞 {t.contact}</div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>📋 {t.players?.length} jogadores</div>
+                          </div>
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button className="btn btn-primary btn-sm" onClick={() => handleApproveTeam(t._id)} style={{ padding: '6px 12px' }}>Aprovar</button>
+                            <button className="btn btn-secondary btn-sm" onClick={() => handleRejectTeam(t._id)} style={{ color: 'var(--red)' }}><Trash2 size={14} /></button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Existem inscrições a aguardar aprovação pelo organizador.</p>
+                )}
                 <div className="divider" style={{ margin: '32px 0' }} />
               </div>
             )}
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <h2 style={{ fontSize: 18, fontWeight: 700 }}>Equipas Confirmadas ({teams.filter(t => t.status === 'approved').length}/{tournament.maxTeams})</h2>
-              {teams.filter(t => t.status === 'approved').length < tournament.maxTeams && (
+              {canManage && teams.filter(t => t.status === 'approved').length < tournament.maxTeams && (
                 <button className="btn btn-primary btn-sm" onClick={() => setShowTeamModal(true)}><Plus size={14} /> Adicionar Equipa</button>
               )}
             </div>
@@ -328,18 +345,20 @@ export default function TournamentDetail() {
                           <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{t.captainName || 'Sem capitão'}</div>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', gap: 6 }}>
-                        <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => {
-                          setEditTeamData(t);
-                          setShowTeamModal(true);
-                        }}><Edit2 size={13} /></button>
-                        <button className="btn btn-danger btn-sm" style={{ padding: '6px 8px' }} onClick={async () => {
-                          if (!confirm(`Eliminar equipa "${t.name}"?`)) return;
-                          await api.delete(`/tournaments/${id}/teams/${t._id}`);
-                          setTeams(prev => prev.filter(x => x._id !== t._id));
-                          toast.success('Equipa eliminada.');
-                        }}><Trash2 size={13} /></button>
-                      </div>
+                      {canManage && (
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => {
+                            setEditTeamData(t);
+                            setShowTeamModal(true);
+                          }}><Edit2 size={13} /></button>
+                          <button className="btn btn-danger btn-sm" style={{ padding: '6px 8px' }} onClick={async () => {
+                            if (!confirm(`Eliminar equipa "${t.name}"?`)) return;
+                            await api.delete(`/tournaments/${id}/teams/${t._id}`);
+                            setTeams(prev => prev.filter(x => x._id !== t._id));
+                            toast.success('Equipa eliminada.');
+                          }}><Trash2 size={13} /></button>
+                        </div>
+                      )}
                     </div>
                     <div style={{ marginTop: 12, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                       <span className="badge badge-gray">👥 {t.players?.length || 0} jogadores</span>
@@ -373,14 +392,16 @@ export default function TournamentDetail() {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
               <h2 style={{ fontSize: 18, fontWeight: 700 }}>Calendário ({matches.length} jogos)</h2>
-              <div style={{ display: 'flex', gap: 10 }}>
-                <button className="btn btn-secondary btn-sm" onClick={() => setShowManualMatchModal(true)}>
-                  <Plus size={14} /> Adicionar Jogo
-                </button>
-                <button className="btn btn-secondary btn-sm" onClick={generateCalendar} disabled={generatingCalendar || teams.length < 2}>
-                  <Calendar size={14} /> {matches.length > 0 ? 'Regenerar' : 'Gerar Calendário'}
-                </button>
-              </div>
+              {canManage && (
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button className="btn btn-secondary btn-sm" onClick={() => setShowManualMatchModal(true)}>
+                    <Plus size={14} /> Adicionar Jogo
+                  </button>
+                  <button className="btn btn-secondary btn-sm" onClick={generateCalendar} disabled={generatingCalendar || teams.length < 2}>
+                    <Calendar size={14} /> {matches.length > 0 ? 'Regenerar' : 'Gerar Calendário'}
+                  </button>
+                </div>
+              )}
             </div>
             {matches.length === 0 ? (
               <div className="empty-state">
@@ -423,9 +444,13 @@ export default function TournamentDetail() {
                               
                               <div style={{ display: 'flex', gap: 6 }}>
                                 <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px', color: '#25D366' }} onClick={() => shareMatchWhatsApp(m)} title="WhatsApp"><MessageCircle size={14} /></button>
-                                <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Agendar"><Calendar size={14} /></button>
-                                <button className="btn btn-primary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowResultModal(m)} title="Resultado"><Trophy size={14} /></button>
-                                <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowShareModal(m)} title="Partilhar"><Camera size={14} /></button>
+                                {canManage && (
+                                  <>
+                                    <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Agendar"><Calendar size={14} /></button>
+                                    <button className="btn btn-primary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowResultModal(m)} title="Resultado"><Trophy size={14} /></button>
+                                    <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowShareModal(m)} title="Partilhar"><Camera size={14} /></button>
+                                  </>
+                                )}
                               </div>
                             </div>
                             {(m.location || m.date || m.referee) && (
@@ -567,7 +592,7 @@ export default function TournamentDetail() {
                     <div style={{ background: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 12, fontSize: 14, color: 'var(--text-secondary)', marginBottom: 16, border: '1px solid var(--border)' }}>
                       "{p.message}"
                     </div>
-                    {p.status === 'pending' && (
+                    {canManage && p.status === 'pending' && (
                       <div style={{ display: 'flex', gap: 10 }}>
                         <button className="btn btn-primary btn-sm" onClick={async () => {
                           await api.put(`/tournaments/sponsor-proposals/${p._id}`, { status: 'accepted' });
@@ -593,9 +618,11 @@ export default function TournamentDetail() {
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <h2 style={{ fontSize: 18, fontWeight: 700 }}>Seguidores do WhatsApp ({subscribers.length})</h2>
-              <button className="btn btn-secondary btn-sm" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('Olá seguidores do torneio ' + tournament.name)}`, '_blank')}>
-                <MessageCircle size={14} /> Mensagem para Todos
-              </button>
+              {canManage && (
+                <button className="btn btn-secondary btn-sm" onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent('Olá seguidores do torneio ' + tournament.name)}`, '_blank')}>
+                  <MessageCircle size={14} /> Mensagem para Todos
+                </button>
+              )}
             </div>
             
             {subscribers.length === 0 ? (
