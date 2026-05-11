@@ -7,8 +7,8 @@ router.get('/me', protect, userController.getMe);
 router.put('/profile', protect, userController.updateProfile);
 
 // Admin Routes
-router.get('/', protect, authorize('superadmin', 'admin'), userController.getAllUsers);
-router.put('/:id', protect, authorize('superadmin', 'admin'), userController.adminUpdateUser);
-router.delete('/:id', protect, authorize('superadmin', 'admin'), userController.deleteUser);
+router.get('/', protect, authorize('superadmin'), userController.getAllUsers);
+router.put('/:id', protect, authorize('superadmin'), userController.adminUpdateUser);
+router.delete('/:id', protect, authorize('superadmin'), userController.deleteUser);
 
 module.exports = router;
