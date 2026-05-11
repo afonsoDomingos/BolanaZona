@@ -11,6 +11,12 @@ exports.create = async (req, res) => {
       comment,
       ip: req.ip
     });
+
+    if (req.user) {
+      const User = require('../models/User');
+      await User.findByIdAndUpdate(req.user._id, { hasGivenFeedback: true });
+    }
+
     res.status(201).json(feedback);
   } catch (err) {
     res.status(500).json({ message: err.message });

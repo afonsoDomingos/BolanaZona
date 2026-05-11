@@ -1,18 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Star, X, Send, Heart } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
 export default function FeedbackPopup() {
+  const { user } = useAuth();
   const [show, setShow] = useState(false);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ experience: '', source: '', rating: 0 });
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    // Verificar se já respondeu ou fechou antes
+    // 1. Verificar localStorage (para visitantes)
     const hasFeedback = localStorage.getItem('bnz_feedback_v1');
     if (hasFeedback) return;
+
+    // 2. Verificar base de dados (para logados)
+    if (user && user.hasGivenFeedback) return;
 
     // Disparar após 1 minuto (60000ms)
     const timer = setTimeout(() => {
@@ -20,7 +25,7 @@ export default function FeedbackPopup() {
     }, 60000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [user]);
 
   const handleSubmit = async () => {
     if (form.rating === 0) return toast.error('Dá-nos uma nota de 1 a 5! ⭐');
