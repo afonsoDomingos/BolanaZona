@@ -7,5 +7,6 @@ router.use(protect);
 router.get('/', ctrl.getAll);
 router.put('/:id/read', ctrl.markAsRead);
 router.put('/read-all', ctrl.markAllAsRead);
+router.delete('/clear', ctrl.clearAll);
 
 module.exports = router;

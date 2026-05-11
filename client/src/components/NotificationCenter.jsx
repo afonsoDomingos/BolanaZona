@@ -40,6 +40,15 @@ export default function NotificationCenter() {
     } catch { toast.error('Erro ao marcar como lidas.'); }
   };
 
+  const clearAll = async () => {
+    if (!window.confirm('Eliminar todas as notificações permanentemente?')) return;
+    try {
+      await api.delete('/notifications/clear');
+      setNotifications([]);
+      toast.success('Notificações limpas.');
+    } catch { toast.error('Erro ao limpar notificações.'); }
+  };
+
   const markRead = async (id) => {
     try {
       await api.put(`/notifications/${id}/read`);
@@ -62,9 +71,14 @@ export default function NotificationCenter() {
         <div className="card animate-fade-in" style={{ position: 'absolute', top: '100%', right: 0, width: 320, maxHeight: 480, overflowY: 'auto', zIndex: 1000, marginTop: 12, padding: 0, border: '1px solid var(--border)', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)' }}>
             <span style={{ fontWeight: 700, fontSize: 15 }}>Notificações</span>
-            {unreadCount > 0 && (
-              <button onClick={markAllRead} style={{ background: 'none', color: 'var(--green)', fontSize: 12, fontWeight: 600 }}>Marcar todas como lidas</button>
-            )}
+            <div style={{ display: 'flex', gap: 12 }}>
+              {unreadCount > 0 && (
+                <button onClick={markAllRead} style={{ background: 'none', color: 'var(--green)', fontSize: 12, fontWeight: 600 }}>Lidas</button>
+              )}
+              {notifications.length > 0 && (
+                <button onClick={clearAll} style={{ background: 'none', color: 'var(--red)', fontSize: 12, fontWeight: 600 }}>Limpar Tudo</button>
+              )}
+            </div>
           </div>
 
           {notifications.length === 0 ? (

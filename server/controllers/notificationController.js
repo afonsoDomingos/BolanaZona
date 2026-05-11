@@ -21,6 +21,13 @@ exports.markAllAsRead = async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
+exports.clearAll = async (req, res) => {
+  try {
+    await Notification.deleteMany({ user: req.user._id });
+    res.json({ message: 'Notificações limpas.' });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
 exports.create = async (userId, title, message, type = 'info', link = '') => {
   try {
     await Notification.create({ user: userId, title, message, type, link });
