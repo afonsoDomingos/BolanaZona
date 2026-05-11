@@ -39,9 +39,14 @@ export default function Navbar() {
                   <User size={18} /> Perfil
                 </Link>
                 {user.role === 'superadmin' && (
-                  <Link to="/admin/users" className={`nav-link ${isActive('/admin/users') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Settings size={18} /> Gestão
-                  </Link>
+                  <>
+                    <Link to="/admin/users" className={`nav-link ${isActive('/admin/users') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Settings size={18} /> Gestão
+                    </Link>
+                    <Link to="/dashboard/analytics" className={`nav-link ${isActive('/dashboard/analytics') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Activity size={18} /> Analytics
+                    </Link>
+                  </>
                 )}
                 <NotificationCenter />
                 <button onClick={handleLogout} className="btn btn-secondary btn-sm" style={{ color: 'var(--red)', borderColor: 'rgba(255,0,0,0.2)' }}>Sair</button>
