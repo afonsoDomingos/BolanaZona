@@ -48,6 +48,14 @@ export default function TournamentDetail() {
       setTournament(tRes.data.tournament);
       setTeams(tRes.data.teams);
       setMatches(tRes.data.matches);
+
+      // Redirecionamento de segurança: Se não for dono nem superadmin, vai para a página pública
+      const ownerId = tRes.data.tournament.createdBy?._id || tRes.data.tournament.createdBy;
+      if (currentUser && currentUser.role !== 'superadmin' && ownerId !== currentUser._id) {
+        navigate(`/t/${tRes.data.tournament.shareCode}`, { replace: true });
+        return;
+      }
+
       setStandings(sRes.data);
       setSubscribers(subRes.data);
       setProposals(propRes.data);
