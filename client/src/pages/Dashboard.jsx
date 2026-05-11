@@ -60,7 +60,13 @@ export default function Dashboard() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 40, flexWrap: 'wrap', gap: 16 }}>
           <div>
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Painel</p>
-            <h1 className="font-syne" style={{ fontSize: 32, fontWeight: 800 }}>Olá, {user?.name?.split(' ')[0]} 👋</h1>
+            <h1 className="font-syne" style={{ fontSize: 32, fontWeight: 800 }}>
+              Olá, {
+                user?.role === 'superadmin' ? 'Chefe ' : 
+                user?.role === 'admin' ? 'Organizador ' : 
+                user?.role === 'player' ? 'Craque ' : 'Fã '
+              }{user?.name?.split(' ')[0]} 👋
+            </h1>
             <p style={{ color: 'var(--text-secondary)', marginTop: 6 }}>Resumo dos teus torneios</p>
           </div>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>

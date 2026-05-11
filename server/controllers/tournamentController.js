@@ -2,6 +2,8 @@ const Team = require('../models/Team');
 const Match = require('../models/Match');
 const Tournament = require('../models/Tournament');
 const User = require('../models/User');
+const SponsorProposal = require('../models/SponsorProposal');
+const Subscriber = require('../models/Subscriber');
 const { create: createNotification } = require('./notificationController');
 
 // GET /api/tournaments
@@ -123,6 +125,8 @@ exports.remove = async (req, res) => {
     await Tournament.findByIdAndDelete(req.params.id);
     await Team.deleteMany({ tournament: req.params.id });
     await Match.deleteMany({ tournament: req.params.id });
+    await SponsorProposal.deleteMany({ tournament: req.params.id });
+    await Subscriber.deleteMany({ tournament: req.params.id });
     res.json({ message: 'Torneio eliminado.' });
   } catch (err) {
     res.status(500).json({ message: err.message });
