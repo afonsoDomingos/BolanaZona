@@ -28,7 +28,17 @@ export default function Login() {
     try {
       const result = await login(sanitizedIdentifier, form.password);
       console.log('✅ Login context resolvido com sucesso');
-      toast.success('Bem-vindo de volta!');
+      
+      // Saudação personalizada baseada no role
+      const greetings = {
+        admin: 'Bem-vindo, Chefe da Zona! 🏆',
+        superadmin: 'Bem-vindo, Mestre da Zona! 👑',
+        player: 'Bem-vindo, Craque da Zona! ⚽',
+        viewer: 'Bem-vindo à Zona, Torcedor! 📣'
+      };
+      const msg = greetings[result.user.role] || 'Bem-vindo de volta!';
+      
+      toast.success(msg);
       navigate('/dashboard');
     } catch (err) {
       console.error('❌ Erro capturado no Login.jsx:', err);
