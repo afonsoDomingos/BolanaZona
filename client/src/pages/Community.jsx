@@ -136,8 +136,15 @@ export default function Community() {
             )}
 
             <div style={{ marginTop: 20, display: 'flex', justifyContent: 'flex-end' }}>
-              <button className="btn btn-primary" onClick={handleCreatePost} disabled={sending} style={{ padding: '0 32px', height: 48, borderRadius: 12 }}>
-                {sending ? 'A publicar...' : 'Publicar no Mural'} <Send size={16} />
+              <button 
+                onClick={() => handleCreatePost()} 
+                className="btn btn-primary" 
+                disabled={sending}
+                style={{ padding: '14px 28px', borderRadius: 16, alignSelf: 'flex-end' }}
+              >
+                {sending ? 'A publicar...' : (
+                  <>Publicar no Mural <Send size={18} /></>
+                )}
               </button>
             </div>
           </div>
