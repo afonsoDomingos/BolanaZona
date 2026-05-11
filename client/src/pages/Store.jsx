@@ -44,7 +44,21 @@ export default function Store() {
     setShowLeadModal(product);
   };
 
-  const finalizePurchase = (product, leadInfo) => {
+  const finalizePurchase = async (product, leadInfo) => {
+    // 1. Enviar para a BD como Lead para não perder o contacto
+    try {
+      await api.post('/leads', {
+        name: leadInfo.name,
+        phone: leadInfo.phone,
+        product: product._id,
+        details: `Tamanho: ${leadInfo.size || 'N/A'}, Cor: ${leadInfo.color || 'N/A'}, Província: ${leadInfo.province || 'N/A'}`
+      });
+      console.log('✅ Lead capturada com sucesso');
+    } catch (err) {
+      console.error('❌ Falha ao capturar lead:', err);
+    }
+
+    // 2. Preparar e abrir WhatsApp
     let details = '';
     if (leadInfo.size) details += `\n- *Tamanho:* ${leadInfo.size}`;
     if (leadInfo.color) details += `\n- *Cor:* ${leadInfo.color}`;
