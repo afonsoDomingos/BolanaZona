@@ -89,7 +89,7 @@ export default function TeamRegistrationModal({ tournament, onClose }) {
             </div>
             <div className="form-group">
               <label className="form-label"><Phone size={14} style={{ display: 'inline', marginRight: 4 }} /> Contacto *</label>
-              <input className="form-input" placeholder="Telemóvel" value={form.contact} onChange={e => setForm({...form, contact: e.target.value})} />
+              <input className="form-input" placeholder="Ex: +258 8x xxx xxxx" value={form.contact} onChange={e => setForm({...form, contact: e.target.value})} />
             </div>
           </div>
 

@@ -399,7 +399,7 @@ function SubscribeModal({ tournament, onClose }) {
           </div>
           <div className="form-group">
             <label className="form-label">O teu WhatsApp</label>
-            <input className="form-input" placeholder="Ex: 847877405" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
+            <input className="form-input" placeholder="Ex: +258 8x xxx xxxx" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
           </div>
           <button className="btn btn-primary" disabled={loading} style={{ width: '100%', justifyContent: 'center', height: 48 }}>
             {loading ? 'A processar...' : 'Ativar Notificações 🚀'}
