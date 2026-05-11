@@ -1,0 +1,17 @@
+{
+  "name": "Bola na Zona",
+  "short_name": "Bola na Zona",
+  "description": "Plataforma de gestão de torneios de futebol de bairro",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080d1a",
+  "theme_color": "#00c853",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -5,10 +5,21 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Bola na Zona - Plataforma de gestão de torneios de futebol de bairro. Cria torneios, gere equipas e acompanha classificações em tempo real." />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#00c853" />
     <title>Bola na Zona · Torneios de Futebol</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('✅ Service Worker registado'))
+            .catch(err => console.log('❌ Erro no Service Worker', err));
+        });
+      }
+    </script>
   </body>
 </html>
