@@ -361,7 +361,7 @@ export default function PublicTournament() {
         </div>
       </div>
 
-      <TeamRegistrationModal tournament={tournament} show={showRegistrationModal} onClose={() => setShowRegistrationModal(false)} />
+      {showRegistrationModal && <TeamRegistrationModal tournament={tournament} onClose={() => setShowRegistrationModal(false)} />}
       {showSponsorModal && <SponsorProposalModal tournament={tournament} onClose={() => setShowSponsorModal(false)} />}
       
       {/* Footer Branding */}
