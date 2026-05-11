@@ -7,6 +7,7 @@ import ScrollToTop from './components/ScrollToTop';
 import InstallPrompt from './components/InstallPrompt';
 import Footer from './components/Footer';
 import FeedbackPopup from './components/FeedbackPopup';
+import CommunityFAB from './components/CommunityFAB';
 import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -66,6 +67,7 @@ function AppRoutes() {
         </Routes>
       </main>
       <Footer />
+      <CommunityFAB />
       <FeedbackPopup />
       <ScrollToTop />
       <InstallPrompt />
