@@ -185,7 +185,8 @@ export default function Community() {
                         </div>
                         {post.scoreData.period && (
                           <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', opacity: 0.7 }}>
-                            {post.scoreData.period === '1T' ? '1ª Parte' : 
+                            {post.scoreData.period === 'PR' ? 'Pré-jogo' :
+                             post.scoreData.period === '1T' ? '1ª Parte' : 
                              post.scoreData.period === '2T' ? '2ª Parte' : 'Finalizado'}
                           </span>
                         )}
@@ -303,7 +304,7 @@ export default function Community() {
                         <input className="form-input" placeholder="Equipa B" style={{ height: 28, fontSize: 11, padding: '0 6px' }} value={scoreData.teamB} onChange={e => setScoreData({...scoreData, teamB: e.target.value})} />
                       </div>
                       <div style={{ display: 'flex', gap: 4 }}>
-                        {['1T', '2T', 'FT'].map(p => (
+                        {['PR', '1T', '2T', 'FT'].map(p => (
                           <button 
                             key={p} 
                             onClick={() => setScoreData({...scoreData, period: p})}
@@ -314,7 +315,7 @@ export default function Community() {
                               border: 'none', fontWeight: 700, cursor: 'pointer'
                             }}
                           >
-                            {p === '1T' ? '1ª P' : p === '2T' ? '2ª P' : 'Final'}
+                            {p === 'PR' ? 'Pré' : p === '1T' ? '1ª P' : p === '2T' ? '2ª P' : 'Final'}
                           </button>
                         ))}
                       </div>
