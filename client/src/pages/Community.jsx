@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageSquare, Trophy, Heart, Send, Zap } from 'lucide-react';
+import { MessageSquare, Trophy, Heart, Send, Zap, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -11,7 +11,7 @@ export default function Community() {
   const [loading, setLoading] = useState(true);
   const [activeMode, setActiveMode] = useState('text'); // text, score, goal
   const [content, setContent] = useState('');
-  const [scoreData, setScoreData] = useState({ teamA: '', teamB: '', scoreA: 0, scoreB: 0, period: 'FT' });
+  const [scoreData, setScoreData] = useState({ teamA: '', teamB: '', scoreA: 0, scoreB: 0, period: 'FT', matchTime: '' });
   const [sending, setSending] = useState(false);
   const scrollRef = useRef(null);
 
@@ -49,7 +49,7 @@ export default function Community() {
         scoreData: activeMode === 'score' ? scoreData : null
       });
       setContent('');
-      setScoreData({ teamA: '', teamB: '', scoreA: 0, scoreB: 0, period: 'FT' });
+      setScoreData({ teamA: '', teamB: '', scoreA: 0, scoreB: 0, period: 'FT', matchTime: '' });
       setActiveMode('text');
       fetchPosts();
       toast.success('Publicado no mural! 🚀');
@@ -68,6 +68,17 @@ export default function Community() {
       fetchPosts();
     } catch {
       toast.error('Erro ao reagir.');
+    }
+  };
+ 
+  const handleDeletePost = async (postId) => {
+    if (!window.confirm('Queres mesmo eliminar esta publicação?')) return;
+    try {
+      await api.delete(`/posts/${postId}`);
+      toast.success('Publicação eliminada.');
+      fetchPosts();
+    } catch {
+      toast.error('Erro ao eliminar.');
     }
   };
 
@@ -184,11 +195,18 @@ export default function Community() {
                           <span style={{ fontWeight: 800, fontSize: 12 }}>{post.scoreData.teamB}</span>
                         </div>
                         {post.scoreData.period && (
-                          <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', opacity: 0.7 }}>
-                            {post.scoreData.period === 'PR' ? 'Pré-jogo' :
-                             post.scoreData.period === '1T' ? '1ª Parte' : 
-                             post.scoreData.period === '2T' ? '2ª Parte' : 'Finalizado'}
-                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                            <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', opacity: 0.7 }}>
+                              {post.scoreData.period === 'PR' ? 'Pré-jogo' :
+                               post.scoreData.period === '1T' ? '1ª Parte' : 
+                               post.scoreData.period === '2T' ? '2ª Parte' : 'Finalizado'}
+                            </span>
+                            {post.scoreData.matchTime && (
+                              <span style={{ fontSize: 9, fontWeight: 700, opacity: 0.5 }}>
+                                • 🕒 {post.scoreData.matchTime}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
                     )}
@@ -226,6 +244,14 @@ export default function Community() {
                       >
                         <Heart size={10} fill={post.likes?.includes(user?._id) ? (isMe ? '#000' : 'var(--red)') : 'none'} /> {post.likes?.length || 0}
                       </button>
+                      {(isMe || user?.role === 'superadmin') && (
+                        <button 
+                          onClick={() => handleDeletePost(post._id)}
+                          style={{ background: 'none', border: 'none', color: isMe ? '#000' : 'var(--red)', cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: 0.6 }}
+                        >
+                          <Trash2 size={10} />
+                        </button>
+                      )}
                       <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
                         {new Date(post.createdAt).toLocaleTimeString('pt-MZ', { hour: '2-digit', minute: '2-digit', hour12: false })}
                       </span>
@@ -300,8 +326,10 @@ export default function Community() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.03)', padding: 4, borderRadius: 10, border: '1px solid var(--border)' }}>
                         <input className="form-input" placeholder="Equipa A" style={{ height: 28, fontSize: 11, padding: '0 6px' }} value={scoreData.teamA} onChange={e => setScoreData({...scoreData, teamA: e.target.value})} />
                         <input type="number" className="form-input" style={{ width: 35, height: 28, textAlign: 'center', fontSize: 11, padding: 0 }} value={scoreData.scoreA} onChange={e => setScoreData({...scoreData, scoreA: parseInt(e.target.value)})} />
+                        <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>vs</span>
                         <input type="number" className="form-input" style={{ width: 35, height: 28, textAlign: 'center', fontSize: 11, padding: 0 }} value={scoreData.scoreB} onChange={e => setScoreData({...scoreData, scoreB: parseInt(e.target.value)})} />
                         <input className="form-input" placeholder="Equipa B" style={{ height: 28, fontSize: 11, padding: '0 6px' }} value={scoreData.teamB} onChange={e => setScoreData({...scoreData, teamB: e.target.value})} />
+                        <input type="text" className="form-input" placeholder="15:30" style={{ width: 50, height: 28, fontSize: 10, padding: '0 4px', textAlign: 'center' }} value={scoreData.matchTime} onChange={e => setScoreData({...scoreData, matchTime: e.target.value})} />
                       </div>
                       <div style={{ display: 'flex', gap: 4 }}>
                         {['PR', '1T', '2T', 'FT'].map(p => (

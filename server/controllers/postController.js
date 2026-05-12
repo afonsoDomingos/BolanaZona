@@ -46,3 +46,20 @@ exports.toggleLike = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.delete = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: 'Post não encontrado' });
+
+    // Verificar se o utilizador é o dono do post ou superadmin
+    if (post.user.toString() !== req.user._id.toString() && req.user.role !== 'superadmin') {
+      return res.status(403).json({ message: 'Sem permissão' });
+    }
+
+    await post.deleteOne();
+    res.json({ message: 'Post eliminado' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
