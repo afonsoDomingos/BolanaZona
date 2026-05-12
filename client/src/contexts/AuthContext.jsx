@@ -26,8 +26,8 @@ export const AuthProvider = ({ children }) => {
     return res.data;
   };
 
-  const register = async (name, email, phone, password, role) => {
-    const res = await api.post('/auth/register', { name, email, phone, password, role });
+  const register = async (name, email, phone, password, role, province) => {
+    const res = await api.post('/auth/register', { name, email, phone, password, role, province });
     localStorage.setItem('bnz_token', res.data.token);
     setUser(res.data.user);
     return res.data;

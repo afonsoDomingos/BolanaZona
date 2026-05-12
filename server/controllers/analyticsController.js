@@ -17,7 +17,19 @@ exports.track = async (req, res) => {
       await User.findByIdAndUpdate(req.user._id, { lastSeen: new Date() });
     }
 
-    res.status(201).json({ message: 'Tracked' });
+    const isNew = req.body.isNewVisitor;
+    
+    let visitorNumber = 0;
+    if (isNew) {
+      // Usar a contagem total de visitas para dar continuidade ao número real
+      const totalVisits = await Analytics.countDocuments({ type: 'visit' });
+      visitorNumber = totalVisits; // O documento atual já foi criado no início desta função
+    }
+
+    res.status(201).json({ 
+      message: 'Tracked', 
+      visitorNumber: visitorNumber > 0 ? visitorNumber : null 
+    });
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
@@ -46,10 +58,12 @@ exports.getStats = async (req, res) => {
       .sort('-createdAt')
       .limit(50);
 
-    // Utilizadores online (ativos nos últimos 5 min)
+    // Utilizadores mais recentemente ativos (Top 20)
     const User = require('../models/User');
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-    const onlineUsers = await User.find({ lastSeen: { $gte: fiveMinutesAgo } }).select('name email role lastSeen');
+    const onlineUsers = await User.find()
+      .select('name email role lastSeen phone')
+      .sort({ lastSeen: -1 })
+      .limit(20);
 
     // Dispositivos e OS
     const deviceStats = await Analytics.aggregate([
@@ -62,6 +76,13 @@ exports.getStats = async (req, res) => {
       { $group: { _id: '$os', count: { $sum: 1 } } }
     ]);
 
-    res.json({ totalVisits, totalPurchases, topProducts, pageVisits, recentEvents, onlineUsers, deviceStats, osStats });
+    // Torneios por província
+    const Tournament = require('../models/Tournament');
+    const tournamentStats = await Tournament.aggregate([
+      { $group: { _id: '$province', count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]);
+
+    res.json({ totalVisits, totalPurchases, topProducts, pageVisits, recentEvents, onlineUsers, deviceStats, osStats, tournamentStats });
   } catch (err) { res.status(500).json({ message: err.message }); }
 };

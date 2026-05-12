@@ -16,8 +16,13 @@ export default function Footer() {
             Vibe
           </a>
         </p>
-        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
           <Link to="/support" style={{ color: 'var(--text-muted)', fontSize: 13, textDecoration: 'none' }} className="hover-green">Apoiar & Sugerir</Link>
+          <span style={{ color: 'rgba(255,255,255,0.1)' }}>|</span>
+          <Link to="/legal/privacy" style={{ color: 'var(--text-muted)', fontSize: 12, textDecoration: 'none' }} className="hover-green">Privacidade</Link>
+          <Link to="/legal/terms" style={{ color: 'var(--text-muted)', fontSize: 12, textDecoration: 'none' }} className="hover-green">Termos</Link>
+          <Link to="/legal/cookies" style={{ color: 'var(--text-muted)', fontSize: 12, textDecoration: 'none' }} className="hover-green">Cookies</Link>
+          <Link to="/legal/cookie-settings" style={{ color: 'var(--text-muted)', fontSize: 12, textDecoration: 'none' }} className="hover-green">Definições</Link>
           <a 
             href="https://www.linkedin.com/in/afonso-domingos-6b59361a5/" 
             target="_blank" 

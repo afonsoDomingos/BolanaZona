@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell } from 'lucide-react';
@@ -38,8 +38,25 @@ function RecentActivity() {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const location = useLocation();
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    const welcomeFlag = localStorage.getItem('bnz_welcome');
+    if (welcomeFlag === 'true') {
+      setShowWelcome(true);
+      localStorage.removeItem('bnz_welcome');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showWelcome) {
+      const timer = setTimeout(() => setShowWelcome(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showWelcome]);
 
   useEffect(() => {
     api.get('/tournaments').then(res => setTournaments(res.data)).finally(() => setLoading(false));
@@ -55,7 +72,45 @@ export default function Dashboard() {
   const statusBadge = { draft: 'badge-gray', registration: 'badge-blue', active: 'badge-green', finished: 'badge-yellow' };
 
   return (
-    <div className="page">
+    <div className="page" style={{ position: 'relative' }}>
+      {showWelcome && (
+        <div className="splash-overlay">
+          <div style={{
+            position: 'absolute', width: '100%', height: '100%', 
+            background: 'radial-gradient(circle at center, rgba(0,200,83,0.08) 0%, transparent 70%)',
+            zIndex: -1
+          }} />
+
+          <div className="card-glass splash-card" style={{ boxShadow: '0 40px 100px rgba(0,0,0,0.5)' }}>
+            <div className="spin-ball splash-ball" style={{ fontSize: 'clamp(60px, 15vw, 100px)', marginBottom: 24 }}>⚽</div>
+            <h1 className="font-syne animate-slide-up splash-title">
+              Bem-vindo à <span className="gradient-text">Zona</span>
+            </h1>
+            <p className="animate-slide-up splash-text" style={{ animationDelay: '0.1s' }}>
+              Olá, {user?.name?.split(' ')[0]}! {
+                user?.role === 'superadmin' || user?.role === 'admin' ? 'Prepara os torneios, o jogo vai começar! 🏆' :
+                user?.role === 'player' ? 'Prepara as chuteiras, és o craque de hoje! ⚽' :
+                'Acompanha tudo, a emoção está aqui! 📣'
+              }
+            </p>
+
+            {localStorage.getItem('bnz_visitor_number') && (
+              <div className="animate-slide-up" style={{ 
+                animationDelay: '0.2s', marginTop: 16, fontSize: 13, color: 'var(--green)', 
+                fontWeight: 700, padding: '4px 12px', background: 'rgba(0,200,83,0.1)', 
+                borderRadius: 20, border: '1px solid rgba(0,200,83,0.2)', display: 'inline-block' 
+              }}>
+                Utilizador nº {localStorage.getItem('bnz_visitor_number')} na plataforma 🏆
+              </div>
+            )}
+            
+            <div style={{ marginTop: 40, width: '100%', maxWidth: 240, height: 6, background: 'rgba(255,255,255,0.05)', borderRadius: 3, overflow: 'hidden' }}>
+              <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--green), #00e676)', width: '100%', animation: 'loading-bar 3s linear forwards' }} />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 40, flexWrap: 'wrap', gap: 16 }}>
           <div>

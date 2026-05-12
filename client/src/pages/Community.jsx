@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageSquare, Trophy, Star, Heart, Send, Plus, Users, Zap } from 'lucide-react';
+import { MessageSquare, Trophy, Heart, Send, Zap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -11,8 +11,9 @@ export default function Community() {
   const [loading, setLoading] = useState(true);
   const [activeMode, setActiveMode] = useState('text'); // text, score, goal
   const [content, setContent] = useState('');
-  const [scoreData, setScoreData] = useState({ teamA: '', teamB: '', scoreA: 0, scoreB: 0 });
+  const [scoreData, setScoreData] = useState({ teamA: '', teamB: '', scoreA: 0, scoreB: 0, period: 'FT' });
   const [sending, setSending] = useState(false);
+  const scrollRef = useRef(null);
 
   const fetchPosts = async () => {
     try {
@@ -24,9 +25,15 @@ export default function Community() {
 
   useEffect(() => {
     fetchPosts();
-    const interval = setInterval(fetchPosts, 15000); // Polling simples a cada 15s
+    const interval = setInterval(fetchPosts, 15000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [posts]);
 
   const handleCreatePost = async (overrideContent = null) => {
     const finalContent = overrideContent || content;
@@ -42,7 +49,7 @@ export default function Community() {
         scoreData: activeMode === 'score' ? scoreData : null
       });
       setContent('');
-      setScoreData({ teamA: '', teamB: '', scoreA: 0, scoreB: 0 });
+      setScoreData({ teamA: '', teamB: '', scoreA: 0, scoreB: 0, period: 'FT' });
       setActiveMode('text');
       fetchPosts();
       toast.success('Publicado no mural! 🚀');
@@ -65,198 +72,277 @@ export default function Community() {
   };
 
   return (
-    <div className="page animate-fade-in" style={{ background: 'var(--bg-main)', minHeight: '100vh' }}>
-      <div className="container" style={{ maxWidth: 700 }}>
+    <div className="page animate-fade-in" style={{ 
+      background: 'var(--bg-primary)', 
+      height: 'calc(100dvh - 64px)', 
+      display: 'flex', 
+      flexDirection: 'column',
+      padding: 0,
+      margin: 0,
+      overflow: 'hidden',
+      position: 'relative'
+    }}>
+      <div className="container" style={{ 
+        maxWidth: 700, 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column',
+        padding: '0 12px',
+        overflow: 'hidden',
+        position: 'relative'
+      }}>
         
-        {/* HEADER */}
-        <header style={{ marginBottom: 40, textAlign: 'center' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(0,200,83,0.1)', border: '1px solid rgba(0,200,83,0.25)', borderRadius: 100, padding: '6px 16px', marginBottom: 16 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--green)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-            <span style={{ fontSize: 12, color: 'var(--green)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1 }}>Mundo do Futebol Live</span>
+        {/* COMPACT HEADER */}
+        <header style={{ 
+          padding: '8px 0', 
+          borderBottom: '1px solid var(--border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <div>
+            <h1 className="font-syne" style={{ fontSize: 18, fontWeight: 900, letterSpacing: -0.5 }}>
+              Mural da <span className="gradient-text">Malta</span>
+            </h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+              <span style={{ fontSize: 9, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Live</span>
+            </div>
           </div>
-          <h1 className="font-syne" style={{ fontSize: 36, fontWeight: 900, marginBottom: 8, letterSpacing: -1 }}>
-            Mural da <span className="gradient-text">Malta</span> 🏟️
-          </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 16 }}>Onde o futebol nunca para. Comenta jogos, partilha placares e vibra com a comunidade.</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 10, maxWidth: 150, textAlign: 'right', lineHeight: 1.2 }}>Vibra com a comunidade em tempo real.</p>
         </header>
 
-        {/* POST CREATOR */}
-        <div className="card" style={{ padding: 20, marginBottom: 40, border: '1px solid rgba(255, 255, 255, 0.05)', background: 'rgba(255,255,255,0.02)' }}>
-          {!user ? (
-            <div style={{ textAlign: 'center', padding: '10px 0' }}>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: 16, fontSize: 14 }}>Queres participar na conversa? Junta-te à malta!</p>
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-                <Link to="/login" className="btn btn-secondary btn-sm">Entrar</Link>
-                <Link to="/register" className="btn btn-primary btn-sm">Criar Conta 🚀</Link>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-                <button onClick={() => setActiveMode('text')} className={`tab ${activeMode === 'text' ? 'active' : ''}`} style={{ flex: 1, borderRadius: 12, fontSize: 13 }}>
-                  <MessageSquare size={16} /> Texto
-                </button>
-                <button onClick={() => setActiveMode('score')} className={`tab ${activeMode === 'score' ? 'active' : ''}`} style={{ flex: 1, borderRadius: 12, fontSize: 13 }}>
-                  <Trophy size={16} /> Placar
-                </button>
-                <button onClick={() => setActiveMode('goal')} className={`tab ${activeMode === 'goal' ? 'active' : ''}`} style={{ flex: 1, borderRadius: 12, fontSize: 13 }}>
-                  <Zap size={16} /> GOLO!
-                </button>
-              </div>
-
-              {activeMode === 'text' && (
-                <textarea 
-                  className="form-input" 
-                  placeholder="Como está o jogo? Alguém a ver o Barça? Fala aqui! ⚽🔥"
-                  style={{ minHeight: 80, borderRadius: 16, padding: 16, fontSize: 15 }}
-                  value={content}
-                  onChange={e => setContent(e.target.value)}
-                />
-              )}
-
-              {activeMode === 'score' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <input className="form-input" placeholder="Equipa A" value={scoreData.teamA} onChange={e => setScoreData({...scoreData, teamA: e.target.value})} />
-                    <input type="number" className="form-input" style={{ width: 70, textAlign: 'center' }} value={scoreData.scoreA} onChange={e => setScoreData({...scoreData, scoreA: parseInt(e.target.value)})} />
-                    <span style={{ fontWeight: 800, color: 'var(--text-muted)' }}>VS</span>
-                    <input type="number" className="form-input" style={{ width: 70, textAlign: 'center' }} value={scoreData.scoreB} onChange={e => setScoreData({...scoreData, scoreB: parseInt(e.target.value)})} />
-                    <input className="form-input" placeholder="Equipa B" value={scoreData.teamB} onChange={e => setScoreData({...scoreData, teamB: e.target.value})} />
-                  </div>
-                </div>
-              )}
-
-              {activeMode === 'goal' && (
-                <div style={{ padding: '20px', textAlign: 'center', background: 'rgba(0, 200, 83, 0.05)', borderRadius: 16, border: '1px dashed var(--green)' }}>
-                  <div style={{ fontSize: 40, marginBottom: 16 }} className="spin-slow">⚽🔥</div>
-                  <h3 style={{ fontWeight: 800, color: 'var(--green)', marginBottom: 16 }}>ESCOLHE A TUA CELEBRAÇÃO!</h3>
-                  <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                    <button onClick={() => handleCreatePost('GOOOOOOOOOLO! ⚽🔥')} className="btn btn-secondary" style={{ borderRadius: 100 }}>Padrão ⚽</button>
-                    <button onClick={() => handleCreatePost('HALA MADRID! ⚪👑')} className="btn btn-secondary" style={{ borderRadius: 100, borderColor: '#fff', color: '#fff' }}>Hala Madrid ⚪</button>
-                    <button onClick={() => handleCreatePost('VISCA BARÇA! 🔴🔵')} className="btn btn-secondary" style={{ borderRadius: 100, borderColor: '#ff4d4d', color: '#ff4d4d' }}>Visca Barça 🔵</button>
-                  </div>
-                </div>
-              )}
-
-              <div style={{ marginTop: 20, display: 'flex', justifyContent: 'flex-end' }}>
-                <button 
-                  onClick={() => handleCreatePost()} 
-                  className="btn btn-primary" 
-                  disabled={sending}
-                  style={{ padding: '14px 28px', borderRadius: 16, alignSelf: 'flex-end' }}
-                >
-                  {sending ? 'A publicar...' : (
-                    <>Publicar no Mural <Send size={18} /></>
-                  )}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* FEED */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {/* SCROLLABLE FEED */}
+        <div 
+          ref={scrollRef}
+          style={{ 
+          flex: 1,
+          overflowY: 'auto',
+          padding: '20px 12px 20px 0',
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: 6,
+          scrollBehavior: 'smooth',
+          overscrollBehavior: 'contain'
+        }}>
           {loading ? (
             <div className="loading-center"><div className="spinner" /></div>
           ) : posts.length === 0 ? (
-            <div className="empty-state"><h3>O mural está vazio...</h3><p>Sê o primeiro a comentar!</p></div>
-          ) : posts.map(post => (
-            <div key={post._id} className="card animate-slide-up" style={{ padding: 20, position: 'relative', overflow: 'hidden' }}>
-              
-              {/* Background celebration for GOAL type */}
-              {post.type === 'goal' && (
-                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 4, background: 'linear-gradient(90deg, var(--green), transparent, var(--green))' }} />
-              )}
+            <div className="empty-state"><h3>A conversa ainda não começou...</h3><p>Diz o primeiro "Olá"!</p></div>
+          ) : posts.map((post, i) => {
+            const isMe = user && post.user?._id === user._id;
+            const showName = !isMe && (i === 0 || posts[i-1].user?._id !== post.user?._id);
+            
+            return (
+              <div key={post._id} className="animate-slide-up" style={{ 
+                display: 'flex', 
+                flexDirection: 'column',
+                alignItems: isMe ? 'flex-end' : 'flex-start',
+                width: '100%',
+                marginTop: showName ? 8 : 2
+              }}>
+                {showName && (
+                  <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--green)', marginBottom: 2, marginLeft: 4 }}>
+                    {post.user?.name || 'Utilizador'}
+                  </div>
+                )}
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: isMe ? 'row-reverse' : 'row',
+                  gap: 8,
+                  maxWidth: '85%'
+                }}>
+                  {/* Bubble */}
+                  <div style={{ 
+                    background: isMe ? 'var(--green)' : 'rgba(255,255,255,0.08)',
+                    color: isMe ? '#000' : '#fff',
+                    padding: '8px 12px',
+                    borderRadius: isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    border: '1px solid ' + (isMe ? 'transparent' : 'rgba(255,255,255,0.05)')
+                  }}>
+                    {post.type === 'text' && (
+                      <p style={{ fontSize: 14, lineHeight: 1.4, margin: 0 }}>{post.content}</p>
+                    )}
 
-              <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
-                  {post.user?.avatar ? <img src={post.user.avatar} style={{ width: '100%', height: '100%', borderRadius: 12 }} /> : '👤'}
-                </div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 14 }}>{post.user?.name}</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{new Date(post.createdAt).toLocaleTimeString()}</div>
+                    {post.type === 'score' && (
+                      <div style={{ 
+                        background: 'rgba(0,0,0,0.1)', 
+                        padding: '8px 10px', 
+                        borderRadius: 8, 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        alignItems: 'center', 
+                        gap: 4,
+                        marginTop: 2
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontWeight: 800, fontSize: 12 }}>{post.scoreData.teamA}</span>
+                          <span style={{ background: isMe ? '#000' : 'var(--green)', color: isMe ? 'var(--green)' : '#000', padding: '1px 6px', borderRadius: 4, fontWeight: 900, fontSize: 12 }}>
+                            {post.scoreData.scoreA}-{post.scoreData.scoreB}
+                          </span>
+                          <span style={{ fontWeight: 800, fontSize: 12 }}>{post.scoreData.teamB}</span>
+                        </div>
+                        {post.scoreData.period && (
+                          <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', opacity: 0.7 }}>
+                            {post.scoreData.period === '1T' ? '1ª Parte' : 
+                             post.scoreData.period === '2T' ? '2ª Parte' : 'Finalizado'}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {post.type === 'goal' && (
+                      <div style={{ 
+                        textAlign: 'center', 
+                        padding: '10px', 
+                        background: post.content.includes('MADRID') ? '#fff' : 
+                                    post.content.includes('BARÇA') ? 'linear-gradient(90deg, #a50044, #004d98)' :
+                                    '#00C853',
+                        borderRadius: 10,
+                        marginTop: 2,
+                        minWidth: 150
+                      }}>
+                        <h4 style={{ margin: 0, fontSize: 15, color: post.content.includes('MADRID') ? '#000' : '#fff' }} className="pulse-text">{post.content}</h4>
+                      </div>
+                    )}
+
+                    <div style={{ 
+                      marginTop: 4, 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'flex-end',
+                      gap: 6,
+                      opacity: 0.5
+                    }}>
+                      <button 
+                        onClick={() => toggleLike(post._id)}
+                        style={{ 
+                          background: 'none', border: 'none', 
+                          color: post.likes?.includes(user?._id) ? (isMe ? '#000' : 'var(--red)') : 'inherit', 
+                          display: 'flex', alignItems: 'center', gap: 2, fontSize: 9, fontWeight: 700, cursor: 'pointer' 
+                        }}
+                      >
+                        <Heart size={10} fill={post.likes?.includes(user?._id) ? (isMe ? '#000' : 'var(--red)') : 'none'} /> {post.likes?.length || 0}
+                      </button>
+                      <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                        {new Date(post.createdAt).toLocaleTimeString('pt-MZ', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
+            );
+          })}
+        </div>
 
-              {post.type === 'text' && (
-                <p style={{ fontSize: 15, lineHeight: 1.6, color: '#fff' }}>{post.content}</p>
-              )}
-
-              {post.type === 'score' && (
-                <div style={{ 
-                  background: 'rgba(255,255,255,0.02)', 
-                  padding: 20, 
-                  borderRadius: 16, 
-                  border: '1px solid var(--border)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 20
-                }}>
-                  <div style={{ flex: 1, textAlign: 'right', fontWeight: 800 }}>{post.scoreData.teamA}</div>
-                  <div style={{ background: 'var(--green)', color: '#000', fontWeight: 900, padding: '4px 16px', borderRadius: 8, fontSize: 20 }}>
-                    {post.scoreData.scoreA} - {post.scoreData.scoreB}
-                  </div>
-                  <div style={{ flex: 1, textAlign: 'left', fontWeight: 800 }}>{post.scoreData.teamB}</div>
-                </div>
-              )}
-
-              {post.type === 'goal' && (
-                <div style={{ 
-                  textAlign: 'center', 
-                  padding: '40px 20px', 
-                  position: 'relative',
-                  overflow: 'hidden',
-                  background: post.content.includes('MADRID') ? 'linear-gradient(135deg, #fff 0%, #f0f0f0 100%)' : 
-                              post.content.includes('BARÇA') ? 'linear-gradient(135deg, #a50044 0%, #004d98 100%)' :
-                              'linear-gradient(135deg, #00C853 0%, #007a33 100%)',
-                  borderRadius: 16,
-                  boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
-                }}>
-                  {/* Floating Particles */}
-                  <div className="celebration-particles">
-                    <span>⚽</span><span>🔥</span><span>✨</span><span>⚽</span><span>🔥</span>
-                  </div>
-
-                  <div style={{ 
-                    fontSize: 14, 
-                    fontWeight: 800, 
-                    color: post.content.includes('MADRID') ? '#0044aa' : '#fff', 
-                    letterSpacing: 4, 
-                    marginBottom: 12,
-                    opacity: 0.8
-                  }}>VIBRAÇÃO TOTAL</div>
-                  
-                  <h2 className="font-syne pulse-text" style={{ 
-                    fontSize: 38, 
-                    fontWeight: 900, 
-                    color: post.content.includes('MADRID') ? '#000' : '#fff', 
-                    letterSpacing: -1,
-                    textShadow: '0 4px 12px rgba(0,0,0,0.2)'
-                  }}>
-                    {post.content}
-                  </h2>
-
-                  <div style={{ marginTop: 16, fontSize: 24 }} className="bounce-animation">🙌🏆🔥</div>
-                </div>
-              )}
-
-              <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 20 }}>
-                <button 
-                  onClick={() => toggleLike(post._id)}
-                  style={{ 
-                    background: 'none', border: 'none', color: post.likes?.includes(user?._id) ? 'var(--red)' : 'var(--text-muted)', 
-                    display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' 
-                  }}
-                >
-                  <Heart size={18} fill={post.likes?.includes(user?._id) ? 'var(--red)' : 'none'} /> {post.likes?.length || 0} Curtidas
-                </button>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                  {post.type === 'score' ? '📢 Atualização de Resultado' : post.type === 'goal' ? '🔥 Celebração' : '💬 Comentário'}
-                </div>
+        {/* FIXED INPUT BAR */}
+        <div style={{ 
+          padding: '8px 0 12px', 
+          borderTop: '1px solid var(--border)',
+          background: 'var(--bg-primary)'
+        }}>
+          {!user ? (
+            <div style={{ textAlign: 'center', padding: '8px 0', background: 'var(--bg-card)', borderRadius: 16, border: '1px solid var(--border)' }}>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: 8, fontSize: 12 }}>Inicia sessão para comentar!</p>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                <Link to="/login" className="btn btn-secondary btn-sm" style={{ height: 28, fontSize: 11 }}>Entrar</Link>
+                <Link to="/register" className="btn btn-primary btn-sm" style={{ height: 28, fontSize: 11 }}>Criar Conta</Link>
               </div>
             </div>
-          ))}
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button onClick={() => setActiveMode('text')} className={`tab ${activeMode === 'text' ? 'active' : ''}`} style={{ flex: 1, height: 28, fontSize: 10, borderRadius: 6, padding: 0 }}>
+                  <MessageSquare size={12} /> Texto
+                </button>
+                <button onClick={() => setActiveMode('score')} className={`tab ${activeMode === 'score' ? 'active' : ''}`} style={{ flex: 1, height: 28, fontSize: 10, borderRadius: 6, padding: 0 }}>
+                  <Trophy size={12} /> Placar
+                </button>
+                <button onClick={() => setActiveMode('goal')} className={`tab ${activeMode === 'goal' ? 'active' : ''}`} style={{ flex: 1, height: 28, fontSize: 10, borderRadius: 6, padding: 0 }}>
+                  <Zap size={12} /> GOLO
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
+                <div style={{ flex: 1 }}>
+                  {activeMode === 'text' && (
+                    <textarea 
+                      className="form-input" 
+                      placeholder="Escreve uma mensagem..."
+                      style={{ minHeight: 36, maxHeight: 100, borderRadius: 10, padding: '8px 12px', fontSize: 13 }}
+                      value={content}
+                      onChange={e => setContent(e.target.value)}
+                    />
+                  )}
+
+                  {activeMode === 'score' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 2 }}>
+                        {['⚽', '🏆', '🔥', '⚔️', '🏁', '🛡️'].map(emoji => (
+                          <button 
+                            key={emoji}
+                            onClick={() => {
+                              if (!scoreData.teamA) setScoreData({...scoreData, teamA: emoji + ' '});
+                              else if (!scoreData.teamB) setScoreData({...scoreData, teamB: emoji + ' '});
+                            }}
+                            style={{ 
+                              background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: 4, 
+                              width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: 12, cursor: 'pointer'
+                            }}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.03)', padding: 4, borderRadius: 10, border: '1px solid var(--border)' }}>
+                        <input className="form-input" placeholder="Equipa A" style={{ height: 28, fontSize: 11, padding: '0 6px' }} value={scoreData.teamA} onChange={e => setScoreData({...scoreData, teamA: e.target.value})} />
+                        <input type="number" className="form-input" style={{ width: 35, height: 28, textAlign: 'center', fontSize: 11, padding: 0 }} value={scoreData.scoreA} onChange={e => setScoreData({...scoreData, scoreA: parseInt(e.target.value)})} />
+                        <input type="number" className="form-input" style={{ width: 35, height: 28, textAlign: 'center', fontSize: 11, padding: 0 }} value={scoreData.scoreB} onChange={e => setScoreData({...scoreData, scoreB: parseInt(e.target.value)})} />
+                        <input className="form-input" placeholder="Equipa B" style={{ height: 28, fontSize: 11, padding: '0 6px' }} value={scoreData.teamB} onChange={e => setScoreData({...scoreData, teamB: e.target.value})} />
+                      </div>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        {['1T', '2T', 'FT'].map(p => (
+                          <button 
+                            key={p} 
+                            onClick={() => setScoreData({...scoreData, period: p})}
+                            style={{ 
+                              flex: 1, height: 20, fontSize: 8, borderRadius: 4, 
+                              background: scoreData.period === p ? 'var(--green)' : 'rgba(255,255,255,0.05)',
+                              color: scoreData.period === p ? '#000' : 'var(--text-muted)',
+                              border: 'none', fontWeight: 700, cursor: 'pointer'
+                            }}
+                          >
+                            {p === '1T' ? '1ª P' : p === '2T' ? '2ª P' : 'Final'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {activeMode === 'goal' && (
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <button onClick={() => handleCreatePost('GOOOOOOOOOLO! ⚽🔥')} className="btn btn-secondary" style={{ flex: 1, height: 32, fontSize: 9, borderRadius: 8 }}>Geral</button>
+                      <button onClick={() => handleCreatePost('HALA MADRID! ⚪👑')} className="btn btn-secondary" style={{ flex: 1, height: 32, fontSize: 9, borderRadius: 8, borderColor: '#fff' }}>Madrid</button>
+                      <button onClick={() => handleCreatePost('VISCA BARÇA! 🔴🔵')} className="btn btn-secondary" style={{ flex: 1, height: 32, fontSize: 9, borderRadius: 8, borderColor: '#ff4d4d' }}>Barça</button>
+                    </div>
+                  )}
+                </div>
+
+                {activeMode !== 'goal' && (
+                  <button 
+                    onClick={() => handleCreatePost()} 
+                    className="btn btn-primary" 
+                    disabled={sending}
+                    style={{ width: 36, height: 36, borderRadius: 10, padding: 0, justifyContent: 'center', flexShrink: 0 }}
+                  >
+                    {sending ? <span className="spinner" style={{ width: 14, height: 14, border: '2px solid #000', borderTopColor: 'transparent' }} /> : <Send size={18} />}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <style>{`

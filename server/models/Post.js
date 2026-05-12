@@ -19,7 +19,8 @@ const postSchema = new mongoose.Schema({
     teamA: String,
     teamB: String,
     scoreA: Number,
-    scoreB: Number
+    scoreB: Number,
+    period: String
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,

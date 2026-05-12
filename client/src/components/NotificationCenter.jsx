@@ -68,7 +68,15 @@ export default function NotificationCenter() {
       </button>
 
       {open && (
-        <div className="card animate-fade-in" style={{ position: 'absolute', top: '100%', right: 0, width: 320, maxHeight: 480, overflowY: 'auto', zIndex: 1000, marginTop: 12, padding: 0, border: '1px solid var(--border)', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
+        <div className="animate-fade-in" style={{ 
+          position: 'absolute', top: '100%', right: 0, width: 320, maxHeight: 480, overflowY: 'auto', 
+          zIndex: 2000, marginTop: 12, padding: 0, 
+          background: 'rgba(13, 21, 41, 0.98)', // Fundo quase opaco para legibilidade
+          backdropFilter: 'blur(24px)',
+          borderRadius: 20,
+          border: '1px solid rgba(255,255,255,0.15)', 
+          boxShadow: '0 20px 80px rgba(0,0,0,0.7)' 
+        }}>
           <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)' }}>
             <span style={{ fontWeight: 700, fontSize: 15 }}>Notificações</span>
             <div style={{ display: 'flex', gap: 12 }}>

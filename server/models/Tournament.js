@@ -14,7 +14,7 @@ const tournamentSchema = new mongoose.Schema({
   startDate: { type: Date },
   endDate: { type: Date },
   prize: { type: String, default: '' },
-  city: { type: String, default: 'Luanda' },
+  province: { type: String, default: 'Maputo Cidade' },
   registrationFee: { type: Number, default: 0 },
   contactLink: { type: String, default: '' },
   allowPublicRegistration: { type: Boolean, default: true },

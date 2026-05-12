@@ -1,6 +1,30 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import api from '../services/api';
+import toast from 'react-hot-toast';
+
+const CountUp = ({ end }) => {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let start = 0;
+    const duration = 1500; // 1.5s para contar
+    const steps = 60;
+    const increment = end / steps;
+    const interval = duration / steps;
+    
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= end) {
+        setCount(end);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, interval);
+    return () => clearInterval(timer);
+  }, [end]);
+  return <span>{count}</span>;
+};
 
 export default function AnalyticsTracker() {
   const location = useLocation();
@@ -17,13 +41,51 @@ export default function AnalyticsTracker() {
     if (ua.indexOf('Mac') !== -1) os = 'MacOS';
     if (ua.indexOf('Linux') !== -1) os = 'Linux';
 
-    // Registar visita
-    api.post('/analytics/track', {
-      type: 'visit',
-      page: location.pathname,
-      deviceType,
-      os
-    }).catch(() => {}); // Ignorar erros para não quebrar a UI
+    // Registar visita com um pequeno atraso para garantir que o servidor está "acordado"
+    const timer = setTimeout(() => {
+      const isNew = !localStorage.getItem('bnz_visitor_id');
+      if (isNew) {
+        const visitorId = Math.random().toString(36).substring(2, 15);
+        localStorage.setItem('bnz_visitor_id', visitorId);
+      }
+
+      api.post('/analytics/track', {
+        type: 'visit',
+        page: location.pathname,
+        deviceType,
+        os,
+        isNewVisitor: isNew
+      }).then(res => {
+        if (res.data.visitorNumber) {
+          localStorage.setItem('bnz_visitor_number', res.data.visitorNumber);
+          
+            // Informar o visitante com um efeito de contagem dinâmica
+          toast.success((t) => (
+            <span>
+              És o visitante nº <b style={{ fontSize: '1.2em' }}><CountUp end={res.data.visitorNumber} /></b> na Zona! ⚽
+            </span>
+          ), {
+            duration: 6000,
+            position: 'bottom-left',
+            icon: '🏆',
+            style: {
+              border: '1px solid var(--green)',
+              padding: '16px',
+              color: '#fff',
+              background: 'rgba(13, 21, 41, 0.95)', // Mais escuro para ler a contagem
+              backdropFilter: 'blur(10px)',
+              fontWeight: 800,
+              fontSize: '14px',
+              marginBottom: '20px',
+              marginLeft: '20px',
+              boxShadow: '0 10px 40px rgba(0,200,83,0.2)'
+            }
+          });
+        }
+      }).catch(() => {});
+    }, 2000); // 2 segundos de espera
+
+    return () => clearTimeout(timer);
   }, [location.pathname]);
 
   return null;

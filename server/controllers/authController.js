@@ -5,7 +5,7 @@ const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: 
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, phone, password, role } = req.body;
+    const { name, email, phone, password, role, province } = req.body;
     console.log('📝 Nova tentativa de registo:', { name, phone, role });
 
     if (!phone) return res.status(400).json({ message: 'Número de telefone é obrigatório.' });
@@ -21,7 +21,7 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: `${field} já registado.` });
     }
 
-    const userData = { name, phone, password, role: role || 'viewer' };
+    const userData = { name, phone, password, role: role || 'viewer', province };
     if (email && email.trim() !== '') userData.email = email.toLowerCase();
 
     const user = await User.create(userData);

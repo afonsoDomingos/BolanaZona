@@ -9,6 +9,8 @@ import Footer from './components/Footer';
 import FeedbackPopup from './components/FeedbackPopup';
 import CommunityFAB from './components/CommunityFAB';
 import ProtectedRoute from './components/ProtectedRoute';
+import CursorGlow from './components/CursorGlow';
+import ClickRipple from './components/ClickRipple';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -27,6 +29,10 @@ import PublicTournament from './pages/PublicTournament';
 import Profile from './pages/Profile';
 import UserManagement from './pages/UserManagement';
 import Community from './pages/Community';
+import Privacy from './pages/legal/Privacy';
+import Terms from './pages/legal/Terms';
+import Cookies from './pages/legal/Cookies';
+import CookieSettings from './pages/legal/CookieSettings';
 import './index.css';
 
 // Bola na Zona - Plataforma Oficial ⚽
@@ -43,7 +49,9 @@ function AppRoutes() {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
       <AnalyticsTracker />
-      <main style={{ flex: 1 }}>
+      <CursorGlow />
+      <ClickRipple />
+      <main style={{ flex: 1, position: 'relative', zIndex: 2 }}>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/explore" element={<Explore />} />
@@ -63,6 +71,10 @@ function AppRoutes() {
           <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['superadmin']}><UserManagement /></ProtectedRoute>} />
           <Route path="/support" element={<Support />} />
           <Route path="/community" element={<Community />} />
+          <Route path="/legal/privacy" element={<Privacy />} />
+          <Route path="/legal/terms" element={<Terms />} />
+          <Route path="/legal/cookies" element={<Cookies />} />
+          <Route path="/legal/cookie-settings" element={<CookieSettings />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>

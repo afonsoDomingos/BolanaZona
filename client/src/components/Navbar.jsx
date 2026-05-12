@@ -9,13 +9,49 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
 
-  const handleLogout = () => { logout(); navigate('/'); setIsMenuOpen(false); };
+  const handleLogout = async () => { 
+    setIsLoggingOut(true);
+    try {
+      await logout(); 
+      // Keep splash for a bit for the effect
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    } finally {
+      setIsLoggingOut(false);
+      navigate('/'); 
+      setIsMenuOpen(false); 
+    }
+  };
 
   return (
     <nav className="navbar">
+      {isLoggingOut && (
+        <div className="splash-overlay">
+          <div style={{
+            position: 'absolute', width: '100%', height: '100%', 
+            background: 'radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%)',
+            zIndex: -1
+          }} />
+
+          <div className="card-glass splash-card" style={{ boxShadow: '0 40px 100px rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div className="spin-ball splash-ball" style={{ fontSize: 'clamp(60px, 15vw, 100px)', marginBottom: 24, filter: 'grayscale(1) brightness(0.7)' }}>⚽</div>
+            <h1 className="font-syne animate-slide-up splash-title">
+              Até à próxima, <span className="gradient-text" style={{ filter: 'grayscale(0.5)' }}>Craque</span>
+            </h1>
+            <p className="animate-slide-up splash-text" style={{ animationDelay: '0.1s' }}>
+              A Zona espera pelo teu regresso. Prepara-te para a próxima jornada.
+            </p>
+            
+            <div style={{ marginTop: 40, width: '100%', maxWidth: 200, height: 4, background: 'rgba(255,255,255,0.05)', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{ height: '100%', background: 'rgba(255,255,255,0.2)', width: '100%', animation: 'loading-bar 2s linear forwards' }} />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="container">
         <div className="navbar-inner">
           <Link to="/" className="navbar-logo" onClick={() => setIsMenuOpen(false)} style={{ flexShrink: 0 }}>
@@ -28,11 +64,11 @@ export default function Navbar() {
           <div className={`navbar-nav ${isMenuOpen ? 'mobile-open' : ''}`}>
             <Link to="/explore" className={`nav-link ${isActive('/explore') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Torneios</Link>
             <Link to="/talents" className={`nav-link ${isActive('/talents') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Talentos</Link>
-            <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <ShoppingBag size={18} /> Loja
-            </Link>
             <Link to="/support" className={`nav-link ${isActive('/support') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <Heart size={18} color="var(--red)" /> Apoiar
+            </Link>
+            <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <ShoppingBag size={18} /> Loja
             </Link>
 
             {user ? (
@@ -52,7 +88,14 @@ export default function Navbar() {
                   </>
                 )}
                 <NotificationCenter />
-                <button onClick={handleLogout} className="btn btn-secondary btn-sm" style={{ color: 'var(--red)', borderColor: 'rgba(255,0,0,0.2)' }}>Sair</button>
+                <button 
+                  onClick={handleLogout} 
+                  className="btn btn-secondary btn-sm" 
+                  disabled={isLoggingOut}
+                  style={{ color: 'var(--red)', borderColor: 'rgba(255,0,0,0.2)', minWidth: 80, justifyContent: 'center' }}
+                >
+                  {isLoggingOut ? <span className="spinner" style={{ width: 14, height: 14, border: '2px solid rgba(255,68,68,0.2)', borderTopColor: 'var(--red)' }} /> : 'Sair'}
+                </button>
               </>
             ) : (
               <>

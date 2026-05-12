@@ -22,7 +22,7 @@ exports.getAll = async (req, res) => {
       .populate('user', 'name avatar')
       .sort({ createdAt: -1 })
       .limit(50);
-    res.json(posts);
+    res.json(posts.reverse());
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, required: true, unique: true, trim: true },
   password: { type: String, required: true, minlength: 6 },
   role: { type: String, enum: ['superadmin', 'admin', 'player', 'viewer'], default: 'viewer' },
+  province: { type: String, default: '' },
   hasGivenFeedback: { type: Boolean, default: false },
   avatar: { type: String, default: '' },
   lastSeen: { type: Date, default: Date.now },

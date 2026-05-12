@@ -16,9 +16,14 @@ export default function TournamentNew() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    name: '', neighborhood: '', location: '', city: 'Maputo', description: '',
+    name: '', neighborhood: '', location: '', province: 'Maputo Cidade', description: '',
     format: 'groups', maxTeams: 8, startDate: '', prize: '', registrationFee: 0, contactLink: '',
   });
+
+  const provinces = [
+    'Maputo Cidade', 'Maputo Província', 'Gaza', 'Inhambane', 'Sofala', 
+    'Manica', 'Tete', 'Zambézia', 'Nampula', 'Niassa', 'Cabo Delgado'
+  ];
 
   const set = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
 
@@ -66,8 +71,10 @@ export default function TournamentNew() {
               </div>
               <div className="form-grid form-grid-3">
                 <div className="form-group">
-                  <label className="form-label">Cidade *</label>
-                  <input className="form-input" placeholder="Ex: Maputo" value={form.city} onChange={e => set('city', e.target.value)} required />
+                  <label className="form-label">Província *</label>
+                  <select className="form-select" value={form.province} onChange={e => set('province', e.target.value)} required>
+                    {provinces.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
                 </div>
                 <div className="form-group">
                   <label className="form-label">Bairro *</label>

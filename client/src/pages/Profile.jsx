@@ -2,15 +2,20 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { User, Mail, Phone, Shield, Camera, Save, LogOut } from 'lucide-react';
+import { User, Mail, Phone, Shield, Camera, Save, LogOut, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
   const { user, logout, setUser } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', phone: '', avatar: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', avatar: '', province: '' });
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  const provinces = [
+    'Maputo Cidade', 'Maputo Província', 'Gaza', 'Inhambane', 'Sofala', 
+    'Manica', 'Tete', 'Zambézia', 'Nampula', 'Niassa', 'Cabo Delgado'
+  ];
 
   useEffect(() => {
     if (user) {
@@ -18,7 +23,8 @@ export default function Profile() {
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
-        avatar: user.avatar || ''
+        avatar: user.avatar || '',
+        province: user.province || ''
       });
     }
   }, [user]);
@@ -112,6 +118,17 @@ export default function Profile() {
               <div className="input-wrapper">
                 <Phone size={18} />
                 <input type="tel" className="form-input" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Província</label>
+              <div className="input-wrapper">
+                <MapPin size={18} />
+                <select className="form-input" value={form.province} onChange={e => setForm({ ...form, province: e.target.value })}>
+                  <option value="">Selecionar Província...</option>
+                  {provinces.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
               </div>
             </div>
 

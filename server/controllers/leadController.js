@@ -6,7 +6,7 @@ const User = require('../models/User');
 
 exports.create = async (req, res) => {
   try {
-    const { productId, tournamentId, name, contact, teamName, message, source } = req.body;
+    const { productId, tournamentId, name, contact, teamName, message, source, size, color, province } = req.body;
     
     const lead = await Lead.create({
       product: productId || null,
@@ -14,6 +14,9 @@ exports.create = async (req, res) => {
       name,
       contact,
       teamName,
+      size,
+      color,
+      province,
       message,
       source: source || 'store'
     });

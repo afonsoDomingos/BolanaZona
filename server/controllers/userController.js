@@ -11,7 +11,7 @@ exports.getMe = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, email, phone, avatar } = req.body;
+    const { name, email, phone, avatar, province } = req.body;
     
     // Validar se o telemóvel já existe em outro utilizador
     if (phone) {
@@ -25,7 +25,7 @@ exports.updateProfile = async (req, res) => {
       if (existing) return res.status(400).json({ message: 'Este e-mail já está em uso.' });
     }
 
-    const updates = { name, phone };
+    const updates = { name, phone, province };
     if (avatar) updates.avatar = avatar;
     
     // Tratar email como undefined se vazio para respeitar o índice sparse
@@ -59,10 +59,10 @@ exports.getAllUsers = async (req, res) => {
 
 exports.adminUpdateUser = async (req, res) => {
   try {
-    const { name, email, phone, role, avatar } = req.body;
+    const { name, email, phone, role, avatar, province } = req.body;
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      { $set: { name, email, phone, role, avatar } },
+      { $set: { name, email, phone, role, avatar, province } },
       { new: true, runValidators: true }
     );
     res.json(user);

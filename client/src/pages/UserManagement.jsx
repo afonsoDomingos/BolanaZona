@@ -87,7 +87,7 @@ export default function UserManagement() {
             <option value="all">Todos os Cargos</option>
             <option value="superadmin">Superadmins</option>
             <option value="admin">Admins</option>
-            <option value="captain">Capitães</option>
+            <option value="player">Jogadores/Capitães</option>
             <option value="viewer">Visualizadores</option>
           </select>
         </div>
@@ -139,7 +139,7 @@ export default function UserManagement() {
                       >
                         <option value="superadmin">Superadmin</option>
                         <option value="admin">Admin</option>
-                        <option value="captain">Capitão</option>
+                        <option value="player">Jogador/Capitão</option>
                         <option value="viewer">Visualizador</option>
                       </select>
                     </td>

@@ -6,6 +6,9 @@ const leadSchema = new mongoose.Schema({
   name: { type: String, required: true },
   contact: { type: String, required: true }, // WhatsApp ou Email
   teamName: { type: String }, // Nome da equipa pretendida
+  size: { type: String }, // Tamanho do produto
+  color: { type: String }, // Cor do produto
+  province: { type: String }, // Província do lead
   message: { type: String },
   status: { type: String, enum: ['new', 'contacted', 'converted', 'lost'], default: 'new' },
   source: { type: String, default: 'store' }, // 'store' ou 'tournament_reg'
