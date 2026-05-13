@@ -156,6 +156,7 @@ function ChallengeModal({ targetSquad, mySquads, onClose }) {
     challengerSquad: mySquads[0]?._id, 
     date: '', 
     location: '', 
+    mapsLink: '',
     message: '',
     type: 'friendly',
     wagerValue: ''
@@ -247,6 +248,12 @@ function ChallengeModal({ targetSquad, mySquads, onClose }) {
               <label className="form-label">Local (Campo)</label>
               <input className="form-input" placeholder="Ex: Campo do Bairro" value={form.location} onChange={e => setForm({...form, location: e.target.value})} />
             </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Link Google Maps (Opcional)</label>
+            <input className="form-input" placeholder="Cola o link da localização aqui..." value={form.mapsLink} onChange={e => setForm({...form, mapsLink: e.target.value})} />
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>📍 Recomendado para ajudar o adversário a encontrar o campo.</p>
           </div>
 
           <div className="form-grid form-grid-2">

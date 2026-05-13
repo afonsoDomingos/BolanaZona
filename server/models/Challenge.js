@@ -6,6 +6,7 @@ const challengeSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'accepted', 'rejected', 'completed', 'cancelled'], default: 'pending' },
   date: { type: Date },
   location: { type: String, default: '' },
+  mapsLink: { type: String, default: '' },
   message: { type: String, default: '' },
   type: { type: String, enum: ['friendly', 'wager'], default: 'friendly' },
   wagerValue: { type: String, default: '' },

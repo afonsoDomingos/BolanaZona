@@ -6,7 +6,7 @@ const Notification = require('../models/Notification');
 exports.create = async (req, res) => {
   console.log('⚡️ Creating challenge - payload:', req.body, 'user:', req.user._id);
   try {
-    const { challengerSquad, challengedSquad, date, location, message, type, wagerValue } = req.body;
+    const { challengerSquad, challengedSquad, date, location, message, type, wagerValue, mapsLink } = req.body;
 
     // Verify that the user actually owns the challenger squad
     const challenger = await Squad.findOne({ _id: challengerSquad, manager: req.user._id });
@@ -22,7 +22,7 @@ exports.create = async (req, res) => {
       return res.status(404).json({ message: 'Clube desafiado não encontrado.' });
     }
 
-    const challenge = await Challenge.create({ challengerSquad, challengedSquad, date, location, message, type, wagerValue });
+    const challenge = await Challenge.create({ challengerSquad, challengedSquad, date, location, message, type, wagerValue, mapsLink });
     console.log('✅ Challenge created with id', challenge._id);
 
     // Build WhatsApp notification
@@ -50,6 +50,7 @@ exports.create = async (req, res) => {
         `📅 *Proposta de Jogo:*`,
         `🗓️ Data: ${dateStr}`,
         location ? `🏟️ Campo: ${location}` : `🏟️ Campo: A definir`,
+        mapsLink ? `📍 Localização: ${mapsLink}` : null,
         `🏆 Tipo: ${type === 'wager' ? `💰 Aposta (${wagerValue || 'A definir'})` : '🤝 Amigável'}`,
         message ? `💬 Mensagem: "${message}"` : null,
         '',
