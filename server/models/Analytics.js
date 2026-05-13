@@ -16,4 +16,4 @@ const analyticsSchema = new mongoose.Schema({
   os: { type: String }, // windows, android, ios, macos, etc
 }, { timestamps: true });
 
-module.exports = mongoose.model('Analytics', analyticsSchema);
+module.exports = mongoose.models.Analytics || mongoose.model('Analytics', analyticsSchema);

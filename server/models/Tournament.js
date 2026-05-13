@@ -26,4 +26,4 @@ const tournamentSchema = new mongoose.Schema({
   bestGoalkeeper: { type: String, default: '' },
 }, { timestamps: true });
 
-module.exports = mongoose.model('Tournament', tournamentSchema);
+module.exports = mongoose.models.Tournament || mongoose.model('Tournament', tournamentSchema);
