@@ -22,6 +22,8 @@ import AdminAnalytics from './pages/AdminAnalytics';
 import Support from './pages/Support';
 import ResetPassword from './pages/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword';
+import MySquads from './pages/MySquads';
+import SquadDetail from './pages/SquadDetail';
 import TournamentList from './pages/TournamentList';
 import TournamentNew from './pages/TournamentNew';
 import TournamentDetail from './pages/TournamentDetail';
@@ -63,6 +65,8 @@ function AppRoutes() {
           <Route path="/reset-password/:token" element={<GuestRoute><ResetPassword /></GuestRoute>} />
           <Route path="/t/:shareCode" element={<PublicTournament />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/dashboard/squads" element={<ProtectedRoute><MySquads /></ProtectedRoute>} />
+          <Route path="/dashboard/squads/:id" element={<ProtectedRoute><SquadDetail /></ProtectedRoute>} />
           <Route path="/dashboard/tournaments" element={<ProtectedRoute><TournamentList /></ProtectedRoute>} />
           <Route path="/dashboard/tournaments/new" element={<ProtectedRoute><TournamentNew /></ProtectedRoute>} />
           <Route path="/dashboard/tournaments/:id" element={<ProtectedRoute><TournamentDetail /></ProtectedRoute>} />

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell } from 'lucide-react';
+import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell, Shield } from 'lucide-react';
 
 function RecentActivity() {
   const [activities, setActivities] = useState([]);
@@ -128,6 +128,7 @@ export default function Dashboard() {
             {user?.role === 'superadmin' && (
               <Link to="/admin/users" className="btn btn-secondary"><Users size={16} /> Gerir Utilizadores</Link>
             )}
+            <Link to="/dashboard/squads" className="btn btn-secondary"><Shield size={16} /> Meus Clubes</Link>
             <Link to="/dashboard/tournaments/new" className="btn btn-primary"><Plus size={16} /> Novo Torneio</Link>
           </div>
         </div>

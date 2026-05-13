@@ -57,6 +57,7 @@ app.use('/api/suggestions', require('./routes/suggestions'));
 app.use('/api/feedbacks', require('./routes/feedbacks'));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/squads', require('./routes/squads'));
 
 // Start DB connection for local development
 if (process.env.NODE_ENV !== 'production') {
