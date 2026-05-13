@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shield, Users, Save, Trash2, Plus, X, Pencil } from 'lucide-react';
+import { ArrowLeft, Shield, Users, Save, Trash2, Plus, X, Pencil, Upload, Image, Camera } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -10,8 +10,28 @@ export default function SquadDetail() {
   const [squad, setSquad] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [newPlayer, setNewPlayer] = useState({ name: '', position: '', number: '' });
+  const [newPlayer, setNewPlayer] = useState({ name: '', position: '', number: '', photo: '' });
   const [editingPlayerIndex, setEditingPlayerIndex] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
+  const uploadImage = async (file, type) => {
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      const res = await api.post('/upload', formData);
+      if (type === 'logo') {
+        setSquad({ ...squad, logo: res.data.url });
+      } else {
+        setNewPlayer({ ...newPlayer, photo: res.data.url });
+      }
+      toast.success('Imagem carregada! 📸');
+    } catch {
+      toast.error('Erro no upload.');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleAddPlayer = (e) => {
     e.preventDefault();
@@ -25,7 +45,7 @@ export default function SquadDetail() {
     } else {
       setSquad({ ...squad, players: [...(squad.players || []), newPlayer] });
     }
-    setNewPlayer({ name: '', position: '', number: '' });
+    setNewPlayer({ name: '', position: '', number: '', photo: '' });
   };
 
   const handleEditPlayer = (index) => {
@@ -132,8 +152,14 @@ export default function SquadDetail() {
                   </div>
                 </div>
                 <div style={{ flex: 2 }}>
-                  <label className="form-label">Link do Símbolo (URL)</label>
-                  <input className="form-input" placeholder="https://..." value={squad.logo || ''} onChange={e => setSquad({...squad, logo: e.target.value})} />
+                  <label className="form-label">Símbolo do Clube</label>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input className="form-input" placeholder="Link da imagem..." value={squad.logo || ''} onChange={e => setSquad({...squad, logo: e.target.value})} style={{ flex: 1 }} />
+                    <label className="btn btn-secondary" style={{ width: 44, height: 44, padding: 0, justifyContent: 'center', cursor: 'pointer', borderRadius: 12 }}>
+                      <Upload size={18} />
+                      <input type="file" hidden accept="image/*" onChange={e => uploadImage(e.target.files[0], 'logo')} />
+                    </label>
+                  </div>
                 </div>
               </div>
 
@@ -167,6 +193,10 @@ export default function SquadDetail() {
                 <option value="Ponta de Lança">Ponta de Lança</option>
               </select>
               <input type="number" className="form-input" placeholder="Nº" value={newPlayer.number} onChange={e => setNewPlayer({...newPlayer, number: e.target.value})} style={{ width: 60, height: 40 }} />
+              <label className="btn btn-secondary" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center', cursor: 'pointer', borderRadius: 10, background: newPlayer.photo ? 'rgba(0,200,83,0.1)' : 'transparent', border: newPlayer.photo ? '1px solid var(--green)' : '1px solid rgba(255,255,255,0.1)' }}>
+                {uploading ? <span className="spinner-xs" /> : newPlayer.photo ? <Image size={18} color="var(--green)" /> : <Camera size={18} />}
+                <input type="file" hidden accept="image/*" onChange={e => uploadImage(e.target.files[0], 'player')} />
+              </label>
               <button type="submit" className="btn btn-primary" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center', background: editingPlayerIndex !== null ? 'var(--yellow)' : 'var(--green)', color: '#000', border: 'none' }}>
                 {editingPlayerIndex !== null ? <Save size={18} /> : <Plus size={18} />}
               </button>
@@ -181,6 +211,9 @@ export default function SquadDetail() {
                 squad.players.map((p, idx) => (
                   <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.05)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {p.photo ? <img src={p.photo} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Users size={16} color="var(--text-muted)" />}
+                      </div>
                       {p.number && <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--green)', background: 'rgba(0,200,83,0.1)', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4 }}>{p.number}</span>}
                       <span style={{ fontWeight: 700, fontSize: 14 }}>{p.name}</span>
                       {p.position && <span style={{ fontSize: 10, color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '2px 6px', borderRadius: 4 }}>{p.position === 'GK' ? 'Guarda-Redes' : p.position === 'DEF' ? 'Defesa' : p.position === 'MID' ? 'Médio' : p.position === 'FWD' ? 'Avançado' : p.position}</span>}

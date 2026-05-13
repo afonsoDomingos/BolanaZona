@@ -5,7 +5,8 @@ const playerSchema = new mongoose.Schema({
   number: { type: Number },
   position: { type: String, default: '' },
   isCaptain: { type: Boolean, default: false },
-  contact: { type: String, trim: true, default: '' }
+  contact: { type: String, trim: true, default: '' },
+  photo: { type: String, default: '' }
 });
 
 const squadSchema = new mongoose.Schema({
