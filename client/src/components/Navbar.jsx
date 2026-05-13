@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { ShoppingBag, Activity, Menu, X, User, Settings, Heart } from 'lucide-react';
+import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 
 export default function Navbar() {
@@ -67,8 +67,27 @@ export default function Navbar() {
             <Link to="/support" className={`nav-link ${isActive('/support') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <Heart size={18} color="var(--red)" /> Apoiar
             </Link>
-            <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <ShoppingBag size={18} /> Loja
+            <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', position: 'relative', padding: '0 12px' }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <ShoppingCart size={22} />
+                <span style={{
+                  position: 'absolute',
+                  top: -8,
+                  right: -10,
+                  background: '#000',
+                  color: '#fff',
+                  fontSize: 10,
+                  fontWeight: 800,
+                  width: 18,
+                  height: 18,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '2px solid #fff',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                }}>0</span>
+              </div>
             </Link>
 
             {user ? (
