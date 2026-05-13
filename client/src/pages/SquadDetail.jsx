@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shield, Users, Save, Trash2, Plus, X } from 'lucide-react';
+import { ArrowLeft, Shield, Users, Save, Trash2, Plus, X, Pencil } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -11,12 +11,26 @@ export default function SquadDetail() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [newPlayer, setNewPlayer] = useState({ name: '', position: '', number: '' });
+  const [editingPlayerIndex, setEditingPlayerIndex] = useState(null);
 
   const handleAddPlayer = (e) => {
     e.preventDefault();
     if (!newPlayer.name) return;
-    setSquad({ ...squad, players: [...(squad.players || []), newPlayer] });
+    
+    if (editingPlayerIndex !== null) {
+      const updatedPlayers = [...(squad.players || [])];
+      updatedPlayers[editingPlayerIndex] = newPlayer;
+      setSquad({ ...squad, players: updatedPlayers });
+      setEditingPlayerIndex(null);
+    } else {
+      setSquad({ ...squad, players: [...(squad.players || []), newPlayer] });
+    }
     setNewPlayer({ name: '', position: '', number: '' });
+  };
+
+  const handleEditPlayer = (index) => {
+    setNewPlayer(squad.players[index]);
+    setEditingPlayerIndex(index);
   };
 
   const handleRemovePlayer = (index) => {
@@ -153,8 +167,8 @@ export default function SquadDetail() {
                 <option value="Ponta de Lança">Ponta de Lança</option>
               </select>
               <input type="number" className="form-input" placeholder="Nº" value={newPlayer.number} onChange={e => setNewPlayer({...newPlayer, number: e.target.value})} style={{ width: 60, height: 40 }} />
-              <button type="submit" className="btn btn-primary" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center' }}>
-                <Plus size={18} />
+              <button type="submit" className="btn btn-primary" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center', background: editingPlayerIndex !== null ? 'var(--yellow)' : 'var(--green)', color: '#000', border: 'none' }}>
+                {editingPlayerIndex !== null ? <Save size={18} /> : <Plus size={18} />}
               </button>
             </form>
 
@@ -171,9 +185,14 @@ export default function SquadDetail() {
                       <span style={{ fontWeight: 700, fontSize: 14 }}>{p.name}</span>
                       {p.position && <span style={{ fontSize: 10, color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '2px 6px', borderRadius: 4 }}>{p.position === 'GK' ? 'Guarda-Redes' : p.position === 'DEF' ? 'Defesa' : p.position === 'MID' ? 'Médio' : p.position === 'FWD' ? 'Avançado' : p.position}</span>}
                     </div>
-                    <button type="button" onClick={() => handleRemovePlayer(idx)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
-                      <X size={16} />
-                    </button>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <button type="button" onClick={() => handleEditPlayer(idx)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
+                        <Pencil size={14} />
+                      </button>
+                      <button type="button" onClick={() => handleRemovePlayer(idx)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
+                        <X size={16} />
+                      </button>
+                    </div>
                   </div>
                 ))
               )}
