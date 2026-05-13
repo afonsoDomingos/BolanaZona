@@ -112,20 +112,27 @@ export default function Landing() {
               <span style={{ fontSize: 13, color: 'var(--green)', fontWeight: 600 }}>Plataforma de Torneios de Futebol</span>
             </div>
 
-            <h1 className="font-syne" style={{ fontSize: 'clamp(40px, 8vw, 88px)', fontWeight: 800, lineHeight: 1.05, marginBottom: 24, textAlign: 'center' }}>
+            <h1 className="font-syne" style={{ fontSize: 'clamp(28px, 8vw, 88px)', fontWeight: 800, lineHeight: 1.05, marginBottom: 24, textAlign: 'center' }}>
               <span className="typewriter">Gere o teu torneio</span><br />
               <span className="gradient-text animate-reveal-dramatic" style={{ animationDelay: '1.5s' }}>como um pro</span>
             </h1>
 
-            <p className="animate-reveal" style={{ fontSize: 20, color: 'var(--text-secondary)', maxWidth: 560, margin: '0 auto 48px', lineHeight: 1.7, animationDelay: '0.2s' }}>
+            <p className="animate-reveal" style={{ fontSize: 'clamp(16px, 3vw, 20px)', color: 'var(--text-secondary)', maxWidth: 560, margin: '0 auto 48px', lineHeight: 1.7, animationDelay: '0.2s' }}>
               Cria torneios de bairro, gere equipas, gera calendários automáticos e partilha resultados em tempo real.
             </p>
 
-            <div className="animate-reveal" style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', animationDelay: '0.4s' }}>
-              <Link to="/register" className="btn btn-primary btn-lg shadow-green">
+            <div className="animate-reveal" style={{ 
+              display: 'flex', 
+              gap: 16, 
+              justifyContent: 'center', 
+              flexWrap: 'wrap', 
+              animationDelay: '0.4s',
+              padding: '0 20px'
+            }}>
+              <Link to="/register" className="btn btn-primary btn-lg shadow-green" style={{ minWidth: 'min(300px, 100%)' }}>
                 Criar Torneio Grátis <ArrowRight size={18} />
               </Link>
-              <Link to="/explore" className="btn btn-secondary btn-lg" style={{ borderColor: 'var(--green)', color: 'var(--green)' }}>
+              <Link to="/explore" className="btn btn-secondary btn-lg" style={{ borderColor: 'var(--green)', color: 'var(--green)', minWidth: 'min(300px, 100%)' }}>
                 <span className="spin-ball">⚽</span> Explorar Torneios
               </Link>
             </div>
