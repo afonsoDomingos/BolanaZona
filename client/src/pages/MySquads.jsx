@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Shield, Plus, ArrowRight, User, Swords, Check, X, Calendar, MapPin } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -14,6 +14,7 @@ export default function MySquads() {
   const [challenges, setChallenges] = useState([]);
   const [tab, setTab] = useState('squads');
   const [updating, setUpdating] = useState(false);
+  const navigate = useNavigate();
 
   const fetchSquads = async () => {
     try {
@@ -39,11 +40,11 @@ export default function MySquads() {
     if (!formData.name) return toast.error('O nome é obrigatório.');
     setSaving(true);
     try {
-      await api.post('/squads', formData);
-      toast.success('Clube criado com sucesso! 🏆');
+      const res = await api.post('/squads', formData);
+      toast.success('Clube criado! Agora adiciona os teus jogadores. ⚽', { duration: 5000 });
       setShowModal(false);
       setFormData({ name: '', neighborhood: '' });
-      fetchSquads();
+      navigate(`/dashboard/squads/${res.data._id}`);
     } catch {
       toast.error('Erro ao criar clube.');
     } finally {
