@@ -17,7 +17,7 @@ app.use(express.json());
 
 // 🟢 FORÇAR POLÍTICA DE POPUPS PARA GOOGLE AUTH
 app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   next();
 });
 
