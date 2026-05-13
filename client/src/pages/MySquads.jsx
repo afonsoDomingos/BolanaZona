@@ -5,6 +5,7 @@ import api from '../services/api';
 import toast from 'react-hot-toast';
 import SquadDetailsModal from '../components/SquadDetailsModal';
 import ChallengeMap from '../components/ChallengeMap';
+import ChallengeModal from '../components/ChallengeModal';
 
 export default function MySquads() {
   const [squads, setSquads] = useState([]);
@@ -18,6 +19,7 @@ export default function MySquads() {
   const [updating, setUpdating] = useState(false);
   const [showSquadDetails, setShowSquadDetails] = useState(null);
   const [expandedMap, setExpandedMap] = useState(null);
+  const [editingChallenge, setEditingChallenge] = useState(null);
   const navigate = useNavigate();
 
   const fetchSquads = async () => {
@@ -205,12 +207,23 @@ export default function MySquads() {
                       />
                     )}
 
-                    {c.status === 'pending' && !isChallenger && (
-                      <div style={{ display: 'flex', gap: 12 }}>
-                        <button className="btn btn-primary" disabled={updating} onClick={() => updateChallengeStatus(c._id, 'accepted')} style={{ flex: 1, justifyContent: 'center' }}><Check size={16}/> Aceitar Desafio</button>
-                        <button className="btn btn-secondary" disabled={updating} onClick={() => updateChallengeStatus(c._id, 'rejected')} style={{ flex: 1, justifyContent: 'center', color: 'var(--red)', borderColor: 'rgba(255,0,0,0.2)' }}><X size={16}/> Recusar</button>
-                      </div>
-                    )}
+                      {c.status === 'pending' && !isChallenger && (
+                        <div style={{ display: 'flex', gap: 12 }}>
+                          <button className="btn btn-primary" disabled={updating} onClick={() => updateChallengeStatus(c._id, 'accepted')} style={{ flex: 1, justifyContent: 'center' }}><Check size={16}/> Aceitar Desafio</button>
+                          <button className="btn btn-secondary" disabled={updating} onClick={() => updateChallengeStatus(c._id, 'rejected')} style={{ flex: 1, justifyContent: 'center', color: 'var(--red)', borderColor: 'rgba(255,0,0,0.2)' }}><X size={16}/> Recusar</button>
+                        </div>
+                      )}
+                      {c.status === 'pending' && isChallenger && (
+                        <div style={{ display: 'flex', gap: 12 }}>
+                          <button 
+                            className="btn btn-secondary" 
+                            onClick={() => setEditingChallenge(c)}
+                            style={{ flex: 1, justifyContent: 'center', color: 'var(--yellow)', borderColor: 'rgba(255,193,7,0.2)' }}
+                          >
+                            <Calendar size={16}/> Editar Desafio
+                          </button>
+                        </div>
+                      )}
                     {c.status === 'pending' && isChallenger && (
                       <div style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }}>A aguardar resposta do {opponentSquad?.name}...</div>
                     )}
@@ -267,6 +280,14 @@ export default function MySquads() {
         <SquadDetailsModal 
           squad={showSquadDetails} 
           onClose={() => setShowSquadDetails(null)} 
+        />
+      )}
+      {editingChallenge && (
+        <ChallengeModal 
+          initialData={editingChallenge}
+          mySquads={squads}
+          onClose={() => setEditingChallenge(null)}
+          onSuccess={fetchSquads}
         />
       )}
     </div>

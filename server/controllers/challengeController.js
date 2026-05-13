@@ -152,3 +152,38 @@ exports.updateStatus = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.update = async (req, res) => {
+  console.log('🔄 Updating challenge details', req.params.id, 'by user', req.user._id);
+  try {
+    const { date, location, message, type, wagerValue, mapsLink } = req.body;
+    const challenge = await Challenge.findById(req.params.id)
+      .populate('challengerSquad')
+      .populate('challengedSquad');
+
+    if (!challenge) return res.status(404).json({ message: 'Desafio não encontrado.' });
+
+    // Only challenger can edit, and only if pending
+    if (challenge.challengerSquad.manager.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Sem permissão.' });
+    }
+
+    if (challenge.status !== 'pending') {
+      return res.status(400).json({ message: 'Apenas desafios pendentes podem ser editados.' });
+    }
+
+    challenge.date = date || challenge.date;
+    challenge.location = location || challenge.location;
+    challenge.message = message || challenge.message;
+    challenge.type = type || challenge.type;
+    challenge.wagerValue = wagerValue || challenge.wagerValue;
+    challenge.mapsLink = mapsLink || challenge.mapsLink;
+
+    await challenge.save();
+    console.log('✅ Challenge updated successfully');
+    res.json(challenge);
+  } catch (err) {
+    console.error('❗️ Error updating challenge:', err);
+    res.status(500).json({ message: err.message });
+  }
+};
