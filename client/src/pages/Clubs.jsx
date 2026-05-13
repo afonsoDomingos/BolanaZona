@@ -119,20 +119,28 @@ export default function Clubs() {
                     const isMySquad = mySquads.find(ms => ms._id === squad._id);
                     if (isMySquad) return null;
 
-                    const pendingChallenge = myChallenges.find(c => 
-                      c.status === 'pending' && 
+                    const activeChallenge = myChallenges.find(c => 
+                      (c.status === 'pending' || (c.status === 'accepted' && new Date(c.date) >= new Date().setHours(0,0,0,0))) && 
                       (c.challengedSquad._id === squad._id || c.challengerSquad._id === squad._id)
                     );
 
-                    if (pendingChallenge) {
+                    if (activeChallenge) {
+                      const isPending = activeChallenge.status === 'pending';
                       return (
                         <div className="btn-group-responsive" style={{ width: '100%' }}>
                           <button 
                             className="btn btn-secondary" 
-                            style={{ flex: 1, height: 44, fontSize: 13, borderColor: 'var(--yellow)', color: 'var(--yellow)', cursor: 'default' }}
+                            style={{ 
+                              flex: 1, 
+                              height: 44, 
+                              fontSize: 13, 
+                              borderColor: isPending ? 'var(--yellow)' : 'var(--green)', 
+                              color: isPending ? 'var(--yellow)' : 'var(--green)', 
+                              cursor: 'default' 
+                            }}
                             disabled
                           >
-                            <Calendar size={16} /> Desafio Pendente
+                            <Calendar size={16} /> {isPending ? 'Desafio Pendente' : 'Jogo Agendado'}
                           </button>
                         </div>
                       );

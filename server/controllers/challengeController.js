@@ -12,6 +12,25 @@ exports.create = async (req, res) => {
       return res.status(400).json({ message: 'Não podes desafiar o teu próprio clube!' });
     }
 
+    // Check if there is already an active challenge (pending or accepted for future)
+    const existingChallenge = await Challenge.findOne({
+      $or: [
+        { status: 'pending' },
+        { status: 'accepted', date: { $gte: new Date().setHours(0, 0, 0, 0) } }
+      ],
+      $or: [
+        { challengerSquad, challengedSquad },
+        { challengerSquad: challengedSquad, challengedSquad: challengerSquad }
+      ]
+    });
+
+    if (existingChallenge) {
+      const reason = existingChallenge.status === 'pending' 
+        ? 'Já existe um desafio pendente.' 
+        : 'Já existe um jogo agendado que ainda não aconteceu.';
+      return res.status(400).json({ message: `${reason} Espera o desfecho antes de novo desafio.` });
+    }
+
     // Verify that the user actually owns the challenger squad
     const challenger = await Squad.findOne({ _id: challengerSquad, manager: req.user._id });
     if (!challenger) {
