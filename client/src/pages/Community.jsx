@@ -93,32 +93,26 @@ export default function Community() {
       position: 'relative'
     }}>
       <div className="container" style={{ 
-        maxWidth: 700, 
+        maxWidth: 900, 
         flex: 1,
         display: 'flex', 
         flexDirection: 'column',
-        padding: '0 12px',
+        padding: '0 16px',
         position: 'relative'
       }}>
         
-        {/* COMPACT HEADER */}
-        <header style={{ 
-          padding: '4px 0', 
-          borderBottom: '1px solid var(--border)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
+        {/* HEADER */}
+        <header className="community-header">
           <div>
-            <h1 className="font-syne" style={{ fontSize: 16, fontWeight: 900, letterSpacing: -0.5, margin: 0 }}>
+            <h1 className="font-syne">
               Mural da <span className="gradient-text">Malta</span>
             </h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--green)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-              <span style={{ fontSize: 8, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Live</span>
+            <div className="live-badge">
+              <span className="dot" />
+              <span className="text">Live</span>
             </div>
           </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: 9, maxWidth: 120, textAlign: 'right', lineHeight: 1.1, margin: 0 }}>Comunidade em tempo real.</p>
+          <p className="subtitle">Comunidade de futebol<br/>em tempo real.</p>
         </header>
 
         {/* SCROLLABLE FEED */}
@@ -165,42 +159,59 @@ export default function Community() {
                   <div style={{ 
                     background: isMe ? 'var(--green)' : 'rgba(255,255,255,0.08)',
                     color: isMe ? '#000' : '#fff',
-                    padding: '4px 10px',
-                    borderRadius: isMe ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                    border: '1px solid ' + (isMe ? 'transparent' : 'rgba(255,255,255,0.05)')
+                    padding: '8px 12px',
+                    borderRadius: isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    border: '1px solid ' + (isMe ? 'transparent' : 'rgba(255,255,255,0.05)'),
+                    wordBreak: 'break-word',
+                    overflowWrap: 'break-word'
                   }}>
                     {post.type === 'text' && (
-                      <p style={{ fontSize: 14, lineHeight: 1.4, margin: 0 }}>{post.content}</p>
+                      <p style={{ fontSize: 14, lineHeight: 1.5, margin: 0 }}>{post.content}</p>
                     )}
 
                     {post.type === 'score' && (
                       <div style={{ 
-                        background: 'rgba(0,0,0,0.1)', 
-                        padding: '4px 8px', 
-                        borderRadius: 6, 
+                        background: isMe ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.2)', 
+                        padding: '12px 16px', 
+                        borderRadius: 12, 
                         display: 'flex', 
                         flexDirection: 'column',
                         alignItems: 'center', 
-                        gap: 2,
-                        marginTop: 2
+                        gap: 8,
+                        marginTop: 4,
+                        minWidth: 200
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontWeight: 800, fontSize: 12 }}>{post.scoreData.teamA}</span>
-                          <span style={{ background: isMe ? '#000' : 'var(--green)', color: isMe ? 'var(--green)' : '#000', padding: '1px 6px', borderRadius: 4, fontWeight: 900, fontSize: 12 }}>
-                            {post.scoreData.scoreA}-{post.scoreData.scoreB}
-                          </span>
-                          <span style={{ fontWeight: 800, fontSize: 12 }}>{post.scoreData.teamB}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 12 }}>
+                          <span style={{ fontWeight: 800, fontSize: 14, flex: 1, textAlign: 'right' }}>{post.scoreData.teamA}</span>
+                          <div style={{ 
+                            background: isMe ? '#000' : 'var(--green)', 
+                            color: isMe ? 'var(--green)' : '#000', 
+                            padding: '4px 12px', 
+                            borderRadius: 8, 
+                            fontWeight: 900, 
+                            fontSize: 16,
+                            letterSpacing: 1,
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                          }}>
+                            {post.scoreData.scoreA} - {post.scoreData.scoreB}
+                          </div>
+                          <span style={{ fontWeight: 800, fontSize: 14, flex: 1, textAlign: 'left' }}>{post.scoreData.teamB}</span>
                         </div>
                         {post.scoreData.period && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                            <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', opacity: 0.7 }}>
+                          <div style={{ 
+                            background: isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)',
+                            padding: '4px 12px',
+                            borderRadius: 16,
+                            display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 
+                          }}>
+                            <span style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: isMe ? '#000' : 'var(--green)' }}>
                               {post.scoreData.period === 'PR' ? 'Pré-jogo' :
                                post.scoreData.period === '1T' ? '1ª Parte' : 
                                post.scoreData.period === '2T' ? '2ª Parte' : 'Finalizado'}
                             </span>
                             {post.scoreData.matchTime && (
-                              <span style={{ fontSize: 9, fontWeight: 700, opacity: 0.5 }}>
+                              <span style={{ fontSize: 10, fontWeight: 700, opacity: 0.7 }}>
                                 • 🕒 {post.scoreData.matchTime}
                               </span>
                             )}
@@ -382,6 +393,59 @@ export default function Community() {
         </div>
       </div>
       <style>{`
+        /* Responsive Header */
+        .community-header {
+          padding: 20px 0 16px;
+          border-bottom: 1px solid var(--border);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .community-header h1 {
+          font-size: 28px;
+          font-weight: 900;
+          letter-spacing: -1px;
+          margin: 0;
+        }
+        .community-header .live-badge {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-top: 4px;
+        }
+        .community-header .dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--green);
+          display: inline-block;
+          animation: pulse 2s infinite;
+        }
+        .community-header .text {
+          font-size: 11px;
+          color: var(--text-secondary);
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+        .community-header .subtitle {
+          color: var(--text-muted);
+          font-size: 13px;
+          text-align: right;
+          line-height: 1.3;
+          margin: 0;
+        }
+
+        @media (max-width: 768px) {
+          .community-header {
+            padding: 12px 0 8px;
+          }
+          .community-header h1 { font-size: 20px; letter-spacing: -0.5px; }
+          .community-header .dot { width: 6px; height: 6px; }
+          .community-header .text { font-size: 9px; }
+          .community-header .subtitle { font-size: 10px; max-width: 140px; }
+        }
+
         /* Override global mobile .btn rules inside input area */
         .community-input-area .btn {
           width: auto !important;
