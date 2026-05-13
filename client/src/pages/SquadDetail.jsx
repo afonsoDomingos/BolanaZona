@@ -91,6 +91,10 @@ export default function SquadDetail() {
                 <label className="form-label">Bairro / Comunidade</label>
                 <input className="form-input" value={squad.neighborhood || ''} onChange={e => setSquad({...squad, neighborhood: e.target.value})} />
               </div>
+              <div>
+                <label className="form-label">Contacto WhatsApp (número internacional, sem +) </label>
+                <input className="form-input" placeholder="Ex: 258842123456" value={squad.contact || ''} onChange={e => setSquad({...squad, contact: e.target.value})} />
+              </div>
               <div style={{ display: 'flex', gap: 16 }}>
                 <div style={{ flex: 1 }}>
                   <label className="form-label">Cor Principal</label>

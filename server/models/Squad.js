@@ -4,13 +4,15 @@ const playerSchema = new mongoose.Schema({
   name: { type: String, required: true },
   number: { type: Number },
   position: { type: String, enum: ['GK', 'DEF', 'MID', 'FWD', ''], default: '' },
-  isCaptain: { type: Boolean, default: false }
+  isCaptain: { type: Boolean, default: false },
+  contact: { type: String, trim: true, default: '' }
 });
 
 const squadSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   manager: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   neighborhood: { type: String, default: '' },
+  contact: { type: String, default: '' }, // WhatsApp do capitão/gestor da equipa
   players: [playerSchema],
   color: { type: String, default: '#00C853' },
   logo: { type: String, default: '' },
