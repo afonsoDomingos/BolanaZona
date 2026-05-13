@@ -148,46 +148,51 @@ exports.resetPassword = async (req, res) => {
 exports.googleLogin = async (req, res) => {
   try {
     const { token, role } = req.body;
+    console.log('🔵 [Google Login] Pedido recebido. Role:', role, '| Token presente:', !!token);
+
     if (!token) return res.status(400).json({ message: 'Token do Google ausente.' });
 
-    // Obter dados do utilizador via Google UserInfo API (funciona com Access Token)
+    // Obter dados do utilizador via Google UserInfo API
+    console.log('🔵 [Google Login] A chamar Google UserInfo API...');
     const response = await axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`);
     const payload = response.data;
     const { sub, email, name, picture } = payload;
+    console.log('🔵 [Google Login] Dados Google recebidos:', { sub, email, name });
 
     if (!email) return res.status(400).json({ message: 'Email não disponível na conta Google.' });
 
     // Procura utilizador pelo Google ID ou Email
+    console.log('🔵 [Google Login] A procurar utilizador na BD...');
     let user = await User.findOne({ $or: [{ googleId: sub }, { email: email.toLowerCase() }] });
 
     let isNewUser = false;
     if (!user) {
       isNewUser = true;
-      // Cria novo utilizador (phone será inserido pelo user no frontend se precisarmos)
+      console.log('🔵 [Google Login] Utilizador não encontrado. A criar novo...');
       user = await User.create({
         name,
         email: email.toLowerCase(),
         googleId: sub,
         avatar: picture,
         role: role || 'viewer',
-        // Criar um número fake provisório se necessário, mas marcámos 'phone' como opcional no schema
       });
-      console.log('✅ Utilizador criado via Google:', user._id);
+      console.log('✅ [Google Login] Utilizador criado com sucesso! ID:', user._id, '| Role:', user.role);
     } else {
-      // Se não tinha googleId associado mas o email coincidiu, atualizamos
+      console.log('✅ [Google Login] Utilizador existente encontrado! ID:', user._id);
       if (!user.googleId) {
         user.googleId = sub;
         if (!user.avatar) user.avatar = picture;
         await user.save();
+        console.log('🔵 [Google Login] googleId associado à conta existente.');
       }
-      console.log('✅ Login via Google (existente):', user._id);
     }
 
     const jwtToken = signToken(user._id);
-    // Envia isNewUser e needPhone (se phone for falsy) para o frontend poder pedir
+    console.log('✅ [Google Login] JWT gerado. isNewUser:', isNewUser, '| needPhone:', !user.phone);
     res.json({ token: jwtToken, user, isNewUser, needPhone: !user.phone });
   } catch (err) {
-    console.error('🔥 Erro no Google Login:', err.message);
-    res.status(500).json({ message: 'Erro ao autenticar com Google.' });
+    console.error('🔥 [Google Login] ERRO DETALHADO:', err.response?.data || err.message);
+    console.error('🔥 [Google Login] Stack:', err.stack);
+    res.status(500).json({ message: 'Erro ao autenticar com Google.', detail: err.response?.data || err.message });
   }
 };
