@@ -16,6 +16,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Explore from './pages/Explore';
+import Clubs from './pages/Clubs';
 import Talents from './pages/Talents';
 import Store from './pages/Store';
 import AdminAnalytics from './pages/AdminAnalytics';
@@ -57,6 +58,7 @@ function AppRoutes() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/explore" element={<Explore />} />
+          <Route path="/clubs" element={<Clubs />} />
           <Route path="/talents" element={<Talents />} />
           <Route path="/shop" element={<Store />} />
           <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />

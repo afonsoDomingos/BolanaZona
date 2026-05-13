@@ -41,3 +41,10 @@ exports.getPublicSquad = async (req, res) => {
     res.json(squad);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
+
+exports.getAllPublicSquads = async (req, res) => {
+  try {
+    const squads = await Squad.find().populate('manager', 'name').sort('-createdAt');
+    res.json(squads);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};

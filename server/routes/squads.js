@@ -8,6 +8,7 @@ router.post('/', protect, squadController.create);
 router.put('/:id', protect, squadController.update);
 router.delete('/:id', protect, squadController.remove);
 
+router.get('/public-all', squadController.getAllPublicSquads);
 router.get('/public/:id', squadController.getPublicSquad);
 
 module.exports = router;
