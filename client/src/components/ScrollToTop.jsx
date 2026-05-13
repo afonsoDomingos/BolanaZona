@@ -25,7 +25,7 @@ export default function ScrollToTop() {
       className="animate-fade-in"
       style={{
         position: 'fixed',
-        bottom: '32px',
+        bottom: '100px',
         right: '32px',
         width: '48px',
         height: '48px',

@@ -112,7 +112,7 @@ export default function Landing() {
               <span style={{ fontSize: 13, color: 'var(--green)', fontWeight: 600 }}>Plataforma de Torneios de Futebol</span>
             </div>
 
-            <h1 className="font-syne" style={{ fontSize: 'clamp(28px, 8vw, 88px)', fontWeight: 800, lineHeight: 1.05, marginBottom: 24, textAlign: 'center' }}>
+            <h1 className="font-syne" style={{ fontSize: 'clamp(22px, 8vw, 88px)', fontWeight: 800, lineHeight: 1.05, marginBottom: 24, textAlign: 'center' }}>
               <span className="typewriter">Gere o teu torneio</span><br />
               <span className="gradient-text animate-reveal-dramatic" style={{ animationDelay: '1.5s' }}>como um pro</span>
             </h1>
@@ -237,6 +237,16 @@ export default function Landing() {
             blink-caret 0.75s step-end 3;
         }
 
+        @media (max-width: 768px) {
+          .typewriter {
+            white-space: normal;
+            border-right: none;
+            width: auto !important;
+            animation: none;
+            opacity: 1;
+          }
+        }
+
         @keyframes typing { from { width: 0 } to { width: 100% } }
         @keyframes blink-caret { 
           from, to { border-color: transparent } 
@@ -265,10 +275,25 @@ export default function Landing() {
           border-right: 3px solid #fff;
         }
 
+        @media (max-width: 768px) {
+          .typewriter-on-scroll {
+            white-space: normal;
+            border-right: none;
+            width: auto !important;
+            display: block;
+          }
+        }
+
         .is-visible .typewriter-on-scroll {
           animation: 
             typing 1.5s steps(20, end) forwards,
             blink-caret-white 0.75s step-end 3;
+        }
+
+        @media (max-width: 768px) {
+          .is-visible .typewriter-on-scroll {
+            animation: none;
+          }
         }
 
         @keyframes blink-caret-white { 
