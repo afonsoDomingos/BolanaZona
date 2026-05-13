@@ -50,7 +50,7 @@ export default function FeedbackPopup() {
     setShow(false);
   };
 
-  if (!show) return null;
+  if (!user || !show) return null;
 
   return (
     <div style={{
