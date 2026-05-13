@@ -105,22 +105,22 @@ export default function Community() {
         
         {/* COMPACT HEADER */}
         <header style={{ 
-          padding: '8px 0', 
+          padding: '4px 0', 
           borderBottom: '1px solid var(--border)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
           <div>
-            <h1 className="font-syne" style={{ fontSize: 18, fontWeight: 900, letterSpacing: -0.5 }}>
+            <h1 className="font-syne" style={{ fontSize: 16, fontWeight: 900, letterSpacing: -0.5, margin: 0 }}>
               Mural da <span className="gradient-text">Malta</span>
             </h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-              <span style={{ fontSize: 9, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Live</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--green)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+              <span style={{ fontSize: 8, color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Live</span>
             </div>
           </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: 10, maxWidth: 150, textAlign: 'right', lineHeight: 1.2 }}>Vibra com a comunidade em tempo real.</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: 9, maxWidth: 120, textAlign: 'right', lineHeight: 1.1, margin: 0 }}>Comunidade em tempo real.</p>
         </header>
 
         {/* SCROLLABLE FEED */}
@@ -266,7 +266,7 @@ export default function Community() {
 
         {/* FIXED INPUT BAR */}
         <div style={{ 
-          padding: '8px 0 12px', 
+          padding: '4px 0 8px', 
           borderTop: '1px solid var(--border)',
           background: 'var(--bg-primary)'
         }}>
