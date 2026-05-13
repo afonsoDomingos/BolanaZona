@@ -130,7 +130,7 @@ export default function Community() {
           flex: 1,
           minHeight: 0,
           overflowY: 'auto',
-          padding: '20px 12px 20px 0',
+          padding: '20px 12px 100px 0',
           display: 'flex', 
           flexDirection: 'column', 
           gap: 4,
@@ -266,9 +266,10 @@ export default function Community() {
 
         {/* FIXED INPUT BAR */}
         <div style={{ 
-          padding: '4px 0 8px', 
+          padding: '4px 0 24px', 
           borderTop: '1px solid var(--border)',
-          background: 'var(--bg-primary)'
+          background: 'var(--bg-primary)',
+          zIndex: 10
         }}>
           {!user ? (
             <div style={{ textAlign: 'center', padding: '8px 0', background: 'var(--bg-card)', borderRadius: 16, border: '1px solid var(--border)' }}>

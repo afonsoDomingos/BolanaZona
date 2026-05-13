@@ -153,8 +153,8 @@ export default function Landing() {
       <section style={{ padding: '100px 0', background: 'linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%)' }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <h2 className="font-syne" style={{ fontSize: 40, fontWeight: 800, marginBottom: 16 }}>
-              Tudo que precisas num só lugar
+            <h2 className="font-syne scroll-reveal" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 800, marginBottom: 16 }}>
+              <span className="typewriter-on-scroll">Tudo que precisas num só lugar</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: 18, maxWidth: 480, margin: '0 auto' }}>
               Do primeiro apito ao pódio final, tens tudo controlado.

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search } from 'lucide-react';
+import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search, Trophy, Users, LogIn } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 
 export default function Navbar() {
@@ -62,9 +62,13 @@ export default function Navbar() {
           </Link>
 
           <div className={`navbar-nav ${isMenuOpen ? 'mobile-open' : ''}`}>
-            <Link to="/explore" className={`nav-link ${isActive('/explore') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Torneios</Link>
-            <Link to="/talents" className={`nav-link ${isActive('/talents') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Talentos</Link>
-            <Link to="/support" className={`nav-link ${isActive('/support') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Link to="/explore" className={`nav-link ${isActive('/explore') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>
+              <Trophy size={20} /> Torneios
+            </Link>
+            <Link to="/talents" className={`nav-link ${isActive('/talents') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>
+              <Users size={20} /> Talentos
+            </Link>
+            <Link to="/support" className={`nav-link ${isActive('/support') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>
               <Heart size={18} color="var(--red)" /> Apoiar
             </Link>
             <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', position: 'relative', padding: '0 12px' }}>
@@ -118,7 +122,9 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link to="/login" className={`nav-link ${isActive('/login') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Entrar</Link>
+                <Link to="/login" className="btn btn-secondary" onClick={() => setIsMenuOpen(false)}>
+                  Entrar
+                </Link>
                 <Link to="/register" className="btn btn-primary" onClick={() => setIsMenuOpen(false)}>Criar Conta</Link>
               </>
             )}

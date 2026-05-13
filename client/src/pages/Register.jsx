@@ -70,13 +70,13 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-page-wrapper" style={{ minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 10px 20px', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,200,83,0.1) 0%, transparent 70%)' }}>
+    <div className="auth-page-wrapper" style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 12px 20px' }}>
       <div style={{ width: '100%', maxWidth: 460 }} className="animate-slide-up">
         
-        <div style={{ textAlign: 'center', marginBottom: 16 }}>
-          <div className="spin-ball" style={{ fontSize: 32, marginBottom: 8 }}>⚽</div>
-          <h1 style={{ fontSize: 20, fontWeight: 800, marginBottom: 2 }}>Criar Conta</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>
+        <div style={{ textAlign: 'center', marginBottom: 8 }}>
+          <div className="spin-ball" style={{ fontSize: 22, marginBottom: 2 }}>⚽</div>
+          <h1 style={{ fontSize: 17, fontWeight: 800, marginBottom: 0 }}>Criar Conta</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 11 }}>
             Passo {step} de 3 — {step === 1 ? 'Perfil' : step === 2 ? 'Identificação' : 'Segurança'}
           </p>
         </div>
@@ -92,33 +92,34 @@ export default function Register() {
             </button>
           </div>
 
-          <div style={{ padding: '20px 28px' }}>
+          <div style={{ padding: '12px 16px' }}>
             {error && <div className="alert alert-error" style={{ marginBottom: 20 }}>{error}</div>}
 
             {step === 1 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <label className="form-label" style={{ textAlign: 'center', marginBottom: 4, fontSize: 13 }}>Como pretendes usar a plataforma?</label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {roles.map(r => (
-                    <div key={r.id} onClick={() => setForm({ ...form, role: r.id })} style={{ padding: '12px 16px', borderRadius: 14, cursor: 'pointer', transition: '0.2s', background: form.role === r.id ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.03)', border: '1px solid ' + (form.role === r.id ? 'var(--green)' : 'rgba(255,255,255,0.1)'), display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <div style={{ fontSize: 20 }}>{r.icon}</div>
+                    <div key={r.id} onClick={() => setForm({ ...form, role: r.id })} style={{ padding: '8px 12px', borderRadius: 10, cursor: 'pointer', transition: '0.2s', background: form.role === r.id ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.03)', border: '1px solid ' + (form.role === r.id ? 'var(--green)' : 'rgba(255,255,255,0.1)'), display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ fontSize: 16 }}>{r.icon}</div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 700, fontSize: 14, color: form.role === r.id ? 'var(--green)' : '#fff' }}>{r.title}</div>
-                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{r.desc}</div>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: form.role === r.id ? 'var(--green)' : '#fff' }}>{r.title}</div>
+                        {/* Descrição escondida em ecrãs muito pequenos para ganhar espaço */}
+                        <div className="hide-mobile" style={{ fontSize: 10, color: 'var(--text-muted)' }}>{r.desc}</div>
                       </div>
-                      <div style={{ width: 18, height: 18, borderRadius: '50%', border: '2px solid ' + (form.role === r.id ? 'var(--green)' : 'rgba(255,255,255,0.2)'), position: 'relative' }}>
-                        {form.role === r.id && <div style={{ position: 'absolute', top: 3, left: 3, width: 8, height: 8, borderRadius: '50%', background: 'var(--green)' }} />}
+                      <div style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid ' + (form.role === r.id ? 'var(--green)' : 'rgba(255,255,255,0.2)'), position: 'relative' }}>
+                        {form.role === r.id && <div style={{ position: 'absolute', top: 2, left: 2, width: 6, height: 6, borderRadius: '50%', background: 'var(--green)' }} />}
                       </div>
                     </div>
                   ))}
                 </div>
-                <button onClick={() => setStep(2)} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 16, height: 48 }}>
+                <button onClick={() => setStep(2)} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 10, height: 42 }}>
                   Continuar com Email <ArrowRight size={18} />
                 </button>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '6px 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '2px 0' }}>
                   <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>OU</span>
+                  <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>OU</span>
                   <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
                 </div>
 
@@ -133,13 +134,13 @@ export default function Register() {
                       background: 'rgba(255,255,255,0.05)', 
                       border: '1px solid rgba(255,255,255,0.1)',
                       color: '#fff',
-                      height: 46,
-                      borderRadius: 12,
-                      fontSize: 14,
+                      height: 42,
+                      borderRadius: 10,
+                      fontSize: 13,
                       fontWeight: 600,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 12,
+                      gap: 10,
                       transition: 'all 0.3s'
                     }}
                     onMouseEnter={(e) => {

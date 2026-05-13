@@ -60,13 +60,13 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-page-wrapper" style={{ minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 10px 20px', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,200,83,0.1) 0%, transparent 70%)' }}>
+    <div className="auth-page-wrapper" style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 12px 20px' }}>
       <div style={{ width: '100%', maxWidth: 400 }} className="animate-slide-up">
         
-        <div style={{ textAlign: 'center', marginBottom: 20 }}>
-          <div className="spin-ball" style={{ fontSize: 32, marginBottom: 8 }}>⚽</div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>Entrar na Zona</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Acede ao teu painel de torneios</p>
+        <div style={{ textAlign: 'center', marginBottom: 12 }}>
+          <div className="spin-ball" style={{ fontSize: 24, marginBottom: 4 }}>⚽</div>
+          <h1 style={{ fontSize: 18, fontWeight: 800, marginBottom: 2 }}>Entrar na Zona</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Acede ao teu painel de torneios</p>
         </div>
 
         <div className="card-glass" style={{ padding: 0, overflow: 'hidden' }}>
@@ -80,7 +80,7 @@ export default function Login() {
             </Link>
           </div>
 
-          <div style={{ padding: '24px 28px' }}>
+          <div style={{ padding: '16px 20px' }}>
             {error && <div className="alert alert-error" style={{ marginBottom: 20 }}>{error}</div>}
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -109,7 +109,7 @@ export default function Login() {
                 </div>
               </div>
 
-              <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', justifyContent: 'center', marginTop: 8, height: 48 }}>
+              <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', justifyContent: 'center', marginTop: 8, height: 42 }}>
                 {loading ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <span className="spinner" style={{ width: 18, height: 18, border: '2px solid rgba(0,0,0,0.2)', borderTopColor: '#000' }} />
@@ -120,9 +120,9 @@ export default function Login() {
                 )}
               </button>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '6px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '2px 0' }}>
                 <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>OU</span>
+                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>OU</span>
                 <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
               </div>
 
@@ -137,13 +137,13 @@ export default function Login() {
                     background: 'rgba(255,255,255,0.05)', 
                     border: '1px solid rgba(255,255,255,0.1)',
                     color: '#fff',
-                    height: 46,
-                    borderRadius: 12,
-                    fontSize: 14,
+                    height: 42,
+                    borderRadius: 10,
+                    fontSize: 13,
                     fontWeight: 600,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 12,
+                    gap: 10,
                     transition: 'all 0.3s'
                   }}
                   onMouseEnter={(e) => {

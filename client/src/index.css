@@ -224,6 +224,22 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .alert-success { background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.3); color: var(--green); }
 
 /* ===== ANIMATIONS ===== */
+/* ===== AUTH PAGES BACKGROUNDS ===== */
+.auth-page-wrapper {
+  background-image: linear-gradient(rgba(8, 13, 26, 0.6), rgba(8, 13, 26, 0.8)), url('/loginbg1.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  transition: background-image 0.5s ease;
+}
+
+@media (max-width: 768px) {
+  .auth-page-wrapper {
+    background-image: linear-gradient(rgba(8, 13, 26, 0.7), rgba(8, 13, 26, 0.9)), url('/loginbg2.png');
+    background-attachment: scroll; /* Melhor performance em mobile */
+  }
+}
+
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
@@ -372,22 +388,94 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     border-top: 1px solid rgba(0,0,0,0.05);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    align-items: center;
+    align-items: stretch;
   }
   
+  .navbar-nav.mobile-open .nav-link:last-of-type {
+    margin-bottom: 12px; /* Espaço antes dos botões principais */
+  }
+
+  .navbar-nav.mobile-open .btn {
+    width: 100% !important;
+    height: 54px !important;
+    padding: 0 !important;
+    border-radius: 18px !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    margin-bottom: 10px;
+    border: none;
+    transition: var(--transition);
+    text-align: center;
+  }
+
+  .navbar-nav.mobile-open .btn-primary,
+  .navbar-nav.mobile-open .btn-secondary {
+    width: 100% !important;
+    height: 54px !important;
+    border-radius: 18px !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    margin-bottom: 12px;
+    border: none !important;
+    padding: 0 !important;
+    transition: var(--transition);
+    animation: slideUpFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  .navbar-nav.mobile-open .btn-secondary {
+    animation-delay: 0.3s;
+    background: #212529 !important;
+    color: #fff !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .navbar-nav.mobile-open .btn-primary {
+    animation-delay: 0.4s;
+    background: var(--green) !important;
+    color: #000 !important;
+    box-shadow: 0 8px 24px rgba(0, 200, 83, 0.2);
+  }
+
+  @keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   .navbar-nav.mobile-open .nav-link {
-    padding: 20px 24px; 
+    padding: 18px 24px; 
     border-radius: 20px;
     background: #f8f9fa;
     width: 100%; 
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 16px;
-    font-size: 18px;
+    gap: 12px;
+    font-size: 17px;
     font-weight: 700;
     color: #1a1a1a;
     border: 1px solid transparent;
+    transition: var(--transition);
+    animation: slideUpFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  .navbar-nav.mobile-open .nav-link:nth-child(1) { animation-delay: 0.05s; }
+  .navbar-nav.mobile-open .nav-link:nth-child(2) { animation-delay: 0.1s; }
+  .navbar-nav.mobile-open .nav-link:nth-child(3) { animation-delay: 0.15s; }
+  .navbar-nav.mobile-open .nav-link:nth-child(4) { animation-delay: 0.2s; }
+  .navbar-nav.mobile-open .nav-link:nth-child(5) { animation-delay: 0.25s; }
+
+  .navbar-nav.mobile-open .nav-link svg {
+    flex-shrink: 0;
+    width: 24px;
+    display: flex;
+    justify-content: center;
+    color: #495057; /* Cor de ícone suave e profissional */
   }
   
   .navbar-nav.mobile-open .nav-link:hover {
@@ -395,23 +483,17 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     transform: scale(0.98);
   }
 
-  /* Especial para o botão de Criar Conta no Mobile */
-  .navbar-nav.mobile-open .btn-primary {
-    margin-top: auto;
-    width: 200px !important;
-    height: 54px !important;
-    border-radius: 14px !important;
-    font-size: 16px !important;
-    font-weight: 800 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-shadow: 0 10px 25px rgba(0, 200, 83, 0.3) !important;
-    background: var(--green) !important;
-    color: #000 !important;
-  }
   
-  .mobile-menu-btn { display: flex; align-items: center; justify-content: center; background: none; color: #1a1a1a; }
+  .mobile-menu-btn { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    background: none; 
+    color: #1a1a1a;
+    padding: 8px;
+    margin-right: -8px;
+    margin-left: auto; /* Mola que empurra para a direita */
+  }
   
   .navbar-logo-text { font-size: 1.1rem; }
   .btn-sm { padding: 8px 16px; font-size: 13px; }
