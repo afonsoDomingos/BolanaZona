@@ -684,6 +684,41 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   transition: gap 0.2s ease;
 }
 
-.card-premium:hover .view-link {
-  gap: 10px;
+/* ===== FLOATING ACTION BUTTONS (FAB) ===== */
+.fab-stack {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+  align-items: center;
+}
+
+.fab-item {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--green);
+  color: #000;
+  box-shadow: 0 10px 30px rgba(0, 200, 83, 0.4);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.fab-item:hover {
+  transform: scale(1.1) translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 200, 83, 0.6);
+  background: #00e676;
+}
+
+@media (max-width: 768px) {
+  .fab-stack { right: 16px; bottom: 16px; gap: 8px; }
+  .fab-item { width: 50px; height: 50px; }
 }

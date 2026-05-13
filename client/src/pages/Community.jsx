@@ -85,21 +85,19 @@ export default function Community() {
   return (
     <div className="page animate-fade-in" style={{ 
       background: 'var(--bg-primary)', 
-      height: 'calc(100dvh - 64px)', 
+      minHeight: 'calc(100dvh - 64px)', 
       display: 'flex', 
       flexDirection: 'column',
       padding: 0,
       margin: 0,
-      overflow: 'hidden',
       position: 'relative'
     }}>
       <div className="container" style={{ 
         maxWidth: 700, 
-        height: '100%', 
+        flex: 1,
         display: 'flex', 
         flexDirection: 'column',
         padding: '0 12px',
-        overflow: 'hidden',
         position: 'relative'
       }}>
         
@@ -128,9 +126,8 @@ export default function Community() {
           ref={scrollRef}
           style={{ 
           flex: 1,
-          minHeight: 0,
           overflowY: 'auto',
-          padding: '20px 12px 100px 0',
+          padding: '20px 0 180px 0',
           display: 'flex', 
           flexDirection: 'column', 
           gap: 4,
@@ -266,10 +263,17 @@ export default function Community() {
 
         {/* FIXED INPUT BAR */}
         <div style={{ 
-          padding: '4px 0 24px', 
-          borderTop: '1px solid var(--border)',
-          background: 'var(--bg-primary)',
-          zIndex: 10
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: '8px 16px max(24px, env(safe-area-inset-bottom))',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgba(8, 13, 26, 0.97)',
+          zIndex: 100,
+          backdropFilter: 'blur(16px)',
+          maxHeight: '55vh',
+          overflowY: 'auto'
         }}>
           {!user ? (
             <div style={{ textAlign: 'center', padding: '8px 0', background: 'var(--bg-card)', borderRadius: 16, border: '1px solid var(--border)' }}>
@@ -280,16 +284,17 @@ export default function Community() {
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div className="community-input-area" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {/* TABS */}
               <div style={{ display: 'flex', gap: 4 }}>
-                <button onClick={() => setActiveMode('text')} className={`tab ${activeMode === 'text' ? 'active' : ''}`} style={{ flex: 1, height: 24, fontSize: 9, borderRadius: 4, padding: 0 }}>
-                  <MessageSquare size={10} /> Texto
+                <button onClick={() => setActiveMode('text')} className={`tab ${activeMode === 'text' ? 'active' : ''}`} style={{ flex: 1, height: 28, fontSize: 10, borderRadius: 6, padding: 0 }}>
+                  <MessageSquare size={11} /> Texto
                 </button>
-                <button onClick={() => setActiveMode('score')} className={`tab ${activeMode === 'score' ? 'active' : ''}`} style={{ flex: 1, height: 24, fontSize: 9, borderRadius: 4, padding: 0 }}>
-                  <Trophy size={10} /> Placar
+                <button onClick={() => setActiveMode('score')} className={`tab ${activeMode === 'score' ? 'active' : ''}`} style={{ flex: 1, height: 28, fontSize: 10, borderRadius: 6, padding: 0 }}>
+                  <Trophy size={11} /> Placar
                 </button>
-                <button onClick={() => setActiveMode('goal')} className={`tab ${activeMode === 'goal' ? 'active' : ''}`} style={{ flex: 1, height: 24, fontSize: 9, borderRadius: 4, padding: 0 }}>
-                  <Zap size={10} /> GOLO
+                <button onClick={() => setActiveMode('goal')} className={`tab ${activeMode === 'goal' ? 'active' : ''}`} style={{ flex: 1, height: 28, fontSize: 10, borderRadius: 6, padding: 0 }}>
+                  <Zap size={11} /> GOLO
                 </button>
               </div>
 
@@ -354,9 +359,9 @@ export default function Community() {
 
                   {activeMode === 'goal' && (
                     <div style={{ display: 'flex', gap: 4 }}>
-                      <button onClick={() => handleCreatePost('GOOOOOOOOOLO! ⚽🔥')} className="btn btn-secondary" style={{ flex: 1, height: 32, fontSize: 9, borderRadius: 8 }}>Geral</button>
-                      <button onClick={() => handleCreatePost('HALA MADRID! ⚪👑')} className="btn btn-secondary" style={{ flex: 1, height: 32, fontSize: 9, borderRadius: 8, borderColor: '#fff' }}>Madrid</button>
-                      <button onClick={() => handleCreatePost('VISCA BARÇA! 🔴🔵')} className="btn btn-secondary" style={{ flex: 1, height: 32, fontSize: 9, borderRadius: 8, borderColor: '#ff4d4d' }}>Barça</button>
+                      <button onClick={() => handleCreatePost('GOOOOOOOOOLO! ⚽🔥')} className="btn btn-secondary" style={{ flex: 1, height: 36, fontSize: 10, borderRadius: 8, width: 'auto', padding: '0 8px' }}>Geral</button>
+                      <button onClick={() => handleCreatePost('HALA MADRID! ⚪👑')} className="btn btn-secondary" style={{ flex: 1, height: 36, fontSize: 10, borderRadius: 8, borderColor: '#fff', width: 'auto', padding: '0 8px' }}>Madrid</button>
+                      <button onClick={() => handleCreatePost('VISCA BARÇA! 🔴🔵')} className="btn btn-secondary" style={{ flex: 1, height: 36, fontSize: 10, borderRadius: 8, borderColor: '#ff4d4d', width: 'auto', padding: '0 8px' }}>Barça</button>
                     </div>
                   )}
                 </div>
@@ -366,7 +371,7 @@ export default function Community() {
                     onClick={() => handleCreatePost()} 
                     className="btn btn-primary" 
                     disabled={sending}
-                    style={{ width: 36, height: 36, borderRadius: 10, padding: 0, justifyContent: 'center', flexShrink: 0 }}
+                    style={{ width: 40, height: 40, borderRadius: 12, padding: 0, justifyContent: 'center', flexShrink: 0 }}
                   >
                     {sending ? <span className="spinner" style={{ width: 14, height: 14, border: '2px solid #000', borderTopColor: 'transparent' }} /> : <Send size={18} />}
                   </button>
@@ -377,6 +382,17 @@ export default function Community() {
         </div>
       </div>
       <style>{`
+        /* Override global mobile .btn rules inside input area */
+        .community-input-area .btn {
+          width: auto !important;
+          height: auto !important;
+          min-width: 0 !important;
+        }
+        .community-input-area .btn-primary {
+          width: 40px !important;
+          height: 40px !important;
+        }
+
         .spin-slow { animation: spin 8s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         

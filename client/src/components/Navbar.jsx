@@ -71,9 +71,9 @@ export default function Navbar() {
             <Link to="/support" className={`nav-link ${isActive('/support') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>
               <Heart size={18} color="var(--red)" /> Apoiar
             </Link>
-            <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', position: 'relative', padding: '0 12px' }}>
+            <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                <ShoppingCart size={22} />
+                <ShoppingCart size={20} />
                 <span style={{
                   position: 'absolute',
                   top: -8,
@@ -82,8 +82,8 @@ export default function Navbar() {
                   color: '#fff',
                   fontSize: 10,
                   fontWeight: 800,
-                  width: 18,
-                  height: 18,
+                  width: 16,
+                  height: 16,
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
@@ -92,6 +92,7 @@ export default function Navbar() {
                   boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                 }}>0</span>
               </div>
+              Loja
             </Link>
 
             {user ? (
