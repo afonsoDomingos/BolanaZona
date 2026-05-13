@@ -15,12 +15,6 @@ console.log('📡 [ENV CHECK] GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ?
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
-// 🟢 FORÇAR POLÍTICA DE POPUPS PARA GOOGLE AUTH
-app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-  next();
-});
-
 // 🟢 LOGGER DE PEDIDOS
 app.use((req, res, next) => {
   console.log(`📩 [PEDIDO] ${req.method} ${req.path}`);
