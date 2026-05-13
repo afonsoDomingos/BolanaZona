@@ -7,6 +7,10 @@ exports.create = async (req, res) => {
   console.log('⚡️ Creating challenge - payload:', req.body, 'user:', req.user._id);
   try {
     const { challengerSquad, challengedSquad, date, location, message, type, wagerValue, mapsLink } = req.body;
+    
+    if (challengerSquad === challengedSquad) {
+      return res.status(400).json({ message: 'Não podes desafiar o teu próprio clube!' });
+    }
 
     // Verify that the user actually owns the challenger squad
     const challenger = await Squad.findOne({ _id: challengerSquad, manager: req.user._id });

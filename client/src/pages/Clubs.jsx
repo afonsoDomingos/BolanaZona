@@ -116,6 +116,9 @@ export default function Clubs() {
                     Ver Equipa
                   </button>
                   {(() => {
+                    const isMySquad = mySquads.find(ms => ms._id === squad._id);
+                    if (isMySquad) return null;
+
                     const pendingChallenge = myChallenges.find(c => 
                       c.status === 'pending' && 
                       (c.challengedSquad._id === squad._id || c.challengerSquad._id === squad._id)
