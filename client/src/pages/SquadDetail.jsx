@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shield, Users, Save, Trash2 } from 'lucide-react';
+import { ArrowLeft, Shield, Users, Save, Trash2, Plus, X } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -10,6 +10,20 @@ export default function SquadDetail() {
   const [squad, setSquad] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [newPlayer, setNewPlayer] = useState({ name: '', position: '', number: '' });
+
+  const handleAddPlayer = (e) => {
+    e.preventDefault();
+    if (!newPlayer.name) return;
+    setSquad({ ...squad, players: [...(squad.players || []), newPlayer] });
+    setNewPlayer({ name: '', position: '', number: '' });
+  };
+
+  const handleRemovePlayer = (index) => {
+    const updatedPlayers = [...(squad.players || [])];
+    updatedPlayers.splice(index, 1);
+    setSquad({ ...squad, players: updatedPlayers });
+  };
 
   useEffect(() => {
     fetchSquad();
@@ -126,12 +140,45 @@ export default function SquadDetail() {
               <Users size={20} color="var(--green)" /> Plantel Oficial
             </h3>
             
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', opacity: 0.6 }}>
-              <Users size={48} style={{ marginBottom: 16 }} />
-              <p style={{ maxWidth: 250, fontSize: 13, lineHeight: 1.5 }}>
-                A gestão individual de jogadores estará disponível na próxima atualização!
-              </p>
+            <form onSubmit={handleAddPlayer} style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+              <input className="form-input" placeholder="Nome do Jogador" value={newPlayer.name} onChange={e => setNewPlayer({...newPlayer, name: e.target.value})} style={{ flex: 2, height: 40 }} />
+              <select className="form-select" value={newPlayer.position} onChange={e => setNewPlayer({...newPlayer, position: e.target.value})} style={{ flex: 1, height: 40 }}>
+                <option value="">Pos.</option>
+                <option value="GK">GR</option>
+                <option value="DEF">DEF</option>
+                <option value="MID">MED</option>
+                <option value="FWD">AV</option>
+              </select>
+              <input type="number" className="form-input" placeholder="Nº" value={newPlayer.number} onChange={e => setNewPlayer({...newPlayer, number: e.target.value})} style={{ width: 60, height: 40 }} />
+              <button type="submit" className="btn btn-primary" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center' }}>
+                <Plus size={18} />
+              </button>
+            </form>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', maxHeight: 300, paddingRight: 8 }}>
+              {(!squad.players || squad.players.length === 0) ? (
+                <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)' }}>
+                  Sem jogadores no plantel.
+                </div>
+              ) : (
+                squad.players.map((p, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      {p.number && <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--green)', background: 'rgba(0,200,83,0.1)', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4 }}>{p.number}</span>}
+                      <span style={{ fontWeight: 700, fontSize: 14 }}>{p.name}</span>
+                      {p.position && <span style={{ fontSize: 10, color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '2px 6px', borderRadius: 4 }}>{p.position === 'GK' ? 'GR' : p.position === 'DEF' ? 'DEF' : p.position === 'MID' ? 'MED' : p.position === 'FWD' ? 'AV' : p.position}</span>}
+                    </div>
+                    <button type="button" onClick={() => handleRemovePlayer(idx)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
+            
+            <p style={{ fontSize: 11, color: 'var(--yellow)', marginTop: 16, textAlign: 'center' }}>
+              ⚠️ Clica em "Guardar" no final para gravar as alterações.
+            </p>
           </div>
         </div>
 
