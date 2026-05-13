@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, Search, MapPin, Swords } from 'lucide-react';
+import { Shield, Search, MapPin, Swords, Users, X } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -9,6 +9,7 @@ export default function Clubs() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showChallengeModal, setShowChallengeModal] = useState(null);
+  const [showSquadDetails, setShowSquadDetails] = useState(null);
   
   const { user } = useAuth();
   const [mySquads, setMySquads] = useState([]);
@@ -94,20 +95,29 @@ export default function Clubs() {
                   <div style={{ textAlign: 'center' }}><div style={{ fontSize: 20, fontWeight: 900, color: 'var(--yellow)' }}>{squad.stats?.tournamentsWon || 0}</div><div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Títulos</div></div>
                 </div>
 
-                <button 
-                  className="btn btn-primary" 
-                  style={{ width: '100%', justifyContent: 'center', background: 'var(--bg-main)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', height: 48 }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'var(--red)'; e.currentTarget.style.borderColor = 'var(--red)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-main)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
-                  onClick={() => {
-                    if (!user) return toast.error('Faz login para desafiar este clube!');
-                    if (mySquads.length === 0) return toast.error('Tens de criar um Clube primeiro no teu Dashboard!');
-                    if (mySquads.find(ms => ms._id === squad._id)) return toast.error('Não podes desafiar o teu próprio clube!');
-                    setShowChallengeModal(squad);
-                  }}
-                >
-                  <Swords size={18} /> Lançar Desafio
-                </button>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <button 
+                    className="btn btn-secondary"
+                    style={{ flex: 1, justifyContent: 'center', height: 48, background: 'rgba(255,255,255,0.05)', border: 'none' }}
+                    onClick={() => setShowSquadDetails(squad)}
+                  >
+                    Ver Equipa
+                  </button>
+                  <button 
+                    className="btn btn-primary" 
+                    style={{ flex: 2, justifyContent: 'center', background: 'var(--bg-main)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', height: 48 }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'var(--red)'; e.currentTarget.style.borderColor = 'var(--red)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-main)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+                    onClick={() => {
+                      if (!user) return toast.error('Faz login para desafiar este clube!');
+                      if (mySquads.length === 0) return toast.error('Tens de criar um Clube primeiro no teu Dashboard!');
+                      if (mySquads.find(ms => ms._id === squad._id)) return toast.error('Não podes desafiar o teu próprio clube!');
+                      setShowChallengeModal(squad);
+                    }}
+                  >
+                    <Swords size={18} /> Lançar Desafio
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -121,6 +131,82 @@ export default function Clubs() {
           onClose={() => setShowChallengeModal(null)} 
         />
       )}
+      {showSquadDetails && (
+        <SquadDetailsModal 
+          squad={showSquadDetails} 
+          onClose={() => setShowSquadDetails(null)} 
+          onChallenge={() => {
+            setShowSquadDetails(null);
+            if (!user) return toast.error('Faz login para desafiar este clube!');
+            if (mySquads.length === 0) return toast.error('Tens de criar um Clube primeiro no teu Dashboard!');
+            if (mySquads.find(ms => ms._id === showSquadDetails._id)) return toast.error('Não podes desafiar o teu próprio clube!');
+            setShowChallengeModal(showSquadDetails);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function SquadDetailsModal({ squad, onClose, onChallenge }) {
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal animate-slide-up" style={{ maxWidth: 500, padding: 32, maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+            <div style={{ width: 64, height: 64, borderRadius: 16, background: 'rgba(255,255,255,0.03)', border: `2px solid ${squad.color || 'var(--green)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              {squad.logo ? <img src={squad.logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Shield size={32} color={squad.color || 'var(--green)'} />}
+            </div>
+            <div>
+              <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 4 }}>{squad.name}</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
+                <MapPin size={14} color="var(--green)" /> {squad.neighborhood || 'Desconhecido'}
+              </div>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+            <X size={24} />
+          </button>
+        </div>
+
+        <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 16, marginBottom: 24 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-secondary)', marginBottom: 16, textTransform: 'uppercase', letterSpacing: 1 }}>Estatísticas</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ textAlign: 'center' }}><div style={{ fontSize: 24, fontWeight: 900 }}>{squad.stats?.wins || 0}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Vitórias</div></div>
+            <div style={{ textAlign: 'center' }}><div style={{ fontSize: 24, fontWeight: 900 }}>{squad.stats?.draws || 0}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Empates</div></div>
+            <div style={{ textAlign: 'center' }}><div style={{ fontSize: 24, fontWeight: 900 }}>{squad.stats?.losses || 0}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Derrotas</div></div>
+            <div style={{ textAlign: 'center' }}><div style={{ fontSize: 24, fontWeight: 900, color: 'var(--yellow)' }}>{squad.stats?.tournamentsWon || 0}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Títulos</div></div>
+          </div>
+        </div>
+
+        <div>
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 800, marginBottom: 16 }}>
+            <Users size={18} color="var(--green)" /> Plantel Oficial
+          </h3>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {(!squad.players || squad.players.length === 0) ? (
+              <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', borderRadius: 12 }}>
+                Este clube ainda não registou jogadores.
+              </div>
+            ) : (
+              squad.players.map((p, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
+                  {p.number && <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--green)', background: 'rgba(0,200,83,0.1)', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, marginRight: 12 }}>{p.number}</span>}
+                  <span style={{ fontWeight: 700, fontSize: 15, flex: 1 }}>{p.name}</span>
+                  {p.position && <span style={{ fontSize: 11, color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '4px 8px', borderRadius: 6, fontWeight: 700 }}>{p.position === 'GK' ? 'GR' : p.position === 'DEF' ? 'DEF' : p.position === 'MID' ? 'MED' : p.position === 'FWD' ? 'AV' : p.position}</span>}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div style={{ marginTop: 32 }}>
+          <button className="btn btn-primary" onClick={onChallenge} style={{ width: '100%', justifyContent: 'center', height: 52, background: 'var(--red)', color: '#fff', border: 'none' }}>
+            <Swords size={18} /> Lançar Desafio a {squad.name}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
