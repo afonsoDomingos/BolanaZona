@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shield, Users, Save, Trash2, Plus, X, Pencil, Upload, Image, Camera } from 'lucide-react';
+import { ArrowLeft, Shield, Users, Save, Trash2, Plus, X, Pencil, Upload, Image, Camera, PieChart } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -245,6 +245,33 @@ export default function SquadDetail() {
             >
               {saving ? <span className="spinner-xs"/> : <><Save size={18}/> Guardar Plantel Oficial</>}
             </button>
+          </div>
+        </div>
+
+        {/* ESTATÍSTICAS DO PLANTEL */}
+        <div className="card-glass" style={{ marginTop: 24, padding: 24 }}>
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, fontSize: 18, fontWeight: 800 }}>
+            <PieChart size={20} color="var(--green)" /> Análise do Plantel
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 16 }}>
+            {['Guarda-Redes', 'Defesa Central', 'Lateral', 'Trinco', 'Médio Centro', 'Extremo', 'Ponta de Lança'].map(pos => {
+              const count = (squad.players || []).filter(p => p.position === pos).length;
+              const total = (squad.players || []).length || 1;
+              const percent = (count / total) * 100;
+              
+              return (
+                <div key={pos} style={{ background: 'rgba(255,255,255,0.02)', padding: 16, borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 8 }}>{pos}</div>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 8 }}>
+                    <div style={{ fontSize: 24, fontWeight: 900, lineHeight: 1 }}>{count}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2 }}>jogadores</div>
+                  </div>
+                  <div style={{ width: '100%', height: 4, background: 'rgba(255,255,255,0.05)', borderRadius: 2, overflow: 'hidden' }}>
+                    <div style={{ width: `${percent}%`, height: '100%', background: 'var(--green)', transition: 'width 1s ease-out' }} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
