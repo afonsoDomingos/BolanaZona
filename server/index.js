@@ -26,38 +26,37 @@ app.use('/api/feedbacks', require('./routes/feedbacks'));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/users', require('./routes/users'));
 
+// Connect DB
+const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) return;
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('✅ MongoDB conectado');
+  } catch (err) {
+    console.error('❌ Erro MongoDB:', err.message);
+  }
+};
+
+// Start DB connection
+connectDB();
+
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'OK', platform: 'Bola na Zona' }));
 
-// Export for Vercel
-module.exports = app;
-
-// Connect DB and start server (only if not running on Vercel)
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 5000;
-  mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-      console.log('✅ MongoDB conectado localmente');
-      app.listen(PORT, () => console.log(`🚀 Servidor a correr em http://localhost:${PORT}`));
-    })
-    .catch(err => {
-      console.error('❌ Erro MongoDB Local:', err.stack);
-    });
-} else {
-  // On Vercel, connect and log
-  mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ MongoDB conectado em Produção'))
-    .catch(err => console.error('❌ Falha Crítica MongoDB Produção:', err.stack));
-}
-
-// Global Error Handler Middleware (Deve ser o último)
+// Global Error Handler Middleware
 app.use((err, req, res, next) => {
-  console.error(`[ERRO NO SERVIDOR] ${new Date().toISOString()}`);
-  console.error(`Path: ${req.path}`);
-  console.error(`Stack: ${err.stack}`);
+  console.error(`[ERRO NO SERVIDOR] ${req.path} - ${err.message}`);
   res.status(err.status || 500).json({
     message: err.message || 'Erro interno no servidor',
     error: process.env.NODE_ENV === 'development' ? err.stack : {},
-    debug_message: err.message // Adicionado para debug em produção
+    debug: true
   });
 });
+
+// Start local server if not on Vercel
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`🚀 Servidor em http://localhost:${PORT}`));
+}
+
+module.exports = app;
