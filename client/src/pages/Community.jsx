@@ -133,7 +133,7 @@ export default function Community() {
           padding: '20px 12px 20px 0',
           display: 'flex', 
           flexDirection: 'column', 
-          gap: 6,
+          gap: 4,
           scrollBehavior: 'smooth',
           overscrollBehavior: 'contain'
         }}>
@@ -168,8 +168,8 @@ export default function Community() {
                   <div style={{ 
                     background: isMe ? 'var(--green)' : 'rgba(255,255,255,0.08)',
                     color: isMe ? '#000' : '#fff',
-                    padding: '8px 12px',
-                    borderRadius: isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                    padding: '4px 10px',
+                    borderRadius: isMe ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                     border: '1px solid ' + (isMe ? 'transparent' : 'rgba(255,255,255,0.05)')
                   }}>
@@ -180,12 +180,12 @@ export default function Community() {
                     {post.type === 'score' && (
                       <div style={{ 
                         background: 'rgba(0,0,0,0.1)', 
-                        padding: '8px 10px', 
-                        borderRadius: 8, 
+                        padding: '4px 8px', 
+                        borderRadius: 6, 
                         display: 'flex', 
                         flexDirection: 'column',
                         alignItems: 'center', 
-                        gap: 4,
+                        gap: 2,
                         marginTop: 2
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -215,13 +215,13 @@ export default function Community() {
                     {post.type === 'goal' && (
                       <div style={{ 
                         textAlign: 'center', 
-                        padding: '10px', 
+                        padding: '6px 12px', 
                         background: post.content.includes('MADRID') ? '#fff' : 
                                     post.content.includes('BARÇA') ? 'linear-gradient(90deg, #a50044, #004d98)' :
                                     '#00C853',
-                        borderRadius: 10,
+                        borderRadius: 8,
                         marginTop: 2,
-                        minWidth: 150
+                        minWidth: 120
                       }}>
                         <h4 style={{ margin: 0, fontSize: 15, color: post.content.includes('MADRID') ? '#000' : '#fff' }} className="pulse-text">{post.content}</h4>
                       </div>
@@ -280,15 +280,15 @@ export default function Community() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ display: 'flex', gap: 6 }}>
-                <button onClick={() => setActiveMode('text')} className={`tab ${activeMode === 'text' ? 'active' : ''}`} style={{ flex: 1, height: 28, fontSize: 10, borderRadius: 6, padding: 0 }}>
-                  <MessageSquare size={12} /> Texto
+              <div style={{ display: 'flex', gap: 4 }}>
+                <button onClick={() => setActiveMode('text')} className={`tab ${activeMode === 'text' ? 'active' : ''}`} style={{ flex: 1, height: 24, fontSize: 9, borderRadius: 4, padding: 0 }}>
+                  <MessageSquare size={10} /> Texto
                 </button>
-                <button onClick={() => setActiveMode('score')} className={`tab ${activeMode === 'score' ? 'active' : ''}`} style={{ flex: 1, height: 28, fontSize: 10, borderRadius: 6, padding: 0 }}>
-                  <Trophy size={12} /> Placar
+                <button onClick={() => setActiveMode('score')} className={`tab ${activeMode === 'score' ? 'active' : ''}`} style={{ flex: 1, height: 24, fontSize: 9, borderRadius: 4, padding: 0 }}>
+                  <Trophy size={10} /> Placar
                 </button>
-                <button onClick={() => setActiveMode('goal')} className={`tab ${activeMode === 'goal' ? 'active' : ''}`} style={{ flex: 1, height: 28, fontSize: 10, borderRadius: 6, padding: 0 }}>
-                  <Zap size={12} /> GOLO
+                <button onClick={() => setActiveMode('goal')} className={`tab ${activeMode === 'goal' ? 'active' : ''}`} style={{ flex: 1, height: 24, fontSize: 9, borderRadius: 4, padding: 0 }}>
+                  <Zap size={10} /> GOLO
                 </button>
               </div>
 
