@@ -102,6 +102,10 @@ export default function MySquads() {
             Desafios ⚔️
             {challenges.filter(c => c.status === 'pending').length > 0 && <span style={{ background: 'var(--red)', color: '#fff', fontSize: 10, padding: '2px 6px', borderRadius: 100 }}>{challenges.filter(c => c.status === 'pending').length}</span>}
           </button>
+          <button onClick={() => setTab('matches')} style={{ padding: '12px 0', background: 'none', border: 'none', color: tab === 'matches' ? 'var(--green)' : 'var(--text-muted)', borderBottom: tab === 'matches' ? '2px solid var(--green)' : '2px solid transparent', fontWeight: 800, fontSize: 16, cursor: 'pointer', transition: '0.2s', display: 'flex', alignItems: 'center', gap: 8 }}>
+            Próximos Jogos ⚽
+            {challenges.filter(c => c.status === 'accepted' && new Date(c.date) >= new Date().setHours(0,0,0,0)).length > 0 && <span style={{ background: 'var(--green)', color: '#000', fontSize: 10, padding: '2px 6px', borderRadius: 100 }}>{challenges.filter(c => c.status === 'accepted' && new Date(c.date) >= new Date().setHours(0,0,0,0)).length}</span>}
+          </button>
         </div>
 
         {loading ? (
@@ -145,18 +149,86 @@ export default function MySquads() {
               </Link>
             ))}
           </div>
-        )) : (
+        ) : tab === 'challenges' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {challenges.length === 0 ? (
+            {challenges.filter(c => c.status !== 'accepted').length === 0 ? (
+              <div className="empty-state card-glass">
+                <Swords size={48} color="var(--text-muted)" style={{ marginBottom: 16 }} />
+                <p>Ainda não tens desafios pendentes ou recusados.</p>
+              </div>
+            ) : (
+              challenges.filter(c => c.status !== 'accepted').map(c => {
+                const isChallenger = squads.some(s => s._id === c.challengerSquad?._id);
+                const mySquad = isChallenger ? c.challengerSquad : c.challengedSquad;
+                const opponentSquad = isChallenger ? c.challengedSquad : c.challengerSquad;
+                
+                return (
+                  <div key={c._id} className="card-glass" style={{ padding: 24, borderRadius: 20, borderLeft: c.status === 'pending' ? '4px solid var(--yellow)' : c.status === 'rejected' ? '1px solid var(--border)' : '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 16 }}>
+                      <div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800, marginBottom: 4 }}>
+                          {isChallenger ? 'Desafio Enviado ↗️' : 'Desafio Recebido ↙️'}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <span style={{ fontSize: 18, fontWeight: 800 }}>{mySquad?.name}</span>
+                          <Swords size={16} color="var(--red)" />
+                          <button 
+                            onClick={() => setShowSquadDetails(opponentSquad)}
+                            style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 18, fontWeight: 800, cursor: 'pointer', color: 'var(--green)', textDecoration: 'underline', textAlign: 'left' }}
+                          >
+                            {opponentSquad?.name}
+                          </button>
+                        </div>
+                      </div>
+                      <div className={`badge ${c.status === 'pending' ? 'badge-yellow' : 'badge-gray'}`}>
+                        {c.status === 'pending' ? 'Pendente' : 'Recusado'}
+                      </div>
+                    </div>
+                    {c.message && <p style={{ fontSize: 14, color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: 12 }}>"{c.message}"</p>}
+                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: 12, borderRadius: 12, marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 12, color: 'var(--text-muted)' }}>
+                      {c.date && <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Calendar size={14}/> {new Date(c.date).toLocaleDateString()}</span>}
+                      {c.location && <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><MapPin size={14}/> {c.location}</span>}
+                      <span style={{ fontWeight: 800, color: c.type === 'wager' ? 'var(--yellow)' : 'var(--green)' }}>{c.type === 'wager' ? `💰 ${c.wagerValue}` : '🤝 Amigável'}</span>
+                    </div>
+                    {c.status === 'pending' && !isChallenger && (
+                      <div className="btn-group-responsive">
+                        <button className="btn btn-primary" disabled={updating} onClick={() => updateChallengeStatus(c._id, 'accepted')} style={{ flex: 1, justifyContent: 'center' }}><Check size={16}/> Aceitar Desafio</button>
+                        <button className="btn btn-secondary" disabled={updating} onClick={() => setShowRejectionModal(c._id)} style={{ flex: 1, justifyContent: 'center', color: 'var(--red)', borderColor: 'rgba(255,0,0,0.2)' }}><X size={16}/> Recusar</button>
+                      </div>
+                    )}
+                    {c.status === 'pending' && isChallenger && (
+                      <div className="btn-group-responsive">
+                        <button 
+                          className="btn btn-secondary" 
+                          onClick={() => setEditingChallenge(c)}
+                          style={{ flex: 1, justifyContent: 'center', color: 'var(--yellow)', borderColor: 'rgba(255,193,7,0.2)' }}
+                        >
+                          <Calendar size={16}/> Editar Desafio
+                        </button>
+                      </div>
+                    )}
+                    {c.status === 'rejected' && c.rejectionReason && (
+                      <div style={{ width: '100%', marginTop: 8, padding: '8px 12px', background: 'rgba(255,0,0,0.05)', borderRadius: 8, fontSize: 11, color: 'var(--red)', border: '1px solid rgba(255,0,0,0.1)' }}>
+                        <strong>Motivo da recusa:</strong> {c.rejectionReason}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {challenges.filter(c => c.status === 'accepted').length === 0 ? (
               <div className="empty-state card-glass">
                 <Swords size={56} color="var(--text-muted)" style={{ marginBottom: 20 }} />
-                <h3 style={{ fontSize: 24, fontWeight: 800 }}>Sem desafios pendentes</h3>
+                <h3 style={{ fontSize: 24, fontWeight: 800 }}>Sem jogos agendados</h3>
                 <p style={{ maxWidth: 400, margin: '12px auto 24px', color: 'var(--text-secondary)' }}>
-                  Vai à <Link to="/clubs" style={{ color: 'var(--green)' }}>Liga Nacional</Link> e atira a primeira pedra para começares a competir!
+                  Aceita desafios na aba "Desafios" para veres aqui os teus próximos confrontos!
                 </p>
               </div>
             ) : (
-              challenges.map(c => {
+              challenges.filter(c => c.status === 'accepted').map(c => {
                 const isChallenger = squads.some(s => s._id === c.challengerSquad?._id);
                 const mySquad = isChallenger ? c.challengerSquad : c.challengedSquad;
                 const opponentSquad = isChallenger ? c.challengedSquad : c.challengerSquad;
