@@ -152,7 +152,14 @@ export default function Clubs() {
 
 
 function ChallengeModal({ targetSquad, mySquads, onClose }) {
-  const [form, setForm] = useState({ challengerSquad: mySquads[0]?._id, date: '', location: '', message: '' });
+  const [form, setForm] = useState({ 
+    challengerSquad: mySquads[0]?._id, 
+    date: '', 
+    location: '', 
+    message: '',
+    type: 'friendly',
+    wagerValue: ''
+  });
   const [loading, setLoading] = useState(false);
   const [whatsappLink, setWhatsappLink] = useState(null);
   const [sent, setSent] = useState(false);
@@ -240,6 +247,22 @@ function ChallengeModal({ targetSquad, mySquads, onClose }) {
               <label className="form-label">Local (Campo)</label>
               <input className="form-input" placeholder="Ex: Campo do Bairro" value={form.location} onChange={e => setForm({...form, location: e.target.value})} />
             </div>
+          </div>
+
+          <div className="form-grid form-grid-2">
+            <div className="form-group">
+              <label className="form-label">Tipo de Jogo</label>
+              <select className="form-select" value={form.type} onChange={e => setForm({...form, type: e.target.value})} style={{ background: form.type === 'wager' ? 'rgba(255, 193, 7, 0.1)' : 'rgba(255,255,255,0.05)', borderColor: form.type === 'wager' ? 'var(--yellow)' : 'rgba(255,255,255,0.1)' }}>
+                <option value="friendly">Amigável 🤝</option>
+                <option value="wager">Aposta / Valores 💰</option>
+              </select>
+            </div>
+            {form.type === 'wager' && (
+              <div className="form-group animate-slide-up">
+                <label className="form-label">Valor da Aposta</label>
+                <input className="form-input" placeholder="Ex: 500 MT" value={form.wagerValue} onChange={e => setForm({...form, wagerValue: e.target.value})} style={{ borderColor: 'var(--yellow)' }} />
+              </div>
+            )}
           </div>
 
           <div className="form-group">

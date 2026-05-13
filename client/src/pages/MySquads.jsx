@@ -181,6 +181,9 @@ export default function MySquads() {
                       <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--text-muted)' }}>
                         {c.date && <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Calendar size={14}/> {new Date(c.date).toLocaleDateString()}</span>}
                         {c.location && <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><MapPin size={14}/> {c.location}</span>}
+                        <span style={{ display: 'flex', gap: 6, alignItems: 'center', color: c.type === 'wager' ? 'var(--yellow)' : 'var(--green)', fontWeight: 800 }}>
+                          {c.type === 'wager' ? `💰 Aposta: ${c.wagerValue || 'Sim'}` : '🤝 Amigável'}
+                        </span>
                       </div>
                     </div>
 

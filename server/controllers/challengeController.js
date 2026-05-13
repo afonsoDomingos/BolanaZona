@@ -6,7 +6,7 @@ const Notification = require('../models/Notification');
 exports.create = async (req, res) => {
   console.log('⚡️ Creating challenge - payload:', req.body, 'user:', req.user._id);
   try {
-    const { challengerSquad, challengedSquad, date, location, message } = req.body;
+    const { challengerSquad, challengedSquad, date, location, message, type, wagerValue } = req.body;
 
     // Verify that the user actually owns the challenger squad
     const challenger = await Squad.findOne({ _id: challengerSquad, manager: req.user._id });
@@ -22,7 +22,7 @@ exports.create = async (req, res) => {
       return res.status(404).json({ message: 'Clube desafiado não encontrado.' });
     }
 
-    const challenge = await Challenge.create({ challengerSquad, challengedSquad, date, location, message });
+    const challenge = await Challenge.create({ challengerSquad, challengedSquad, date, location, message, type, wagerValue });
     console.log('✅ Challenge created with id', challenge._id);
 
     // Build WhatsApp notification
@@ -50,6 +50,7 @@ exports.create = async (req, res) => {
         `📅 *Proposta de Jogo:*`,
         `🗓️ Data: ${dateStr}`,
         location ? `🏟️ Campo: ${location}` : `🏟️ Campo: A definir`,
+        `🏆 Tipo: ${type === 'wager' ? `💰 Aposta (${wagerValue || 'A definir'})` : '🤝 Amigável'}`,
         message ? `💬 Mensagem: "${message}"` : null,
         '',
         `✅ Para *ACEITAR* ou ❌ *RECUSAR* o desafio, entra na tua conta em *bolanazona.com* → Meus Clubes → Desafios`,
@@ -62,9 +63,9 @@ exports.create = async (req, res) => {
     // Create Internal Notification for the challenged manager
     await Notification.create({
       user: challenged.manager._id,
-      title: 'Novo Desafio! ⚔️',
-      message: `A equipa ${challenger.name} lançou-vos um desafio para o dia ${date ? new Date(date).toLocaleDateString() : 'a definir'}.`,
-      type: 'info',
+      title: type === 'wager' ? 'Novo Desafio com Aposta! 💰' : 'Novo Desafio! ⚔️',
+      message: `A equipa ${challenger.name} lançou um desafio ${type === 'wager' ? `com aposta (${wagerValue})` : 'amigável'} para o dia ${date ? new Date(date).toLocaleDateString() : 'a definir'}.`,
+      type: type === 'wager' ? 'warning' : 'info',
       link: '/dashboard/squads'
     });
 
