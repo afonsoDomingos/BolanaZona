@@ -1,6 +1,7 @@
 const Challenge = require('../models/Challenge');
 const Squad = require('../models/Squad');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 exports.create = async (req, res) => {
   console.log('⚡️ Creating challenge - payload:', req.body, 'user:', req.user._id);
@@ -57,6 +58,15 @@ exports.create = async (req, res) => {
       ].filter(Boolean).join('\n');
       whatsappLink = `https://wa.me/${recipientPhone}?text=${encodeURIComponent(waMessage)}`;
     }
+
+    // Create Internal Notification for the challenged manager
+    await Notification.create({
+      user: challenged.manager._id,
+      title: 'Novo Desafio! ⚔️',
+      message: `A equipa ${challenger.name} lançou-vos um desafio para o dia ${date ? new Date(date).toLocaleDateString() : 'a definir'}.`,
+      type: 'info',
+      link: '/dashboard/squads'
+    });
 
     res.status(201).json({ challenge, whatsappLink });
   } catch (err) {
@@ -124,6 +134,15 @@ exports.updateStatus = async (req, res) => {
         whatsappLink = `https://wa.me/${recipientPhone}?text=${encodeURIComponent(waMessage)}`;
       }
     }
+
+    // Create Internal Notification for the challenger manager
+    await Notification.create({
+      user: challenge.challengerSquad.manager,
+      title: status === 'accepted' ? 'Desafio Aceite! 🔥' : 'Desafio Recusado ❌',
+      message: `A equipa ${challenge.challengedSquad.name} ${status === 'accepted' ? 'aceitou' : 'recusou'} o vosso desafio.`,
+      type: status === 'accepted' ? 'success' : 'warning',
+      link: '/dashboard/squads'
+    });
 
     res.json({ challenge, whatsappLink });
   } catch (err) {
