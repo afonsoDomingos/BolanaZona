@@ -4,6 +4,7 @@ import { Shield, Plus, ArrowRight, User, Swords, Check, X, Calendar, MapPin } fr
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import SquadDetailsModal from '../components/SquadDetailsModal';
+import ChallengeMap from '../components/ChallengeMap';
 
 export default function MySquads() {
   const [squads, setSquads] = useState([]);
@@ -197,23 +198,11 @@ export default function MySquads() {
                     </div>
 
                     {c.mapsLink && expandedMap === c._id && (
-                      <div className="animate-fade-in" style={{ marginTop: 16, borderRadius: 16, overflow: 'hidden', height: 250, border: '1px solid rgba(255,255,255,0.1)', position: 'relative' }}>
-                        <iframe 
-                          width="100%" 
-                          height="100%" 
-                          style={{ border: 0 }}
-                          loading="lazy" 
-                          allowFullScreen 
-                          src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(c.location + ' ' + (c.challengedSquad?.city || 'Moçambique'))}`}
-                        ></iframe>
-                        {/* Alternative without API key if key is missing */}
-                        <iframe 
-                          width="100%" 
-                          height="100%" 
-                          style={{ border: 0, position: 'absolute', top: 0, left: 0 }}
-                          src={`https://maps.google.com/maps?q=${encodeURIComponent(c.location + ' ' + (c.challengedSquad?.city || 'Moçambique'))}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
-                        ></iframe>
-                      </div>
+                      <ChallengeMap 
+                        location={c.location} 
+                        mapsLink={c.mapsLink} 
+                        city={opponentSquad?.city} 
+                      />
                     )}
 
                     {c.status === 'pending' && !isChallenger && (
