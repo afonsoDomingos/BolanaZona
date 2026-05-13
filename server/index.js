@@ -55,12 +55,12 @@ connectDB();
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'OK', platform: 'Bola na Zona' }));
 
-// Global Error Handler Middleware
+// 🟢 MIDDLEWARE DE ERRO (DEVE ESTAR ANTES DO EXPORT)
 app.use((err, req, res, next) => {
-  console.error(`[ERRO NO SERVIDOR] ${req.path} - ${err.message}`);
+  console.error(`🔥 [ERRO CRÍTICO] ${req.path}:`, err.message);
   res.status(err.status || 500).json({
     message: err.message || 'Erro interno no servidor',
-    error: process.env.NODE_ENV === 'development' ? err.stack : {},
+    error: err.stack,
     debug: true
   });
 });
