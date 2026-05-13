@@ -13,7 +13,7 @@ export default function CommunityFAB() {
     <Link 
       to="/community" 
       className="fab-item animate-fade-in"
-      style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9998 }}
+      style={{ position: 'fixed', bottom: '84px', right: '20px', zIndex: 9998 }}
       title="Entrar na Comunidade"
     >
       <div className="fab-badge">LIVE</div>
@@ -41,12 +41,6 @@ export default function CommunityFAB() {
           100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 23, 68, 0); }
         }
 
-        @media (max-width: 768px) {
-          .fab-item {
-            bottom: 16px !important;
-            right: 16px !important;
-          }
-        }
       `}</style>
     </Link>
   );

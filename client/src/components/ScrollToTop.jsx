@@ -25,7 +25,7 @@ export default function ScrollToTop() {
       className="fab-item animate-fade-in"
       style={{
         position: 'fixed',
-        bottom: '84px',
+        bottom: '20px',
         right: '20px',
         zIndex: 9999,
       }}

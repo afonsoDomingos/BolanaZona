@@ -357,6 +357,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .recent-tournament-card { display: flex; align-items: center; gap: 16px; text-decoration: none; }
 
 
+.hide-desktop { display: none; }
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   html { font-size: 15px; }
@@ -502,7 +504,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .dashboard-sidebar { order: 1; }
   .recent-tournament-card { flex-direction: column; align-items: flex-start !important; gap: 16px !important; }
   .hide-mobile { display: none; }
-  .hide-desktop { display: inline; } /* Visível no mobile */
+  .hide-desktop { display: inline !important; } /* Visível no mobile */
   
   .table-wrapper table { min-width: 600px; } /* Force scroll for data integrity */
   
