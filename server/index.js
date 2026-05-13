@@ -21,6 +21,26 @@ app.use((req, res, next) => {
   next();
 });
 
+// 🟢 MIDDLEWARE DE CONEXÃO MONGO (CRÍTICO PARA VERCEL)
+app.use(async (req, res, next) => {
+  if (mongoose.connection.readyState >= 1) return next();
+  try {
+    console.log('📡 [DB] A ligar ao MongoDB...');
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('✅ [DB] Ligado');
+    next();
+  } catch (err) {
+    console.error('❌ [DB] Erro:', err.message);
+    return res.status(500).json({ message: 'Erro de base de dados', error: err.message });
+  }
+});
+
+// 🟢 LOGGER DE PEDIDOS
+app.use((req, res, next) => {
+  console.log(`📩 [PEDIDO] ${req.method} ${req.path}`);
+  next();
+});
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tournaments', require('./routes/tournaments'));
@@ -37,20 +57,6 @@ app.use('/api/suggestions', require('./routes/suggestions'));
 app.use('/api/feedbacks', require('./routes/feedbacks'));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/users', require('./routes/users'));
-
-// Connect DB
-const connectDB = async () => {
-  if (mongoose.connection.readyState >= 1) return;
-  try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('✅ MongoDB conectado');
-  } catch (err) {
-    console.error('❌ Erro MongoDB:', err.message);
-  }
-};
-
-// Start DB connection
-connectDB();
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'OK', platform: 'Bola na Zona' }));
