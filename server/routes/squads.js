@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const squadController = require('../controllers/squadController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect } = require('../middleware/auth');
 
 router.get('/my-squads', protect, squadController.getMySquads);
 router.post('/', protect, squadController.create);

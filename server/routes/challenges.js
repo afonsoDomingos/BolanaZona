@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const challengeController = require('../controllers/challengeController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect } = require('../middleware/auth');
 
 router.post('/', protect, challengeController.create);
 router.get('/my-challenges', protect, challengeController.getMyChallenges);
