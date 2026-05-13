@@ -185,7 +185,7 @@ export default function Landing() {
                 <span className="spin-ball cta-ball" style={{ fontSize: 48 }}>⚽</span>
               </div>
             </div>
-            <h2 className="font-syne" style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 800, marginBottom: 16, color: '#fff' }}>
+            <h2 className="font-syne" style={{ fontSize: 'clamp(24px, 5vw, 48px)', fontWeight: 800, marginBottom: 16, color: '#fff' }}>
               <span className="typewriter-on-scroll">Pronto para apitar?</span>
             </h2>
             <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 20, marginBottom: 40, fontWeight: 500 }}>
