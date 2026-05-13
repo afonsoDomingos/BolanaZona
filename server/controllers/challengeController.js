@@ -111,7 +111,21 @@ exports.updateStatus = async (req, res) => {
     challenge.status = status;
     await challenge.save();
     console.log('✅ Challenge status updated to', status);
-    res.json(challenge);
+
+    let whatsappLink = null;
+    const recipientPhone = (challenge.challengerSquad.contact || challenge.challengerSquad.manager?.phone || '').replace(/\D/g, '');
+    
+    if (recipientPhone && isChallengedManager) {
+      if (status === 'accepted') {
+        const waMessage = `⚔️ *DESAFIO ACEITE!* ⚔️\n\nOlá, a equipa *${challenge.challengedSquad.name}* acaba de aceitar o vosso desafio no Bola na Zona! 🔥\n\nVamos fechar os detalhes do jogo?`;
+        whatsappLink = `https://wa.me/${recipientPhone}?text=${encodeURIComponent(waMessage)}`;
+      } else if (status === 'rejected') {
+        const waMessage = `Olá! A equipa *${challenge.challengedSquad.name}* não pode aceitar o vosso desafio neste momento. Fica para a próxima! ⚽`;
+        whatsappLink = `https://wa.me/${recipientPhone}?text=${encodeURIComponent(waMessage)}`;
+      }
+    }
+
+    res.json({ challenge, whatsappLink });
   } catch (err) {
     console.error('❗️ Error updating challenge status:', err);
     res.status(500).json({ message: err.message });

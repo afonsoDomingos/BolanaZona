@@ -54,8 +54,14 @@ export default function MySquads() {
   const updateChallengeStatus = async (id, status) => {
     setUpdating(true);
     try {
-      await api.put(`/challenges/${id}/status`, { status });
+      const res = await api.put(`/challenges/${id}/status`, { status });
       toast.success(status === 'accepted' ? 'Desafio Aceite! 🔥' : 'Desafio Recusado.');
+      
+      if (res.data.whatsappLink) {
+        toast.success('O WhatsApp vai abrir para avisares o adversário!', { duration: 4000 });
+        setTimeout(() => window.open(res.data.whatsappLink, '_blank'), 500);
+      }
+      
       fetchSquads();
     } catch {
       toast.error('Erro ao atualizar estado.');
