@@ -128,7 +128,7 @@ export default function MySquads() {
               </Link>
             ))}
           </div>
-        ) : (
+        )) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {challenges.length === 0 ? (
               <div className="empty-state card-glass">
