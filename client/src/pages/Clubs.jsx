@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, Search, MapPin, Swords, Users, X } from 'lucide-react';
+import { Shield, Search, MapPin, Swords, Users, X, Phone } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -162,6 +162,11 @@ function SquadDetailsModal({ squad, onClose, onChallenge }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
                 <MapPin size={14} color="var(--green)" /> {squad.neighborhood || 'Desconhecido'}
               </div>
+              {squad.contact && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
+                  <Phone size={14} color="var(--green)" /> {squad.contact}
+                </div>
+              )}
             </div>
           </div>
           <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
