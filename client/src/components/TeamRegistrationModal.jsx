@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { X, Save, Plus, Users, Shield, Phone, User, Trophy } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function TeamRegistrationModal({ tournament, onClose }) {
   const [form, setForm] = useState({ 
@@ -18,8 +19,35 @@ export default function TeamRegistrationModal({ tournament, onClose }) {
   const [loading, setLoading] = useState(false);
   const [availableTournaments, setAvailableTournaments] = useState([tournament]);
   const [selectedTournament, setSelectedTournament] = useState(tournament._id);
+  const { user } = useAuth();
+  const [squads, setSquads] = useState([]);
+  const [selectedSquadId, setSelectedSquadId] = useState('');
 
   const STEPS = ['Informações', 'Plantel'];
+
+  useEffect(() => {
+    if (user) {
+      api.get('/squads/my-squads').then(res => setSquads(res.data)).catch(() => {});
+    }
+  }, [user]);
+
+  const handleImportSquad = (e) => {
+    const squadId = e.target.value;
+    setSelectedSquadId(squadId);
+    if (!squadId) return;
+    
+    const squad = squads.find(s => s._id === squadId);
+    if (squad) {
+      setForm(prev => ({
+        ...prev,
+        name: squad.name,
+        color: squad.color || prev.color,
+        logo: squad.logo || prev.logo,
+        players: squad.players || []
+      }));
+      toast.success('Clube importado! Plantel carregado. 🪄');
+    }
+  };
 
   useEffect(() => {
     api.get('/tournaments/public/all').then(res => {
@@ -99,6 +127,24 @@ export default function TeamRegistrationModal({ tournament, onClose }) {
         <div style={{ padding: 24 }}>
           {step === 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {!user ? (
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: 16, borderRadius: 12, border: '1px solid var(--border)', marginBottom: 8 }}>
+                  <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 0 }}>
+                    💡 <strong>Dica:</strong> Se já tens conta no Bola na Zona, faz login para importar o teu Clube guardado automaticamente!
+                  </p>
+                </div>
+              ) : squads.length > 0 ? (
+                <div style={{ background: 'rgba(0,200,83,0.1)', padding: 16, borderRadius: 12, marginBottom: 8, border: '1px solid rgba(0,200,83,0.2)' }}>
+                  <label className="form-label" style={{ color: 'var(--green)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                    <Shield size={16} /> Importar dos Meus Clubes
+                  </label>
+                  <select className="form-select" value={selectedSquadId} onChange={handleImportSquad}>
+                    <option value="">Selecionar Clube Guardado...</option>
+                    {squads.map(s => <option key={s._id} value={s._id}>{s.name} ({s.players?.length || 0} Jogadores)</option>)}
+                  </select>
+                </div>
+              ) : null}
+
               <div className="form-group">
                 <label className="form-label"><Trophy size={14} style={{ display: 'inline', marginRight: 4 }} /> Torneio</label>
                 <select className="form-select" value={selectedTournament} onChange={e => setSelectedTournament(e.target.value)}>

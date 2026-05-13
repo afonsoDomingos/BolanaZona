@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save, MapPin, Edit2, Camera, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save, MapPin, Edit2, Camera, MessageCircle, Shield } from 'lucide-react';
 import MatchShareModal from '../components/MatchShareModal';
 
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
@@ -1029,10 +1029,37 @@ function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
   const [playerNumber, setPlayerNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  
+  // FASE 2: Import Squads
+  const [squads, setSquads] = useState([]);
+  const [selectedSquadId, setSelectedSquadId] = useState('');
 
   useEffect(() => {
     if (initialData) setForm(initialData);
   }, [initialData]);
+
+  useEffect(() => {
+    // Fetch user squads
+    api.get('/squads/my-squads').then(res => setSquads(res.data)).catch(() => {});
+  }, []);
+
+  const handleImportSquad = (e) => {
+    const squadId = e.target.value;
+    setSelectedSquadId(squadId);
+    if (!squadId) return;
+    
+    const squad = squads.find(s => s._id === squadId);
+    if (squad) {
+      setForm(prev => ({
+        ...prev,
+        name: squad.name,
+        color: squad.color || prev.color,
+        logo: squad.logo || prev.logo,
+        players: squad.players || []
+      }));
+      toast.success('Clube importado com sucesso! 🪄');
+    }
+  };
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -1087,6 +1114,22 @@ function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
           <h2 className="modal-title">{initialData ? 'Editar Equipa' : 'Adicionar Equipa'}</h2>
           <button className="modal-close" onClick={onClose}><X size={18} /></button>
         </div>
+
+        {!initialData && squads.length > 0 && (
+          <div style={{ background: 'rgba(0,200,83,0.1)', padding: 16, borderRadius: 12, marginBottom: 20, border: '1px solid rgba(0,200,83,0.2)' }}>
+            <label className="form-label" style={{ color: 'var(--green)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+              <Shield size={16} /> Importar dos Meus Clubes
+            </label>
+            <select className="form-select" value={selectedSquadId} onChange={handleImportSquad}>
+              <option value="">Selecionar Clube Guardado...</option>
+              {squads.map(s => <option key={s._id} value={s._id}>{s.name} ({s.players?.length || 0} Jogadores)</option>)}
+            </select>
+            <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 8 }}>
+              Isto vai preencher automaticamente o nome, símbolo, cor e o plantel inteiro num segundo.
+            </p>
+          </div>
+        )}
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div className="form-group">
             <label className="form-label">Nome da Equipa *</label>
