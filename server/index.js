@@ -5,9 +5,21 @@ const cors = require('cors');
 
 const app = express();
 
+// 🟢 LOG DE ARRANQUE E VARIÁVEIS
+console.log('🚀 [SERVER] A iniciar Bola na Zona Backend...');
+console.log('📡 [ENV CHECK] MONGO_URI:', process.env.MONGO_URI ? '✅ Configurada' : '❌ EM FALTA');
+console.log('📡 [ENV CHECK] JWT_SECRET:', process.env.JWT_SECRET ? '✅ Configurada' : '❌ EM FALTA');
+console.log('📡 [ENV CHECK] GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? '✅ Configurada' : '❌ EM FALTA');
+
 // Middleware
-app.use(cors({ origin: true, credentials: true })); // Allow all origins in production for flexibility
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+
+// 🟢 LOGGER DE PEDIDOS
+app.use((req, res, next) => {
+  console.log(`📩 [PEDIDO] ${req.method} ${req.path}`);
+  next();
+});
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
