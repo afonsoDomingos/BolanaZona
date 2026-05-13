@@ -17,11 +17,13 @@ export default function Login() {
     onSuccess: async (tokenResponse) => {
       try {
         setLoading(true);
-        await loginWithGoogle(tokenResponse.access_token);
+        const res = await loginWithGoogle(tokenResponse.access_token);
+        console.log('✅ Resposta do Servidor:', res);
         toast.success('Entraste com o Google! ⚽');
         navigate('/dashboard');
       } catch (err) {
-        setError(err.response?.data?.message || 'Erro no login com Google.');
+        console.error('🔥 ERRO COMPLETO DO GOOGLE LOGIN:', err.response?.data);
+        setError(err.response?.data?.detail || err.response?.data?.message || 'Erro no login com Google.');
       } finally { setLoading(false); }
     },
     onError: () => setError('Falha na autenticação com Google.'),

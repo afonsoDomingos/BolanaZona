@@ -18,12 +18,14 @@ export default function Register() {
     onSuccess: async (tokenResponse) => {
       try {
         setLoading(true);
-        await loginWithGoogle(tokenResponse.access_token, form.role);
+        const res = await loginWithGoogle(tokenResponse.access_token, form.role);
+        console.log('✅ Resposta do Servidor (Registo):', res);
         toast.success('Conta criada com o Google! ⚽');
         localStorage.setItem('bnz_welcome', 'true');
         navigate('/dashboard');
       } catch (err) {
-        setError(err.response?.data?.message || 'Erro no registo com Google.');
+        console.error('🔥 ERRO COMPLETO NO REGISTO GOOGLE:', err.response?.data);
+        setError(err.response?.data?.detail || err.response?.data?.message || 'Erro no registo com Google.');
       } finally { setLoading(false); }
     },
     onError: () => setError('Falha na autenticação com Google.'),
