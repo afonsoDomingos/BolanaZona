@@ -144,10 +144,10 @@ export default function SquadDetail() {
               <input className="form-input" placeholder="Nome do Jogador" value={newPlayer.name} onChange={e => setNewPlayer({...newPlayer, name: e.target.value})} style={{ flex: 2, height: 40 }} />
               <select className="form-select" value={newPlayer.position} onChange={e => setNewPlayer({...newPlayer, position: e.target.value})} style={{ flex: 1, height: 40 }}>
                 <option value="">Pos.</option>
-                <option value="GK">GR</option>
-                <option value="DEF">DEF</option>
-                <option value="MID">MED</option>
-                <option value="FWD">AV</option>
+                <option value="GK">Guarda-Redes</option>
+                <option value="DEF">Defesa</option>
+                <option value="MID">Médio</option>
+                <option value="FWD">Avançado</option>
               </select>
               <input type="number" className="form-input" placeholder="Nº" value={newPlayer.number} onChange={e => setNewPlayer({...newPlayer, number: e.target.value})} style={{ width: 60, height: 40 }} />
               <button type="submit" className="btn btn-primary" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center' }}>
@@ -166,7 +166,7 @@ export default function SquadDetail() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       {p.number && <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--green)', background: 'rgba(0,200,83,0.1)', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4 }}>{p.number}</span>}
                       <span style={{ fontWeight: 700, fontSize: 14 }}>{p.name}</span>
-                      {p.position && <span style={{ fontSize: 10, color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '2px 6px', borderRadius: 4 }}>{p.position === 'GK' ? 'GR' : p.position === 'DEF' ? 'DEF' : p.position === 'MID' ? 'MED' : p.position === 'FWD' ? 'AV' : p.position}</span>}
+                      {p.position && <span style={{ fontSize: 10, color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '2px 6px', borderRadius: 4 }}>{p.position === 'GK' ? 'Guarda-Redes' : p.position === 'DEF' ? 'Defesa' : p.position === 'MID' ? 'Médio' : p.position === 'FWD' ? 'Avançado' : p.position}</span>}
                     </div>
                     <button type="button" onClick={() => handleRemovePlayer(idx)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
                       <X size={16} />

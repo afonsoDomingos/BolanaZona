@@ -194,7 +194,7 @@ function SquadDetailsModal({ squad, onClose, onChallenge }) {
                 <div key={idx} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
                   {p.number && <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--green)', background: 'rgba(0,200,83,0.1)', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, marginRight: 12 }}>{p.number}</span>}
                   <span style={{ fontWeight: 700, fontSize: 15, flex: 1 }}>{p.name}</span>
-                  {p.position && <span style={{ fontSize: 11, color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '4px 8px', borderRadius: 6, fontWeight: 700 }}>{p.position === 'GK' ? 'GR' : p.position === 'DEF' ? 'DEF' : p.position === 'MID' ? 'MED' : p.position === 'FWD' ? 'AV' : p.position}</span>}
+                  {p.position && <span style={{ fontSize: 11, color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '4px 8px', borderRadius: 6, fontWeight: 700 }}>{p.position === 'GK' ? 'Guarda-Redes' : p.position === 'DEF' ? 'Defesa' : p.position === 'MID' ? 'Médio' : p.position === 'FWD' ? 'Avançado' : p.position}</span>}
                 </div>
               ))
             )}
