@@ -57,6 +57,7 @@ app.use((err, req, res, next) => {
   console.error(`Stack: ${err.stack}`);
   res.status(err.status || 500).json({
     message: err.message || 'Erro interno no servidor',
-    error: process.env.NODE_ENV === 'development' ? err.stack : {}
+    error: process.env.NODE_ENV === 'development' ? err.stack : {},
+    debug_message: err.message // Adicionado para debug em produção
   });
 });
