@@ -143,11 +143,14 @@ export default function SquadDetail() {
             <form onSubmit={handleAddPlayer} style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
               <input className="form-input" placeholder="Nome do Jogador" value={newPlayer.name} onChange={e => setNewPlayer({...newPlayer, name: e.target.value})} style={{ flex: 2, height: 40 }} />
               <select className="form-select" value={newPlayer.position} onChange={e => setNewPlayer({...newPlayer, position: e.target.value})} style={{ flex: 1, height: 40 }}>
-                <option value="">Pos.</option>
-                <option value="GK">Guarda-Redes</option>
-                <option value="DEF">Defesa</option>
-                <option value="MID">Médio</option>
-                <option value="FWD">Avançado</option>
+                <option value="">Posição (Opc.)</option>
+                <option value="Guarda-Redes">Guarda-Redes</option>
+                <option value="Defesa Central">Defesa Central</option>
+                <option value="Lateral">Lateral</option>
+                <option value="Trinco">Trinco / Defensivo</option>
+                <option value="Médio Centro">Médio Centro</option>
+                <option value="Extremo">Extremo / Ala</option>
+                <option value="Ponta de Lança">Ponta de Lança</option>
               </select>
               <input type="number" className="form-input" placeholder="Nº" value={newPlayer.number} onChange={e => setNewPlayer({...newPlayer, number: e.target.value})} style={{ width: 60, height: 40 }} />
               <button type="submit" className="btn btn-primary" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center' }}>

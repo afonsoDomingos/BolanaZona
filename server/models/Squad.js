@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const playerSchema = new mongoose.Schema({
   name: { type: String, required: true },
   number: { type: Number },
-  position: { type: String, enum: ['GK', 'DEF', 'MID', 'FWD', ''], default: '' },
+  position: { type: String, default: '' },
   isCaptain: { type: Boolean, default: false },
   contact: { type: String, trim: true, default: '' }
 });
