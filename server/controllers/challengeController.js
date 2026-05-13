@@ -111,8 +111,8 @@ exports.getMyChallenges = async (req, res) => {
         { challengedSquad: { $in: mySquadIds } }
       ]
     })
-      .populate('challengerSquad', 'name logo color manager')
-      .populate('challengedSquad', 'name logo color manager')
+      .populate('challengerSquad')
+      .populate('challengedSquad')
       .sort('-createdAt');
     console.log(`✅ Retrieved ${challenges.length} challenges`);
     res.json(challenges);

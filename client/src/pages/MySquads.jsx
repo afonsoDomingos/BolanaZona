@@ -171,12 +171,15 @@ export default function MySquads() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                           <span style={{ fontSize: 18, fontWeight: 800 }}>{mySquad?.name}</span>
                           <Swords size={16} color="var(--red)" />
-                          <button 
-                            onClick={() => setShowSquadDetails(opponentSquad)}
-                            style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 18, fontWeight: 800, cursor: 'pointer', color: 'var(--green)', textDecoration: 'underline' }}
-                          >
-                            {opponentSquad?.name}
-                          </button>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <button 
+                              onClick={() => setShowSquadDetails(opponentSquad)}
+                              style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 18, fontWeight: 800, cursor: 'pointer', color: 'var(--green)', textDecoration: 'underline', textAlign: 'left' }}
+                            >
+                              {opponentSquad?.name}
+                            </button>
+                            <span style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>Ver plantel e estatísticas</span>
+                          </div>
                         </div>
                       </div>
                       <div className={`badge ${c.status === 'pending' ? 'badge-yellow' : c.status === 'accepted' ? 'badge-green' : 'badge-gray'}`}>
