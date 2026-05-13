@@ -10,6 +10,7 @@ const challengeSchema = new mongoose.Schema({
   message: { type: String, default: '' },
   type: { type: String, enum: ['friendly', 'wager'], default: 'friendly' },
   wagerValue: { type: String, default: '' },
+  rejectionReason: { type: String, default: '' },
   result: {
     challengerScore: { type: Number, default: 0 },
     challengedScore: { type: Number, default: 0 },

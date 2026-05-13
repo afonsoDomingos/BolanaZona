@@ -20,6 +20,8 @@ export default function MySquads() {
   const [showSquadDetails, setShowSquadDetails] = useState(null);
   const [expandedMap, setExpandedMap] = useState(null);
   const [editingChallenge, setEditingChallenge] = useState(null);
+  const [showRejectionModal, setShowRejectionModal] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState('');
   const navigate = useNavigate();
 
   const fetchSquads = async () => {
@@ -58,10 +60,10 @@ export default function MySquads() {
     }
   };
 
-  const updateChallengeStatus = async (id, status) => {
+  const updateChallengeStatus = async (id, status, reason = '') => {
     setUpdating(true);
     try {
-      const res = await api.put(`/challenges/${id}/status`, { status });
+      const res = await api.put(`/challenges/${id}/status`, { status, rejectionReason: reason });
       toast.success(status === 'accepted' ? 'Desafio Aceite! 🔥' : 'Desafio Recusado.');
       
       if (res.data.whatsappLink) {
@@ -70,6 +72,8 @@ export default function MySquads() {
       }
       
       fetchSquads();
+      setShowRejectionModal(null);
+      setRejectionReason('');
     } catch {
       toast.error('Erro ao atualizar estado.');
     } finally {
@@ -196,6 +200,11 @@ export default function MySquads() {
                         <span style={{ display: 'flex', gap: 6, alignItems: 'center', color: c.type === 'wager' ? 'var(--yellow)' : 'var(--green)', fontWeight: 800 }}>
                           {c.type === 'wager' ? `💰 Aposta: ${c.wagerValue || 'Sim'}` : '🤝 Amigável'}
                         </span>
+                        {c.status === 'rejected' && c.rejectionReason && (
+                          <div style={{ width: '100%', marginTop: 8, padding: '8px 12px', background: 'rgba(255,0,0,0.05)', borderRadius: 8, fontSize: 11, color: 'var(--red)', border: '1px solid rgba(255,0,0,0.1)' }}>
+                            <strong>Motivo da recusa:</strong> {c.rejectionReason}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -210,7 +219,7 @@ export default function MySquads() {
                       {c.status === 'pending' && !isChallenger && (
                         <div style={{ display: 'flex', gap: 12 }}>
                           <button className="btn btn-primary" disabled={updating} onClick={() => updateChallengeStatus(c._id, 'accepted')} style={{ flex: 1, justifyContent: 'center' }}><Check size={16}/> Aceitar Desafio</button>
-                          <button className="btn btn-secondary" disabled={updating} onClick={() => updateChallengeStatus(c._id, 'rejected')} style={{ flex: 1, justifyContent: 'center', color: 'var(--red)', borderColor: 'rgba(255,0,0,0.2)' }}><X size={16}/> Recusar</button>
+                          <button className="btn btn-secondary" disabled={updating} onClick={() => setShowRejectionModal(c._id)} style={{ flex: 1, justifyContent: 'center', color: 'var(--red)', borderColor: 'rgba(255,0,0,0.2)' }}><X size={16}/> Recusar</button>
                         </div>
                       )}
                       {c.status === 'pending' && isChallenger && (
@@ -289,6 +298,41 @@ export default function MySquads() {
           onClose={() => setEditingChallenge(null)}
           onSuccess={fetchSquads}
         />
+      )}
+      {showRejectionModal && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowRejectionModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div className="modal animate-slide-up" style={{ background: '#0a0f1e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, maxWidth: 400, padding: 32, width: '100%' }}>
+            <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 16 }}>Recusar Desafio ❌</h2>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: 24, fontSize: 14 }}>Diz-nos o motivo (opcional) para informarmos a equipa adversária:</p>
+            
+            <div className="form-group" style={{ marginBottom: 24 }}>
+              <select 
+                className="form-select" 
+                onChange={e => setRejectionReason(e.target.value)}
+                defaultValue=""
+              >
+                <option value="">Sem motivo específico</option>
+                <option value="Distância muito grande">Distância muito grande 🗺️</option>
+                <option value="Valor da aposta muito alto">Valor da aposta muito alto 💰</option>
+                <option value="Já temos jogo agendado">Já temos jogo agendado 🗓️</option>
+                <option value="Plantel incompleto nesta data">Plantel incompleto nesta data 👥</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button className="btn btn-secondary" onClick={() => setShowRejectionModal(null)} style={{ flex: 1 }}>Cancelar</button>
+              <button 
+                className="btn btn-primary" 
+                onClick={() => {
+                  updateChallengeStatus(showRejectionModal, 'rejected', rejectionReason);
+                }}
+                style={{ flex: 1, background: 'var(--red)', border: 'none', color: '#fff', justifyContent: 'center' }}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

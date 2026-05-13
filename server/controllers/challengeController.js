@@ -102,7 +102,7 @@ exports.getMyChallenges = async (req, res) => {
 exports.updateStatus = async (req, res) => {
   console.log('🔄 Updating challenge status', req.params.id, 'to', req.body.status, 'by user', req.user._id);
   try {
-    const { status } = req.body;
+    const { status, rejectionReason } = req.body;
     const challenge = await Challenge.findById(req.params.id)
       .populate('challengedSquad')
       .populate('challengerSquad');
@@ -121,6 +121,7 @@ exports.updateStatus = async (req, res) => {
     }
 
     challenge.status = status;
+    if (rejectionReason) challenge.rejectionReason = rejectionReason;
     await challenge.save();
     console.log('✅ Challenge status updated to', status);
 
@@ -132,7 +133,7 @@ exports.updateStatus = async (req, res) => {
         const waMessage = `⚔️ *DESAFIO ACEITE!* ⚔️\n\nOlá, a equipa *${challenge.challengedSquad.name}* acaba de aceitar o vosso desafio no Bola na Zona! 🔥\n\nVamos fechar os detalhes do jogo?`;
         whatsappLink = `https://wa.me/${recipientPhone}?text=${encodeURIComponent(waMessage)}`;
       } else if (status === 'rejected') {
-        const waMessage = `Olá! A equipa *${challenge.challengedSquad.name}* não pode aceitar o vosso desafio neste momento. Fica para a próxima! ⚽`;
+        const waMessage = `Olá! A equipa *${challenge.challengedSquad.name}* não pode aceitar o vosso desafio neste momento.${rejectionReason ? `\n\n*Motivo:* ${rejectionReason}` : ''}\n\nFica para a próxima! ⚽`;
         whatsappLink = `https://wa.me/${recipientPhone}?text=${encodeURIComponent(waMessage)}`;
       }
     }
@@ -141,7 +142,7 @@ exports.updateStatus = async (req, res) => {
     await Notification.create({
       user: challenge.challengerSquad.manager,
       title: status === 'accepted' ? 'Desafio Aceite! 🔥' : 'Desafio Recusado ❌',
-      message: `A equipa ${challenge.challengedSquad.name} ${status === 'accepted' ? 'aceitou' : 'recusou'} o vosso desafio.`,
+      message: `A equipa ${challenge.challengedSquad.name} ${status === 'accepted' ? 'aceitou' : 'recusou'} o vosso desafio.${rejectionReason ? ` Motivo: ${rejectionReason}` : ''}`,
       type: status === 'accepted' ? 'success' : 'warning',
       link: '/dashboard/squads'
     });
