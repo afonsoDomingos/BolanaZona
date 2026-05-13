@@ -1,0 +1,10 @@
+        </div>
+Ÿ’¬ ComentÃ¡rio'}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <style>{`
+        .spin-slow { animation: spin 8s linear infinite; }

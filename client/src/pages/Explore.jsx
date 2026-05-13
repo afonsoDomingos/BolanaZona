@@ -80,7 +80,7 @@ export default function Explore() {
           <div className="loading-center"><div className="spinner" /></div>
         ) : filtered.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-state-icon">⚽</div>
+            <div className="empty-state-icon spin-ball">⚽</div>
             <h3>Nenhum torneio encontrado</h3>
             <p style={{ marginBottom: 24 }}>{search || cityFilter || neighborhoodFilter ? 'Tenta ajustar os teus filtros ou pesquisa.' : 'Ainda não existem torneios ativos nesta zona.'}</p>
             {search || cityFilter || neighborhoodFilter ? (

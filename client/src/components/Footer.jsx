@@ -1,7 +1,10 @@
 import { Linkedin, Heart } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function Footer() {
+  const location = useLocation();
+  if (location.pathname === '/community') return null;
+
   return (
     <footer style={{ padding: '40px 20px', textAlign: 'center', borderTop: '1px solid var(--border)', marginTop: 'auto' }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>

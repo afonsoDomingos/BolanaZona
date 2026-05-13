@@ -170,7 +170,7 @@ export default function Dashboard() {
                 <div className="loading-center"><div className="spinner" /></div>
               ) : tournaments.length === 0 ? (
                 <div className="empty-state">
-                  <div className="empty-state-icon">⚽</div>
+                  <div className="empty-state-icon spin-ball">⚽</div>
                   <h3>Ainda sem torneios</h3>
                   <p style={{ marginBottom: 24 }}>Cria o teu primeiro torneio!</p>
                   <Link to="/dashboard/tournaments/new" className="btn btn-primary"><Plus size={16} /> Criar Torneio</Link>
@@ -180,7 +180,7 @@ export default function Dashboard() {
                   {tournaments.slice(0, 5).map(t => (
                     <Link key={t._id} to={`/dashboard/tournaments/${t._id}`} className="card recent-tournament-card">
                       <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
-                        <div className="card-icon-sm">⚽</div>
+                        <div className="card-icon-sm spin-ball">⚽</div>
                         <div style={{ flex: 1 }}>
                           <div style={{ fontWeight: 700, fontSize: 15 }}>{t.name}</div>
                           <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>{t.neighborhood} · {t.maxTeams} equipas</div>

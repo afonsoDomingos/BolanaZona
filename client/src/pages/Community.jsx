@@ -128,6 +128,7 @@ export default function Community() {
           ref={scrollRef}
           style={{ 
           flex: 1,
+          minHeight: 0,
           overflowY: 'auto',
           padding: '20px 12px 20px 0',
           display: 'flex', 

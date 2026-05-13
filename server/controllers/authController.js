@@ -1,5 +1,9 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
+const axios = require('axios');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
@@ -137,7 +141,53 @@ exports.resetPassword = async (req, res) => {
     user.resetPasswordExpires = undefined;
     await user.save();
 
-    const token = signToken(user._id);
     res.json({ token, user });
   } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+exports.googleLogin = async (req, res) => {
+  try {
+    const { token, role } = req.body;
+    if (!token) return res.status(400).json({ message: 'Token do Google ausente.' });
+
+    // Obter dados do utilizador via Google UserInfo API (funciona com Access Token)
+    const response = await axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`);
+    const payload = response.data;
+    const { sub, email, name, picture } = payload;
+
+    if (!email) return res.status(400).json({ message: 'Email não disponível na conta Google.' });
+
+    // Procura utilizador pelo Google ID ou Email
+    let user = await User.findOne({ $or: [{ googleId: sub }, { email: email.toLowerCase() }] });
+
+    let isNewUser = false;
+    if (!user) {
+      isNewUser = true;
+      // Cria novo utilizador (phone será inserido pelo user no frontend se precisarmos)
+      user = await User.create({
+        name,
+        email: email.toLowerCase(),
+        googleId: sub,
+        avatar: picture,
+        role: role || 'viewer',
+        // Criar um número fake provisório se necessário, mas marcámos 'phone' como opcional no schema
+      });
+      console.log('✅ Utilizador criado via Google:', user._id);
+    } else {
+      // Se não tinha googleId associado mas o email coincidiu, atualizamos
+      if (!user.googleId) {
+        user.googleId = sub;
+        if (!user.avatar) user.avatar = picture;
+        await user.save();
+      }
+      console.log('✅ Login via Google (existente):', user._id);
+    }
+
+    const jwtToken = signToken(user._id);
+    // Envia isNewUser e needPhone (se phone for falsy) para o frontend poder pedir
+    res.json({ token: jwtToken, user, isNewUser, needPhone: !user.phone });
+  } catch (err) {
+    console.error('🔥 Erro no Google Login:', err.message);
+    res.status(500).json({ message: 'Erro ao autenticar com Google.' });
+  }
 };

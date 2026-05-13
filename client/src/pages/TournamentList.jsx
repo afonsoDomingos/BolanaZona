@@ -64,7 +64,7 @@ export default function TournamentList() {
               <div key={t._id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 14, background: 'var(--green-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>⚽</div>
+                    <div className="spin-ball" style={{ width: 48, height: 48, borderRadius: 14, background: 'var(--green-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>⚽</div>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: 16 }}>{t.name}</div>
                       <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>📍 {t.neighborhood}</div>

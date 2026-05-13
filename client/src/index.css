@@ -441,10 +441,16 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   50% { transform: translateY(-20px) rotate(180deg); }
 }
 
+@keyframes ball-rotation {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .spin-ball {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  animation: ball-rotation 4s linear infinite;
 }
 
 .splash-ball {
