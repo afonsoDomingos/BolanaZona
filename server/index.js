@@ -28,6 +28,15 @@ app.use(async (req, res, next) => {
     console.log('📡 [DB] A ligar ao MongoDB...');
     await mongoose.connect(process.env.MONGO_URI);
     console.log('✅ [DB] Ligado');
+    
+    // 🔴 COMANDO TEMPORÁRIO PARA LIMPAR O INDEX PROBLEMÁTICO
+    try {
+      await mongoose.connection.db.collection('users').dropIndex('phone_1');
+      console.log('🗑️ [DB] Index phone_1 removido com sucesso');
+    } catch (e) {
+      console.log('ℹ️ [DB] Index phone_1 não existia ou já foi removido');
+    }
+
     next();
   } catch (err) {
     console.error('❌ [DB] Erro:', err.message);
