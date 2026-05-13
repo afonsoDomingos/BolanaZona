@@ -8,7 +8,7 @@ export default function MySquads() {
   const [squads, setSquads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ name: '', neighborhood: '' });
+  const [formData, setFormData] = useState({ name: '', neighborhood: '', city: 'Maputo (Cidade)' });
   const [saving, setSaving] = useState(false);
 
   const [challenges, setChallenges] = useState([]);
@@ -43,7 +43,7 @@ export default function MySquads() {
       const res = await api.post('/squads', formData);
       toast.success('Clube criado! Agora adiciona os teus jogadores. ⚽', { duration: 5000 });
       setShowModal(false);
-      setFormData({ name: '', neighborhood: '' });
+      setFormData({ name: '', neighborhood: '', city: 'Maputo (Cidade)' });
       navigate(`/dashboard/squads/${res.data._id}`);
     } catch {
       toast.error('Erro ao criar clube.');
@@ -204,6 +204,22 @@ export default function MySquads() {
               <div>
                 <label className="form-label">Nome da Equipa <span style={{color: 'var(--red)'}}>*</span></label>
                 <input required className="form-input" placeholder="Ex: Galáticos FC" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+              </div>
+              <div>
+                <label className="form-label">Província / Cidade <span style={{color: 'var(--red)'}}>*</span></label>
+                <select required className="form-select" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})}>
+                  <option value="Cabo Delgado">Cabo Delgado</option>
+                  <option value="Gaza">Gaza</option>
+                  <option value="Inhambane">Inhambane</option>
+                  <option value="Manica">Manica</option>
+                  <option value="Maputo (Cidade)">Maputo (Cidade)</option>
+                  <option value="Maputo (Província)">Maputo (Província)</option>
+                  <option value="Nampula">Nampula</option>
+                  <option value="Niassa">Niassa</option>
+                  <option value="Sofala">Sofala</option>
+                  <option value="Tete">Tete</option>
+                  <option value="Zambézia">Zambézia</option>
+                </select>
               </div>
               <div>
                 <label className="form-label">Bairro / Comunidade (Opcional)</label>

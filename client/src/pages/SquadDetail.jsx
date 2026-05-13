@@ -137,8 +137,20 @@ export default function SquadDetail() {
               </div>
               <div style={{ display: 'flex', gap: 16 }}>
                 <div style={{ flex: 1 }}>
-                  <label className="form-label">Cidade</label>
-                  <input className="form-input" placeholder="Ex: Luanda" value={squad.city || ''} onChange={e => setSquad({...squad, city: e.target.value})} />
+                  <label className="form-label">Província / Cidade</label>
+                  <select className="form-select" value={squad.city || 'Maputo (Cidade)'} onChange={e => setSquad({...squad, city: e.target.value})}>
+                    <option value="Cabo Delgado">Cabo Delgado</option>
+                    <option value="Gaza">Gaza</option>
+                    <option value="Inhambane">Inhambane</option>
+                    <option value="Manica">Manica</option>
+                    <option value="Maputo (Cidade)">Maputo (Cidade)</option>
+                    <option value="Maputo (Província)">Maputo (Província)</option>
+                    <option value="Nampula">Nampula</option>
+                    <option value="Niassa">Niassa</option>
+                    <option value="Sofala">Sofala</option>
+                    <option value="Tete">Tete</option>
+                    <option value="Zambézia">Zambézia</option>
+                  </select>
                 </div>
                 <div style={{ flex: 1 }}>
                   <label className="form-label">Bairro / Comunidade</label>
