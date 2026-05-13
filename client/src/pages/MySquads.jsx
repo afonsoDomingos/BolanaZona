@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Shield, Plus, ArrowRight, User, Swords, Check, X, Calendar, MapPin } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import SquadDetailsModal from '../components/SquadDetailsModal';
 
 export default function MySquads() {
   const [squads, setSquads] = useState([]);
@@ -14,6 +15,7 @@ export default function MySquads() {
   const [challenges, setChallenges] = useState([]);
   const [tab, setTab] = useState('squads');
   const [updating, setUpdating] = useState(false);
+  const [showSquadDetails, setShowSquadDetails] = useState(null);
   const navigate = useNavigate();
 
   const fetchSquads = async () => {
@@ -161,7 +163,12 @@ export default function MySquads() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                           <span style={{ fontSize: 18, fontWeight: 800 }}>{mySquad?.name}</span>
                           <Swords size={16} color="var(--red)" />
-                          <span style={{ fontSize: 18, fontWeight: 800 }}>{opponentSquad?.name}</span>
+                          <button 
+                            onClick={() => setShowSquadDetails(opponentSquad)}
+                            style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 18, fontWeight: 800, cursor: 'pointer', color: 'var(--green)', textDecoration: 'underline' }}
+                          >
+                            {opponentSquad?.name}
+                          </button>
                         </div>
                       </div>
                       <div className={`badge ${c.status === 'pending' ? 'badge-yellow' : c.status === 'accepted' ? 'badge-green' : 'badge-gray'}`}>
@@ -234,6 +241,12 @@ export default function MySquads() {
             </form>
           </div>
         </div>
+      )}
+      {showSquadDetails && (
+        <SquadDetailsModal 
+          squad={showSquadDetails} 
+          onClose={() => setShowSquadDetails(null)} 
+        />
       )}
     </div>
   );
