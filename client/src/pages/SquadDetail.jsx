@@ -237,9 +237,14 @@ export default function SquadDetail() {
               )}
             </div>
             
-            <p style={{ fontSize: 11, color: 'var(--yellow)', marginTop: 16, textAlign: 'center' }}>
-              ⚠️ Clica em "Guardar" no final para gravar as alterações.
-            </p>
+            <button 
+              onClick={handleUpdate} 
+              className="btn btn-primary" 
+              disabled={saving} 
+              style={{ marginTop: 24, width: '100%', justifyContent: 'center', height: 48, background: 'var(--green)', color: '#000', border: 'none' }}
+            >
+              {saving ? <span className="spinner-xs"/> : <><Save size={18}/> Guardar Plantel Oficial</>}
+            </button>
           </div>
         </div>
 
