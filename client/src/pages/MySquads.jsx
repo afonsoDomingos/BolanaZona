@@ -16,6 +16,7 @@ export default function MySquads() {
   const [tab, setTab] = useState('squads');
   const [updating, setUpdating] = useState(false);
   const [showSquadDetails, setShowSquadDetails] = useState(null);
+  const [expandedMap, setExpandedMap] = useState(null);
   const navigate = useNavigate();
 
   const fetchSquads = async () => {
@@ -182,15 +183,38 @@ export default function MySquads() {
                         {c.date && <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Calendar size={14}/> {new Date(c.date).toLocaleDateString()}</span>}
                         {c.location && <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><MapPin size={14}/> {c.location}</span>}
                         {c.mapsLink && (
-                          <a href={c.mapsLink} target="_blank" rel="noreferrer" style={{ display: 'flex', gap: 6, alignItems: 'center', color: 'var(--green)', textDecoration: 'underline' }}>
-                            <MapPin size={14}/> Ver no Maps
-                          </a>
+                          <button 
+                            onClick={() => setExpandedMap(expandedMap === c._id ? null : c._id)}
+                            style={{ display: 'flex', gap: 6, alignItems: 'center', color: 'var(--green)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
+                          >
+                            <MapPin size={14}/> {expandedMap === c._id ? 'Fechar Mapa' : 'Ver no Mapa'}
+                          </button>
                         )}
                         <span style={{ display: 'flex', gap: 6, alignItems: 'center', color: c.type === 'wager' ? 'var(--yellow)' : 'var(--green)', fontWeight: 800 }}>
                           {c.type === 'wager' ? `💰 Aposta: ${c.wagerValue || 'Sim'}` : '🤝 Amigável'}
                         </span>
                       </div>
                     </div>
+
+                    {c.mapsLink && expandedMap === c._id && (
+                      <div className="animate-fade-in" style={{ marginTop: 16, borderRadius: 16, overflow: 'hidden', height: 250, border: '1px solid rgba(255,255,255,0.1)', position: 'relative' }}>
+                        <iframe 
+                          width="100%" 
+                          height="100%" 
+                          style={{ border: 0 }}
+                          loading="lazy" 
+                          allowFullScreen 
+                          src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(c.location + ' ' + (c.challengedSquad?.city || 'Moçambique'))}`}
+                        ></iframe>
+                        {/* Alternative without API key if key is missing */}
+                        <iframe 
+                          width="100%" 
+                          height="100%" 
+                          style={{ border: 0, position: 'absolute', top: 0, left: 0 }}
+                          src={`https://maps.google.com/maps?q=${encodeURIComponent(c.location + ' ' + (c.challengedSquad?.city || 'Moçambique'))}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                        ></iframe>
+                      </div>
+                    )}
 
                     {c.status === 'pending' && !isChallenger && (
                       <div style={{ display: 'flex', gap: 12 }}>
