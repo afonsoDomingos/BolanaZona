@@ -184,11 +184,25 @@ export default function MySquads() {
                         {c.status === 'pending' ? 'Pendente' : 'Recusado'}
                       </div>
                     </div>
-                    {c.message && <p style={{ fontSize: 14, color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: 12 }}>"{c.message}"</p>}
-                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: 12, borderRadius: 12, marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 12, color: 'var(--text-muted)' }}>
-                      {c.date && <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Calendar size={14}/> {new Date(c.date).toLocaleDateString()}</span>}
-                      {c.location && <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><MapPin size={14}/> {c.location}</span>}
-                      <span style={{ fontWeight: 800, color: c.type === 'wager' ? 'var(--yellow)' : 'var(--green)' }}>{c.type === 'wager' ? `💰 ${c.wagerValue}` : '🤝 Amigável'}</span>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 16 }}>
+                      <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>Data do Jogo</div>
+                        <div style={{ fontSize: 14, fontWeight: 700, display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <Calendar size={16} color="var(--green)" /> {c.date ? new Date(c.date).toLocaleDateString() : 'A definir'}
+                        </div>
+                      </div>
+                      <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>Local / Campo</div>
+                        <div style={{ fontSize: 14, fontWeight: 700, display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <MapPin size={16} color="var(--green)" /> {c.location || 'A definir'}
+                        </div>
+                      </div>
+                      <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>Tipo / Aposta</div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: c.type === 'wager' ? 'var(--yellow)' : 'var(--green)' }}>
+                          {c.type === 'wager' ? `💰 ${c.wagerValue}` : '🤝 Amigável'}
+                        </div>
+                      </div>
                     </div>
                     {c.status === 'pending' && !isChallenger && (
                       <div className="btn-group-responsive">
@@ -259,28 +273,34 @@ export default function MySquads() {
                       </div>
                     </div>
 
-                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 12, marginBottom: 20 }}>
-                      {c.message && <p style={{ fontSize: 14, color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: 12 }}>"{c.message}"</p>}
-                      <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--text-muted)' }}>
-                        {c.date && <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Calendar size={14}/> {new Date(c.date).toLocaleDateString()}</span>}
-                        {c.location && <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><MapPin size={14}/> {c.location}</span>}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>
+                      <div style={{ background: 'linear-gradient(135deg, rgba(0, 200, 83, 0.1), rgba(0, 200, 83, 0.05))', padding: '20px', borderRadius: 16, border: '1px solid rgba(0, 200, 83, 0.2)' }}>
+                        <div style={{ fontSize: 11, color: 'var(--green)', fontWeight: 800, textTransform: 'uppercase', marginBottom: 8, letterSpacing: 0.5 }}>📅 Data Confirmada</div>
+                        <div style={{ fontSize: 18, fontWeight: 900 }}>
+                          {c.date ? new Date(c.date).toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' }) : 'A definir'}
+                        </div>
+                      </div>
+                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', marginBottom: 8, letterSpacing: 0.5 }}>📍 Local do Jogo</div>
+                        <div style={{ fontSize: 18, fontWeight: 900 }}>{c.location || 'A definir'}</div>
                         {c.mapsLink && (
                           <button 
                             onClick={() => setExpandedMap(expandedMap === c._id ? null : c._id)}
-                            style={{ display: 'flex', gap: 6, alignItems: 'center', color: 'var(--green)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline' }}
+                            style={{ marginTop: 8, display: 'flex', gap: 6, alignItems: 'center', color: 'var(--green)', background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}
                           >
-                            <MapPin size={14}/> {expandedMap === c._id ? 'Fechar Mapa' : 'Ver no Mapa'}
+                            <MapPin size={14}/> {expandedMap === c._id ? 'Ocultar Mapa' : 'Ver Mapa Interativo'}
                           </button>
                         )}
-                        <span style={{ display: 'flex', gap: 6, alignItems: 'center', color: c.type === 'wager' ? 'var(--yellow)' : 'var(--green)', fontWeight: 800 }}>
-                          {c.type === 'wager' ? `💰 Aposta: ${c.wagerValue || 'Sim'}` : '🤝 Amigável'}
-                        </span>
-                        {c.status === 'rejected' && c.rejectionReason && (
-                          <div style={{ width: '100%', marginTop: 8, padding: '8px 12px', background: 'rgba(255,0,0,0.05)', borderRadius: 8, fontSize: 11, color: 'var(--red)', border: '1px solid rgba(255,0,0,0.1)' }}>
-                            <strong>Motivo da recusa:</strong> {c.rejectionReason}
-                          </div>
-                        )}
                       </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '12px 20px', borderRadius: 100, marginBottom: 24 }}>
+                      <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                        Tipo: <span style={{ fontWeight: 800, color: c.type === 'wager' ? 'var(--yellow)' : 'var(--green)' }}>{c.type === 'wager' ? `💰 Aposta (${c.wagerValue})` : '🤝 Jogo Amigável'}</span>
+                      </div>
+                      <a href={`https://wa.me/${opponentSquad?.contact}`} target="_blank" rel="noreferrer" style={{ fontSize: 13, fontWeight: 700, color: 'var(--green)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                         Combinar no WhatsApp 💬
+                      </a>
                     </div>
 
                     {c.mapsLink && expandedMap === c._id && (
