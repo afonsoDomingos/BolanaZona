@@ -91,7 +91,10 @@ export default function Clubs() {
                   <div style={{ flex: 1 }}>
                     <h3 style={{ fontSize: 22, fontWeight: 900, marginBottom: 4, letterSpacing: -0.5 }}>{squad.name}</h3>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
-                      <MapPin size={14} color="var(--green)" /> {squad.city || 'Luanda'}{squad.neighborhood ? ` - ${squad.neighborhood}` : ''}
+                      <MapPin size={14} color="var(--green)" /> {squad.city || 'Maputo (Cidade)'}{squad.neighborhood ? ` - ${squad.neighborhood}` : ''}
+                    </div>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10, fontWeight: 900, color: 'var(--yellow)', background: 'rgba(255, 193, 7, 0.1)', padding: '2px 8px', borderRadius: 100, marginTop: 6, textTransform: 'uppercase' }}>
+                      {squad.category || 'Senior'}
                     </div>
                   </div>
                 </div>

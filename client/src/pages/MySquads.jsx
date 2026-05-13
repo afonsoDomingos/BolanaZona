@@ -11,7 +11,7 @@ export default function MySquads() {
   const [squads, setSquads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ name: '', neighborhood: '', city: 'Maputo (Cidade)' });
+  const [formData, setFormData] = useState({ name: '', neighborhood: '', city: 'Maputo (Cidade)', category: 'Senior' });
   const [saving, setSaving] = useState(false);
 
   const [challenges, setChallenges] = useState([]);
@@ -271,6 +271,19 @@ export default function MySquads() {
                   <option value="Zambézia">Zambézia</option>
                 </select>
               </div>
+
+              <div className="form-group">
+                <label className="form-label">Escalão / Categoria</label>
+                <select className="form-select" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
+                  <option value="Senior">Sénior (Livre) ⚽</option>
+                  <option value="Sub-20">Sub-20 (Juniores) 🏃</option>
+                  <option value="Sub-17">Sub-17 (Juvenis) 👦</option>
+                  <option value="Sub-15">Sub-15 (Iniciados) 🧒</option>
+                  <option value="Veteranos">Veteranos (+35) 👴</option>
+                  <option value="Feminino">Feminino ♀️</option>
+                </select>
+              </div>
+
               <div>
                 <label className="form-label">Bairro / Comunidade (Opcional)</label>
                 <input className="form-input" placeholder="Ex: Maxaquene" value={formData.neighborhood} onChange={e => setFormData({...formData, neighborhood: e.target.value})} />

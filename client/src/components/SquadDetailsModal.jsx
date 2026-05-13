@@ -21,6 +21,9 @@ export default function SquadDetailsModal({ squad, onClose, onChallenge }) {
                   <Phone size={14} color="var(--green)" /> {squad.contact}
                 </div>
               )}
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 800, color: 'var(--yellow)', background: 'rgba(255, 193, 7, 0.1)', padding: '4px 10px', borderRadius: 100, marginTop: 8, textTransform: 'uppercase', border: '1px solid rgba(255, 193, 7, 0.2)' }}>
+                ⚽ {squad.category || 'Senior'}
+              </div>
             </div>
           </div>
           <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>

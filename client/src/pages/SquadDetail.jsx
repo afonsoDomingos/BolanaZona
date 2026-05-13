@@ -161,6 +161,17 @@ export default function SquadDetail() {
                 <label className="form-label">Contacto WhatsApp (número internacional, sem +) </label>
                 <input className="form-input" placeholder="Ex: 258842123456" value={squad.contact || ''} onChange={e => setSquad({...squad, contact: e.target.value})} />
               </div>
+              <div>
+                <label className="form-label">Escalão / Categoria</label>
+                <select className="form-select" value={squad.category || 'Senior'} onChange={e => setSquad({...squad, category: e.target.value})}>
+                  <option value="Senior">Sénior (Livre) ⚽</option>
+                  <option value="Sub-20">Sub-20 (Juniores) 🏃</option>
+                  <option value="Sub-17">Sub-17 (Juvenis) 👦</option>
+                  <option value="Sub-15">Sub-15 (Iniciados) 🧒</option>
+                  <option value="Veteranos">Veteranos (+35) 👴</option>
+                  <option value="Feminino">Feminino ♀️</option>
+                </select>
+              </div>
               <div style={{ display: 'flex', gap: 16 }}>
                 <div style={{ flex: 1 }}>
                   <label className="form-label">Cor Principal</label>
