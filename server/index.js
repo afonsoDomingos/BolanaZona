@@ -58,6 +58,13 @@ app.use('/api/feedbacks', require('./routes/feedbacks'));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/users', require('./routes/users'));
 
+// Start DB connection for local development
+if (process.env.NODE_ENV !== 'production') {
+  mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('✅ [DB] Conectado Localmente'))
+    .catch(err => console.error('❌ [DB] Erro Local:', err.message));
+}
+
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'OK', platform: 'Bola na Zona' }));
 

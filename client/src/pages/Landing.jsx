@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, Users, Calendar, BarChart2, Share2, ArrowRight, CheckCircle, ClipboardList, Handshake, Camera } from 'lucide-react';
 
@@ -13,37 +14,115 @@ const features = [
 ];
 
 export default function Landing() {
+  const [scrollOpacity, setScrollOpacity] = useState(1);
+  const [pageLoading, setPageLoading] = useState(true);
+
+  useEffect(() => {
+    // Simular carregamento inicial
+    const timer = setTimeout(() => setPageLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (pageLoading) return;
+
+    // Iniciar o radar de scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+        } else {
+          entry.target.classList.remove('is-visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const animatedElements = document.querySelectorAll('.scroll-reveal');
+    animatedElements.forEach(el => observer.observe(el));
+
+    const handleScroll = () => {
+      const scrollPos = window.scrollY;
+      const newOpacity = Math.max(0, 1 - scrollPos / 400);
+      setScrollOpacity(newOpacity);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
+    };
+  }, [pageLoading]);
+
+  if (pageLoading) {
+    return (
+      <div style={{ 
+        height: '100vh', width: '100vw', 
+        background: '#0a0f14', 
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexDirection: 'column', gap: 30,
+        position: 'fixed', inset: 0, zIndex: 9999
+      }}>
+        <div style={{ position: 'relative' }}>
+          {/* Aura pulsante */}
+          <div style={{ 
+            position: 'absolute', inset: -20, borderRadius: '50%', 
+            background: 'rgba(0, 200, 83, 0.2)', filter: 'blur(30px)',
+            animation: 'pulse-glow 1.5s ease-in-out infinite'
+          }} />
+          <div className="spin-ball" style={{ fontSize: 80, position: 'relative', zIndex: 1 }}>⚽</div>
+        </div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <p className="font-syne" style={{ color: 'var(--green)', fontWeight: 900, letterSpacing: 4, fontSize: 10, textTransform: 'uppercase', opacity: 0.8 }}>
+            Bola na Zona
+          </p>
+          {/* Barra de progresso ultra-fina */}
+          <div style={{ width: 120, height: 2, background: 'rgba(255,255,255,0.05)', borderRadius: 10, overflow: 'hidden' }}>
+            <div style={{ width: '100%', height: '100%', background: 'var(--green)', animation: 'loading-bar 1.2s ease-in-out forwards' }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ minHeight: '100vh' }}>
       {/* Hero */}
       <section style={{
         minHeight: 'calc(100vh - 64px)',
         display: 'flex', alignItems: 'center',
-        background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,200,83,0.15) 0%, transparent 70%)',
+        backgroundImage: 'linear-gradient(rgba(10, 15, 20, 0.85), rgba(10, 15, 20, 0.7)), url(/banner1.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
         position: 'relative', overflow: 'hidden',
       }}>
-        {/* Decorative balls */}
-        <div style={{ position: 'absolute', top: '15%', right: '8%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,200,83,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '10%', left: '5%', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,200,83,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-        <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+        <div className="container" style={{ 
+          textAlign: 'center', 
+          position: 'relative', 
+          zIndex: 1,
+          opacity: scrollOpacity,
+          transform: `translateY(${typeof window !== 'undefined' ? window.scrollY * 0.3 : 0}px)`,
+          transition: 'opacity 0.1s ease-out'
+        }}>
           <div className="animate-slide-up">
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(0,200,83,0.1)', border: '1px solid rgba(0,200,83,0.25)', borderRadius: 100, padding: '6px 16px', marginBottom: 32 }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--green)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
               <span style={{ fontSize: 13, color: 'var(--green)', fontWeight: 600 }}>Plataforma de Torneios de Futebol</span>
             </div>
 
-            <h1 className="font-syne" style={{ fontSize: 'clamp(48px, 8vw, 88px)', fontWeight: 800, lineHeight: 1.05, marginBottom: 24 }}>
-              Gere o teu torneio<br />
-              <span className="gradient-text">como um pro</span>
+            <h1 className="font-syne" style={{ fontSize: 'clamp(40px, 8vw, 88px)', fontWeight: 800, lineHeight: 1.05, marginBottom: 24, textAlign: 'center' }}>
+              <span className="typewriter">Gere o teu torneio</span><br />
+              <span className="gradient-text animate-reveal-dramatic" style={{ animationDelay: '1.5s' }}>como um pro</span>
             </h1>
 
-            <p style={{ fontSize: 20, color: 'var(--text-secondary)', maxWidth: 560, margin: '0 auto 48px', lineHeight: 1.7 }}>
+            <p className="animate-reveal" style={{ fontSize: 20, color: 'var(--text-secondary)', maxWidth: 560, margin: '0 auto 48px', lineHeight: 1.7, animationDelay: '0.2s' }}>
               Cria torneios de bairro, gere equipas, gera calendários automáticos e partilha resultados em tempo real.
             </p>
 
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/register" className="btn btn-primary btn-lg">
+            <div className="animate-reveal" style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', animationDelay: '0.4s' }}>
+              <Link to="/register" className="btn btn-primary btn-lg shadow-green">
                 Criar Torneio Grátis <ArrowRight size={18} />
               </Link>
               <Link to="/explore" className="btn btn-secondary btn-lg" style={{ borderColor: 'var(--green)', color: 'var(--green)' }}>
@@ -77,7 +156,7 @@ export default function Landing() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
             {features.map((f, i) => (
-              <div key={i} className="card animate-slide-up" style={{ animationDelay: `${i * 0.1}s` }}>
+              <div key={i} className="card scroll-reveal" style={{ transitionDelay: `${(i % 4) * 0.1}s` }}>
                 <div style={{ width: 56, height: 56, borderRadius: 14, background: 'var(--green-subtle)', border: '1px solid rgba(0,200,83,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--green)', marginBottom: 20 }}>
                   {f.icon}
                 </div>
@@ -92,18 +171,27 @@ export default function Landing() {
       {/* CTA */}
       <section style={{ padding: '80px 0' }}>
         <div className="container">
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(0,200,83,0.15) 0%, rgba(0,200,83,0.05) 100%)',
-            border: '1px solid rgba(0,200,83,0.3)', borderRadius: 28,
-            padding: '64px 48px', textAlign: 'center',
+          <div className="scroll-reveal" style={{
+            backgroundImage: 'linear-gradient(rgba(0, 200, 83, 0.9), rgba(0, 168, 67, 0.85)), url(/banner2.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            borderRadius: 28,
+            padding: '80px 48px', textAlign: 'center',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+            border: '1px solid rgba(255,255,255,0.1)'
           }}>
-            <h2 className="font-syne" style={{ fontSize: 40, fontWeight: 800, marginBottom: 16 }}>
-              Pronto para apitar? <span className="spin-ball">⚽</span>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+              <div className="cta-ball-container">
+                <span className="spin-ball cta-ball" style={{ fontSize: 48 }}>⚽</span>
+              </div>
+            </div>
+            <h2 className="font-syne" style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 800, marginBottom: 16, color: '#fff' }}>
+              <span className="typewriter-on-scroll">Pronto para apitar?</span>
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 18, marginBottom: 40 }}>
+            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 20, marginBottom: 40, fontWeight: 500 }}>
               Cria o teu primeiro torneio em menos de 2 minutos.
             </p>
-            <Link to="/register" className="btn btn-primary btn-lg">
+            <Link to="/register" className="btn btn-lg" style={{ background: '#000', color: '#fff', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
               Criar Torneio Agora <ArrowRight size={18} />
             </Link>
           </div>
@@ -118,6 +206,135 @@ export default function Landing() {
           </p>
         </div>
       </footer>
+
+      <style>{`
+        @keyframes pulse-glow {
+          0%, 100% { transform: scale(1); opacity: 0.3; }
+          50% { transform: scale(1.5); opacity: 0.6; }
+        }
+
+        @keyframes loading-bar {
+          from { transform: translateX(-100%); }
+          to { transform: translateX(0); }
+        }
+
+        .typewriter {
+          display: inline-block;
+          overflow: hidden;
+          border-right: 3px solid var(--green);
+          white-space: nowrap;
+          margin: 0 auto;
+          letter-spacing: -1px;
+          animation: 
+            typing 1.5s steps(20, end) forwards,
+            blink-caret 0.75s step-end 3;
+        }
+
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink-caret { 
+          from, to { border-color: transparent } 
+          50% { border-color: var(--green); } 
+        }
+
+        .scroll-reveal {
+          opacity: 0;
+          transform: translateY(40px) scale(0.95);
+          filter: blur(5px);
+          transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+          will-change: transform, opacity;
+        }
+
+        .scroll-reveal.is-visible {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+        }
+
+        .typewriter-on-scroll {
+          display: inline-block;
+          overflow: hidden;
+          white-space: nowrap;
+          width: 0;
+          border-right: 3px solid #fff;
+        }
+
+        .is-visible .typewriter-on-scroll {
+          animation: 
+            typing 1.5s steps(20, end) forwards,
+            blink-caret-white 0.75s step-end 3;
+        }
+
+        @keyframes blink-caret-white { 
+          from, to { border-color: transparent } 
+          50% { border-color: #fff; } 
+        }
+
+        .is-visible .cta-ball-container {
+          animation: ball-shoot-up 1s cubic-bezier(0.2, 0.8, 0.2, 1) 1.5s forwards;
+        }
+
+        .cta-ball {
+          display: inline-block;
+          animation: spin 3s linear infinite;
+        }
+
+        @keyframes ball-shoot-up {
+          from { transform: translateY(0); }
+          to { transform: translateY(-30px) scale(1.2); }
+        }
+
+        .animate-reveal-dramatic {
+          opacity: 0;
+          animation: revealDramatic 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes revealDramatic {
+          from {
+            opacity: 0;
+            transform: translateY(50px) scale(0.92);
+            filter: blur(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+          }
+        }
+
+        .animate-reveal {
+          opacity: 0;
+          animation: revealUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes revealUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .shadow-green {
+          box-shadow: 0 0 20px rgba(0, 200, 83, 0.2);
+          transition: all 0.3s ease;
+        }
+        .shadow-green:hover {
+          box-shadow: 0 0 30px rgba(0, 200, 83, 0.4);
+          transform: translateY(-2px);
+        }
+
+        .spin-ball { 
+          display: inline-block;
+          animation: spin 3s linear infinite; 
+        }
+        @keyframes spin { 
+          from { transform: rotate(0deg); } 
+          to { transform: rotate(360deg); } 
+        }
+      `}</style>
     </div>
   );
 }
