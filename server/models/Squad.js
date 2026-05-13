@@ -12,7 +12,8 @@ const playerSchema = new mongoose.Schema({
 const squadSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   manager: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  neighborhood: { type: String, default: '' },
+  neighborhood: { type: String, trim: true },
+  city: { type: String, trim: true, default: 'Luanda' },
   contact: { type: String, default: '' }, // WhatsApp do capitão/gestor da equipa
   players: [playerSchema],
   color: { type: String, default: '#00C853' },

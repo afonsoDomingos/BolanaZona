@@ -135,9 +135,15 @@ export default function SquadDetail() {
                 <label className="form-label">Nome da Equipa</label>
                 <input required className="form-input" value={squad.name} onChange={e => setSquad({...squad, name: e.target.value})} />
               </div>
-              <div>
-                <label className="form-label">Bairro / Comunidade</label>
-                <input className="form-input" value={squad.neighborhood || ''} onChange={e => setSquad({...squad, neighborhood: e.target.value})} />
+              <div style={{ display: 'flex', gap: 16 }}>
+                <div style={{ flex: 1 }}>
+                  <label className="form-label">Cidade</label>
+                  <input className="form-input" placeholder="Ex: Luanda" value={squad.city || ''} onChange={e => setSquad({...squad, city: e.target.value})} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="form-label">Bairro / Comunidade</label>
+                  <input className="form-input" placeholder="Ex: Maianga" value={squad.neighborhood || ''} onChange={e => setSquad({...squad, neighborhood: e.target.value})} />
+                </div>
               </div>
               <div>
                 <label className="form-label">Contacto WhatsApp (número internacional, sem +) </label>

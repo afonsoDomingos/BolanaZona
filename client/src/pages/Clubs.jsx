@@ -82,7 +82,7 @@ export default function Clubs() {
                   <div style={{ flex: 1 }}>
                     <h3 style={{ fontSize: 22, fontWeight: 900, marginBottom: 4, letterSpacing: -0.5 }}>{squad.name}</h3>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
-                      <MapPin size={14} color="var(--green)" /> {squad.neighborhood || 'Luanda'}
+                      <MapPin size={14} color="var(--green)" /> {squad.city || 'Luanda'}{squad.neighborhood ? ` - ${squad.neighborhood}` : ''}
                     </div>
                   </div>
                 </div>
@@ -160,7 +160,7 @@ function SquadDetailsModal({ squad, onClose, onChallenge }) {
             <div>
               <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 4 }}>{squad.name}</h2>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
-                <MapPin size={14} color="var(--green)" /> {squad.neighborhood || 'Desconhecido'}
+                <MapPin size={14} color="var(--green)" /> {squad.city || 'Luanda'}{squad.neighborhood ? ` - ${squad.neighborhood}` : ''}
               </div>
               {squad.contact && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
