@@ -217,13 +217,13 @@ export default function MySquads() {
                     )}
 
                       {c.status === 'pending' && !isChallenger && (
-                        <div style={{ display: 'flex', gap: 12 }}>
+                        <div className="btn-group-responsive">
                           <button className="btn btn-primary" disabled={updating} onClick={() => updateChallengeStatus(c._id, 'accepted')} style={{ flex: 1, justifyContent: 'center' }}><Check size={16}/> Aceitar Desafio</button>
                           <button className="btn btn-secondary" disabled={updating} onClick={() => setShowRejectionModal(c._id)} style={{ flex: 1, justifyContent: 'center', color: 'var(--red)', borderColor: 'rgba(255,0,0,0.2)' }}><X size={16}/> Recusar</button>
                         </div>
                       )}
                       {c.status === 'pending' && isChallenger && (
-                        <div style={{ display: 'flex', gap: 12 }}>
+                        <div className="btn-group-responsive">
                           <button 
                             className="btn btn-secondary" 
                             onClick={() => setEditingChallenge(c)}

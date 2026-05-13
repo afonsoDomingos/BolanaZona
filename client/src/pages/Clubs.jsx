@@ -107,7 +107,7 @@ export default function Clubs() {
                   <div style={{ textAlign: 'center' }}><div style={{ fontSize: 20, fontWeight: 900, color: 'var(--yellow)' }}>{squad.stats?.tournamentsWon || 0}</div><div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Títulos</div></div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 12 }}>
+                <div className="btn-group-responsive">
                   <button 
                     className="btn btn-secondary"
                     style={{ flex: 1, justifyContent: 'center', height: 48, background: 'rgba(255,255,255,0.05)', border: 'none' }}
@@ -123,7 +123,7 @@ export default function Clubs() {
 
                     if (pendingChallenge) {
                       return (
-                        <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+                        <div className="btn-group-responsive" style={{ width: '100%' }}>
                           <button 
                             className="btn btn-secondary" 
                             style={{ flex: 1, height: 44, fontSize: 13, borderColor: 'var(--yellow)', color: 'var(--yellow)', cursor: 'default' }}

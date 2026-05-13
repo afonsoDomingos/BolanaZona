@@ -133,7 +133,7 @@ export default function ChallengeModal({ targetSquad, mySquads, onClose, onSucce
             <textarea className="form-input" placeholder="Vamos ver quem manda na zona..." value={form.message} onChange={e => setForm({...form, message: e.target.value})} style={{ height: 80, resize: 'none' }} />
           </div>
 
-          <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+          <div className="btn-group-responsive" style={{ marginTop: 12 }}>
             <button type="button" className="btn btn-secondary" onClick={onClose} style={{ flex: 1, height: 48 }}>Cancelar</button>
             <button type="submit" className="btn btn-primary" disabled={loading} style={{ flex: 1, height: 48, background: initialData ? 'var(--yellow)' : 'var(--red)', color: initialData ? '#000' : '#fff', border: 'none' }}>
               {loading ? <span className="spinner" /> : initialData ? '🔄 Atualizar Desafio' : '⚔️ Desafiar Agora'}
