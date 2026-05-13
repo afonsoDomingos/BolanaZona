@@ -502,6 +502,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .dashboard-sidebar { order: 1; }
   .recent-tournament-card { flex-direction: column; align-items: flex-start !important; gap: 16px !important; }
   .hide-mobile { display: none; }
+  .hide-desktop { display: inline; } /* Visível no mobile */
   
   .table-wrapper table { min-width: 600px; } /* Force scroll for data integrity */
   

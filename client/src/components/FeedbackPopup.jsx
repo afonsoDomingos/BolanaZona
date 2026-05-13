@@ -12,17 +12,20 @@ export default function FeedbackPopup() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    // 1. Verificar localStorage (para visitantes)
+    // Apenas para utilizadores autenticados
+    if (!user) return;
+
+    // Não mostrar se já deu feedback
+    if (user.hasGivenFeedback) return;
+
+    // Verificar localStorage
     const hasFeedback = localStorage.getItem('bnz_feedback_v1');
     if (hasFeedback) return;
 
-    // 2. Verificar base de dados (para logados)
-    if (user && user.hasGivenFeedback) return;
-
-    // Disparar após 1 minuto (60000ms)
+    // Disparar após 3 minutos de uso da plataforma
     const timer = setTimeout(() => {
       setShow(true);
-    }, 60000);
+    }, 180000);
 
     return () => clearTimeout(timer);
   }, [user]);
@@ -52,13 +55,13 @@ export default function FeedbackPopup() {
   return (
     <div style={{
       position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
-      width: 'clamp(320px, 90vw, 400px)',
-      background: 'rgba(13, 21, 41, 0.95)',
+      width: 'clamp(290px, 88vw, 360px)',
+      background: 'rgba(13, 21, 41, 0.97)',
       backdropFilter: 'blur(16px)',
       border: '1px solid rgba(0, 200, 83, 0.3)',
-      borderRadius: 24,
+      borderRadius: 18,
       boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-      padding: 24,
+      padding: 16,
       animation: 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
     }}>
       <button onClick={closeForever} style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
@@ -73,39 +76,39 @@ export default function FeedbackPopup() {
         </div>
       ) : (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--green-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>⚽</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--green-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>⚽</div>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Diz-nos a tua opinião!</h3>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Leva apenas 30 segundos.</p>
+              <h3 style={{ fontSize: 14, fontWeight: 800, margin: 0 }}>Diz-nos a tua opinião!</h3>
+              <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>Leva apenas 30 segundos.</p>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div>
-              <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 8 }}>Que nota dás à plataforma?</label>
-              <div style={{ display: 'flex', gap: 8 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>Que nota dás à plataforma?</label>
+              <div style={{ display: 'flex', gap: 6 }}>
                 {[1, 2, 3, 4, 5].map(star => (
                   <button 
                     key={star}
                     onClick={() => setForm({ ...form, rating: star })}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                   >
-                    <Star size={24} fill={form.rating >= star ? 'var(--yellow)' : 'none'} color={form.rating >= star ? 'var(--yellow)' : 'var(--text-muted)'} />
+                    <Star size={20} fill={form.rating >= star ? 'var(--yellow)' : 'none'} color={form.rating >= star ? 'var(--yellow)' : 'var(--text-muted)'} />
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 8 }}>Como descreves a tua experiência?</label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {['⭐ Fácil de usar', '🎨 Design Bonito', '🚀 Muito Rápido', '📱 Top no Telemóvel', '🤔 Podia ser melhor', '❌ Difícil'].map(tag => (
+              <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>Como descreves a tua experiência?</label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {['⭐ Fácil de usar', '🎨 Design Bonito', '🚀 Muito Rápido', '📱 Top no Telemóvel', '🤔 Podia melhorar', '❌ Difícil'].map(tag => (
                   <button
                     key={tag}
                     onClick={() => setForm({ ...form, experience: form.experience.includes(tag) ? form.experience.replace(tag, '').trim() : (form.experience + ' ' + tag).trim() })}
                     style={{
-                      padding: '6px 12px', borderRadius: 8, fontSize: 12, border: '1px solid',
+                      padding: '4px 8px', borderRadius: 6, fontSize: 11, border: '1px solid',
                       borderColor: form.experience.includes(tag) ? 'var(--green)' : 'rgba(255,255,255,0.1)',
                       background: form.experience.includes(tag) ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.05)',
                       color: form.experience.includes(tag) ? 'var(--green)' : 'var(--text-secondary)',
@@ -119,8 +122,8 @@ export default function FeedbackPopup() {
             </div>
 
             <div>
-              <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 8 }}>Onde ouviste falar de nós?</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>Onde ouviste falar de nós?</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                 {[
                   { id: 'social_media', label: 'Redes Sociais' },
                   { id: 'friends', label: 'Amigos' },
@@ -131,7 +134,7 @@ export default function FeedbackPopup() {
                     key={s.id}
                     onClick={() => setForm({ ...form, source: s.id })}
                     style={{
-                      padding: '8px', borderRadius: 8, fontSize: 12, border: '1px solid',
+                      padding: '6px', borderRadius: 6, fontSize: 11, border: '1px solid',
                       borderColor: form.source === s.id ? 'var(--green)' : 'rgba(255,255,255,0.1)',
                       background: form.source === s.id ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.05)',
                       color: form.source === s.id ? 'var(--green)' : 'var(--text-secondary)',
@@ -145,18 +148,18 @@ export default function FeedbackPopup() {
             </div>
 
             <div>
-              <label style={{ fontSize: 13, fontWeight: 600, display: 'block', marginBottom: 8 }}>Algum comentário extra? (Opcional)</label>
+              <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>Algum comentário? (Opcional)</label>
               <textarea 
                 className="form-input" 
                 placeholder="Ex: Adorei os prints dos jogos!"
-                style={{ fontSize: 13, minHeight: 60, borderRadius: 12, padding: 12 }}
+                style={{ fontSize: 12, minHeight: 44, borderRadius: 10, padding: 10 }}
                 value={form.comment || ''}
                 onChange={e => setForm({ ...form, comment: e.target.value })}
               />
             </div>
 
-            <button onClick={handleSubmit} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', height: 44, borderRadius: 12 }}>
-              Enviar Feedback <Send size={16} />
+            <button onClick={handleSubmit} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', height: 38, borderRadius: 10, fontSize: 13 }}>
+              Enviar Feedback <Send size={14} />
             </button>
           </div>
         </>
