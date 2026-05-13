@@ -29,6 +29,7 @@ export default function Register() {
       } finally { setLoading(false); }
     },
     onError: () => setError('Falha na autenticação com Google.'),
+    ux_mode: 'redirect', // 🚀 Resolve erros de COOP na consola
   });
 
   const roles = [

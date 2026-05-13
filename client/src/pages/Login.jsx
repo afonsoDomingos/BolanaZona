@@ -27,6 +27,7 @@ export default function Login() {
       } finally { setLoading(false); }
     },
     onError: () => setError('Falha na autenticação com Google.'),
+    ux_mode: 'redirect', // 🚀 Resolve erros de COOP na consola
   });
 
   const handleSubmit = async (e) => {
