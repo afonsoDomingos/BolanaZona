@@ -114,6 +114,7 @@ export default function Explore() {
             )}
           </div>
         ) : (
+          <>
             {/* Live Matches Section */}
             {matches.length > 0 && (
               <div style={{ marginBottom: 60 }}>
@@ -228,6 +229,7 @@ export default function Explore() {
                 </Link>
               ))}
             </div>
+          </>
         )}
       </div>
     </div>
