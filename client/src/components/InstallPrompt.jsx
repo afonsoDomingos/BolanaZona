@@ -3,23 +3,23 @@ import { Download, X, Smartphone } from 'lucide-react';
 
 export default function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [promptState, setPromptState] = useState('hidden'); // 'hidden', 'big', 'mini'
+  const [promptState, setPromptState] = useState('hidden'); // 'hidden', 'big', 'mini', 'manual'
 
   useEffect(() => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     const handler = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      // Mostrar após 5 segundos para não ser intrusivo
-      setTimeout(() => {
-        setPromptState(prev => prev === 'hidden' ? 'big' : prev);
-      }, 5000);
     };
 
     window.addEventListener('beforeinstallprompt', handler);
 
-    // Verificar se já está instalado
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setPromptState('hidden');
+    if (!isStandalone && isMobile) {
+      setTimeout(() => {
+        setPromptState(prev => prev === 'hidden' ? 'big' : prev);
+      }, 5000);
     }
 
     return () => window.removeEventListener('beforeinstallprompt', handler);
@@ -36,59 +36,71 @@ export default function InstallPrompt() {
   }, [promptState]);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
-    try {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      
-      // Quer o utilizador aceite ou recuse o popup nativo, o prompt é consumido
-      setPromptState('hidden');
-      setDeferredPrompt(null);
-    } catch (err) {
-      console.error(err);
+    if (deferredPrompt) {
+      try {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        setPromptState('hidden');
+        setDeferredPrompt(null);
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      // Manual instruction for iOS / unsupported browsers
+      setPromptState('manual');
     }
   };
 
-  if (promptState === 'hidden' || !deferredPrompt) return null;
+  if (promptState === 'hidden') return null;
 
   return (
     <>
-      {promptState === 'big' ? (
-        <div className="install-prompt animate-slide-up">
-          <div style={{ 
-            width: '48px', 
-            height: '48px', 
-            borderRadius: '12px', 
-            background: 'linear-gradient(135deg, var(--green), #00e676)', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            color: '#000',
-            flexShrink: 0
-          }}>
-            <Smartphone size={24} />
-          </div>
+      {promptState === 'big' || promptState === 'manual' ? (
+        <div className="install-prompt animate-slide-up" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ 
+              width: '48px', 
+              height: '48px', 
+              borderRadius: '12px', 
+              background: 'linear-gradient(135deg, var(--green), #00e676)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              color: '#000',
+              flexShrink: 0
+            }}>
+              <Smartphone size={24} />
+            </div>
 
-          <div style={{ flex: 1 }}>
-            <h4 style={{ fontSize: '15px', fontWeight: 800, margin: 0, color: '#fff' }}>Instalar Bola na Zona</h4>
-            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0' }}>Acede mais rápido e consome menos dados.</p>
-          </div>
+            <div style={{ flex: 1 }}>
+              <h4 style={{ fontSize: '15px', fontWeight: 800, margin: 0, color: '#fff' }}>Instalar Bola na Zona</h4>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0' }}>Acede mais rápido e consome menos dados.</p>
+            </div>
 
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <button 
-              onClick={handleInstall}
-              className="btn btn-primary btn-sm"
-              style={{ height: '36px', padding: '0 16px', borderRadius: '10px', flexShrink: 0 }}
-            >
-              <Download size={14} /> Instalar
-            </button>
-            <button 
-              onClick={() => setPromptState('mini')}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
-            >
-              <X size={18} />
-            </button>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              {promptState !== 'manual' && (
+                <button 
+                  onClick={handleInstall}
+                  className="btn btn-primary btn-sm"
+                  style={{ height: '36px', padding: '0 16px', borderRadius: '10px', flexShrink: 0 }}
+                >
+                  <Download size={14} /> Instalar
+                </button>
+              )}
+              <button 
+                onClick={() => setPromptState('mini')}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
           </div>
+          
+          {promptState === 'manual' && (
+            <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+              Para instalar, toca em <strong>Partilhar</strong> (ícone do meio na barra do navegador) e escolhe <strong>Adicionar ao Ecrã Principal</strong>.
+            </div>
+          )}
         </div>
       ) : (
         <div className="install-mini animate-fade-in" onClick={handleInstall} title="Instalar Bola na Zona">
