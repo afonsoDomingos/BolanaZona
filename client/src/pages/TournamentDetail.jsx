@@ -922,6 +922,7 @@ function FinishTournamentModal({ teams, onClose, onConfirm }) {
 }
 
 function TournamentEditModal({ tournament, onClose, onSaved }) {
+  const { user } = useAuth();
   const [form, setForm] = useState({ ...tournament });
   const [loading, setLoading] = useState(false);
 
@@ -943,6 +944,18 @@ function TournamentEditModal({ tournament, onClose, onSaved }) {
           <button className="modal-close" onClick={onClose}><X size={18} /></button>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {user?.role === 'superadmin' && (
+            <div style={{ background: 'rgba(255,214,0,0.1)', padding: 12, borderRadius: 12, border: '1px solid rgba(255,214,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Shield size={20} color="var(--yellow)" fill="var(--yellow)" />
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: 13 }}>Liga Oficial</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Destacar este torneio como verificado.</div>
+                </div>
+              </div>
+              <input type="checkbox" checked={form.isOfficial} onChange={e => setForm({...form, isOfficial: e.target.checked})} style={{ width: 24, height: 24, accentColor: 'var(--yellow)' }} />
+            </div>
+          )}
           <div className="form-group">
             <label className="form-label">Nome do Torneio</label>
             <input className="form-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />

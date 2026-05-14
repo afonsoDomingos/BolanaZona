@@ -199,7 +199,10 @@ export default function Explore() {
                   </div>
                   
                   <div className="card-body-premium" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    <h3 className="card-title-premium">{t.name}</h3>
+                    <h3 className="card-title-premium" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      {t.name}
+                      {t.isOfficial && <Shield size={16} fill="var(--yellow)" color="var(--yellow)" style={{ flexShrink: 0 }} />}
+                    </h3>
                     
                     <div className="card-info-grid" style={{ flex: 1 }}>
                       <div className="info-item">

@@ -122,7 +122,10 @@ export default function PublicTournament() {
                 <div className="spin-ball" style={{ width: 80, height: 80, borderRadius: 24, background: 'var(--green-subtle)', border: '2px solid rgba(0,200,83,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, boxShadow: '0 10px 30px rgba(0,200,83,0.2)' }}>⚽</div>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                    <h1 className="font-syne" style={{ fontSize: 'clamp(28px, 6vw, 44px)', fontWeight: 900, lineHeight: 1.1 }}>{tournament.name}</h1>
+                    <h1 className="font-syne" style={{ fontSize: 'clamp(28px, 6vw, 44px)', fontWeight: 900, lineHeight: 1.1, display: 'flex', alignItems: 'center', gap: 12 }}>
+                      {tournament.name}
+                      {tournament.isOfficial && <Shield size={32} fill="var(--yellow)" color="var(--yellow)" />}
+                    </h1>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)', fontSize: 16 }}>
                     <MapPin size={18} color="var(--green)" /> {tournament.location}, {tournament.neighborhood}
