@@ -773,6 +773,28 @@ export default function TournamentDetail() {
           onSaved={() => { setShowManualMatchModal(false); load(); }} 
         />
       )}
+
+      {/* EDIT MATCH MODAL (SCHEDULE/DATE) */}
+      {showEditMatchModal && (
+        <MatchScheduleModal 
+          match={showEditMatchModal} 
+          tournamentId={id} 
+          onClose={() => setShowEditMatchModal(null)} 
+          onSaved={() => { setShowEditMatchModal(null); load(); }} 
+        />
+      )}
+
+      {/* EDIT TOURNAMENT MODAL */}
+      {showEditTournamentModal && (
+        <TournamentEditModal 
+          tournament={tournament} 
+          onClose={() => setShowEditTournamentModal(false)} 
+          onSaved={(updated) => { 
+            setTournament(updated); 
+            setShowEditTournamentModal(false); 
+          }} 
+        />
+      )}
     </div>
   );
 }
