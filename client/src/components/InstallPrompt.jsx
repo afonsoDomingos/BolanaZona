@@ -61,8 +61,8 @@ export default function InstallPrompt() {
         setPromptState('manual');
       }
     } else {
-      // Manual instruction for iOS / unsupported browsers
-      setPromptState('manual');
+      // Se não temos o prompt nativo, mostramos o banner informativo/manual
+      setPromptState(prev => prev === 'big' ? 'manual' : 'big');
     }
   };
 
@@ -125,7 +125,7 @@ export default function InstallPrompt() {
           )}
         </div>
       ) : (
-        <div className="install-mini animate-fade-in" onClick={() => setPromptState('big')} title="Instalar Bola na Zona">
+        <div className="install-mini animate-fade-in" onClick={handleInstall} title="Instalar Bola na Zona">
           <Download size={22} color="#000" />
         </div>
       )}
