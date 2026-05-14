@@ -69,7 +69,7 @@ export default function SquadDetail() {
     setNewPlayer({ name: '', position: '', number: '', photo: '' });
     
     // Auto-save
-    await saveSquad(updatedSquad, false);
+    await saveSquad(updatedSquad, true);
   };
 
   const handleEditPlayer = (index) => {
@@ -141,6 +141,15 @@ export default function SquadDetail() {
               <h1 className="font-syne" style={{ fontSize: 28, fontWeight: 900, marginBottom: 4 }}>{squad.name}</h1>
               <p style={{ color: 'var(--text-secondary)' }}>Gestão do Plantel</p>
             </div>
+          </div>
+          
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button onClick={handleDelete} className="btn btn-secondary" style={{ color: 'var(--red)', borderColor: 'rgba(255,68,68,0.2)' }}>
+              <Trash2 size={16} /> Eliminar
+            </button>
+            <button onClick={handleUpdate} className="btn btn-primary" disabled={saving} style={{ minWidth: 140, justifyContent: 'center' }}>
+              {saving ? <span className="spinner-xs" /> : <><Save size={18} /> Guardar</>}
+            </button>
           </div>
         </div>
 
@@ -246,7 +255,7 @@ export default function SquadDetail() {
                 {uploading ? <span className="spinner-xs" /> : newPlayer.photo ? <Image size={18} color="var(--green)" /> : <Camera size={18} />}
                 <input type="file" hidden accept="image/*" onChange={e => uploadImage(e.target.files[0], 'player')} />
               </label>
-              <button type="submit" className="btn btn-primary" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center', background: editingPlayerIndex !== null ? 'var(--yellow)' : 'var(--green)', color: '#000', border: 'none' }}>
+              <button type="submit" className="btn btn-primary" title="Adicionar / Guardar Jogador" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center', background: editingPlayerIndex !== null ? 'var(--yellow)' : 'var(--green)', color: '#000', border: 'none' }}>
                 {editingPlayerIndex !== null ? <Save size={18} /> : <Plus size={18} />}
               </button>
               {editingPlayerIndex !== null && (
@@ -270,7 +279,7 @@ export default function SquadDetail() {
                       </div>
                       {p.number && <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--green)', background: 'rgba(0,200,83,0.1)', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4 }}>{p.number}</span>}
                       <span style={{ fontWeight: 700, fontSize: 14 }}>{p.name}</span>
-                      {p.position && <span style={{ fontSize: 10, color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '2px 6px', borderRadius: 4 }}>{p.position === 'GK' ? 'Guarda-Redes' : p.position === 'DEF' ? 'Defesa' : p.position === 'MID' ? 'Médio' : p.position === 'FWD' ? 'Avançado' : p.position}</span>}
+                      {p.position && <span style={{ fontSize: 10, color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '2px 6px', borderRadius: 4 }}>{p.position}</span>}
                     </div>
                     <div style={{ display: 'flex', gap: 4 }}>
                       <button type="button" onClick={() => handleEditPlayer(idx)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
