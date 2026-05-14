@@ -211,3 +211,79 @@ exports.update = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.updateDetails = async (req, res) => {
+  console.log('🔄 Updating accepted challenge details', req.params.id, 'by user', req.user._id);
+  try {
+    const { date, location, mapsLink } = req.body;
+    const challenge = await Challenge.findById(req.params.id)
+      .populate('challengerSquad')
+      .populate('challengedSquad');
+
+    if (!challenge) return res.status(404).json({ message: 'Desafio não encontrado.' });
+
+    // Both managers can update if it's accepted
+    const isChallengedManager = challenge.challengedSquad.manager.toString() === req.user._id.toString();
+    const isChallengerManager = challenge.challengerSquad.manager.toString() === req.user._id.toString();
+
+    if (!isChallengedManager && !isChallengerManager) {
+      return res.status(403).json({ message: 'Sem permissão.' });
+    }
+
+    challenge.date = date || challenge.date;
+    challenge.location = location || challenge.location;
+    challenge.mapsLink = mapsLink || challenge.mapsLink;
+
+    await challenge.save();
+    console.log('✅ Challenge details updated successfully');
+    res.json(challenge);
+  } catch (err) {
+    console.error('❗️ Error updating challenge details:', err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.updateResult = async (req, res) => {
+  console.log('🏁 Updating challenge result', req.params.id, 'by user', req.user._id);
+  try {
+    const { challengerScore, challengedScore } = req.body;
+    const challenge = await Challenge.findById(req.params.id)
+      .populate('challengerSquad')
+      .populate('challengedSquad');
+
+    if (!challenge) return res.status(404).json({ message: 'Desafio não encontrado.' });
+
+    // Both managers can update result
+    const isChallengedManager = challenge.challengedSquad.manager.toString() === req.user._id.toString();
+    const isChallengerManager = challenge.challengerSquad.manager.toString() === req.user._id.toString();
+
+    if (!isChallengedManager && !isChallengerManager) {
+      return res.status(403).json({ message: 'Sem permissão.' });
+    }
+
+    challenge.result = {
+      challengerScore: Number(challengerScore),
+      challengedScore: Number(challengedScore),
+      confirmed: true
+    };
+    challenge.status = 'completed';
+
+    await challenge.save();
+
+    // Notify the other manager
+    const recipientId = isChallengedManager ? challenge.challengerSquad.manager : challenge.challengedSquad.manager;
+    await Notification.create({
+      user: recipientId,
+      title: 'Resultado de Jogo Registado 🏁',
+      message: `O resultado do jogo entre ${challenge.challengerSquad.name} e ${challenge.challengedSquad.name} foi registado: ${challengerScore} - ${challengedScore}.`,
+      type: 'success',
+      link: '/dashboard/squads'
+    });
+
+    console.log('✅ Challenge result updated successfully');
+    res.json(challenge);
+  } catch (err) {
+    console.error('❗️ Error updating challenge result:', err);
+    res.status(500).json({ message: err.message });
+  }
+};

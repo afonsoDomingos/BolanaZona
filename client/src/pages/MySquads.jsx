@@ -21,6 +21,8 @@ export default function MySquads() {
   const [expandedMap, setExpandedMap] = useState(null);
   const [editingChallenge, setEditingChallenge] = useState(null);
   const [showRejectionModal, setShowRejectionModal] = useState(null);
+  const [showResultModal, setShowResultModal] = useState(null);
+  const [showEditDetailsModal, setShowEditDetailsModal] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const navigate = useNavigate();
 
@@ -102,9 +104,11 @@ export default function MySquads() {
             Desafios ⚔️
             {challenges.filter(c => c.status === 'pending').length > 0 && <span style={{ background: 'var(--red)', color: '#fff', fontSize: 10, padding: '2px 6px', borderRadius: 100 }}>{challenges.filter(c => c.status === 'pending').length}</span>}
           </button>
-          <button onClick={() => setTab('matches')} style={{ padding: '12px 0', background: 'none', border: 'none', color: tab === 'matches' ? 'var(--green)' : 'var(--text-muted)', borderBottom: tab === 'matches' ? '2px solid var(--green)' : '2px solid transparent', fontWeight: 800, fontSize: 16, cursor: 'pointer', transition: '0.2s', display: 'flex', alignItems: 'center', gap: 8 }}>
             Próximos Jogos ⚽
             {challenges.filter(c => c.status === 'accepted' && new Date(c.date) >= new Date().setHours(0,0,0,0)).length > 0 && <span style={{ background: 'var(--green)', color: '#000', fontSize: 10, padding: '2px 6px', borderRadius: 100 }}>{challenges.filter(c => c.status === 'accepted' && new Date(c.date) >= new Date().setHours(0,0,0,0)).length}</span>}
+          </button>
+          <button onClick={() => setTab('results')} style={{ padding: '12px 0', background: 'none', border: 'none', color: tab === 'results' ? 'var(--green)' : 'var(--text-muted)', borderBottom: tab === 'results' ? '2px solid var(--green)' : '2px solid transparent', fontWeight: 800, fontSize: 16, cursor: 'pointer', transition: '0.2s', display: 'flex', alignItems: 'center', gap: 8 }}>
+            Resultados 🏁
           </button>
         </div>
 
@@ -303,6 +307,15 @@ export default function MySquads() {
                       </a>
                     </div>
 
+                    <div className="btn-group-responsive">
+                      <button className="btn btn-secondary" onClick={() => setShowEditDetailsModal(c)} style={{ flex: 1, justifyContent: 'center' }}>
+                        <Calendar size={16}/> Editar Jogo
+                      </button>
+                      <button className="btn btn-primary" onClick={() => setShowResultModal(c)} style={{ flex: 1, justifyContent: 'center' }}>
+                        <Trophy size={16}/> Inserir Resultado
+                      </button>
+                    </div>
+
                     {c.mapsLink && expandedMap === c._id && (
                       <ChallengeMap 
                         location={c.location} 
@@ -331,6 +344,59 @@ export default function MySquads() {
                     {c.status === 'pending' && isChallenger && (
                       <div style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }}>A aguardar resposta do {opponentSquad?.name}...</div>
                     )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {challenges.filter(c => c.status === 'completed').length === 0 ? (
+              <div className="empty-state card-glass">
+                <Trophy size={56} color="var(--text-muted)" style={{ marginBottom: 20 }} />
+                <h3 style={{ fontSize: 24, fontWeight: 800 }}>Sem resultados ainda</h3>
+                <p style={{ maxWidth: 400, margin: '12px auto 24px', color: 'var(--text-secondary)' }}>
+                  Finaliza os teus jogos agendados para veres aqui o histórico de vitórias!
+                </p>
+              </div>
+            ) : (
+              challenges.filter(c => c.status === 'completed').map(c => {
+                const isChallenger = squads.some(s => s._id === c.challengerSquad?._id);
+                const mySquad = isChallenger ? c.challengerSquad : c.challengedSquad;
+                const opponentSquad = isChallenger ? c.challengedSquad : c.challengerSquad;
+                const myScore = isChallenger ? c.result.challengerScore : c.result.challengedScore;
+                const opponentScore = isChallenger ? c.result.challengedScore : c.result.challengerScore;
+                const isWin = myScore > opponentScore;
+                const isDraw = myScore === opponentScore;
+
+                return (
+                  <div key={c._id} className="card-glass" style={{ padding: 24, borderRadius: 20, borderLeft: `4px solid ${isWin ? 'var(--green)' : isDraw ? 'var(--yellow)' : 'var(--red)'}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800 }}>
+                        {new Date(c.date).toLocaleDateString()} · {c.location}
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 900, color: isWin ? 'var(--green)' : isDraw ? 'var(--yellow)' : 'var(--red)' }}>
+                        {isWin ? 'VITÓRIA 🏆' : isDraw ? 'EMPATE 🤝' : 'DERROTA ❌'}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+                      <div style={{ flex: 1, textAlign: 'right' }}>
+                        <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 4 }}>{c.challengerSquad.name}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Desafiador</div>
+                      </div>
+                      
+                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px 20px', borderRadius: 12, border: '1px solid var(--border)', display: 'flex', gap: 16, alignItems: 'center' }}>
+                        <span style={{ fontSize: 32, fontWeight: 900 }}>{c.result.challengerScore}</span>
+                        <span style={{ fontSize: 18, color: 'var(--text-muted)' }}>-</span>
+                        <span style={{ fontSize: 32, fontWeight: 900 }}>{c.result.challengedScore}</span>
+                      </div>
+
+                      <div style={{ flex: 1, textAlign: 'left' }}>
+                        <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 4 }}>{c.challengedSquad.name}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Desafiado</div>
+                      </div>
+                    </div>
                   </div>
                 );
               })
@@ -442,6 +508,129 @@ export default function MySquads() {
           </div>
         </div>
       )}
+
+      {showResultModal && (
+        <ResultChallengeModal 
+          challenge={showResultModal} 
+          onClose={() => setShowResultModal(null)} 
+          onSuccess={fetchSquads} 
+        />
+      )}
+
+      {showEditDetailsModal && (
+        <EditChallengeDetailsModal 
+          challenge={showEditDetailsModal} 
+          onClose={() => setShowEditDetailsModal(null)} 
+          onSuccess={fetchSquads} 
+        />
+      )}
+    </div>
+  );
+}
+
+function ResultChallengeModal({ challenge, onClose, onSuccess }) {
+  const [challengerScore, setChallengerScore] = useState('');
+  const [challengedScore, setChallengedScore] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (challengerScore === '' || challengedScore === '') return toast.error('Insere os resultados.');
+    setLoading(true);
+    try {
+      await api.put(`/challenges/${challenge._id}/result`, { challengerScore, challengedScore });
+      toast.success('Resultado registado! 🏁');
+      onSuccess();
+      onClose();
+    } catch {
+      toast.error('Erro ao registar resultado.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div className="modal animate-slide-up" style={{ background: '#0a0f1e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, maxWidth: 400, padding: 32, width: '100%' }}>
+        <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8, textAlign: 'center' }}>Finalizar Jogo 🏁</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 24, fontSize: 14, textAlign: 'center' }}>Insere o resultado final deste desafio.</p>
+        
+        <form onSubmit={handleSave}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 32 }}>
+            <div style={{ textAlign: 'center', flex: 1 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 800 }}>{challenge.challengerSquad.name}</div>
+              <input type="number" min="0" className="score-input" style={{ width: '100%', height: 60, fontSize: 24, textAlign: 'center' }} value={challengerScore} onChange={e => setChallengerScore(e.target.value)} />
+            </div>
+            <div style={{ fontWeight: 900, fontSize: 24, marginTop: 20 }}>×</div>
+            <div style={{ textAlign: 'center', flex: 1 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 800 }}>{challenge.challengedSquad.name}</div>
+              <input type="number" min="0" className="score-input" style={{ width: '100%', height: 60, fontSize: 24, textAlign: 'center' }} value={challengedScore} onChange={e => setChallengedScore(e.target.value)} />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button type="button" className="btn btn-secondary" onClick={onClose} style={{ flex: 1 }}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={loading} style={{ flex: 1, justifyContent: 'center' }}>
+              {loading ? <span className="spinner"/> : 'Confirmar'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function EditChallengeDetailsModal({ challenge, onClose, onSuccess }) {
+  const [form, setForm] = useState({
+    date: challenge.date ? new Date(challenge.date).toISOString().split('T')[0] : '',
+    location: challenge.location || '',
+    mapsLink: challenge.mapsLink || ''
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await api.put(`/challenges/${challenge._id}/details`, form);
+      toast.success('Informações atualizadas! ✍️');
+      onSuccess();
+      onClose();
+    } catch {
+      toast.error('Erro ao atualizar informações.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div className="modal animate-slide-up" style={{ background: '#0a0f1e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, maxWidth: 440, padding: 32, width: '100%' }}>
+        <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8 }}>Editar Jogo 🗓️</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 24, fontSize: 14 }}>Altera os detalhes do desafio agendado.</p>
+        
+        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="form-group">
+            <label className="form-label">Nova Data</label>
+            <input type="date" className="form-input" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Novo Local</label>
+            <input className="form-input" value={form.location} onChange={e => setForm({...form, location: e.target.value})} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Link Google Maps (Opcional)</label>
+            <input className="form-input" placeholder="https://goo.gl/maps/..." value={form.mapsLink} onChange={e => setForm({...form, mapsLink: e.target.value})} />
+          </div>
+
+          <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+            <button type="button" className="btn btn-secondary" onClick={onClose} style={{ flex: 1 }}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={loading} style={{ flex: 1, justifyContent: 'center' }}>
+              {loading ? <span className="spinner"/> : 'Guardar Alterações'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
