@@ -184,7 +184,6 @@ export default function InstallPrompt() {
           }
         }
       `}</style>
-      `}</style>
     </>
   );
 }
