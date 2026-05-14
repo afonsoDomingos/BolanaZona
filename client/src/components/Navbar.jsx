@@ -125,12 +125,17 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              <>
-                <Link to="/login" className="btn" style={{ background: 'rgba(0,0,0,0.05)', color: '#1a1a1a' }} onClick={() => setIsMenuOpen(false)}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 8 }}>
+                <Link 
+                  to="/login" 
+                  className="btn btn-sm" 
+                  style={{ background: 'rgba(0,0,0,0.04)', color: '#1a1a1a', border: '1px solid rgba(0,0,0,0.05)' }} 
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   Entrar
                 </Link>
-                <Link to="/register" className="btn btn-primary" onClick={() => setIsMenuOpen(false)}>Criar Conta</Link>
-              </>
+                <Link to="/register" className="btn btn-primary btn-sm" onClick={() => setIsMenuOpen(false)}>Criar Conta</Link>
+              </div>
             )}
           </div>
 

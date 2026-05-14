@@ -340,7 +340,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   font-size: 18px;
 }
 .navbar-logo-text { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; white-space: nowrap; }
-.navbar-nav { display: flex; align-items: center; gap: 2px; }
+.navbar-nav { display: flex; align-items: center; gap: 8px; }
 .mobile-menu-btn { display: none; }
 .nav-link {
   padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600;
