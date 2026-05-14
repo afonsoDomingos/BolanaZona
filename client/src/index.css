@@ -584,6 +584,22 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   animation: bounce-spin 2s ease-in-out infinite;
 }
 
+.pulse-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff1744;
+  margin-right: 6px;
+  animation: pulse-red-dot 1.5s infinite;
+}
+
+@keyframes pulse-red-dot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255, 23, 68, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 23, 68, 0); }
+}
+
 /* ===== PREMIUM TOURNAMENT CARDS ===== */
 .card-premium {
   background: var(--bg-card);

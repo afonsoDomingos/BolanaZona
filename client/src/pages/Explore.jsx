@@ -10,9 +10,17 @@ export default function Explore() {
   const [cityFilter, setCityFilter] = useState('');
   const [neighborhoodFilter, setNeighborhoodFilter] = useState('');
 
+  const [matches, setMatches] = useState([]);
+
   useEffect(() => {
-    api.get('/tournaments/public/all')
-      .then(res => setTournaments(res.data))
+    Promise.all([
+      api.get('/tournaments/public/all'),
+      api.get('/tournaments/public/matches/live')
+    ])
+      .then(([tournamentsRes, matchesRes]) => {
+        setTournaments(tournamentsRes.data);
+        setMatches(matchesRes.data);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -106,53 +114,120 @@ export default function Explore() {
             )}
           </div>
         ) : (
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-            gap: '32px 24px', // Proporção 32 vertical, 24 horizontal
-            maxWidth: 1200, 
-            margin: '0 auto' 
-          }}>
-            {filtered.map(t => (
-              <Link key={t._id} to={`/t/${t.shareCode}`} className="card-premium" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <div className="card-image-wrapper">
-                  <div className="status-badge-wrapper">
-                    <span className={`badge-premium ${statusBadge[t.status]}`}>{statusLabel[t.status]}</span>
-                  </div>
-                  <div className="card-icon-main">⚽</div>
+            {/* Live Matches Section */}
+            {matches.length > 0 && (
+              <div style={{ marginBottom: 60 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+                  <h2 className="font-syne" style={{ fontSize: 24, fontWeight: 800 }}>Jogos em Destaque 🔴</h2>
+                  <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, var(--red), transparent)', opacity: 0.3 }} />
                 </div>
                 
-                <div className="card-body-premium" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                  <h3 className="card-title-premium">{t.name}</h3>
-                  
-                  <div className="card-info-grid" style={{ flex: 1 }}>
-                    <div className="info-item">
-                      <MapPin size={16} className="text-green" />
-                      <span>{t.neighborhood}</span>
-                    </div>
-                    <div className="info-item">
-                      <Trophy size={16} className="text-yellow" />
-                      <span>{t.prize || 'Troféu & Glória'}</span>
-                    </div>
-                    <div className="info-item">
-                      <Users size={16} className="text-blue" />
-                      <span>Máx. {t.maxTeams} equipas</span>
-                    </div>
-                  </div>
+                <div style={{ 
+                  display: 'flex', 
+                  overflowX: 'auto', 
+                  gap: 20, 
+                  paddingBottom: 20, 
+                  margin: '0 -20px', 
+                  padding: '0 20px 20px',
+                  scrollSnapType: 'x mandatory' 
+                }}>
+                  {matches.map(m => (
+                    <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="match-card" style={{ textDecoration: 'none', minWidth: 320, flexShrink: 0, scrollSnapAlign: 'start', position: 'relative' }}>
+                      <div style={{ position: 'absolute', top: 12, right: 12, background: m.status === 'live' || m.status === 'active' ? 'rgba(255, 23, 68, 0.2)' : 'rgba(255, 255, 255, 0.1)', color: m.status === 'live' || m.status === 'active' ? '#ff1744' : 'var(--text-muted)', padding: '4px 8px', borderRadius: 8, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        {(m.status === 'live' || m.status === 'active') ? <><span className="pulse-dot" style={{ width: 6, height: 6, background: '#ff1744', borderRadius: '50%' }}></span> LIVE</> : 'A DECORRER'}
+                      </div>
+                      
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, marginBottom: 12 }}>
+                        {m.tournament?.name}
+                      </div>
 
-                  <div className="card-footer-premium" style={{ marginTop: 'auto' }}>
-                    <div className="date-info">
-                      <Calendar size={14} />
-                      {new Date(t.startDate).toLocaleDateString()}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                        <div style={{ flex: 1, textAlign: 'center' }}>
+                          <div style={{ width: 40, height: 40, borderRadius: 12, background: m.homeTeam?.color || 'var(--green)', margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                          </div>
+                          <div style={{ fontWeight: 800, fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.homeTeam?.name}</div>
+                        </div>
+
+                        <div style={{ padding: '0 16px', textAlign: 'center' }}>
+                          {(m.status === 'live' || m.status === 'active') && m.homeScore !== null ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 24, fontWeight: 900, color: 'var(--green)' }}>
+                              <span>{m.homeScore}</span>
+                              <span style={{ color: 'var(--text-muted)', fontSize: 16 }}>-</span>
+                              <span>{m.awayScore}</span>
+                            </div>
+                          ) : (
+                            <div style={{ fontSize: 14, fontWeight: 800 }}>
+                              {m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'VS'}
+                            </div>
+                          )}
+                        </div>
+
+                        <div style={{ flex: 1, textAlign: 'center' }}>
+                          <div style={{ width: 40, height: 40, borderRadius: 12, background: m.awayTeam?.color || 'var(--green)', margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                          </div>
+                          <div style={{ fontWeight: 800, fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.awayTeam?.name}</div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Torneios Grid */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+              <h2 className="font-syne" style={{ fontSize: 24, fontWeight: 800 }}>Ligas Disponíveis</h2>
+            </div>
+            
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
+              gap: '32px 24px',
+              maxWidth: 1200, 
+              margin: '0 auto' 
+            }}>
+              {filtered.map(t => (
+                <Link key={t._id} to={`/t/${t.shareCode}`} className="card-premium" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  <div className="card-image-wrapper">
+                    <div className="status-badge-wrapper">
+                      <span className={`badge-premium ${statusBadge[t.status]}`}>{statusLabel[t.status]}</span>
                     </div>
-                    <div className="view-link">
-                      Explorar <ArrowRight size={16} />
+                    <div className="card-icon-main">⚽</div>
+                  </div>
+                  
+                  <div className="card-body-premium" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    <h3 className="card-title-premium">{t.name}</h3>
+                    
+                    <div className="card-info-grid" style={{ flex: 1 }}>
+                      <div className="info-item">
+                        <MapPin size={16} className="text-green" />
+                        <span>{t.neighborhood}</span>
+                      </div>
+                      <div className="info-item">
+                        <Trophy size={16} className="text-yellow" />
+                        <span>{t.prize || 'Troféu & Glória'}</span>
+                      </div>
+                      <div className="info-item">
+                        <Users size={16} className="text-blue" />
+                        <span>Máx. {t.maxTeams} equipas</span>
+                      </div>
+                    </div>
+
+                    <div className="card-footer-premium" style={{ marginTop: 'auto' }}>
+                      <div className="date-info">
+                        <Calendar size={14} />
+                        {new Date(t.startDate).toLocaleDateString()}
+                      </div>
+                      <div className="view-link">
+                        Explorar <ArrowRight size={16} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
         )}
       </div>
     </div>

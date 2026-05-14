@@ -67,6 +67,30 @@ exports.getAllPublicTournaments = async (req, res) => {
   }
 };
 
+exports.getGlobalMatches = async (req, res) => {
+  try {
+    const matches = await Match.find({ 
+      status: { $in: ['scheduled', 'live', 'active'] } // Support both legacy active and new live
+    })
+    .populate({
+      path: 'tournament',
+      match: { status: { $in: ['registration', 'active'] } },
+      select: 'name shareCode neighborhood'
+    })
+    .populate('homeTeam', 'name logo color')
+    .populate('awayTeam', 'name logo color')
+    .sort({ date: 1 })
+    .limit(20);
+
+    // Filter out matches where tournament is null (due to populate match failing)
+    const validMatches = matches.filter(m => m.tournament != null);
+    
+    res.json(validMatches);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // POST /api/tournaments
 exports.create = async (req, res) => {
   try {

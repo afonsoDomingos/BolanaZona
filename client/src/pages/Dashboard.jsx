@@ -58,8 +58,18 @@ export default function Dashboard() {
     }
   }, [showWelcome]);
 
+  const [matches, setMatches] = useState([]);
+
   useEffect(() => {
-    api.get('/tournaments').then(res => setTournaments(res.data)).finally(() => setLoading(false));
+    Promise.all([
+      api.get('/tournaments'),
+      api.get('/tournaments/public/matches/live')
+    ])
+      .then(([tournamentsRes, matchesRes]) => {
+        setTournaments(tournamentsRes.data);
+        setMatches(matchesRes.data);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const stats = {
@@ -137,6 +147,63 @@ export default function Dashboard() {
           {/* Main Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             {/* Stats */}
+            {/* Global/Live Matches */}
+            {matches.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <h2 style={{ fontSize: 20, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    Jogos em Destaque <span className="badge badge-red" style={{ fontSize: 10, padding: '2px 8px' }}>LIVE</span>
+                  </h2>
+                </div>
+                
+                <div style={{ 
+                  display: 'flex', 
+                  overflowX: 'auto', 
+                  gap: 16, 
+                  paddingBottom: 16,
+                  margin: '0 -20px',
+                  padding: '0 20px 16px',
+                  scrollbarWidth: 'none'
+                }}>
+                  {matches.map(m => (
+                    <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="card" style={{ textDecoration: 'none', minWidth: 280, padding: 16, flexShrink: 0 }}>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800, marginBottom: 12 }}>
+                        {m.tournament?.name}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                        <div style={{ flex: 1, textAlign: 'center' }}>
+                          <div style={{ width: 32, height: 32, borderRadius: 8, background: m.homeTeam?.color || 'var(--green)', margin: '0 auto 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                          </div>
+                          <div style={{ fontWeight: 700, fontSize: 12, maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.homeTeam?.name}</div>
+                        </div>
+                        
+                        <div style={{ textAlign: 'center', minWidth: 60 }}>
+                          {m.status === 'live' || m.status === 'active' ? (
+                            <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</div>
+                          ) : (
+                            <div style={{ fontSize: 14, fontWeight: 800 }}>{m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'VS'}</div>
+                          )}
+                        </div>
+
+                        <div style={{ flex: 1, textAlign: 'center' }}>
+                          <div style={{ width: 32, height: 32, borderRadius: 8, background: m.awayTeam?.color || 'var(--green)', margin: '0 auto 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                          </div>
+                          <div style={{ fontWeight: 700, fontSize: 12, maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.awayTeam?.name}</div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <style>{`
+              .badge-red { background: rgba(255, 23, 68, 0.1); color: #ff1744; border: 1px solid rgba(255, 23, 68, 0.2); }
+              ::-webkit-scrollbar { display: none; }
+            `}</style>
+
             <div className="stats-grid">
               <div className="stat-card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
