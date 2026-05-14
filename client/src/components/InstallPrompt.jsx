@@ -18,19 +18,20 @@ export default function InstallPrompt() {
     const handler = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      // Sempre que o navegador dispare o evento, mostramos após um pequeno delay
-      setTimeout(() => {
-        setPromptState(prev => prev === 'hidden' ? 'big' : prev);
-      }, 5000);
+      // Mostrar prompt imediatamente quando o navegador permitir
+      setPromptState('big');
     };
 
     window.addEventListener('beforeinstallprompt', handler);
 
-    // Fallback para iOS e navegadores onde o evento não dispara
-    if (isMobile) {
-      fallbackTimeout = setTimeout(() => {
-        setPromptState(prev => prev === 'hidden' ? 'big' : prev);
-      }, 6000);
+    // Fallback para iOS (Safari não suporta o evento automático)
+    if (isMobile && !isStandalone) {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIOS) {
+        fallbackTimeout = setTimeout(() => {
+          setPromptState('manual');
+        }, 8000); // Dar tempo ao utilizador para ver a landing page
+      }
     }
 
     return () => {
@@ -39,12 +40,12 @@ export default function InstallPrompt() {
     };
   }, []);
 
-  // Auto-esconder o banner grande após 10 segundos visível
+  // Auto-esconder o banner grande após 15 segundos visível
   useEffect(() => {
     if (promptState === 'big') {
       const autoHide = setTimeout(() => {
         setPromptState('mini');
-      }, 10000);
+      }, 15000);
       return () => clearTimeout(autoHide);
     }
   }, [promptState]);
@@ -52,12 +53,15 @@ export default function InstallPrompt() {
   const handleInstall = async () => {
     if (deferredPrompt) {
       try {
+        console.log('🚀 [PWA] A disparar prompt nativo...');
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
+        console.log(`✅ [PWA] Resultado da escolha: ${outcome}`);
         setPromptState('hidden');
         setDeferredPrompt(null);
       } catch (err) {
-        console.error(err);
+        console.error('❌ [PWA] Erro no prompt:', err);
+        setPromptState('manual');
       }
     } else {
       // Manual instruction for iOS / unsupported browsers
@@ -111,8 +115,15 @@ export default function InstallPrompt() {
           </div>
           
           {promptState === 'manual' && (
-            <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-              Para instalar, toca em <strong>Partilhar</strong> (ícone do meio na barra do navegador) e escolhe <strong>Adicionar ao Ecrã Principal</strong>.
+            <div style={{ marginTop: '16px', padding: '12px', background: 'rgba(255,255,255,0.07)', borderRadius: '12px', fontSize: '12px', color: 'var(--text-secondary)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              {/iPad|iPhone|iPod/.test(navigator.userAgent) ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <span style={{ color: 'var(--yellow)', fontWeight: 700 }}>📱 Instrução para iPhone:</span>
+                  <span>Toca no ícone de <strong>Partilhar</strong> (o quadrado com uma seta para cima na barra de baixo) e depois escolhe <strong>"Adicionar ao Ecrã Principal"</strong>.</span>
+                </div>
+              ) : (
+                <>Para instalar, clica nos três pontos do navegador e escolhe <strong>"Instalar Aplicação"</strong> ou <strong>"Adicionar ao Ecrã Principal"</strong>.</>
+              )}
             </div>
           )}
         </div>
