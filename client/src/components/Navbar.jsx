@@ -126,7 +126,7 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link to="/login" className="btn btn-secondary" onClick={() => setIsMenuOpen(false)}>
+                <Link to="/login" className="btn" style={{ background: 'rgba(0,0,0,0.05)', color: '#1a1a1a' }} onClick={() => setIsMenuOpen(false)}>
                   Entrar
                 </Link>
                 <Link to="/register" className="btn btn-primary" onClick={() => setIsMenuOpen(false)}>Criar Conta</Link>
