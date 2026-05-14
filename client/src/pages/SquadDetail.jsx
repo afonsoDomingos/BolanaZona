@@ -34,19 +34,42 @@ export default function SquadDetail() {
     }
   };
 
-  const handleAddPlayer = (e) => {
+  const saveSquad = async (dataToSave, showSuccessMsg = true) => {
+    setSaving(true);
+    try {
+      await api.put(`/squads/${id}`, dataToSave);
+      if (showSuccessMsg) toast.success('Plantel atualizado! ✨');
+      setSquad(dataToSave);
+    } catch {
+      toast.error('Erro ao atualizar.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    if (e) e.preventDefault();
+    await saveSquad(squad, true);
+  };
+
+  const handleAddPlayer = async (e) => {
     e.preventDefault();
     if (!newPlayer.name) return;
     
+    let updatedPlayers;
     if (editingPlayerIndex !== null) {
-      const updatedPlayers = [...(squad.players || [])];
+      updatedPlayers = [...(squad.players || [])];
       updatedPlayers[editingPlayerIndex] = newPlayer;
-      setSquad({ ...squad, players: updatedPlayers });
       setEditingPlayerIndex(null);
     } else {
-      setSquad({ ...squad, players: [...(squad.players || []), newPlayer] });
+      updatedPlayers = [...(squad.players || []), newPlayer];
     }
+    
+    const updatedSquad = { ...squad, players: updatedPlayers };
     setNewPlayer({ name: '', position: '', number: '', photo: '' });
+    
+    // Auto-save
+    await saveSquad(updatedSquad, false);
   };
 
   const handleEditPlayer = (index) => {
@@ -62,10 +85,13 @@ export default function SquadDetail() {
     setNewPlayer({ name: '', position: '', number: '', photo: '' });
   };
 
-  const handleRemovePlayer = (index) => {
+  const handleRemovePlayer = async (index) => {
+    if (!window.confirm('Queres mesmo remover este jogador?')) return;
     const updatedPlayers = [...(squad.players || [])];
     updatedPlayers.splice(index, 1);
-    setSquad({ ...squad, players: updatedPlayers });
+    
+    const updatedSquad = { ...squad, players: updatedPlayers };
+    await saveSquad(updatedSquad, false);
   };
 
   useEffect(() => {
@@ -74,7 +100,6 @@ export default function SquadDetail() {
 
   const fetchSquad = async () => {
     try {
-      // Usamos a rota pública por agora, ou podemos criar um GET /squads/:id protegido
       const res = await api.get(`/squads/public/${id}`);
       setSquad(res.data);
     } catch {
@@ -82,20 +107,6 @@ export default function SquadDetail() {
       navigate('/dashboard/squads');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      await api.put(`/squads/${id}`, squad);
-      toast.success('Clube atualizado! ✨');
-      fetchSquad();
-    } catch {
-      toast.error('Erro ao atualizar.');
-    } finally {
-      setSaving(false);
     }
   };
 
