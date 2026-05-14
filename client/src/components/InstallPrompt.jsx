@@ -27,7 +27,7 @@ export default function InstallPrompt() {
     // Fallback para quando o evento não dispara (incluindo iOS e Android/Safari/etc)
     if (isMobile && !isStandalone) {
       fallbackTimeout = setTimeout(() => {
-        setPromptState(prev => prev === 'hidden' ? 'mini' : prev);
+        setPromptState(prev => prev === 'hidden' ? 'big' : prev);
       }, 3000); 
     }
 
@@ -176,7 +176,7 @@ export default function InstallPrompt() {
             background: linear-gradient(135deg, var(--green), #00e676);
             border-radius: 50%;
             align-items: center;
-            justifyContent: center;
+            justify-content: center;
             box-shadow: 0 8px 24px rgba(0, 200, 83, 0.4);
             z-index: 9999;
             cursor: pointer;
