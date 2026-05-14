@@ -6,23 +6,37 @@ export default function InstallPrompt() {
   const [promptState, setPromptState] = useState('hidden'); // 'hidden', 'big', 'mini', 'manual'
 
   useEffect(() => {
+    let fallbackTimeout;
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isStandalone) {
+      setPromptState('hidden');
+      return;
+    }
 
     const handler = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
+      // Sempre que o navegador dispare o evento, mostramos após um pequeno delay
+      setTimeout(() => {
+        setPromptState(prev => prev === 'hidden' ? 'big' : prev);
+      }, 5000);
     };
 
     window.addEventListener('beforeinstallprompt', handler);
 
-    if (!isStandalone && isMobile) {
-      setTimeout(() => {
+    // Fallback para iOS e navegadores onde o evento não dispara
+    if (isMobile) {
+      fallbackTimeout = setTimeout(() => {
         setPromptState(prev => prev === 'hidden' ? 'big' : prev);
-      }, 5000);
+      }, 6000);
     }
 
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+      if (fallbackTimeout) clearTimeout(fallbackTimeout);
+    };
   }, []);
 
   // Auto-esconder o banner grande após 10 segundos visível
@@ -147,10 +161,10 @@ export default function InstallPrompt() {
           .install-mini {
             display: flex;
             position: fixed;
-            bottom: 24px;
-            left: 24px;
-            width: 52px;
-            height: 52px;
+            bottom: 20px;
+            left: 20px;
+            width: 48px;
+            height: 48px;
             background: linear-gradient(135deg, var(--green), #00e676);
             border-radius: 50%;
             align-items: center;

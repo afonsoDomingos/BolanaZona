@@ -13,7 +13,7 @@ export default function CommunityFAB() {
     <Link 
       to="/community" 
       className="fab-item animate-fade-in"
-      style={{ position: 'fixed', bottom: '84px', right: '20px', zIndex: 9998 }}
+      style={{ position: 'fixed', bottom: '96px', right: '20px', zIndex: 9998 }}
       title="Entrar na Comunidade"
     >
       <div className="fab-badge">LIVE</div>

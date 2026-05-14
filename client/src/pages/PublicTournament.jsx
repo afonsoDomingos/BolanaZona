@@ -213,7 +213,7 @@ export default function PublicTournament() {
               <div className="empty-state"><h3>Tabela a ser preparada...</h3><p>Os dados aparecerão logo após o primeiro apito!</p></div>
             ) : (
               <div style={{ position: 'relative' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 16 }}>
                   <h3 className="font-syne" style={{ fontSize: 20, fontWeight: 800 }}>Classificação Oficial</h3>
                   <button onClick={() => captureImage('print-standings', `Classificacao_${tournament.name}`)} className="btn btn-secondary btn-sm" style={{ border: '1px solid var(--green)', color: 'var(--green)' }}>
                     <Camera size={14} /> Guardar Tabela
