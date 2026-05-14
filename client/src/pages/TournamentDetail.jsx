@@ -443,6 +443,11 @@ export default function TournamentDetail() {
                                 <div style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: 8, minWidth: 80, textAlign: 'center' }}>
                                   {m.status === 'finished' ? (
                                     <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</div>
+                                  ) : m.status === 'live' || m.status === 'active' ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                      <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore !== null ? m.homeScore : 0} - {m.awayScore !== null ? m.awayScore : 0}</div>
+                                      <div className="badge badge-green pulse-dot" style={{ fontSize: 9, padding: '2px 6px' }}>LIVE</div>
+                                    </div>
                                   ) : m.status === 'cancelled' ? (
                                     <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--red)' }}>CANCELADO</div>
                                   ) : (
@@ -963,6 +968,8 @@ function MatchScheduleModal({ match, tournamentId, onClose, onSaved }) {
   const [location, setLocation] = useState(match.location || '');
   const [referee, setReferee] = useState(match.referee || '');
   const [status, setStatus] = useState(match.status || 'scheduled');
+  const [homeScore, setHomeScore] = useState(match.homeScore ?? '');
+  const [awayScore, setAwayScore] = useState(match.awayScore ?? '');
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
@@ -970,7 +977,12 @@ function MatchScheduleModal({ match, tournamentId, onClose, onSaved }) {
     try {
       const dateTime = date && time ? new Date(`${date}T${time}`) : null;
       await api.put(`/tournaments/${tournamentId}/matches/${match._id}`, {
-        date: dateTime, location, referee, status
+        date: dateTime, 
+        location, 
+        referee, 
+        status,
+        homeScore: homeScore !== '' ? Number(homeScore) : null,
+        awayScore: awayScore !== '' ? Number(awayScore) : null
       });
       toast.success('Jogo atualizado!');
       onSaved();
@@ -992,9 +1004,28 @@ function MatchScheduleModal({ match, tournamentId, onClose, onSaved }) {
             <label className="form-label">Estado da Partida</label>
             <select className="form-select" value={status} onChange={e => setStatus(e.target.value)}>
               <option value="scheduled">📅 Agendado</option>
+              <option value="live">🔴 Ao Vivo / A Decorrer</option>
+              <option value="finished">🏁 Concluído</option>
               <option value="cancelled">🚫 Cancelado / Anulado</option>
             </select>
           </div>
+
+          {(status === 'live' || status === 'active' || status === 'finished') && (
+            <div style={{ background: 'rgba(0,200,83,0.05)', padding: 16, borderRadius: 12, border: '1px solid rgba(0,200,83,0.1)' }}>
+              <label className="form-label" style={{ textAlign: 'center', display: 'block', marginBottom: 12 }}>Pontuação em Direto</label>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>CASA</div>
+                  <input type="number" min="0" className="score-input" style={{ width: 60, height: 50, fontSize: 24 }} value={homeScore} onChange={e => setHomeScore(e.target.value)} />
+                </div>
+                <div style={{ fontWeight: 800, fontSize: 20, marginTop: 15 }}>×</div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>FORA</div>
+                  <input type="number" min="0" className="score-input" style={{ width: 60, height: 50, fontSize: 24 }} value={awayScore} onChange={e => setAwayScore(e.target.value)} />
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="form-grid form-grid-2">
             <div className="form-group">

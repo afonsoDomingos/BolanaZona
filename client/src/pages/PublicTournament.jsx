@@ -310,7 +310,7 @@ export default function PublicTournament() {
 
                             <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 32px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap' }}>
                               {m.location && <div style={{ fontSize: 12, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}><MapPin size={14} color="var(--green)" /> {m.location}</div>}
-                              {m.status === 'active' && <div style={{ fontSize: 12, color: 'var(--green)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 6 }}><Clock size={14} className="spin-slow" /> A DECORRER</div>}
+                              {(m.status === 'live' || m.status === 'active') && <div style={{ fontSize: 12, color: 'var(--green)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 6 }}><Clock size={14} className="spin-slow" /> A DECORRER</div>}
                               {m.referee && <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>🏁 {m.referee}</div>}
                             </div>
 
