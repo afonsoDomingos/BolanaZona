@@ -24,14 +24,11 @@ export default function InstallPrompt() {
 
     window.addEventListener('beforeinstallprompt', handler);
 
-    // Fallback para iOS (Safari não suporta o evento automático)
+    // Fallback para quando o evento não dispara (incluindo iOS e Android/Safari/etc)
     if (isMobile && !isStandalone) {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      if (isIOS) {
-        fallbackTimeout = setTimeout(() => {
-          setPromptState('manual');
-        }, 8000); // Dar tempo ao utilizador para ver a landing page
-      }
+      fallbackTimeout = setTimeout(() => {
+        setPromptState(prev => prev === 'hidden' ? 'mini' : prev);
+      }, 3000); 
     }
 
     return () => {
@@ -42,7 +39,7 @@ export default function InstallPrompt() {
 
   // Auto-esconder o banner grande após 15 segundos visível
   useEffect(() => {
-    if (promptState === 'big') {
+    if (promptState === 'big' || promptState === 'manual') {
       const autoHide = setTimeout(() => {
         setPromptState('mini');
       }, 15000);
@@ -73,7 +70,7 @@ export default function InstallPrompt() {
 
   return (
     <>
-      {promptState === 'big' || promptState === 'manual' ? (
+      {(promptState === 'big' || promptState === 'manual') ? (
         <div className="install-prompt animate-slide-up" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{ 
@@ -96,7 +93,7 @@ export default function InstallPrompt() {
             </div>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              {promptState !== 'manual' && (
+              {promptState === 'big' && (
                 <button 
                   onClick={handleInstall}
                   className="btn btn-primary btn-sm"
@@ -128,7 +125,7 @@ export default function InstallPrompt() {
           )}
         </div>
       ) : (
-        <div className="install-mini animate-fade-in" onClick={handleInstall} title="Instalar Bola na Zona">
+        <div className="install-mini animate-fade-in" onClick={() => setPromptState('big')} title="Instalar Bola na Zona">
           <Download size={22} color="#000" />
         </div>
       )}
@@ -148,7 +145,7 @@ export default function InstallPrompt() {
           align-items: center;
           gap: 16px;
           box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-          z-index: 1100;
+          z-index: 9999;
         }
 
         .install-mini {
@@ -179,13 +176,14 @@ export default function InstallPrompt() {
             background: linear-gradient(135deg, var(--green), #00e676);
             border-radius: 50%;
             align-items: center;
-            justify-content: center;
+            justifyContent: center;
             box-shadow: 0 8px 24px rgba(0, 200, 83, 0.4);
-            z-index: 1100;
+            z-index: 9999;
             cursor: pointer;
             border: 2px solid var(--bg-primary);
           }
         }
+      `}</style>
       `}</style>
     </>
   );
