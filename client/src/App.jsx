@@ -31,6 +31,7 @@ import TournamentDetail from './pages/TournamentDetail';
 import PublicTournament from './pages/PublicTournament';
 import Profile from './pages/Profile';
 import UserManagement from './pages/UserManagement';
+import AdminTeams from './pages/AdminTeams';
 import Community from './pages/Community';
 import Privacy from './pages/legal/Privacy';
 import Terms from './pages/legal/Terms';
@@ -75,6 +76,7 @@ function AppRoutes() {
           <Route path="/dashboard/analytics" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminAnalytics /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['superadmin']}><UserManagement /></ProtectedRoute>} />
+          <Route path="/admin/teams" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminTeams /></ProtectedRoute>} />
           <Route path="/support" element={<Support />} />
           <Route path="/community" element={<Community />} />
           <Route path="/legal/privacy" element={<Privacy />} />
