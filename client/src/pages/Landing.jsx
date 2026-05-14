@@ -139,7 +139,7 @@ export default function Landing() {
 
             {/* Trust badges */}
             <div style={{ display: 'flex', gap: 24, justifyContent: 'center', marginTop: 48, flexWrap: 'wrap' }}>
-              {['100% Gratuito', 'Sem instalação', 'Partilha fácil'].map(t => (
+              {['100% Gratuito', 'Instalável', 'Partilha fácil'].map(t => (
                 <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)', fontSize: 14 }}>
                   <CheckCircle size={16} color="var(--green)" /> {t}
                 </div>
