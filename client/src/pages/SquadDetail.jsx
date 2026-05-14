@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield, Users, Save, Trash2, Plus, X, Pencil, Upload, Image, Camera, PieChart } from 'lucide-react';
 import api from '../services/api';
@@ -13,6 +13,7 @@ export default function SquadDetail() {
   const [newPlayer, setNewPlayer] = useState({ name: '', position: '', number: '', photo: '' });
   const [editingPlayerIndex, setEditingPlayerIndex] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const playerFormRef = useRef(null);
 
   const uploadImage = async (file, type) => {
     setUploading(true);
@@ -51,6 +52,14 @@ export default function SquadDetail() {
   const handleEditPlayer = (index) => {
     setNewPlayer(squad.players[index]);
     setEditingPlayerIndex(index);
+    if (playerFormRef.current) {
+      playerFormRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingPlayerIndex(null);
+    setNewPlayer({ name: '', position: '', number: '', photo: '' });
   };
 
   const handleRemovePlayer = (index) => {
@@ -203,13 +212,13 @@ export default function SquadDetail() {
             </form>
           </div>
 
-          {/* JOGADORES (BREVEMENTE) */}
+          {/* JOGADORES */}
           <div className="card-glass" style={{ padding: 24, display: 'flex', flexDirection: 'column' }}>
             <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, fontSize: 18, fontWeight: 800 }}>
               <Users size={20} color="var(--green)" /> Plantel Oficial
             </h3>
             
-            <form onSubmit={handleAddPlayer} style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+            <form ref={playerFormRef} onSubmit={handleAddPlayer} style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
               <input className="form-input" placeholder="Nome do Jogador" value={newPlayer.name} onChange={e => setNewPlayer({...newPlayer, name: e.target.value})} style={{ flex: 2, height: 40 }} />
               <select className="form-select" value={newPlayer.position} onChange={e => setNewPlayer({...newPlayer, position: e.target.value})} style={{ flex: 1, height: 40 }}>
                 <option value="">Posição (Opc.)</option>
@@ -229,6 +238,11 @@ export default function SquadDetail() {
               <button type="submit" className="btn btn-primary" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center', background: editingPlayerIndex !== null ? 'var(--yellow)' : 'var(--green)', color: '#000', border: 'none' }}>
                 {editingPlayerIndex !== null ? <Save size={18} /> : <Plus size={18} />}
               </button>
+              {editingPlayerIndex !== null && (
+                <button type="button" onClick={cancelEdit} className="btn btn-secondary" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center', borderRadius: 10 }}>
+                  <X size={18} />
+                </button>
+              )}
             </form>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', maxHeight: 300, paddingRight: 8 }}>

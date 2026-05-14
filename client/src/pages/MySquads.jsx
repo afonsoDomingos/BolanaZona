@@ -149,7 +149,7 @@ export default function MySquads() {
               </Link>
             ))}
           </div>
-        ) : tab === 'challenges' ? (
+        )) : tab === 'challenges' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {challenges.filter(c => c.status !== 'accepted').length === 0 ? (
               <div className="empty-state card-glass">
