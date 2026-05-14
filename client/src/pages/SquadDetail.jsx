@@ -234,9 +234,12 @@ export default function SquadDetail() {
 
           {/* JOGADORES */}
           <div className="card-glass" style={{ padding: 24, display: 'flex', flexDirection: 'column' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, fontSize: 18, fontWeight: 800 }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 18, fontWeight: 800 }}>
               <Users size={20} color="var(--green)" /> Plantel Oficial
             </h3>
+            <p style={{ fontSize: 12, color: 'var(--yellow)', marginBottom: 16, fontWeight: 600 }}>
+              💡 Preenche os dados e clica no ícone amarelo (disquete) para guardar cada jogador.
+            </p>
             
             <form ref={playerFormRef} onSubmit={handleAddPlayer} style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
               <input className="form-input" placeholder="Nome do Jogador" value={newPlayer.name} onChange={e => setNewPlayer({...newPlayer, name: e.target.value})} style={{ flex: 2, height: 40 }} />
