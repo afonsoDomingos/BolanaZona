@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell, Shield } from 'lucide-react';
+import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell, Shield, Phone } from 'lucide-react';
 
 function RecentActivity() {
   const [activities, setActivities] = useState([]);
@@ -145,6 +145,40 @@ export default function Dashboard() {
             <Link to="/dashboard/tournaments/new" className="btn btn-primary"><Plus size={16} /> Novo Torneio</Link>
           </div>
         </div>
+
+        {/* WhatsApp Missing Alert */}
+        {!user?.phone && (
+          <div className="card animate-slide-up" style={{ 
+            background: 'rgba(37, 211, 102, 0.08)', 
+            border: '1px solid rgba(37, 211, 102, 0.2)', 
+            marginBottom: 32, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            gap: 16,
+            flexWrap: 'wrap',
+            padding: '16px 24px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ 
+                width: 48, height: 48, borderRadius: 14, 
+                background: '#25D366', display: 'flex', 
+                alignItems: 'center', justifyContent: 'center', color: '#000' 
+              }}>
+                <Phone size={24} />
+              </div>
+              <div>
+                <h4 style={{ fontWeight: 800, fontSize: 16, marginBottom: 2 }}>Configura o teu WhatsApp! 📲</h4>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                  Precisas de um número para receber notificações de desafios e gerir os teus clubes.
+                </p>
+              </div>
+            </div>
+            <Link to="/profile" className="btn" style={{ background: '#25D366', color: '#000', fontWeight: 800, fontSize: 13 }}>
+              Registar Agora
+            </Link>
+          </div>
+        )}
 
         <div className="dashboard-grid">
           {/* Main Column */}

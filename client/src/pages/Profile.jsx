@@ -114,7 +114,10 @@ export default function Profile() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Telemóvel</label>
+              <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                Telemóvel 
+                <span style={{ fontSize: 10, color: '#25D366', fontWeight: 700 }}>● USADO PARA WHATSAPP</span>
+              </label>
               <div className="input-wrapper">
                 <Phone size={18} />
                 <input type="tel" className="form-input" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required />
