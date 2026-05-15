@@ -186,7 +186,6 @@ export default function Dashboard() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             {/* Stats */}
             {/* Global/Live Matches */}
-            {/* Jogos em Destaque removidos temporariamente */}
 
             <style>{`
               .badge-red { background: rgba(255, 23, 68, 0.1); color: #ff1744; border: 1px solid rgba(255, 23, 68, 0.2); }
@@ -213,6 +212,66 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
+
+            {/* Jogos em Destaque - Design Slim */}
+            {matches.length > 0 && (
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                  <h2 style={{ fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    Jogos em Destaque <span className="badge badge-red" style={{ fontSize: 9, padding: '1px 6px' }}>LIVE</span>
+                  </h2>
+                </div>
+                
+                <div style={{ 
+                  display: 'flex', 
+                  overflowX: 'auto', 
+                  gap: 12, 
+                  paddingBottom: 8,
+                  scrollbarWidth: 'none'
+                }} className="hide-scrollbar">
+                  {matches.map(m => (
+                    <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="card" style={{ 
+                      textDecoration: 'none', 
+                      minWidth: 280,
+                      padding: '12px 16px', 
+                      flexShrink: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 8,
+                      background: 'rgba(255,255,255,0.02)',
+                      border: '1px solid rgba(255,255,255,0.05)'
+                    }}>
+                      <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        {m.tournament?.name}
+                      </div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                          <div style={{ width: 24, height: 24, borderRadius: 6, background: m.homeTeam?.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
+                            {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                          </div>
+                          <span style={{ fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 70 }}>{m.homeTeam?.name}</span>
+                        </div>
+
+                        <div style={{ padding: '2px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: 6, minWidth: 50, textAlign: 'center' }}>
+                          <span style={{ fontWeight: 900, fontSize: 13, color: m.status === 'live' ? 'var(--green)' : 'var(--text-primary)' }}>
+                            {m.status === 'live' ? `${m.homeScore} - ${m.awayScore}` : 'VS'}
+                          </span>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'flex-end' }}>
+                          <span style={{ fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 70 }}>{m.awayTeam?.name}</span>
+                          <div style={{ width: 24, height: 24, borderRadius: 6, background: m.awayTeam?.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
+                            {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                  <div style={{ minWidth: 20, flexShrink: 0 }} />
+                </div>
+              </div>
+            )}
 
             {/* Recent Tournaments */}
             <div>
