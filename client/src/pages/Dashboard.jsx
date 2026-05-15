@@ -227,7 +227,10 @@ export default function Dashboard() {
                   overflowX: 'auto', 
                   gap: 12, 
                   paddingBottom: 8,
-                  scrollbarWidth: 'none'
+                  margin: '0 -24px',
+                  padding: '0 24px 8px',
+                  scrollbarWidth: 'none',
+                  WebkitOverflowScrolling: 'touch'
                 }} className="hide-scrollbar">
                   {matches.map(m => (
                     <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="card" style={{ 
@@ -245,30 +248,44 @@ export default function Dashboard() {
                         {m.tournament?.name}
                       </div>
                       
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-                          <div style={{ width: 24, height: 24, borderRadius: 6, background: m.homeTeam?.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+                          <div style={{ width: 22, height: 22, borderRadius: 5, background: m.homeTeam?.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                             {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                           </div>
-                          <span style={{ fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 70 }}>{m.homeTeam?.name}</span>
+                          <span style={{ 
+                            fontWeight: 700, 
+                            fontSize: 11, 
+                            whiteSpace: 'nowrap', 
+                            overflow: 'hidden', 
+                            textOverflow: 'ellipsis',
+                            color: 'var(--text-primary)'
+                          }}>{m.homeTeam?.name}</span>
                         </div>
 
-                        <div style={{ padding: '2px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: 6, minWidth: 50, textAlign: 'center' }}>
+                        <div style={{ padding: '2px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: 6, minWidth: 46, textAlign: 'center', flexShrink: 0 }}>
                           <span style={{ fontWeight: 900, fontSize: 13, color: m.status === 'live' ? 'var(--green)' : 'var(--text-primary)' }}>
                             {m.status === 'live' ? `${m.homeScore} - ${m.awayScore}` : 'VS'}
                           </span>
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'flex-end' }}>
-                          <span style={{ fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 70 }}>{m.awayTeam?.name}</span>
-                          <div style={{ width: 24, height: 24, borderRadius: 6, background: m.awayTeam?.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'flex-end', minWidth: 0 }}>
+                          <span style={{ 
+                            fontWeight: 700, 
+                            fontSize: 11, 
+                            whiteSpace: 'nowrap', 
+                            overflow: 'hidden', 
+                            textOverflow: 'ellipsis',
+                            color: 'var(--text-primary)'
+                          }}>{m.awayTeam?.name}</span>
+                          <div style={{ width: 22, height: 22, borderRadius: 5, background: m.awayTeam?.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                             {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                           </div>
                         </div>
                       </div>
                     </Link>
                   ))}
-                  <div style={{ minWidth: 20, flexShrink: 0 }} />
+                  <div style={{ minWidth: 24, flexShrink: 0 }} />
                 </div>
               </div>
             )}
