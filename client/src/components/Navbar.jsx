@@ -129,7 +129,7 @@ export default function Navbar() {
                 <Link 
                   to="/login" 
                   className="btn btn-sm" 
-                  style={{ background: 'rgba(0,0,0,0.04)', color: '#1a1a1a', border: '1px solid rgba(0,0,0,0.05)' }} 
+                  style={{ background: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} 
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Entrar
