@@ -200,11 +200,15 @@ export default function Dashboard() {
                   gap: 16, 
                   paddingBottom: 16,
                   margin: '0 -24px',
-                  padding: '0 24px 16px',
-                  scrollbarWidth: 'none'
+                            scrollbarWidth: 'none'
                 }}>
                   {matches.map(m => (
-                    <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="card" style={{ textDecoration: 'none', minWidth: 300, padding: 20, flexShrink: 0 }}>
+                    <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="card" style={{ 
+                      textDecoration: 'none', 
+                      minWidth: 'calc((100% - 32px) / 3)', /* Mostra exatamente 3 cards com os gaps */
+                      padding: 20, 
+                      flexShrink: 0 
+                    }}>
                       <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800, marginBottom: 12 }}>
                         {m.tournament?.name}
                       </div>
@@ -254,9 +258,10 @@ export default function Dashboard() {
                       </div>
                     </Link>
                   ))}
-                  {/* Spacer to prevent cut on the right */}
-                  <div style={{ minWidth: 8, flexShrink: 0 }} />
+                  <div style={{ minWidth: 24, flexShrink: 0 }} /> {/* Espaçador final para o scroll */}
                 </div>
+              </div>
+           </div>
               </div>
             )}
 
