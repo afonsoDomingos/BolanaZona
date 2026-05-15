@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageSquare, Trophy, Heart, Send, Zap, Trash2 } from 'lucide-react';
+import { MessageSquare, Trophy, Heart, Send, Zap, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -14,6 +14,19 @@ export default function Community() {
   const [scoreData, setScoreData] = useState({ teamA: '', teamB: '', scoreA: 0, scoreB: 0, period: 'FT', matchTime: '' });
   const [sending, setSending] = useState(false);
   const scrollRef = useRef(null);
+
+  const scrollChat = (direction) => {
+    if (scrollRef.current) {
+      const amount = direction === 'up' ? -400 : 400;
+      scrollRef.current.scrollBy({ top: amount, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  };
 
   const fetchPosts = async () => {
     try {
@@ -265,6 +278,44 @@ export default function Community() {
               </div>
             );
           })}
+        </div>
+
+        {/* FLOATING SCROLL BUTTONS */}
+        <div style={{ 
+          position: 'fixed', 
+          right: 16, 
+          bottom: 160, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: 8, 
+          zIndex: 90 
+        }}>
+          <button 
+            onClick={() => scrollChat('up')}
+            style={{ 
+              width: 36, height: 36, borderRadius: '50%', 
+              background: 'rgba(8, 13, 26, 0.8)', 
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', backdropFilter: 'blur(8px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+            }}
+          >
+            <ChevronUp size={20} />
+          </button>
+          <button 
+            onClick={() => scrollChat('down')}
+            style={{ 
+              width: 36, height: 36, borderRadius: '50%', 
+              background: 'rgba(8, 13, 26, 0.8)', 
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', backdropFilter: 'blur(8px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+            }}
+          >
+            <ChevronDown size={20} />
+          </button>
         </div>
 
         {/* FIXED INPUT BAR */}
