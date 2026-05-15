@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
@@ -49,6 +49,9 @@ const GuestRoute = ({ children }) => {
 };
 
 function AppRoutes() {
+  const location = useLocation();
+  const isCommunityPage = location.pathname === '/community';
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
@@ -87,10 +90,10 @@ function AppRoutes() {
         </Routes>
       </main>
       <Footer />
-      <CommunityFAB />
+      {!isCommunityPage && <CommunityFAB />}
       <FeedbackPopup />
       <ScrollToTop />
-      <InstallPrompt />
+      {!isCommunityPage && <InstallPrompt />}
       <Toaster
         position="top-right"
         toastOptions={{
