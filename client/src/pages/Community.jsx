@@ -102,17 +102,17 @@ export default function Community() {
       }}>
         
         {/* HEADER */}
-        <header className="community-header">
+        <header className="community-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
           <div>
-            <h1 className="font-syne">
+            <h1 className="font-syne" style={{ marginBottom: 2 }}>
               Mural da <span className="gradient-text">Malta</span>
             </h1>
-            <div className="live-badge">
-              <span className="dot" />
-              <span className="text">Live</span>
-            </div>
+            <p className="subtitle" style={{ textAlign: 'left', opacity: 0.8 }}>Comunidade de futebol em tempo real.</p>
           </div>
-          <p className="subtitle">Comunidade de futebol<br/>em tempo real.</p>
+          <div className="live-badge" style={{ marginTop: 4 }}>
+            <span className="dot" />
+            <span className="text">Live</span>
+          </div>
         </header>
 
         {/* SCROLLABLE FEED */}
