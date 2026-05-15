@@ -160,73 +160,73 @@ export default function Community() {
                 flexDirection: 'column',
                 alignItems: isMe ? 'flex-end' : 'flex-start',
                 width: '100%',
-                marginTop: showName ? 8 : 2
+                marginTop: showName ? 6 : 1
               }}>
                 {showName && (
-                  <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--green)', marginBottom: 2, marginLeft: 4 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--green)', marginBottom: 1, marginLeft: 4 }}>
                     {post.user?.name || 'Utilizador'}
                   </div>
                 )}
                 <div style={{ 
                   display: 'flex', 
                   flexDirection: isMe ? 'row-reverse' : 'row',
-                  gap: 8,
-                  maxWidth: '85%'
+                  gap: 6,
+                  maxWidth: '92%'
                 }}>
                   {/* Bubble */}
                   <div style={{ 
                     background: isMe ? 'var(--green)' : 'rgba(255,255,255,0.08)',
                     color: isMe ? '#000' : '#fff',
-                    padding: '6px 10px',
-                    borderRadius: isMe ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    padding: '4px 10px',
+                    borderRadius: isMe ? '10px 10px 2px 10px' : '10px 10px 10px 2px',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
                     border: '1px solid ' + (isMe ? 'transparent' : 'rgba(255,255,255,0.05)'),
                     wordBreak: 'break-word',
                     overflowWrap: 'break-word'
                   }}>
                     {post.type === 'text' && (
-                      <p style={{ fontSize: 13, lineHeight: 1.4, margin: 0 }}>{post.content}</p>
+                      <p style={{ fontSize: 12, lineHeight: 1.3, margin: 0 }}>{post.content}</p>
                     )}
 
                     {post.type === 'score' && (
                       <div style={{ 
                         background: isMe ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.2)', 
-                        padding: '8px 12px', 
-                        borderRadius: 10, 
+                        padding: '5px 10px', 
+                        borderRadius: 8, 
                         display: 'flex', 
                         flexDirection: 'column',
                         alignItems: 'center', 
-                        gap: 6,
-                        marginTop: 2,
-                        minWidth: 180
+                        gap: 2,
+                        marginTop: 1,
+                        minWidth: 210
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 8 }}>
-                          <span style={{ fontWeight: 800, fontSize: 12, flex: 1, textAlign: 'right' }}>{post.scoreData.teamA}</span>
+                          <span style={{ fontWeight: 800, fontSize: 11, flex: 1, textAlign: 'right' }}>{post.scoreData.teamA}</span>
                           <div style={{ 
                             background: isMe ? '#000' : 'var(--green)', 
                             color: isMe ? 'var(--green)' : '#000', 
-                            padding: '2px 10px', 
-                            borderRadius: 6, 
+                            padding: '1px 10px', 
+                            borderRadius: 4, 
                             fontWeight: 900, 
-                            fontSize: 14,
-                            letterSpacing: 0.5,
-                            boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
+                            fontSize: 13,
+                            letterSpacing: 0.2,
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                           }}>
-                            {post.scoreData.scoreA} - {post.scoreData.scoreB}
+                            {post.scoreData.scoreA}-{post.scoreData.scoreB}
                           </div>
-                          <span style={{ fontWeight: 800, fontSize: 12, flex: 1, textAlign: 'left' }}>{post.scoreData.teamB}</span>
+                          <span style={{ fontWeight: 800, fontSize: 11, flex: 1, textAlign: 'left' }}>{post.scoreData.teamB}</span>
                         </div>
                         {post.scoreData.period && (
                           <div style={{ 
-                            background: isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)',
-                            padding: '2px 10px',
-                            borderRadius: 12,
-                            display: 'flex', alignItems: 'center', gap: 4
+                            background: isMe ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.03)',
+                            padding: '1px 8px',
+                            borderRadius: 10,
+                            display: 'flex', alignItems: 'center', gap: 2
                           }}>
-                            <span style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', color: isMe ? '#000' : 'var(--green)' }}>
-                              {post.scoreData.period === 'PR' ? 'Pré-jogo' :
-                               post.scoreData.period === '1T' ? '1ª Parte' : 
-                               post.scoreData.period === '2T' ? '2ª Parte' : 'Finalizado'}
+                            <span style={{ fontSize: 8, fontWeight: 800, textTransform: 'uppercase', color: isMe ? '#000' : 'var(--green)' }}>
+                              {post.scoreData.period === 'PR' ? 'Pré' :
+                               post.scoreData.period === '1T' ? '1ª P' : 
+                               post.scoreData.period === '2T' ? '2ª P' : 'Fim'}
                             </span>
                           </div>
                         )}
@@ -236,15 +236,15 @@ export default function Community() {
                     {post.type === 'goal' && (
                       <div style={{ 
                         textAlign: 'center', 
-                        padding: '4px 10px', 
+                        padding: '2px 10px', 
                         background: post.content.includes('MADRID') ? '#fff' : 
                                     post.content.includes('BARÇA') ? 'linear-gradient(90deg, #a50044, #004d98)' :
                                     '#00C853',
-                        borderRadius: 6,
+                        borderRadius: 5,
                         marginTop: 1,
-                        minWidth: 100
+                        minWidth: 120
                       }}>
-                        <h4 style={{ margin: 0, fontSize: 13, color: post.content.includes('MADRID') ? '#000' : '#fff' }} className="pulse-text">{post.content}</h4>
+                        <h4 style={{ margin: 0, fontSize: 11, color: post.content.includes('MADRID') ? '#000' : '#fff' }} className="pulse-text">{post.content}</h4>
                       </div>
                     )}
 
