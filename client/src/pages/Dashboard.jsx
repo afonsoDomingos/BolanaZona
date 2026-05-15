@@ -213,7 +213,17 @@ export default function Dashboard() {
                           <div style={{ width: 40, height: 40, borderRadius: 10, background: m.homeTeam?.color || 'var(--green)', margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                             {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                           </div>
-                          <div style={{ fontWeight: 800, fontSize: 13, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.homeTeam?.name}</div>
+                          <div style={{ 
+                            fontWeight: 800, 
+                            fontSize: 12, 
+                            maxWidth: 110, 
+                            overflow: 'hidden', 
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            lineHeight: '1.2',
+                            minHeight: '2.4em'
+                          }}>{m.homeTeam?.name}</div>
                         </div>
                         
                         <div style={{ textAlign: 'center', minWidth: 70 }}>
@@ -229,7 +239,17 @@ export default function Dashboard() {
                           <div style={{ width: 40, height: 40, borderRadius: 10, background: m.awayTeam?.color || 'var(--green)', margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                             {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                           </div>
-                          <div style={{ fontWeight: 800, fontSize: 13, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.awayTeam?.name}</div>
+                          <div style={{ 
+                            fontWeight: 800, 
+                            fontSize: 12, 
+                            maxWidth: 110, 
+                            overflow: 'hidden', 
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            lineHeight: '1.2',
+                            minHeight: '2.4em'
+                          }}>{m.awayTeam?.name}</div>
                         </div>
                       </div>
                     </Link>
