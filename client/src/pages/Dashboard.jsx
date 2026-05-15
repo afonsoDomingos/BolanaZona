@@ -134,24 +134,15 @@ export default function Dashboard() {
             </h1>
             <p style={{ color: 'var(--text-secondary)', marginTop: 6 }}>Resumo dos teus torneios</p>
           </div>
-          <div style={{ 
-            display: 'flex', 
-            gap: 12, 
-            overflowX: 'auto', 
-            paddingBottom: 8, 
-            marginRight: -20, 
-            paddingRight: 20,
-            scrollbarWidth: 'none',
-            WebkitOverflowScrolling: 'touch'
-          }} className="hide-scrollbar">
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingRight: 4 }}>
             {user?.role === 'superadmin' && (
-              <div style={{ display: 'flex', gap: 12 }}>
-                <Link to="/admin/users" className="btn btn-secondary" style={{ flexShrink: 0 }}><Users size={16} /> Utilizadores</Link>
-                <Link to="/admin/teams" className="btn btn-secondary" style={{ flexShrink: 0 }}><Shield size={16} /> Central de Equipas</Link>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <Link to="/admin/users" className="btn btn-secondary"><Users size={16} /> Utilizadores</Link>
+                <Link to="/admin/teams" className="btn btn-secondary"><Shield size={16} /> Central de Equipas</Link>
               </div>
             )}
-            <Link to="/dashboard/squads" className="btn btn-secondary" style={{ flexShrink: 0 }}><Shield size={16} /> Meus Clubes</Link>
-            <Link to="/dashboard/tournaments/new" className="btn btn-primary" style={{ flexShrink: 0 }}><Plus size={16} /> Novo Torneio</Link>
+            <Link to="/dashboard/squads" className="btn btn-secondary"><Shield size={16} /> Meus Clubes</Link>
+            <Link to="/dashboard/tournaments/new" className="btn btn-primary"><Plus size={16} /> Novo Torneio</Link>
           </div>
         </div>
 
@@ -162,22 +153,14 @@ export default function Dashboard() {
             border: '1px solid rgba(37, 211, 102, 0.2)', 
             marginBottom: 32, 
             display: 'flex', 
-            flexDirection: 'column',
-            alignItems: 'stretch', 
-            justifyContent: 'center',
-            textAlign: 'center',
-            gap: 20,
-            padding: '24px',
-            marginRight: 4,
-            '@media (min-width: 640px)': {
-              flexDirection: 'row',
-              textAlign: 'left',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            gap: 16,
+            flexWrap: 'wrap',
+            padding: '20px 24px',
+            marginRight: 4
           }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-              {/* Note: React doesn't support @media in inline styles like this, so I will just use flexWrap: wrap which is already there but improve the inner layout */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <div style={{ 
                 width: 48, height: 48, borderRadius: 14, 
                 background: '#25D366', display: 'flex', 
@@ -230,17 +213,7 @@ export default function Dashboard() {
                           <div style={{ width: 40, height: 40, borderRadius: 10, background: m.homeTeam?.color || 'var(--green)', margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                             {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                           </div>
-                          <div style={{ 
-                            fontWeight: 800, 
-                            fontSize: 12, 
-                            maxWidth: 110, 
-                            overflow: 'hidden', 
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            lineHeight: '1.2',
-                            minHeight: '2.4em'
-                          }}>{m.homeTeam?.name}</div>
+                          <div style={{ fontWeight: 800, fontSize: 13, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.homeTeam?.name}</div>
                         </div>
                         
                         <div style={{ textAlign: 'center', minWidth: 70 }}>
@@ -256,17 +229,7 @@ export default function Dashboard() {
                           <div style={{ width: 40, height: 40, borderRadius: 10, background: m.awayTeam?.color || 'var(--green)', margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                             {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                           </div>
-                          <div style={{ 
-                            fontWeight: 800, 
-                            fontSize: 12, 
-                            maxWidth: 110, 
-                            overflow: 'hidden', 
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            lineHeight: '1.2',
-                            minHeight: '2.4em'
-                          }}>{m.awayTeam?.name}</div>
+                          <div style={{ fontWeight: 800, fontSize: 13, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.awayTeam?.name}</div>
                         </div>
                       </div>
                     </Link>
