@@ -377,9 +377,21 @@ export default function Community() {
                     onClick={() => handleCreatePost()} 
                     className="btn btn-primary" 
                     disabled={sending}
-                    style={{ width: 40, height: 40, borderRadius: 12, padding: 0, justifyContent: 'center', flexShrink: 0 }}
+                    style={{ 
+                      width: 44, 
+                      height: 44, 
+                      borderRadius: '50%', 
+                      padding: 0, 
+                      justifyContent: 'center', 
+                      flexShrink: 0,
+                      boxShadow: '0 4px 12px rgba(0, 200, 83, 0.3)',
+                      transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                      marginBottom: 2
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
+                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                   >
-                    {sending ? <span className="spinner" style={{ width: 14, height: 14, border: '2px solid #000', borderTopColor: 'transparent' }} /> : <Send size={18} />}
+                    {sending ? <span className="spinner" style={{ width: 16, height: 16, border: '2px solid #000', borderTopColor: 'transparent' }} /> : <Send size={20} />}
                   </button>
                 )}
               </div>
