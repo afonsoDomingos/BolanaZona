@@ -181,12 +181,6 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div className="dashboard-grid">
-          {/* Main Column */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-            {/* Stats */}
-            {/* Global/Live Matches */}
-
 {/* Jogos em Destaque - Design Slim */}
             {matches.length > 0 && (
               <div style={{ marginBottom: 8 }}>
@@ -263,6 +257,12 @@ export default function Dashboard() {
                 </div>
               </div>
             )}
+        <div className="dashboard-grid">
+          {/* Main Column */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+            {/* Stats */}
+            {/* Global/Live Matches */}
+
 
 
 
