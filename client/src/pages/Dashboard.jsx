@@ -242,8 +242,6 @@ export default function Dashboard() {
                     overflowX: 'auto', 
                     gap: 12, 
                     paddingBottom: 8,
-                    margin: '0 -24px',
-                    padding: '0 24px 8px',
                     scrollbarWidth: 'none',
                     WebkitOverflowScrolling: 'touch',
                     scrollBehavior: 'smooth'
