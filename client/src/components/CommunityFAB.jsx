@@ -22,17 +22,18 @@ export default function CommunityFAB() {
       <style>{`
         .fab-badge {
           position: absolute;
-          top: -2px;
-          right: -2px;
+          top: 0;
+          right: 0;
           background: #ff1744;
           color: white;
-          font-size: 9px;
+          font-size: 8px;
           font-weight: 900;
-          padding: 2px 6px;
+          padding: 2px 7px;
           border-radius: 100px;
-          border: 2px solid var(--bg-primary);
+          border: 2px solid #00C853; /* Match button color */
           animation: pulse-red 2s infinite;
           z-index: 10;
+          box-shadow: 0 2px 8px rgba(255, 23, 68, 0.4);
         }
 
         @keyframes pulse-red {

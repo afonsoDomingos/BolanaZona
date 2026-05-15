@@ -134,7 +134,7 @@ export default function Dashboard() {
             </h1>
             <p style={{ color: 'var(--text-secondary)', marginTop: 6 }}>Resumo dos teus torneios</p>
           </div>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingRight: 4 }}>
             {user?.role === 'superadmin' && (
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 <Link to="/admin/users" className="btn btn-secondary"><Users size={16} /> Utilizadores</Link>
@@ -157,7 +157,8 @@ export default function Dashboard() {
             justifyContent: 'space-between',
             gap: 16,
             flexWrap: 'wrap',
-            padding: '16px 24px'
+            padding: '20px 24px',
+            marginRight: 4
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <div style={{ 
@@ -198,40 +199,43 @@ export default function Dashboard() {
                   overflowX: 'auto', 
                   gap: 16, 
                   paddingBottom: 16,
-                  margin: '0 -20px',
-                  padding: '0 20px 16px',
+                  margin: '0 -24px',
+                  padding: '0 24px 16px',
                   scrollbarWidth: 'none'
                 }}>
                   {matches.map(m => (
-                    <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="card" style={{ textDecoration: 'none', minWidth: 280, padding: 16, flexShrink: 0 }}>
+                    <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="card" style={{ textDecoration: 'none', minWidth: 300, padding: 20, flexShrink: 0 }}>
                       <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800, marginBottom: 12 }}>
                         {m.tournament?.name}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
                         <div style={{ flex: 1, textAlign: 'center' }}>
-                          <div style={{ width: 32, height: 32, borderRadius: 8, background: m.homeTeam?.color || 'var(--green)', margin: '0 auto 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                          <div style={{ width: 40, height: 40, borderRadius: 10, background: m.homeTeam?.color || 'var(--green)', margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                             {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                           </div>
-                          <div style={{ fontWeight: 700, fontSize: 12, maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.homeTeam?.name}</div>
+                          <div style={{ fontWeight: 800, fontSize: 13, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.homeTeam?.name}</div>
                         </div>
                         
-                        <div style={{ textAlign: 'center', minWidth: 60 }}>
+                        <div style={{ textAlign: 'center', minWidth: 70 }}>
                           {m.status === 'live' || m.status === 'active' ? (
-                            <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</div>
+                            <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--green)', letterSpacing: 1 }}>{m.homeScore} - {m.awayScore}</div>
                           ) : (
-                            <div style={{ fontSize: 14, fontWeight: 800 }}>{m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'VS'}</div>
+                            <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-secondary)' }}>{m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'VS'}</div>
                           )}
+                          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 700, marginTop: 4 }}>MIN: {m.minute || '0'}'</div>
                         </div>
 
                         <div style={{ flex: 1, textAlign: 'center' }}>
-                          <div style={{ width: 32, height: 32, borderRadius: 8, background: m.awayTeam?.color || 'var(--green)', margin: '0 auto 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                          <div style={{ width: 40, height: 40, borderRadius: 10, background: m.awayTeam?.color || 'var(--green)', margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                             {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                           </div>
-                          <div style={{ fontWeight: 700, fontSize: 12, maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.awayTeam?.name}</div>
+                          <div style={{ fontWeight: 800, fontSize: 13, maxWidth: 110, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.awayTeam?.name}</div>
                         </div>
                       </div>
                     </Link>
                   ))}
+                  {/* Spacer to prevent cut on the right */}
+                  <div style={{ minWidth: 8, flexShrink: 0 }} />
                 </div>
               </div>
             )}

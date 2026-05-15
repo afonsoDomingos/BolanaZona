@@ -438,7 +438,7 @@ export default function TournamentDetail() {
                           {roundMatches.map(m => (
                           <div key={m._id} className="match-card" style={{ padding: '12px 16px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                              <div style={{ flex: 1, textAlign: 'right', fontWeight: 700, fontSize: 14 }}>{m.homeTeam?.name || '—'}</div>
+                              <div style={{ flex: 1, textAlign: 'right', fontWeight: 700, fontSize: 14, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.homeTeam?.name || '—'}</div>
                               
                                 <div style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: 8, minWidth: 80, textAlign: 'center' }}>
                                   {m.status === 'finished' ? (
