@@ -83,20 +83,6 @@ export default function MySquads() {
     }
   };
 
-  return (
-    <div className="page animate-fade-in" style={{ paddingBottom: 100 }}>
-      <div className="container" style={{ maxWidth: 800 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 40, flexWrap: 'wrap', gap: 16 }}>
-          <div>
-            <h1 className="font-syne" style={{ fontSize: 32, fontWeight: 900, marginBottom: 8 }}>Meus Clubes</h1>
-            <p style={{ color: 'var(--text-secondary)' }}>A tua identidade no mundo do futebol.</p>
-          </div>
-          <button onClick={() => setShowModal(true)} className="btn btn-primary" style={{ padding: '0 24px', height: 44 }}>
-            <Plus size={18} /> Criar Clube
-          </button>
-        </div>
-
-
   const btnTabStyle = (t) => ({
     padding: '12px 0', background: 'none', border: 'none', flexShrink: 0,
     color: tab === t ? 'var(--green)' : 'var(--text-muted)',
@@ -373,8 +359,10 @@ export default function MySquads() {
           </button>
           <button onClick={() => setTab('results')} style={btnTabStyle('results')}>Resultados 🏁</button>
         </div>
+
 
-        {renderContent()}
+
+  {renderContent()}
       </div>
       {showModal && (
         <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
