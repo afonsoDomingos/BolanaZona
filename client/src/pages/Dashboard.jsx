@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell, Shield, Phone } from 'lucide-react';
+import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell, Shield, Phone, ChevronLeft, ChevronRight } from 'lucide-react';
 
 function RecentActivity() {
   const [activities, setActivities] = useState([]);
@@ -50,6 +50,15 @@ export default function Dashboard() {
       localStorage.removeItem('bnz_welcome');
     }
   }, []);
+
+  const scrollRef = useRef(null);
+
+  const scrollMatches = (direction) => {
+    if (scrollRef.current) {
+      const amount = direction === 'left' ? -300 : 300;
+      scrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     if (showWelcome) {
@@ -183,23 +192,63 @@ export default function Dashboard() {
 
 {/* Jogos em Destaque - Design Slim */}
             {matches.length > 0 && (
-              <div style={{ marginBottom: 8 }}>
+              <div style={{ marginBottom: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <h2 style={{ fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
                     Jogos em Destaque <span className="badge badge-red" style={{ fontSize: 9, padding: '1px 6px' }}>LIVE</span>
                   </h2>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button 
+                      onClick={() => scrollMatches('left')}
+                      style={{ 
+                        background: 'rgba(255,255,255,0.05)', 
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: 8,
+                        width: 32,
+                        height: 32,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'var(--text-primary)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <button 
+                      onClick={() => scrollMatches('right')}
+                      style={{ 
+                        background: 'rgba(255,255,255,0.05)', 
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: 8,
+                        width: 32,
+                        height: 32,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'var(--text-primary)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
                 </div>
                 
-                <div style={{ 
-                  display: 'flex', 
-                  overflowX: 'auto', 
-                  gap: 12, 
-                  paddingBottom: 8,
-                  margin: '0 -24px',
-                  padding: '0 24px 8px',
-                  scrollbarWidth: 'none',
-                  WebkitOverflowScrolling: 'touch'
-                }} className="hide-scrollbar">
+                <div 
+                  ref={scrollRef}
+                  style={{ 
+                    display: 'flex', 
+                    overflowX: 'auto', 
+                    gap: 12, 
+                    paddingBottom: 8,
+                    margin: '0 -24px',
+                    padding: '0 24px 8px',
+                    scrollbarWidth: 'none',
+                    WebkitOverflowScrolling: 'touch',
+                    scrollBehavior: 'smooth'
+                  }} className="hide-scrollbar"
+                >
                   {matches.map(m => (
                     <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="card" style={{ 
                       textDecoration: 'none', 
