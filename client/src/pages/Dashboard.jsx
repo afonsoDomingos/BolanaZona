@@ -199,13 +199,13 @@ export default function Dashboard() {
                   overflowX: 'auto', 
                   gap: 16, 
                   paddingBottom: 16,
-                  margin: '0 -24px',
+                  margin: '0 -24px', padding: '0 24px 16px',
                             scrollbarWidth: 'none'
                 }}>
                   {matches.map(m => (
                     <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="card" style={{ 
                       textDecoration: 'none', 
-                      minWidth: 'calc((100% - 32px) / 3)', /* Mostra exatamente 3 cards com os gaps */
+                      minWidth: 340,
                       padding: 20, 
                       flexShrink: 0 
                     }}>
