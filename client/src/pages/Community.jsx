@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { MessageSquare, Trophy, Heart, Send, Zap, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { MessageSquare, Trophy, Heart, Send, Zap, Trash2, ChevronUp, ChevronDown, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -14,6 +14,8 @@ export default function Community() {
   const [scoreData, setScoreData] = useState({ teamA: '', teamB: '', scoreA: 0, scoreB: 0, period: 'FT', matchTime: '' });
   const [sending, setSending] = useState(false);
   const scrollRef = useRef(null);
+
+  const navigate = useNavigate();
 
   const scrollChat = (direction) => {
     if (scrollRef.current) {
@@ -152,17 +154,52 @@ export default function Community() {
       }}>
         
         {/* HEADER */}
-        <header className="community-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
-          <div>
-            <h1 className="font-syne" style={{ marginBottom: 2 }}>
-              Mural da <span className="gradient-text">Malta</span>
-            </h1>
-            <p className="subtitle" style={{ textAlign: 'left', opacity: 0.8 }}>Comunidade de futebol em tempo real.</p>
+        <header className="community-header" style={{ 
+          flexDirection: 'row', 
+          justifyContent: 'space-between', 
+          alignItems: 'flex-start', 
+          gap: 4,
+          paddingTop: 12
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div>
+              <h1 className="font-syne" style={{ marginBottom: 2 }}>
+                Mural da <span className="gradient-text">Malta</span>
+              </h1>
+              <p className="subtitle" style={{ textAlign: 'left', opacity: 0.8 }}>Comunidade de futebol em tempo real.</p>
+            </div>
+            <div className="live-badge" style={{ marginTop: 4 }}>
+              <span className="dot" />
+              <span className="text">Live</span>
+            </div>
           </div>
-          <div className="live-badge" style={{ marginTop: 4 }}>
-            <span className="dot" />
-            <span className="text">Live</span>
-          </div>
+          
+          <button 
+            onClick={() => navigate('/dashboard')}
+            style={{ 
+              background: 'rgba(255,255,255,0.05)', 
+              border: '1px solid rgba(255,255,255,0.1)', 
+              borderRadius: '50%', 
+              width: 32, 
+              height: 32, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+              e.currentTarget.style.color = '#fff';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+              e.currentTarget.style.color = 'var(--text-muted)';
+            }}
+          >
+            <X size={18} />
+          </button>
         </header>
 
         {/* SCROLLABLE FEED */}
