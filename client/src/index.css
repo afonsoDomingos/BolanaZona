@@ -326,7 +326,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
 /* ===== NAV ===== */
 .navbar {
-  background: var(--bg-primary);
+  background: #ffffff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   position: sticky; top: 0; z-index: 100; height: 64px;
   display: flex; align-items: center;
@@ -344,7 +344,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .mobile-menu-btn { display: none; }
 .nav-link {
   padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 600;
-  color: var(--text-primary); transition: var(--transition);
+  color: #1a1a1a; transition: var(--transition);
   white-space: nowrap;
 }
 .nav-link:hover { background: rgba(0, 0, 0, 0.04); color: var(--green); }
@@ -389,7 +389,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .navbar-nav.mobile-open {
     display: flex; position: fixed; top: 64px; left: 0; right: 0; 
     height: calc(100dvh - 64px);
-    background: var(--bg-primary); 
+    background: #ffffff; 
     flex-direction: column; padding: 40px 24px 120px; gap: 16px;
     animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1001;
     border-top: 1px solid rgba(0,0,0,0.05);
@@ -437,7 +437,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
   .navbar-nav.mobile-open .btn-secondary {
     animation-delay: 0.3s;
-    background: var(--bg-card) !important;
+    background: #212529 !important;
     color: #fff !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   }
@@ -457,7 +457,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .navbar-nav.mobile-open .nav-link {
     padding: 18px 24px; 
     border-radius: 20px;
-    background: var(--bg-secondary);
+    background: #f8f9fa;
     width: 100%; 
     display: flex;
     align-items: center;
@@ -465,7 +465,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     gap: 12px;
     font-size: 17px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #1a1a1a;
     border: 1px solid transparent;
     transition: var(--transition);
     animation: slideUpFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
@@ -496,7 +496,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     align-items: center; 
     justify-content: center; 
     background: none; 
-    color: var(--text-primary);
+    color: #1a1a1a;
     padding: 8px;
     margin-right: -8px;
     margin-left: auto; /* Mola que empurra para a direita */
