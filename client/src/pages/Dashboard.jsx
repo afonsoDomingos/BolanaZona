@@ -134,15 +134,24 @@ export default function Dashboard() {
             </h1>
             <p style={{ color: 'var(--text-secondary)', marginTop: 6 }}>Resumo dos teus torneios</p>
           </div>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingRight: 4 }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: 12, 
+            overflowX: 'auto', 
+            paddingBottom: 8, 
+            marginRight: -20, 
+            paddingRight: 20,
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch'
+          }} className="hide-scrollbar">
             {user?.role === 'superadmin' && (
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <Link to="/admin/users" className="btn btn-secondary"><Users size={16} /> Utilizadores</Link>
-                <Link to="/admin/teams" className="btn btn-secondary"><Shield size={16} /> Central de Equipas</Link>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <Link to="/admin/users" className="btn btn-secondary" style={{ flexShrink: 0 }}><Users size={16} /> Utilizadores</Link>
+                <Link to="/admin/teams" className="btn btn-secondary" style={{ flexShrink: 0 }}><Shield size={16} /> Central de Equipas</Link>
               </div>
             )}
-            <Link to="/dashboard/squads" className="btn btn-secondary"><Shield size={16} /> Meus Clubes</Link>
-            <Link to="/dashboard/tournaments/new" className="btn btn-primary"><Plus size={16} /> Novo Torneio</Link>
+            <Link to="/dashboard/squads" className="btn btn-secondary" style={{ flexShrink: 0 }}><Shield size={16} /> Meus Clubes</Link>
+            <Link to="/dashboard/tournaments/new" className="btn btn-primary" style={{ flexShrink: 0 }}><Plus size={16} /> Novo Torneio</Link>
           </div>
         </div>
 
