@@ -89,14 +89,46 @@ export default function Community() {
   };
  
   const handleDeletePost = async (postId) => {
-    if (!window.confirm('Queres mesmo eliminar esta publicação?')) return;
-    try {
-      await api.delete(`/posts/${postId}`);
-      toast.success('Publicação eliminada.');
-      fetchPosts();
-    } catch {
-      toast.error('Erro ao eliminar.');
-    }
+    toast((t) => (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '4px 2px' }}>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 600 }}>Queres eliminar esta mensagem?</p>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button 
+            onClick={async () => {
+              toast.dismiss(t.id);
+              try {
+                await api.delete(`/posts/${postId}`);
+                toast.success('Mensagem eliminada.', { id: 'del-success' });
+                fetchPosts();
+              } catch {
+                toast.error('Erro ao eliminar.');
+              }
+            }}
+            style={{ 
+              background: 'var(--red)', color: '#fff', border: 'none', 
+              padding: '4px 12px', borderRadius: 6, fontSize: 11, fontWeight: 800,
+              cursor: 'pointer'
+            }}
+          >
+            Eliminar
+          </button>
+          <button 
+            onClick={() => toast.dismiss(t.id)}
+            style={{ 
+              background: 'rgba(255,255,255,0.1)', color: '#fff', border: 'none', 
+              padding: '4px 12px', borderRadius: 6, fontSize: 11, fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: 5000,
+      position: 'bottom-center',
+      style: { background: '#0d1529', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '12px' }
+    });
   };
 
   return (
