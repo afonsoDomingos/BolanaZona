@@ -189,16 +189,30 @@ export default function Explore() {
               maxWidth: 1200, 
               margin: '0 auto' 
             }}>
-              {filtered.map(t => (
+              {filtered.map((t, idx) => (
                 <Link key={t._id} to={`/t/${t.shareCode}`} className="card-premium" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <div className="card-image-wrapper">
-                    <div className="status-badge-wrapper">
+                    <img 
+                      src={`/banner${(idx % 3) + 1}.png`} 
+                      alt="Banner" 
+                      style={{ 
+                        position: 'absolute', 
+                        inset: 0, 
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'cover',
+                        opacity: 0.5,
+                        transition: 'transform 0.4s ease'
+                      }} 
+                      className="card-banner-img"
+                    />
+                    <div className="status-badge-wrapper" style={{ zIndex: 2 }}>
                       <span className={`badge-premium ${statusBadge[t.status]}`}>{statusLabel[t.status]}</span>
                     </div>
-                    <div className="card-icon-main">⚽</div>
+                    <div className="card-icon-main" style={{ zIndex: 2, position: 'relative', textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>⚽</div>
                   </div>
                   
-                  <div className="card-body-premium" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                  <div className="card-body-premium" style={{ display: 'flex', flexDirection: 'column', flex: 1, position: 'relative', zIndex: 3 }}>
                     <h3 className="card-title-premium" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       {t.name}
                       {t.isOfficial && <Shield size={16} fill="var(--yellow)" color="var(--yellow)" style={{ flexShrink: 0 }} />}
