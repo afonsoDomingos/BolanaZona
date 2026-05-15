@@ -261,8 +261,6 @@ export default function Dashboard() {
                   <div style={{ minWidth: 24, flexShrink: 0 }} /> {/* Espaçador final para o scroll */}
                 </div>
               </div>
-           </div>
-              </div>
             )}
 
             <style>{`
