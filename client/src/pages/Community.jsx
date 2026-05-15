@@ -17,8 +17,12 @@ export default function Community() {
 
   const scrollChat = (direction) => {
     if (scrollRef.current) {
+      const el = scrollRef.current;
       const amount = direction === 'up' ? -400 : 400;
-      scrollRef.current.scrollBy({ top: amount, behavior: 'smooth' });
+      el.scrollTo({
+        top: el.scrollTop + amount,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -111,7 +115,8 @@ export default function Community() {
         display: 'flex', 
         flexDirection: 'column',
         padding: '0 16px',
-        position: 'relative'
+        position: 'relative',
+        overflow: 'hidden'
       }}>
         
         {/* HEADER */}
@@ -288,7 +293,7 @@ export default function Community() {
           display: 'flex', 
           flexDirection: 'column', 
           gap: 8, 
-          zIndex: 90 
+          zIndex: 999 
         }}>
           <button 
             onClick={() => scrollChat('up')}
