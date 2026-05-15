@@ -242,10 +242,10 @@ export default function MySquads() {
                       {isChallenger ? 'Desafio Enviado ↗️' : 'Desafio Recebido ↙️'}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <span style={{ fontSize: 18, fontWeight: 800 }}>{mySquad?.name}</span>
+                      <span style={{ fontSize: 18, fontWeight: 800 }}>{mySquad?.name || 'Equipa'}</span>
                       <Swords size={16} color="var(--red)" />
                       <button onClick={() => setShowSquadDetails(opponentSquad)} style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 18, fontWeight: 800, cursor: 'pointer', color: 'var(--green)', textDecoration: 'underline', textAlign: 'left' }}>
-                        {opponentSquad?.name}
+                        {opponentSquad?.name || 'Ver Oponente'}
                       </button>
                     </div>
                   </div>
@@ -301,28 +301,28 @@ export default function MySquads() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {filtered.map(c => {
             const isChallenger = squads.some(s => s._id === c.challengerSquad?._id);
-            const myScore = isChallenger ? c.result.challengerScore : c.result.challengedScore;
-            const opponentScore = isChallenger ? c.result.challengedScore : c.result.challengerScore;
+            const myScore = isChallenger ? c.result?.challengerScore : c.result?.challengedScore;
+            const opponentScore = isChallenger ? c.result?.challengedScore : c.result?.challengerScore;
             const isWin = myScore > opponentScore;
             const isDraw = myScore === opponentScore;
             return (
               <div key={c._id} className="card-glass" style={{ padding: 24, borderRadius: 20, borderLeft: `4px solid ${isWin ? 'var(--green)' : isDraw ? 'var(--yellow)' : 'var(--red)'}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800 }}>{new Date(c.date).toLocaleDateString()} · {c.location}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800 }}>{c.date ? new Date(c.date).toLocaleDateString() : 'Sem data'} · {c.location || 'Local desconhecido'}</div>
                   <span style={{ fontSize: 11, fontWeight: 900, color: isWin ? 'var(--green)' : isDraw ? 'var(--yellow)' : 'var(--red)' }}>{isWin ? 'VITÓRIA 🏆' : isDraw ? 'EMPATE 🤝' : 'DERROTA ❌'}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
                   <div style={{ flex: 1, textAlign: 'right' }}>
-                    <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 4 }}>{c.challengerSquad.name}</div>
+                    <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 4 }}>{c.challengerSquad?.name || 'Equipa A'}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Desafiador</div>
                   </div>
                   <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px 20px', borderRadius: 12, border: '1px solid var(--border)', display: 'flex', gap: 16, alignItems: 'center' }}>
-                    <span style={{ fontSize: 32, fontWeight: 900 }}>{c.result.challengerScore}</span>
+                    <span style={{ fontSize: 32, fontWeight: 900 }}>{c.result?.challengerScore || 0}</span>
                     <span style={{ fontSize: 18, color: 'var(--text-muted)' }}>-</span>
-                    <span style={{ fontSize: 32, fontWeight: 900 }}>{c.result.challengedScore}</span>
+                    <span style={{ fontSize: 32, fontWeight: 900 }}>{c.result?.challengedScore || 0}</span>
                   </div>
                   <div style={{ flex: 1, textAlign: 'left' }}>
-                    <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 4 }}>{c.challengedSquad.name}</div>
+                    <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 4 }}>{c.challengedSquad?.name || 'Equipa B'}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Desafiado</div>
                   </div>
                 </div>
