@@ -76,92 +76,128 @@ export default function FeedbackPopup() {
         </div>
       ) : (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
             <div style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--green-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>⚽</div>
-            <div>
+            <div style={{ flex: 1 }}>
               <h3 style={{ fontSize: 14, fontWeight: 800, margin: 0 }}>Diz-nos a tua opinião!</h3>
-              <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>Leva apenas 30 segundos.</p>
+              <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                {[1, 2, 3, 4].map(s => (
+                  <div key={s} style={{ flex: 1, height: 3, borderRadius: 2, background: s <= step ? 'var(--green)' : 'rgba(255,255,255,0.1)', transition: 'all 0.3s' }} />
+                ))}
+              </div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>Que nota dás à plataforma?</label>
-              <div style={{ display: 'flex', gap: 6 }}>
-                {[1, 2, 3, 4, 5].map(star => (
-                  <button 
-                    key={star}
-                    onClick={() => setForm({ ...form, rating: star })}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                  >
-                    <Star size={20} fill={form.rating >= star ? 'var(--yellow)' : 'none'} color={form.rating >= star ? 'var(--yellow)' : 'var(--text-muted)'} />
-                  </button>
-                ))}
+          <div style={{ minHeight: 140, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            {step === 1 && (
+              <div className="animate-fade-in">
+                <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 12, textAlign: 'center' }}>Que nota dás à plataforma?</label>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <button 
+                      key={star}
+                      onClick={() => {
+                        setForm({ ...form, rating: star });
+                        setStep(2);
+                      }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, transition: 'transform 0.2s' }}
+                      onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
+                      onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                    >
+                      <Star size={32} fill={form.rating >= star ? 'var(--yellow)' : 'none'} color={form.rating >= star ? 'var(--yellow)' : 'var(--text-muted)'} />
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>Como descreves a tua experiência?</label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                {['⭐ Fácil de usar', '🎨 Design Bonito', '🚀 Muito Rápido', '📱 Top no Telemóvel', '🤔 Podia melhorar', '❌ Difícil'].map(tag => (
-                  <button
-                    key={tag}
-                    onClick={() => setForm({ ...form, experience: form.experience.includes(tag) ? form.experience.replace(tag, '').trim() : (form.experience + ' ' + tag).trim() })}
-                    style={{
-                      padding: '4px 8px', borderRadius: 6, fontSize: 11, border: '1px solid',
-                      borderColor: form.experience.includes(tag) ? 'var(--green)' : 'rgba(255,255,255,0.1)',
-                      background: form.experience.includes(tag) ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.05)',
-                      color: form.experience.includes(tag) ? 'var(--green)' : 'var(--text-secondary)',
-                      cursor: 'pointer', transition: 'all 0.2s'
-                    }}
-                  >
-                    {tag}
-                  </button>
-                ))}
+            {step === 2 && (
+              <div className="animate-fade-in">
+                <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 12 }}>Como descreves a tua experiência?</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {['⭐ Fácil de usar', '🎨 Design Bonito', '🚀 Muito Rápido', '📱 Top no Telemóvel', '🤔 Podia melhorar', '❌ Difícil'].map(tag => (
+                    <button
+                      key={tag}
+                      onClick={() => setForm({ ...form, experience: form.experience.includes(tag) ? form.experience.replace(tag, '').trim() : (form.experience + ' ' + tag).trim() })}
+                      style={{
+                        padding: '6px 12px', borderRadius: 8, fontSize: 12, border: '1px solid',
+                        borderColor: form.experience.includes(tag) ? 'var(--green)' : 'rgba(255,255,255,0.1)',
+                        background: form.experience.includes(tag) ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.05)',
+                        color: form.experience.includes(tag) ? 'var(--green)' : 'var(--text-secondary)',
+                        cursor: 'pointer', transition: 'all 0.2s'
+                      }}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+                <button 
+                  disabled={!form.experience}
+                  onClick={() => setStep(3)} 
+                  className="btn btn-primary" 
+                  style={{ width: '100%', marginTop: 16, height: 36, fontSize: 12, opacity: form.experience ? 1 : 0.5 }}
+                >
+                  Continuar
+                </button>
               </div>
-            </div>
+            )}
 
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>Onde ouviste falar de nós?</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                {[
-                  { id: 'social_media', label: 'Redes Sociais' },
-                  { id: 'friends', label: 'Amigos' },
-                  { id: 'tournament', label: 'Num Torneio' },
-                  { id: 'google', label: 'Google' }
-                ].map(s => (
-                  <button
-                    key={s.id}
-                    onClick={() => setForm({ ...form, source: s.id })}
-                    style={{
-                      padding: '6px', borderRadius: 6, fontSize: 11, border: '1px solid',
-                      borderColor: form.source === s.id ? 'var(--green)' : 'rgba(255,255,255,0.1)',
-                      background: form.source === s.id ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.05)',
-                      color: form.source === s.id ? 'var(--green)' : 'var(--text-secondary)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {s.label}
-                  </button>
-                ))}
+            {step === 3 && (
+              <div className="animate-fade-in">
+                <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 12 }}>Onde ouviste falar de nós?</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  {[
+                    { id: 'social_media', label: 'Redes Sociais' },
+                    { id: 'friends', label: 'Amigos' },
+                    { id: 'tournament', label: 'Num Torneio' },
+                    { id: 'google', label: 'Google' }
+                  ].map(s => (
+                    <button
+                      key={s.id}
+                      onClick={() => {
+                        setForm({ ...form, source: s.id });
+                        setStep(4);
+                      }}
+                      style={{
+                        padding: '10px', borderRadius: 8, fontSize: 12, border: '1px solid',
+                        borderColor: form.source === s.id ? 'var(--green)' : 'rgba(255,255,255,0.1)',
+                        background: form.source === s.id ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.05)',
+                        color: form.source === s.id ? 'var(--green)' : 'var(--text-secondary)',
+                        cursor: 'pointer', transition: 'all 0.2s'
+                      }}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>Algum comentário? (Opcional)</label>
-              <textarea 
-                className="form-input" 
-                placeholder="Ex: Adorei os prints dos jogos!"
-                style={{ fontSize: 12, minHeight: 44, borderRadius: 10, padding: 10 }}
-                value={form.comment || ''}
-                onChange={e => setForm({ ...form, comment: e.target.value })}
-              />
-            </div>
+            {step === 4 && (
+              <div className="animate-fade-in">
+                <label style={{ fontSize: 13, fontWeight: 700, display: 'block', marginBottom: 8 }}>Algum comentário? (Opcional)</label>
+                <textarea 
+                  className="form-input" 
+                  placeholder="Ex: Adorei os prints dos jogos!"
+                  style={{ fontSize: 13, minHeight: 60, borderRadius: 10, padding: 12, background: 'rgba(255,255,255,0.05)' }}
+                  value={form.comment || ''}
+                  onChange={e => setForm({ ...form, comment: e.target.value })}
+                />
+                <button onClick={handleSubmit} className="btn btn-primary" style={{ width: '100%', marginTop: 12, height: 40, borderRadius: 10, fontSize: 14 }}>
+                  Enviar Feedback <Send size={16} />
+                </button>
+              </div>
+            )}
+          </div>
 
-            <button onClick={handleSubmit} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', height: 38, borderRadius: 10, fontSize: 13 }}>
-              Enviar Feedback <Send size={14} />
+          {step > 1 && (
+            <button 
+              onClick={() => setStep(step - 1)} 
+              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 11, cursor: 'pointer', marginTop: 12, display: 'flex', alignItems: 'center', gap: 4 }}
+            >
+              ← Voltar
             </button>
-          </div>
+          )}
         </>
       )}
 
@@ -169,6 +205,13 @@ export default function FeedbackPopup() {
         @keyframes slideUp {
           from { transform: translateY(100px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.98); }
+          to { opacity: 1; transform: scale(1); }
         }
       `}</style>
     </div>
