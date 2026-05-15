@@ -121,7 +121,7 @@ export default function Community() {
           style={{ 
           flex: 1,
           overflowY: 'auto',
-          padding: '20px 0 180px 0',
+          padding: '20px 0 240px 0',
           display: 'flex', 
           flexDirection: 'column', 
           gap: 4,
@@ -159,62 +159,57 @@ export default function Community() {
                   <div style={{ 
                     background: isMe ? 'var(--green)' : 'rgba(255,255,255,0.08)',
                     color: isMe ? '#000' : '#fff',
-                    padding: '8px 12px',
-                    borderRadius: isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    padding: '6px 10px',
+                    borderRadius: isMe ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                     border: '1px solid ' + (isMe ? 'transparent' : 'rgba(255,255,255,0.05)'),
                     wordBreak: 'break-word',
                     overflowWrap: 'break-word'
                   }}>
                     {post.type === 'text' && (
-                      <p style={{ fontSize: 14, lineHeight: 1.5, margin: 0 }}>{post.content}</p>
+                      <p style={{ fontSize: 13, lineHeight: 1.4, margin: 0 }}>{post.content}</p>
                     )}
 
                     {post.type === 'score' && (
                       <div style={{ 
                         background: isMe ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.2)', 
-                        padding: '12px 16px', 
-                        borderRadius: 12, 
+                        padding: '8px 12px', 
+                        borderRadius: 10, 
                         display: 'flex', 
                         flexDirection: 'column',
                         alignItems: 'center', 
-                        gap: 8,
-                        marginTop: 4,
-                        minWidth: 200
+                        gap: 6,
+                        marginTop: 2,
+                        minWidth: 180
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 12 }}>
-                          <span style={{ fontWeight: 800, fontSize: 14, flex: 1, textAlign: 'right' }}>{post.scoreData.teamA}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 8 }}>
+                          <span style={{ fontWeight: 800, fontSize: 12, flex: 1, textAlign: 'right' }}>{post.scoreData.teamA}</span>
                           <div style={{ 
                             background: isMe ? '#000' : 'var(--green)', 
                             color: isMe ? 'var(--green)' : '#000', 
-                            padding: '4px 12px', 
-                            borderRadius: 8, 
+                            padding: '2px 10px', 
+                            borderRadius: 6, 
                             fontWeight: 900, 
-                            fontSize: 16,
-                            letterSpacing: 1,
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                            fontSize: 14,
+                            letterSpacing: 0.5,
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
                           }}>
                             {post.scoreData.scoreA} - {post.scoreData.scoreB}
                           </div>
-                          <span style={{ fontWeight: 800, fontSize: 14, flex: 1, textAlign: 'left' }}>{post.scoreData.teamB}</span>
+                          <span style={{ fontWeight: 800, fontSize: 12, flex: 1, textAlign: 'left' }}>{post.scoreData.teamB}</span>
                         </div>
                         {post.scoreData.period && (
                           <div style={{ 
-                            background: isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)',
-                            padding: '4px 12px',
-                            borderRadius: 16,
-                            display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 
+                            background: isMe ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.05)',
+                            padding: '2px 10px',
+                            borderRadius: 12,
+                            display: 'flex', alignItems: 'center', gap: 4
                           }}>
-                            <span style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', color: isMe ? '#000' : 'var(--green)' }}>
+                            <span style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', color: isMe ? '#000' : 'var(--green)' }}>
                               {post.scoreData.period === 'PR' ? 'Pré-jogo' :
                                post.scoreData.period === '1T' ? '1ª Parte' : 
                                post.scoreData.period === '2T' ? '2ª Parte' : 'Finalizado'}
                             </span>
-                            {post.scoreData.matchTime && (
-                              <span style={{ fontSize: 10, fontWeight: 700, opacity: 0.7 }}>
-                                • 🕒 {post.scoreData.matchTime}
-                              </span>
-                            )}
                           </div>
                         )}
                       </div>
@@ -223,15 +218,15 @@ export default function Community() {
                     {post.type === 'goal' && (
                       <div style={{ 
                         textAlign: 'center', 
-                        padding: '6px 12px', 
+                        padding: '4px 10px', 
                         background: post.content.includes('MADRID') ? '#fff' : 
                                     post.content.includes('BARÇA') ? 'linear-gradient(90deg, #a50044, #004d98)' :
                                     '#00C853',
-                        borderRadius: 8,
-                        marginTop: 2,
-                        minWidth: 120
+                        borderRadius: 6,
+                        marginTop: 1,
+                        minWidth: 100
                       }}>
-                        <h4 style={{ margin: 0, fontSize: 15, color: post.content.includes('MADRID') ? '#000' : '#fff' }} className="pulse-text">{post.content}</h4>
+                        <h4 style={{ margin: 0, fontSize: 13, color: post.content.includes('MADRID') ? '#000' : '#fff' }} className="pulse-text">{post.content}</h4>
                       </div>
                     )}
 
@@ -283,7 +278,7 @@ export default function Community() {
           background: 'rgba(8, 13, 26, 0.97)',
           zIndex: 100,
           backdropFilter: 'blur(16px)',
-          maxHeight: '55vh',
+          maxHeight: '40vh',
           overflowY: 'auto'
         }}>
           {!user ? (
