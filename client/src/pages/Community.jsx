@@ -261,17 +261,17 @@ export default function Community() {
                         style={{ 
                           background: 'none', border: 'none', 
                           color: post.likes?.includes(user?._id) ? (isMe ? '#000' : 'var(--red)') : 'inherit', 
-                          display: 'flex', alignItems: 'center', gap: 2, fontSize: 9, fontWeight: 700, cursor: 'pointer' 
+                          display: 'flex', alignItems: 'center', gap: 3, fontSize: 11, fontWeight: 700, cursor: 'pointer' 
                         }}
                       >
-                        <Heart size={10} fill={post.likes?.includes(user?._id) ? (isMe ? '#000' : 'var(--red)') : 'none'} /> {post.likes?.length || 0}
+                        <Heart size={14} fill={post.likes?.includes(user?._id) ? (isMe ? '#000' : 'var(--red)') : 'none'} /> {post.likes?.length || 0}
                       </button>
                       {(isMe || user?.role === 'superadmin') && (
                         <button 
                           onClick={() => handleDeletePost(post._id)}
                           style={{ background: 'none', border: 'none', color: isMe ? '#000' : 'var(--red)', cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: 0.6 }}
                         >
-                          <Trash2 size={10} />
+                          <Trash2 size={13} />
                         </button>
                       )}
                       <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
