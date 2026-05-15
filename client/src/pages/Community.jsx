@@ -98,7 +98,7 @@ export default function Community() {
   return (
     <div className="page animate-fade-in" style={{ 
       background: 'var(--bg-primary)', 
-      minHeight: 'calc(100dvh - 64px)', 
+      height: 'calc(100dvh - 64px)', 
       display: 'flex', 
       flexDirection: 'column',
       padding: 0,
