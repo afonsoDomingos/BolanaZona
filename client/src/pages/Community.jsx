@@ -355,7 +355,7 @@ export default function Community() {
                 </button>
               </div>
 
-              <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                 <div style={{ flex: 1 }}>
                   {activeMode === 'text' && (
                     <textarea 
@@ -436,8 +436,7 @@ export default function Community() {
                       justifyContent: 'center', 
                       flexShrink: 0,
                       boxShadow: '0 4px 12px rgba(0, 200, 83, 0.3)',
-                      transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                      marginBottom: 2
+                      transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                     }}
                     onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
                     onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
