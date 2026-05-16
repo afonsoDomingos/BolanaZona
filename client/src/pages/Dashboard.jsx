@@ -68,18 +68,33 @@ export default function Dashboard() {
   }, [showWelcome]);
 
   const [matches, setMatches] = useState([]);
+  const [managedTeams, setManagedTeams] = useState([]);
 
   useEffect(() => {
     Promise.all([
       api.get('/tournaments'),
-      api.get('/tournaments/public/matches/live')
+      api.get('/tournaments/public/matches/live'),
+      api.get('/teams/my-managed-teams')
     ])
-      .then(([tournamentsRes, matchesRes]) => {
+      .then(([tournamentsRes, matchesRes, teamsRes]) => {
         setTournaments(tournamentsRes.data);
         setMatches(matchesRes.data);
+        setManagedTeams(teamsRes.data);
       })
       .finally(() => setLoading(false));
   }, []);
+
+  const handleUnlink = async (teamId) => {
+    if (!window.confirm('Queres mesmo deixar de gerir esta equipa? Perderás o acesso ao painel dela.')) return;
+    try {
+      await api.put(`/teams/${teamId}/unlink`);
+      toast.success('Desvinculado com sucesso.');
+      setManagedTeams(managedTeams.filter(t => t._id !== teamId));
+    } catch {
+      toast.error('Erro ao desvincular.');
+    }
+  };
+
 
   const stats = {
     total: tournaments.length,
@@ -379,7 +394,45 @@ export default function Dashboard() {
                 </div>
               )}
             </div>
+
+            {managedTeams.length > 0 && (
+              <div style={{ marginTop: 32 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <h2 style={{ fontSize: 20, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <Shield size={22} color="var(--blue)" /> Equipas que Gerencio
+                  </h2>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {managedTeams.map(team => (
+                    <div key={team._id} className="card animate-slide-up" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, background: 'rgba(41,121,255,0.02)', border: '1px solid rgba(41,121,255,0.1)', borderRadius: 16 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div style={{ width: 44, height: 44, borderRadius: 12, background: team.color || 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                          {team.logo ? <img src={team.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 10 }} /> : <Shield size={20} color="#fff" />}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>{team.name}</div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Torneio: <span style={{ color: 'var(--text-secondary)' }}>{team.tournament?.name}</span></div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 12 }}>
+                        <button 
+                          onClick={() => handleUnlink(team._id)}
+                          className="btn btn-secondary btn-sm"
+                          style={{ color: 'var(--red)', borderColor: 'rgba(255,0,0,0.1)', height: 36, fontSize: 12 }}
+                        >
+                          Sair da Gestão
+                        </button>
+                        <Link to={`/t/${team.tournament?.shareCode}`} className="btn btn-primary btn-sm" style={{ height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px', fontSize: 12 }}>
+                          Ver Torneio
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
+
 
           {/* Sidebar - Notifications */}
           <div className="dashboard-sidebar">

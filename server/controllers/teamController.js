@@ -13,6 +13,16 @@ exports.getByTournament = async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
+exports.getMyManagedTeams = async (req, res) => {
+  try {
+    const teams = await Team.find({ captain: req.user._id })
+      .populate('tournament', 'name shareCode status')
+      .sort('-createdAt');
+    res.json(teams);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+
 exports.registerPublicTeam = async (req, res) => {
   try {
     const tournament = await Tournament.findById(req.params.tournamentId);
@@ -105,12 +115,31 @@ exports.acceptInvite = async (req, res) => {
     }
 
     team.captain = req.user._id;
-    // Opcional: invalidar o código após uso ou manter para outros membros?
-    // Por agora mantemos o vínculo um-para-um.
     await team.save();
 
     res.json({ message: 'Convite aceite com sucesso!', teamId: team._id, tournamentId: team.tournament });
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
+
+exports.unlinkManager = async (req, res) => {
+  try {
+    const team = await Team.findById(req.params.id).populate('tournament');
+    if (!team) return res.status(404).json({ message: 'Equipa não encontrada.' });
+
+    const isCurrentCaptain = team.captain && team.captain.toString() === req.user._id.toString();
+    const isOwner = team.tournament.createdBy.toString() === req.user._id.toString();
+    const isSuperAdmin = req.user.role === 'superadmin';
+
+    if (!isCurrentCaptain && !isOwner && !isSuperAdmin) {
+      return res.status(403).json({ message: 'Sem permissão para remover a gestão desta equipa.' });
+    }
+
+    team.captain = null;
+    await team.save();
+
+    res.json({ message: 'Gestão removida com sucesso.' });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
 
 

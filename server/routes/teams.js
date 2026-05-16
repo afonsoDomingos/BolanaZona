@@ -6,13 +6,18 @@ const { protect } = require('../middleware/auth');
 router.post('/public-register', ctrl.registerPublicTeam);
 
 router.use(protect);
+router.get('/my-managed-teams', ctrl.getMyManagedTeams);
 router.get('/', ctrl.getByTournament);
+
 router.post('/', ctrl.create);
 router.put('/:id', ctrl.update);
 router.delete('/:id', ctrl.remove);
 router.put('/:id/link-manager', ctrl.linkManager);
 router.post('/:id/invite-code', ctrl.generateInviteCode);
 router.post('/accept-invite/:code', ctrl.acceptInvite);
+router.put('/:id/unlink', ctrl.unlinkManager);
+
+
 
 
 
