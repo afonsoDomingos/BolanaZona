@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Shield, Plus, ArrowRight, User, Swords, Check, X, Calendar, MapPin, Trophy, LogOut } from 'lucide-react';
+import { Shield, Plus, ArrowRight, User, Swords, Check, X, Calendar, MapPin, Trophy, LogOut, Edit2, Save, Upload } from 'lucide-react';
 
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -26,7 +26,9 @@ export default function MySquads() {
   const [showEditDetailsModal, setShowEditDetailsModal] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [managedTeams, setManagedTeams] = useState([]);
+  const [selectedEditTeam, setSelectedEditTeam] = useState(null);
   const navigate = useNavigate();
+
 
 
   const fetchSquads = async () => {
@@ -183,14 +185,18 @@ export default function MySquads() {
                   </div>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
-                <Link to={`/t/${team.tournament?.shareCode}`} className="btn btn-primary btn-sm" style={{ height: 36, display: 'flex', alignItems: 'center', gap: 6, padding: '0 14px', fontSize: 12 }}>
-                  <Trophy size={13} /> Ver Torneio
+              <div style={{ display: 'flex', gap: 10, flexShrink: 0, flexWrap: 'wrap' }}>
+                <button onClick={() => setSelectedEditTeam(team)} className="btn btn-primary btn-sm" style={{ height: 36, display: 'flex', alignItems: 'center', gap: 6, padding: '0 14px', fontSize: 12 }}>
+                  <Edit2 size={13} /> Gerir Plantel
+                </button>
+                <Link to={`/t/${team.tournament?.shareCode}`} className="btn btn-secondary btn-sm" style={{ height: 36, display: 'flex', alignItems: 'center', gap: 6, padding: '0 14px', fontSize: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <Trophy size={13} /> Torneio
                 </Link>
                 <button onClick={() => handleUnlink(team._id)} className="btn btn-secondary btn-sm" style={{ height: 36, color: 'var(--red)', borderColor: 'rgba(255,0,0,0.15)', fontSize: 12, gap: 6 }}>
                   <LogOut size={13} /> Sair
                 </button>
               </div>
+
             </div>
           ))}
         </div>
@@ -429,11 +435,24 @@ export default function MySquads() {
           <button onClick={() => setTab('results')} style={btnTabStyle('results')}>Resultados 🏁</button>
         </div>
 
-
+
 
 
   {renderContent()}
       </div>
+
+      {selectedEditTeam && (
+        <TeamEditModal
+          team={selectedEditTeam}
+          onClose={() => setSelectedEditTeam(null)}
+          onSaved={(updatedTeam) => {
+            setManagedTeams(prev => prev.map(t => t._id === updatedTeam._id ? updatedTeam : t));
+            setSelectedEditTeam(null);
+            fetchSquads(); // reload
+          }}
+        />
+      )}
+
       {showModal && (
         <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
           <div className="card-glass animate-slide-up" style={{ width: '100%', maxWidth: 440, padding: 32, border: '1px solid rgba(255,255,255,0.1)' }}>
@@ -663,3 +682,201 @@ function EditChallengeDetailsModal({ challenge, onClose, onSuccess }) {
     </div>
   );
 }
+
+function TeamEditModal({ team, onClose, onSaved }) {
+  const [form, setForm] = useState({
+    name: team.name || '',
+    captainName: team.captainName || '',
+    coachName: team.coachName || '',
+    contact: team.contact || '',
+    color: team.color || '#00C853',
+    logo: team.logo || '',
+    players: team.players || []
+  });
+  const [playerName, setPlayerName] = useState('');
+  const [playerNumber, setPlayerNumber] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  // Import local squads
+  const [squads, setSquads] = useState([]);
+  const [selectedSquadId, setSelectedSquadId] = useState('');
+
+  useEffect(() => {
+    api.get('/squads/my-squads').then(res => setSquads(res.data)).catch(() => {});
+  }, []);
+
+  const handleImportSquad = (e) => {
+    const squadId = e.target.value;
+    setSelectedSquadId(squadId);
+    if (!squadId) return;
+
+    const squad = squads.find(s => s._id === squadId);
+    if (squad) {
+      setForm(prev => ({
+        ...prev,
+        name: squad.name,
+        color: squad.color || prev.color,
+        logo: squad.logo || prev.logo,
+        players: squad.players || []
+      }));
+      toast.success('Clube importado com sucesso! 🪄');
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('image', file);
+    setUploading(true);
+    try {
+      const res = await api.post('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setForm(prev => ({ ...prev, logo: res.data.url }));
+      toast.success('Logotipo carregado! 📸');
+    } catch {
+      toast.error('Erro ao carregar imagem.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const addPlayer = () => {
+    if (!playerName.trim()) return;
+    setForm(prev => ({
+      ...prev,
+      players: [...prev.players, {
+        name: playerName.trim(),
+        number: playerNumber ? Number(playerNumber) : null
+      }]
+    }));
+    setPlayerName('');
+    setPlayerNumber('');
+  };
+
+  const removePlayer = (index) => {
+    setForm(prev => ({
+      ...prev,
+      players: prev.players.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleSave = async () => {
+    if (!form.name.trim()) return toast.error('O nome da equipa é obrigatório.');
+    setLoading(true);
+    try {
+      const res = await api.put(`/teams/${team._id}`, form);
+      toast.success('Equipa do torneio atualizada com sucesso! 🏆');
+      onSaved(res.data);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Erro ao salvar equipa.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div className="modal animate-slide-up" style={{ background: '#0a0f1e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, maxWidth: 500, padding: 32, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>🛡️ Gerir Equipa do Torneio</h2>
+          <button className="modal-close" onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={18} /></button>
+        </div>
+
+        {/* Squad importer shortcut */}
+        {squads.length > 0 && (
+          <div style={{ padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 16, border: '1px dashed rgba(255,255,255,0.1)', marginBottom: 20 }}>
+            <label className="form-label" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--green)', fontWeight: 700 }}>🪄 Importar da Minha Garagem</label>
+            <select className="form-select" value={selectedSquadId} onChange={handleImportSquad} style={{ height: 40, fontSize: 13, marginTop: 6 }}>
+              <option value="">Selecionar um clube local...</option>
+              {squads.map(s => <option key={s._id} value={s._id}>{s.name} ({s.players?.length || 0} jog.)</option>)}
+            </select>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block', marginTop: 4 }}>Substitui os dados da equipa pelos dados do teu clube principal.</span>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+            <div style={{ position: 'relative', width: 68, height: 68, borderRadius: 20, background: form.color, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.1)', overflow: 'hidden', flexShrink: 0 }}>
+              {form.logo ? (
+                <img src={form.logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <Shield size={32} color="#fff" />
+              )}
+              {uploading && (
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div className="spinner" style={{ width: 20, height: 20 }} />
+                </div>
+              )}
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="form-label" style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.05)', padding: '8px 14px', borderRadius: 10, fontSize: 12, border: '1px solid rgba(255,255,255,0.1)' }}>
+                <Upload size={14} /> Carregar Logo
+                <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Cor Principal:</span>
+                <input type="color" value={form.color} onChange={e => setForm({...form, color: e.target.value})} style={{ width: 28, height: 28, border: 'none', borderRadius: 6, cursor: 'pointer', background: 'none' }} />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Nome da Equipa</label>
+            <input required className="form-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+          </div>
+
+          <div className="form-grid form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="form-group">
+              <label className="form-label">Treinador</label>
+              <input className="form-input" placeholder="Opcional" value={form.coachName} onChange={e => setForm({...form, coachName: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Contacto (WhatsApp)</label>
+              <input className="form-input" placeholder="Ex: +258..." value={form.contact} onChange={e => setForm({...form, contact: e.target.value})} />
+            </div>
+          </div>
+
+          {/* Player Management section */}
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 16, marginTop: 8 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 800, marginBottom: 12, display: 'flex', justifyContent: 'space-between' }}>
+              <span>Jogadores ({form.players?.length || 0})</span>
+            </h3>
+
+            {/* Add Player Box */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+              <input style={{ flex: 3, height: 38, fontSize: 13 }} className="form-input" placeholder="Nome do jogador" value={playerName} onChange={e => setPlayerName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addPlayer()} />
+              <input style={{ flex: 1, height: 38, fontSize: 13, textAlign: 'center' }} className="form-input" placeholder="Nº" type="number" value={playerNumber} onChange={e => setPlayerNumber(e.target.value)} onKeyDown={e => e.key === 'Enter' && addPlayer()} />
+              <button className="btn btn-primary" onClick={addPlayer} style={{ padding: '0 16px', height: 38 }}><Plus size={16} /></button>
+            </div>
+
+            {/* Players List scrollable */}
+            <div style={{ maxHeight: 180, overflowY: 'auto', background: 'rgba(0,0,0,0.2)', borderRadius: 12, padding: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {form.players.length === 0 ? (
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: '16px 0' }}>Sem jogadores inscritos. Adiciona-os acima.</div>
+              ) : (
+                form.players.map((p, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.03)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+                      {p.number !== null && <span style={{ color: 'var(--green)', fontWeight: 700 }}>#{p.number}</span>}
+                      <span>{p.name}</span>
+                    </div>
+                    <button className="btn btn-sm" onClick={() => removePlayer(i)} style={{ color: 'var(--red)', background: 'none', border: 'none', padding: 4 }}><X size={14} /></button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+          <button className="btn btn-secondary" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Cancelar</button>
+          <button className="btn btn-primary" onClick={handleSave} disabled={loading} style={{ flex: 2, justifyContent: 'center' }}>
+            {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><Save size={16} /> Salvar Plantel</>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+

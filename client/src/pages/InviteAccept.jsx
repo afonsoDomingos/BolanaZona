@@ -27,11 +27,12 @@ export default function InviteAccept() {
       try {
         const res = await api.post(`/teams/accept-invite/${code}`);
         toast.success('Convite aceite! Agora geres esta equipa. 🎉');
-        navigate(`/dashboard/tournaments/${res.data.tournamentId}`);
+        navigate('/dashboard/squads');
       } catch (err) {
         toast.error(err.response?.data?.message || 'Erro ao processar convite.');
-        navigate('/dashboard');
+        navigate('/dashboard/squads');
       } finally {
+
         setProcessing(false);
       }
     };

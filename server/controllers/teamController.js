@@ -52,11 +52,22 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-    const team = await Team.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const team = await Team.findById(req.params.id).populate('tournament');
     if (!team) return res.status(404).json({ message: 'Equipa não encontrada.' });
-    res.json(team);
+
+    const isCaptain = team.captains && team.captains.some(c => c.toString() === req.user._id.toString());
+    const isOwner = team.tournament.createdBy.toString() === req.user._id.toString();
+    const isSuperAdmin = req.user.role === 'superadmin';
+
+    if (!isCaptain && !isOwner && !isSuperAdmin) {
+      return res.status(403).json({ message: 'Sem permissão para editar esta equipa.' });
+    }
+
+    const updated = await Team.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('tournament');
+    res.json(updated);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
+
 
 exports.remove = async (req, res) => {
   try {
