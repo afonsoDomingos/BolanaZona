@@ -205,6 +205,31 @@ export default function SquadDetailsModal({ squad, onClose, onChallenge }) {
 
                       </div>
 
+                      {ch.result?.scorers?.length > 0 && (
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 10, borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 10, fontSize: 11 }}>
+                          {/* My Squad Scorers */}
+                          <div style={{ textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)', paddingRight: 10 }}>
+                            {ch.result.scorers
+                              .filter(s => String(s.teamId) === String(squad._id))
+                              .map((s, i) => (
+                                <div key={i} style={{ color: 'var(--text-secondary)', marginBottom: 2 }}>
+                                  {s.playerName} {s.goals > 1 && `(${s.goals})`} ⚽
+                                </div>
+                              ))}
+                          </div>
+                          {/* Opponent Squad Scorers */}
+                          <div style={{ textAlign: 'left', paddingLeft: 10 }}>
+                            {ch.result.scorers
+                              .filter(s => String(s.teamId) === String(opponent?._id || opponent))
+                              .map((s, i) => (
+                                <div key={i} style={{ color: 'var(--text-secondary)', marginBottom: 2 }}>
+                                  ⚽ {s.playerName} {s.goals > 1 && `(${s.goals})`}
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
                     </div>
                   );
                 })}

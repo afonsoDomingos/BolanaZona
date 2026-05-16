@@ -397,6 +397,31 @@ export default function MySquads() {
                     <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Desafiado</div>
                   </div>
                 </div>
+
+                {c.result?.scorers?.length > 0 && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 20, borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 16, fontSize: 12 }}>
+                    {/* Challenger Scorers */}
+                    <div style={{ textAlign: 'right', borderRight: '1px solid rgba(255,255,255,0.03)', paddingRight: 16 }}>
+                      {c.result.scorers
+                        .filter(s => String(s.teamId) === String(c.challengerSquad?._id || c.challengerSquad))
+                        .map((s, i) => (
+                          <div key={i} style={{ color: 'var(--text-secondary)', marginBottom: 2 }}>
+                            {s.playerName} {s.goals > 1 && `(${s.goals})`} ⚽
+                          </div>
+                        ))}
+                    </div>
+                    {/* Challenged Scorers */}
+                    <div style={{ textAlign: 'left', paddingLeft: 16 }}>
+                      {c.result.scorers
+                        .filter(s => String(s.teamId) === String(c.challengedSquad?._id || c.challengedSquad))
+                        .map((s, i) => (
+                          <div key={i} style={{ color: 'var(--text-secondary)', marginBottom: 2 }}>
+                            ⚽ {s.playerName} {s.goals > 1 && `(${s.goals})`}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -579,15 +604,45 @@ export default function MySquads() {
 function ResultChallengeModal({ challenge, onClose, onSuccess }) {
   const [challengerScore, setChallengerScore] = useState('');
   const [challengedScore, setChallengedScore] = useState('');
+  const [scorers, setScorers] = useState([]); // Array of { playerName, teamId, goals }
+  const [challengerPlayer, setChallengerPlayer] = useState('');
+  const [challengerCustomName, setChallengerCustomName] = useState('');
+  const [challengedPlayer, setChallengedPlayer] = useState('');
+  const [challengedCustomName, setChallengedCustomName] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSave = async (e) => {
     e.preventDefault();
     if (challengerScore === '' || challengedScore === '') return toast.error('Insere os resultados.');
+    
+    // Sum of scorer goals per team
+    const challengerScorerGoals = scorers
+      .filter(s => s.teamId === challenge.challengerSquad._id)
+      .reduce((sum, s) => sum + s.goals, 0);
+    const challengedScorerGoals = scorers
+      .filter(s => s.teamId === challenge.challengedSquad._id)
+      .reduce((sum, s) => sum + s.goals, 0);
+
+    // Dynamic warning
+    if (Number(challengerScore) > 0 && challengerScorerGoals !== Number(challengerScore)) {
+      if (!window.confirm(`Tens a certeza que queres submeter? Adicionaste ${challengerScorerGoals} golos de marcadores para o ${challenge.challengerSquad.name}, mas o resultado final inserido foi de ${challengerScore}.`)) {
+        return;
+      }
+    }
+    if (Number(challengedScore) > 0 && challengedScorerGoals !== Number(challengedScore)) {
+      if (!window.confirm(`Tens a certeza que queres submeter? Adicionaste ${challengedScorerGoals} golos de marcadores para o ${challenge.challengedSquad.name}, mas o resultado final inserido foi de ${challengedScore}.`)) {
+        return;
+      }
+    }
+
     setLoading(true);
     try {
-      await api.put(`/challenges/${challenge._id}/result`, { challengerScore, challengedScore });
-      toast.success('Resultado registado! 🏁');
+      await api.put(`/challenges/${challenge._id}/result`, { 
+        challengerScore, 
+        challengedScore,
+        scorers
+      });
+      toast.success('Resultado e Marcadores registados! 🏁');
       onSuccess();
       onClose();
     } catch {
@@ -597,29 +652,183 @@ function ResultChallengeModal({ challenge, onClose, onSuccess }) {
     }
   };
 
+  const addScorer = (playerName, teamId) => {
+    if (!playerName.trim()) return;
+    // Check if player already in list
+    const existingIdx = scorers.findIndex(s => s.playerName === playerName && s.teamId === teamId);
+    if (existingIdx > -1) {
+      const updated = [...scorers];
+      updated[existingIdx].goals += 1;
+      setScorers(updated);
+    } else {
+      setScorers([...scorers, { playerName, teamId, goals: 1 }]);
+    }
+  };
+
+  const removeScorer = (idx) => {
+    const updated = [...scorers];
+    if (updated[idx].goals > 1) {
+      updated[idx].goals -= 1;
+      setScorers(updated);
+    } else {
+      setScorers(updated.filter((_, i) => i !== idx));
+    }
+  };
+
+  const challengerScorersList = scorers.filter(s => s.teamId === challenge.challengerSquad._id);
+  const challengedScorersList = scorers.filter(s => s.teamId === challenge.challengedSquad._id);
+
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-      <div className="modal animate-slide-up" style={{ background: '#0a0f1e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, maxWidth: 400, padding: 32, width: '100%' }}>
+      <div className="modal animate-slide-up" style={{ background: '#0a0f1e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, maxWidth: 640, padding: 32, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
         <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8, textAlign: 'center' }}>Finalizar Jogo 🏁</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: 24, fontSize: 14, textAlign: 'center' }}>Insere o resultado final deste desafio.</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 24, fontSize: 14, textAlign: 'center' }}>Insere o resultado final e os marcadores de golo.</p>
         
         <form onSubmit={handleSave}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 32 }}>
+          {/* Scores input */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, marginBottom: 32 }}>
             <div style={{ textAlign: 'center', flex: 1 }}>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 800 }}>{challenge.challengerSquad.name}</div>
-              <input type="number" min="0" className="score-input" style={{ width: '100%', height: 60, fontSize: 24, textAlign: 'center' }} value={challengerScore} onChange={e => setChallengerScore(e.target.value)} />
+              <div style={{ fontSize: 13, color: 'var(--text-primary)', marginBottom: 8, fontWeight: 800 }}>{challenge.challengerSquad.name}</div>
+              <input type="number" min="0" className="score-input" style={{ width: '100%', height: 60, fontSize: 28, textAlign: 'center', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)' }} value={challengerScore} onChange={e => setChallengerScore(e.target.value)} />
             </div>
-            <div style={{ fontWeight: 900, fontSize: 24, marginTop: 20 }}>×</div>
+            <div style={{ fontWeight: 900, fontSize: 24, marginTop: 24, color: 'var(--text-muted)' }}>×</div>
             <div style={{ textAlign: 'center', flex: 1 }}>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 800 }}>{challenge.challengedSquad.name}</div>
-              <input type="number" min="0" className="score-input" style={{ width: '100%', height: 60, fontSize: 24, textAlign: 'center' }} value={challengedScore} onChange={e => setChallengedScore(e.target.value)} />
+              <div style={{ fontSize: 13, color: 'var(--text-primary)', marginBottom: 8, fontWeight: 800 }}>{challenge.challengedSquad.name}</div>
+              <input type="number" min="0" className="score-input" style={{ width: '100%', height: 60, fontSize: 28, textAlign: 'center', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)' }} value={challengedScore} onChange={e => setChallengedScore(e.target.value)} />
+            </div>
+          </div>
+
+          {/* Goals Scorers Section */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 32, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 20 }}>
+            {/* Challenger Scorers */}
+            <div>
+              <h3 style={{ fontSize: 12, fontWeight: 800, color: 'var(--green)', textTransform: 'uppercase', marginBottom: 12 }}>Marcadores {challenge.challengerSquad.name}</h3>
+              
+              {Number(challengerScore) > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <select 
+                      style={{ flex: 1, padding: 8, borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 12 }}
+                      value={challengerPlayer}
+                      onChange={e => {
+                        const name = e.target.value;
+                        if (name) {
+                          addScorer(name, challenge.challengerSquad._id);
+                          setChallengerPlayer('');
+                        }
+                      }}
+                    >
+                      <option value="">Plantel...</option>
+                      {(challenge.challengerSquad.players || []).map((p, i) => (
+                        <option key={i} value={p.name}>{p.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <input 
+                      type="text" 
+                      placeholder="Outro jogador..." 
+                      style={{ flex: 1, padding: 8, borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 12 }} 
+                      value={challengerCustomName}
+                      onChange={e => setChallengerCustomName(e.target.value)}
+                    />
+                    <button 
+                      type="button" 
+                      className="btn btn-sm btn-primary" 
+                      style={{ padding: '0 12px', fontSize: 12 }}
+                      onClick={() => {
+                        if (challengerCustomName.trim()) {
+                          addScorer(challengerCustomName, challenge.challengerSquad._id);
+                          setChallengerCustomName('');
+                        }
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {/* Scorer Badges */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                    {challengerScorersList.map((s, idx) => (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(0, 200, 83, 0.15)', border: '1px solid rgba(0, 200, 83, 0.3)', padding: '4px 10px', borderRadius: 20, fontSize: 11, color: 'var(--green)', fontWeight: 700 }}>
+                        <span>⚽ {s.playerName} {s.goals > 1 && `(${s.goals})`}</span>
+                        <button type="button" onClick={() => removeScorer(scorers.indexOf(s))} style={{ background: 'none', border: 'none', color: '#ff1744', padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 900 }}>×</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Nenhum golo marcado.</span>
+              )}
+            </div>
+
+            {/* Challenged Scorers */}
+            <div>
+              <h3 style={{ fontSize: 12, fontWeight: 800, color: 'var(--green)', textTransform: 'uppercase', marginBottom: 12 }}>Marcadores {challenge.challengedSquad.name}</h3>
+              
+              {Number(challengedScore) > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <select 
+                      style={{ flex: 1, padding: 8, borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 12 }}
+                      value={challengedPlayer}
+                      onChange={e => {
+                        const name = e.target.value;
+                        if (name) {
+                          addScorer(name, challenge.challengedSquad._id);
+                          setChallengedPlayer('');
+                        }
+                      }}
+                    >
+                      <option value="">Plantel...</option>
+                      {(challenge.challengedSquad.players || []).map((p, i) => (
+                        <option key={i} value={p.name}>{p.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <input 
+                      type="text" 
+                      placeholder="Outro jogador..." 
+                      style={{ flex: 1, padding: 8, borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 12 }} 
+                      value={challengedCustomName}
+                      onChange={e => setChallengedCustomName(e.target.value)}
+                    />
+                    <button 
+                      type="button" 
+                      className="btn btn-sm btn-primary" 
+                      style={{ padding: '0 12px', fontSize: 12 }}
+                      onClick={() => {
+                        if (challengedCustomName.trim()) {
+                          addScorer(challengedCustomName, challenge.challengedSquad._id);
+                          setChallengedCustomName('');
+                        }
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {/* Scorer Badges */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                    {challengedScorersList.map((s, idx) => (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(0, 200, 83, 0.15)', border: '1px solid rgba(0, 200, 83, 0.3)', padding: '4px 10px', borderRadius: 20, fontSize: 11, color: 'var(--green)', fontWeight: 700 }}>
+                        <span>⚽ {s.playerName} {s.goals > 1 && `(${s.goals})`}</span>
+                        <button type="button" onClick={() => removeScorer(scorers.indexOf(s))} style={{ background: 'none', border: 'none', color: '#ff1744', padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 900 }}>×</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Nenhum golo marcado.</span>
+              )}
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: 12 }}>
             <button type="button" className="btn btn-secondary" onClick={onClose} style={{ flex: 1 }}>Cancelar</button>
             <button type="submit" className="btn btn-primary" disabled={loading} style={{ flex: 1, justifyContent: 'center' }}>
-              {loading ? <span className="spinner"/> : 'Confirmar'}
+              {loading ? <span className="spinner"/> : 'Confirmar Resultado'}
             </button>
           </div>
         </form>

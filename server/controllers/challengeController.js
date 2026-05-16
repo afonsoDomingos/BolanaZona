@@ -301,7 +301,7 @@ const updateSquadStats = async (squadId) => {
 exports.updateResult = async (req, res) => {
   console.log('🏁 Updating challenge result', req.params.id, 'by user', req.user._id);
   try {
-    const { challengerScore, challengedScore } = req.body;
+    const { challengerScore, challengedScore, scorers } = req.body;
     const challenge = await Challenge.findById(req.params.id)
       .populate('challengerSquad')
       .populate('challengedSquad');
@@ -319,7 +319,8 @@ exports.updateResult = async (req, res) => {
     challenge.result = {
       challengerScore: Number(challengerScore),
       challengedScore: Number(challengedScore),
-      confirmed: true
+      confirmed: true,
+      scorers: scorers || []
     };
     challenge.status = 'completed';
 

@@ -14,7 +14,14 @@ const challengeSchema = new mongoose.Schema({
   result: {
     challengerScore: { type: Number, default: 0 },
     challengedScore: { type: Number, default: 0 },
-    confirmed: { type: Boolean, default: false }
+    confirmed: { type: Boolean, default: false },
+    scorers: [
+      {
+        playerName: { type: String, required: true },
+        teamId: { type: mongoose.Schema.Types.ObjectId, ref: 'Squad', required: true },
+        goals: { type: Number, default: 1 }
+      }
+    ]
   }
 }, { timestamps: true });
 
