@@ -180,6 +180,9 @@ exports.generateCalendar = async (req, res) => {
     const matches = [];
     const { startDate } = req.body;
     let currentDate = startDate ? new Date(startDate) : new Date();
+    // Normalizar para as 15:00 para não parecer um resultado (ex: 02:00)
+    currentDate.setHours(15, 0, 0, 0);
+
 
     if (tournament.format === 'groups' || tournament.format === 'groups_knockout') {
       // Round Robin

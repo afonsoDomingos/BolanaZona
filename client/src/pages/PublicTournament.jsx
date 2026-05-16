@@ -307,9 +307,13 @@ export default function PublicTournament() {
                                   <div style={{ fontSize: 12, fontWeight: 900, color: 'var(--red)', letterSpacing: 1 }}>CANCELADO</div>
                                 ) : (
                                   <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                    <div style={{ fontSize: 20, fontWeight: 900 }}>{m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : '--:--'}</div>
+                                    <div style={{ fontSize: 20, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                                      <Clock size={18} style={{ opacity: 0.5 }} />
+                                      {m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'vs'}
+                                    </div>
                                     <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{m.date ? new Date(m.date).toLocaleDateString() : 'A Definir'}</div>
                                   </div>
+
                                 )}
                               </div>
 

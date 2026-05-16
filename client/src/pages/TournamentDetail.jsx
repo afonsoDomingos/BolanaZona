@@ -491,10 +491,12 @@ export default function TournamentDetail() {
                                   ) : m.status === 'cancelled' ? (
                                     <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--red)' }}>CANCELADO</div>
                                   ) : (
-                                    <div style={{ fontSize: 13, fontWeight: 600 }}>
-                                      {m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                                      <Calendar size={12} style={{ opacity: 0.6 }} />
+                                      {m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'vs'}
                                     </div>
                                   )}
+
                                 </div>
 
                               <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 14 }}>{m.awayTeam?.name || '—'}</div>
