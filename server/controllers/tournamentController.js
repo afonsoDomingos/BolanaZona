@@ -9,13 +9,22 @@ const { create: createNotification } = require('./notificationController');
 // GET /api/tournaments
 exports.getAll = async (req, res) => {
   try {
-    const tournaments = await Tournament.find({ createdBy: req.user._id })
+    let query = { createdBy: req.user._id };
+    
+    // Se for superadmin, pode ver todos os torneios para gestão
+    if (req.user.role === 'superadmin') {
+      query = {};
+    }
+
+    const tournaments = await Tournament.find(query)
+      .populate('createdBy', 'name email')
       .sort({ createdAt: -1 });
     res.json(tournaments);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 // GET /api/tournaments/:id
 exports.getOne = async (req, res) => {

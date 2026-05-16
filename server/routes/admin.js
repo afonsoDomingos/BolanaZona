@@ -4,7 +4,7 @@ const ctrl = require('../controllers/adminController');
 const { protect, authorize } = require('../middleware/auth');
 
 router.use(protect);
-router.use(authorize('superadmin'));
+router.use(authorize('superadmin', 'admin'));
 
 router.get('/central-equipas', ctrl.getCentralDeEquipas);
 router.delete('/teams/:id', ctrl.deleteTeam);

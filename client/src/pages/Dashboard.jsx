@@ -144,9 +144,11 @@ export default function Dashboard() {
             <p style={{ color: 'var(--text-secondary)', marginTop: 6 }}>Resumo dos teus torneios</p>
           </div>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingRight: 4 }}>
-            {user?.role === 'superadmin' && (
+            {(user?.role === 'superadmin' || user?.role === 'admin') && (
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <Link to="/admin/users" className="btn btn-secondary"><Users size={16} /> Utilizadores</Link>
+                {user?.role === 'superadmin' && (
+                  <Link to="/admin/users" className="btn btn-secondary"><Users size={16} /> Utilizadores</Link>
+                )}
                 <Link to="/admin/teams" className="btn btn-secondary"><Shield size={16} /> Central de Equipas</Link>
               </div>
             )}

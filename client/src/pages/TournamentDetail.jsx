@@ -175,6 +175,11 @@ export default function TournamentDetail() {
                 <span className={`badge ${statusBadge[tournament.status]}`}>{statusLabel[tournament.status]}</span>
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>📍 {tournament.neighborhood} · 🏟️ {tournament.location} · 👥 {teams.length}/{tournament.maxTeams} equipas</p>
+              {tournament.createdBy && (
+                <p style={{ color: 'var(--green)', fontSize: 13, marginTop: 4, fontWeight: 600 }}>
+                  🛡️ Organizador: {tournament.createdBy.name || 'Sistema'} {tournament.createdBy.email && `(${tournament.createdBy.email})`}
+                </p>
+              )}
             </div>
             
             {/* Financial Summary */}

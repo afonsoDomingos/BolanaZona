@@ -2,16 +2,20 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { Plus, Search, Trash2, ArrowRight, Trophy } from 'lucide-react';
+import { Plus, Search, Trash2, ArrowRight, Trophy, User } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+
 
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
 const statusBadge = { draft: 'badge-gray', registration: 'badge-blue', active: 'badge-green', finished: 'badge-yellow' };
 const formatLabel = { groups: 'Fase de Grupos', knockout: 'Mata-mata', groups_knockout: 'Grupos + Mata-mata' };
 
 export default function TournamentList() {
+  const { user } = useAuth();
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
 
   useEffect(() => {
     api.get('/tournaments').then(res => setTournaments(res.data)).finally(() => setLoading(false));
@@ -36,8 +40,12 @@ export default function TournamentList() {
       <div className="container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <h1 className="font-syne" style={{ fontSize: 28, fontWeight: 800 }}>Os Meus Torneios</h1>
-            <p style={{ color: 'var(--text-secondary)', marginTop: 4 }}>{tournaments.length} torneio(s) criado(s)</p>
+            <h1 className="font-syne" style={{ fontSize: 28, fontWeight: 800 }}>
+              {user?.role === 'superadmin' ? 'Todos os Torneios' : 'Os Meus Torneios'}
+            </h1>
+            <p style={{ color: 'var(--text-secondary)', marginTop: 4 }}>
+              {user?.role === 'superadmin' ? `${tournaments.length} torneios na plataforma` : `${tournaments.length} torneio(s) criado(s)`}
+            </p>
           </div>
           <Link to="/dashboard/tournaments/new" className="btn btn-primary"><Plus size={16} /> Novo Torneio</Link>
         </div>
@@ -76,6 +84,11 @@ export default function TournamentList() {
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <span className="badge badge-gray">👥 {t.maxTeams} equipas</span>
                   <span className="badge badge-gray">{formatLabel[t.format]}</span>
+                  {t.createdBy && (
+                    <span className="badge badge-gray" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <User size={10} /> {t.createdBy.name || 'Sistema'}
+                    </span>
+                  )}
                 </div>
 
                 <div style={{ display: 'flex', gap: 8, marginTop: 'auto' }}>
