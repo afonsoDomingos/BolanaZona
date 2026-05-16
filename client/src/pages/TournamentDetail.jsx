@@ -492,12 +492,8 @@ export default function TournamentDetail() {
                                   ) : m.status === 'cancelled' ? (
                                     <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--red)' }}>CANCELADO</div>
                                   ) : (
-                                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-                                      <Calendar size={12} style={{ opacity: 0.6 }} />
-                                      {m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'vs'}
-                                    </div>
+                                    <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--text-muted)' }}>VS</div>
                                   )}
-
                                 </div>
 
                               <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 14 }}>{m.awayTeam?.name || '—'}</div>
@@ -506,7 +502,7 @@ export default function TournamentDetail() {
                                 <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px', color: '#25D366' }} onClick={() => shareMatchWhatsApp(m)} title="WhatsApp"><MessageCircle size={14} /></button>
                                 {canManage && (
                                   <>
-                                    <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Agendar"><Calendar size={14} /></button>
+                                    <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Editar Jogo"><Edit2 size={14} /></button>
                                     <button 
                                       className="btn btn-primary btn-sm" 
                                       style={{ padding: '6px 8px', opacity: (!m.date || new Date(m.date) > new Date()) ? 0.5 : 1, cursor: (!m.date || new Date(m.date) > new Date()) ? 'not-allowed' : 'pointer' }} 
@@ -526,9 +522,10 @@ export default function TournamentDetail() {
                                 )}
                               </div>
                             </div>
+                            {/* Date, location, referee info bar */}
                             {(m.location || m.date || m.referee) && (
-                              <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 8, fontSize: 11, color: 'var(--text-muted)' }}>
-                                {m.date && <span>📅 {new Date(m.date).toLocaleDateString()}</span>}
+                              <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 8, fontSize: 11, color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+                                {m.date && <span>📅 {new Date(m.date).toLocaleDateString('pt-PT')} · {new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</span>}
                                 {m.location && <span>🏟️ {m.location}</span>}
                                 {m.referee && <span>🏁 {m.referee}</span>}
                               </div>

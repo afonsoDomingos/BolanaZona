@@ -296,10 +296,15 @@ export default function Dashboard() {
                         </div>
 
                         <div style={{ padding: '2px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: 6, minWidth: 46, textAlign: 'center', flexShrink: 0 }}>
-                          <span style={{ fontWeight: 900, fontSize: 13, color: m.status === 'live' ? 'var(--green)' : 'var(--text-primary)' }}>
-                            {m.status === 'live' ? `${m.homeScore} - ${m.awayScore}` : 'VS'}
-                          </span>
+                          {m.status === 'live' ? (
+                            <span style={{ fontWeight: 900, fontSize: 13, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</span>
+                          ) : m.status === 'finished' ? (
+                            <span style={{ fontWeight: 900, fontSize: 13, color: 'var(--text-muted)' }}>{m.homeScore} - {m.awayScore}</span>
+                          ) : (
+                            <span style={{ fontWeight: 900, fontSize: 13, color: 'var(--text-secondary)' }}>VS</span>
+                          )}
                         </div>
+
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'flex-end', minWidth: 0 }}>
                           <span style={{ 
@@ -315,7 +320,15 @@ export default function Dashboard() {
                           </div>
                         </div>
                       </div>
+                      {/* Date + Location bar */}
+                      {(m.date || m.location) && (
+                        <div style={{ display: 'flex', gap: 10, fontSize: 9, color: 'var(--text-muted)', marginTop: 4, justifyContent: 'center', flexWrap: 'wrap' }}>
+                          {m.date && <span>📅 {new Date(m.date).toLocaleDateString('pt-PT')} · {new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</span>}
+                          {m.location && <span>🏟️ {m.location}</span>}
+                        </div>
+                      )}
                     </Link>
+
                   ))}
                   <div style={{ minWidth: 24, flexShrink: 0 }} />
                 </div>
