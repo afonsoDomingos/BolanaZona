@@ -405,7 +405,7 @@ export default function TournamentDetail() {
                     {canManage && (
                       <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                          {t.captain ? (
+                          {t.captains && t.captains.length > 0 ? (
                             <span style={{ color: 'var(--green)', fontWeight: 600 }}>✅ Gestor Vinculado</span>
                           ) : (
                             <span>⚠️ Sem gestor</span>
@@ -416,8 +416,9 @@ export default function TournamentDetail() {
                           style={{ fontSize: 11, padding: '4px 10px' }}
                           onClick={() => setShowLinkModal(t)}
                         >
-                          {t.captain ? 'Alterar Gestor' : 'Vincular Gestor'}
+                          {t.captains && t.captains.length > 0 ? 'Gerir Gestores' : 'Vincular Gestor'}
                         </button>
+
                       </div>
                     )}
                   </div>

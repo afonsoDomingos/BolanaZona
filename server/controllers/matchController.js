@@ -64,8 +64,8 @@ exports.updateResult = async (req, res) => {
       
       // Aqui poderíamos chamar um serviço de WhatsApp para os telefones em subscribers.map(s => s.phone)
       // Por agora, vamos garantir que a notificação interna chegue ao dono do torneio e capitães
-      const captains = await Team.find({ _id: { $in: [match.homeTeam, match.awayTeam] } }).select('captain');
-      const notifyUsers = [match.tournament.createdBy, ...captains.map(c => c.captain).filter(Boolean)];
+      const captains = await Team.find({ _id: { $in: [match.homeTeam, match.awayTeam] } }).select('captains');
+      const notifyUsers = [match.tournament.createdBy, ...captains.flatMap(c => c.captains).filter(Boolean)];
 
       for (const userId of notifyUsers) {
         await createNotification(

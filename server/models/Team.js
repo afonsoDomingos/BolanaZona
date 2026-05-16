@@ -9,7 +9,8 @@ const playerSchema = new mongoose.Schema({
 const teamSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   tournament: { type: mongoose.Schema.Types.ObjectId, ref: 'Tournament', required: true },
-  captain: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  captains: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
   captainName: { type: String, default: '' },
   coachName: { type: String, default: '' },
   contact: { type: String, default: '' },

@@ -15,12 +15,13 @@ exports.getByTournament = async (req, res) => {
 
 exports.getMyManagedTeams = async (req, res) => {
   try {
-    const teams = await Team.find({ captain: req.user._id })
+    const teams = await Team.find({ captains: req.user._id })
       .populate('tournament', 'name shareCode status')
       .sort('-createdAt');
     res.json(teams);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
+
 
 
 exports.registerPublicTeam = async (req, res) => {
@@ -78,11 +79,14 @@ exports.linkManager = async (req, res) => {
       return res.status(403).json({ message: 'Sem permissão para vincular gestores nesta equipa.' });
     }
 
-    team.captain = userId;
+    if (!team.captains.includes(userId)) {
+      team.captains.push(userId);
+    }
     await team.save();
 
-    const updated = await Team.findById(team._id).populate('captain', 'name phone email');
+    const updated = await Team.findById(team._id).populate('captains', 'name phone email');
     res.json({ message: 'Gestor vinculado com sucesso!', team: updated });
+
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
@@ -110,14 +114,15 @@ exports.acceptInvite = async (req, res) => {
     const team = await Team.findOne({ invitationCode: code });
     if (!team) return res.status(404).json({ message: 'Convite inválido ou expirado.' });
 
-    if (team.captain) {
-      return res.status(400).json({ message: 'Esta equipa já tem um gestor vinculado.' });
+    if (team.captains.includes(req.user._id)) {
+      return res.status(400).json({ message: 'Já és gestor desta equipa.' });
     }
 
-    team.captain = req.user._id;
+    team.captains.push(req.user._id);
     await team.save();
 
     res.json({ message: 'Convite aceite com sucesso!', teamId: team._id, tournamentId: team.tournament });
+
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
@@ -126,7 +131,7 @@ exports.unlinkManager = async (req, res) => {
     const team = await Team.findById(req.params.id).populate('tournament');
     if (!team) return res.status(404).json({ message: 'Equipa não encontrada.' });
 
-    const isCurrentCaptain = team.captain && team.captain.toString() === req.user._id.toString();
+    const isCurrentCaptain = team.captains.some(c => c.toString() === req.user._id.toString());
     const isOwner = team.tournament.createdBy.toString() === req.user._id.toString();
     const isSuperAdmin = req.user.role === 'superadmin';
 
@@ -134,12 +139,13 @@ exports.unlinkManager = async (req, res) => {
       return res.status(403).json({ message: 'Sem permissão para remover a gestão desta equipa.' });
     }
 
-    team.captain = null;
+    team.captains = team.captains.filter(c => c.toString() !== req.user._id.toString());
     await team.save();
 
     res.json({ message: 'Gestão removida com sucesso.' });
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
+
 
 
 
