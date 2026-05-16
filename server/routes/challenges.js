@@ -5,6 +5,7 @@ const { protect } = require('../middleware/auth');
 
 router.post('/', protect, challengeController.create);
 router.get('/my-challenges', protect, challengeController.getMyChallenges);
+router.get('/squad/:squadId', challengeController.getSquadChallenges);
 router.put('/:id', protect, challengeController.update);
 router.put('/:id/status', protect, challengeController.updateStatus);
 router.put('/:id/details', protect, challengeController.updateDetails);
