@@ -319,23 +319,19 @@ export default function PublicTournament() {
                                 ) : m.status === 'cancelled' ? (
                                   <div style={{ fontSize: 12, fontWeight: 900, color: 'var(--red)', letterSpacing: 1 }}>CANCELADO</div>
                                 ) : (
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                    <div style={{ fontSize: 20, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                                      <Clock size={18} style={{ opacity: 0.5 }} />
-                                      {m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'vs'}
-                                    </div>
-                                    <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>{m.date ? new Date(m.date).toLocaleDateString() : 'A Definir'}</div>
+                                  <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.03)', padding: '6px 18px', borderRadius: 8, display: 'inline-block' }}>
+                                    VS
                                   </div>
-
                                 )}
                               </div>
 
                               <div style={{ flex: 1, textAlign: 'left', fontWeight: 800, fontSize: 18 }}>{m.awayTeam?.name}</div>
                             </div>
 
-                            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 32px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap' }}>
+                            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 32px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap' }}>
+                              {m.date && <div style={{ fontSize: 12, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}><Clock size={14} color="var(--green)" /> {new Date(m.date).toLocaleDateString('pt-PT')} · {new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</div>}
                               {m.location && <div style={{ fontSize: 12, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}><MapPin size={14} color="var(--green)" /> {m.location}</div>}
-                              {(m.status === 'live' || m.status === 'active') && <div style={{ fontSize: 12, color: 'var(--green)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 6 }}><Clock size={14} className="spin-slow" /> A DECORRER</div>}
+                              {m.status === 'live' && <div style={{ fontSize: 12, color: 'var(--green)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 6 }}><Clock size={14} className="spin-slow" /> LIVE</div>}
                               {m.referee && <div style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>🏁 {m.referee}</div>}
                             </div>
 

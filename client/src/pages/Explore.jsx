@@ -136,60 +136,85 @@ export default function Explore() {
                   scrollSnapType: 'x mandatory' 
                 }}>
                   {matches.map(m => (
-                    <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="match-card" style={{ textDecoration: 'none', minWidth: 320, flexShrink: 0, scrollSnapAlign: 'start', position: 'relative' }}>
-                      <div style={{ position: 'absolute', top: 12, right: 12, background: m.status === 'live' || m.status === 'active' ? 'rgba(255, 23, 68, 0.2)' : 'rgba(255, 255, 255, 0.1)', color: m.status === 'live' || m.status === 'active' ? '#ff1744' : 'var(--text-muted)', padding: '4px 8px', borderRadius: 8, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4 }}>
-                        {(m.status === 'live' || m.status === 'active') ? <><span className="pulse-dot" style={{ width: 6, height: 6, background: '#ff1744', borderRadius: '50%' }}></span> LIVE</> : 'A DECORRER'}
+                    <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="match-card hover-scale" style={{ textDecoration: 'none', minWidth: 320, flexShrink: 0, scrollSnapAlign: 'start', position: 'relative', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 20, padding: '24px 20px 16px' }}>
+                      <div style={{ position: 'absolute', top: 12, right: 12, background: m.status === 'live' ? 'rgba(255, 23, 68, 0.2)' : m.status === 'finished' ? 'rgba(0, 200, 83, 0.1)' : 'rgba(255, 255, 255, 0.05)', color: m.status === 'live' ? '#ff1744' : m.status === 'finished' ? 'var(--green)' : 'var(--text-muted)', padding: '4px 8px', borderRadius: 8, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        {m.status === 'live' ? (
+                          <><span className="pulse-dot" style={{ width: 6, height: 6, background: '#ff1744', borderRadius: '50%' }}></span> LIVE</>
+                        ) : m.status === 'finished' ? (
+                          'CONCLUÍDO'
+                        ) : (
+                          'AGENDADO'
+                        )}
                       </div>
                       
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, marginBottom: 12 }}>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, marginBottom: 16 }}>
                         {m.tournament?.name}
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                        <div style={{ flex: 1, textAlign: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 12 }}>
+                        {/* Home Team */}
+                        <div style={{ flex: 1, textAlign: 'center', minWidth: 0 }}>
                           <div 
                             onClick={(e) => { e.preventDefault(); m.homeTeam?.logo && setPreviewImage(m.homeTeam.logo); }}
                             style={{ 
-                              width: 40, height: 40, borderRadius: 12, background: m.homeTeam?.color || 'var(--green)', 
+                              width: 44, height: 44, borderRadius: 14, background: m.homeTeam?.color || 'var(--green)', 
                               margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                              overflow: 'hidden', cursor: m.homeTeam?.logo ? 'pointer' : 'default' 
+                              overflow: 'hidden', cursor: m.homeTeam?.logo ? 'pointer' : 'default', border: '1px solid rgba(255,255,255,0.05)'
                             }}
                           >
                             {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                           </div>
-                          <div style={{ fontWeight: 800, fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.homeTeam?.name}</div>
+                          <div style={{ fontWeight: 800, fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-primary)' }}>{m.homeTeam?.name}</div>
                         </div>
 
-
-                        <div style={{ padding: '0 16px', textAlign: 'center' }}>
-                          {(m.status === 'live' || m.status === 'active') && m.homeScore !== null ? (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 24, fontWeight: 900, color: 'var(--green)' }}>
+                        {/* Mid Section */}
+                        <div style={{ padding: '0 12px', textAlign: 'center', flexShrink: 0 }}>
+                          {m.status === 'live' && m.homeScore !== null ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 22, fontWeight: 900, color: 'var(--green)' }}>
                               <span>{m.homeScore}</span>
-                              <span style={{ color: 'var(--text-muted)', fontSize: 16 }}>-</span>
+                              <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>-</span>
+                              <span>{m.awayScore}</span>
+                            </div>
+                          ) : m.status === 'finished' && m.homeScore !== null ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 22, fontWeight: 900, color: 'var(--text-muted)' }}>
+                              <span>{m.homeScore}</span>
+                              <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>-</span>
                               <span>{m.awayScore}</span>
                             </div>
                           ) : (
-                            <div style={{ fontSize: 14, fontWeight: 800 }}>
-                              {m.date ? new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : 'VS'}
+                            <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.04)', padding: '4px 14px', borderRadius: 8 }}>
+                              VS
                             </div>
                           )}
                         </div>
 
-                        <div style={{ flex: 1, textAlign: 'center' }}>
+                        {/* Away Team */}
+                        <div style={{ flex: 1, textAlign: 'center', minWidth: 0 }}>
                           <div 
                             onClick={(e) => { e.preventDefault(); m.awayTeam?.logo && setPreviewImage(m.awayTeam.logo); }}
                             style={{ 
-                              width: 40, height: 40, borderRadius: 12, background: m.awayTeam?.color || 'var(--green)', 
+                              width: 44, height: 44, borderRadius: 14, background: m.awayTeam?.color || 'var(--green)', 
                               margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                              overflow: 'hidden', cursor: m.awayTeam?.logo ? 'pointer' : 'default' 
+                              overflow: 'hidden', cursor: m.awayTeam?.logo ? 'pointer' : 'default', border: '1px solid rgba(255,255,255,0.05)'
                             }}
                           >
                             {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                           </div>
-                          <div style={{ fontWeight: 800, fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.awayTeam?.name}</div>
+                          <div style={{ fontWeight: 800, fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-primary)' }}>{m.awayTeam?.name}</div>
                         </div>
-
                       </div>
+
+                      {/* Match Details Footer */}
+                      {(m.date || m.location) && (
+                        <div style={{ display: 'flex', gap: 10, fontSize: 10, color: 'var(--text-secondary)', marginTop: 14, justifyContent: 'center', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 10, flexWrap: 'wrap' }}>
+                          {m.date && (
+                            <span>
+                              📅 {new Date(m.date).toLocaleDateString('pt-PT')} às {new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          )}
+                          {m.location && <span>🏟️ {m.location}</span>}
+                        </div>
+                      )}
                     </Link>
                   ))}
                 </div>
