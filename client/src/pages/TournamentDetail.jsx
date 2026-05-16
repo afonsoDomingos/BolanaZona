@@ -30,6 +30,8 @@ export default function TournamentDetail() {
   const [showManualMatchModal, setShowManualMatchModal] = useState(false);
   const [generatingCalendar, setGeneratingCalendar] = useState(false);
   const [subscribers, setSubscribers] = useState([]);
+  const [previewImage, setPreviewImage] = useState(null);
+
   const { user: currentUser } = useAuth();
   const isOwner = currentUser && tournament && (
     (typeof tournament.createdBy === 'string' && tournament.createdBy === currentUser._id) ||
@@ -354,9 +356,17 @@ export default function TournamentDetail() {
                   <div key={t._id} className="card">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                        <div style={{ width: 40, height: 40, borderRadius: 10, background: t.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                        <div 
+                          onClick={() => t.logo && setPreviewImage(t.logo)}
+                          style={{ 
+                            width: 40, height: 40, borderRadius: 10, background: t.color || 'var(--green)', 
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                            overflow: 'hidden', flexShrink: 0, cursor: t.logo ? 'pointer' : 'default' 
+                          }}
+                        >
                           {t.logo ? <img src={t.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                         </div>
+
                         <div>
                           <div style={{ fontWeight: 700, fontSize: 15 }}>{t.name}</div>
                           <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{t.captainName || 'Sem capitão'}</div>
@@ -796,11 +806,27 @@ export default function TournamentDetail() {
           onClose={() => setShowEditTournamentModal(false)} 
           onSaved={(updated) => { 
             setTournament(updated); 
-            setShowEditTournamentModal(false); 
           }} 
         />
       )}
+      
+      {previewImage && (
+        <div 
+          className="modal-overlay animate-fade-in" 
+          onClick={() => setPreviewImage(null)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+        >
+          <button style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}><X size={32} /></button>
+          <img 
+            src={previewImage} 
+            alt="Preview" 
+            style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain', borderRadius: 12, boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }} 
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
+
   );
 }
 

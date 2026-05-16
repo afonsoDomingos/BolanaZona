@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { Trophy, Users, MapPin, Calendar, ArrowRight, Search } from 'lucide-react';
+import { Trophy, Users, MapPin, Calendar, ArrowRight, Search, X } from 'lucide-react';
+
 
 export default function Explore() {
   const [tournaments, setTournaments] = useState([]);
@@ -11,6 +12,8 @@ export default function Explore() {
   const [neighborhoodFilter, setNeighborhoodFilter] = useState('');
 
   const [matches, setMatches] = useState([]);
+  const [previewImage, setPreviewImage] = useState(null);
+
 
   useEffect(() => {
     Promise.all([
@@ -144,11 +147,19 @@ export default function Explore() {
 
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                         <div style={{ flex: 1, textAlign: 'center' }}>
-                          <div style={{ width: 40, height: 40, borderRadius: 12, background: m.homeTeam?.color || 'var(--green)', margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                          <div 
+                            onClick={(e) => { e.preventDefault(); m.homeTeam?.logo && setPreviewImage(m.homeTeam.logo); }}
+                            style={{ 
+                              width: 40, height: 40, borderRadius: 12, background: m.homeTeam?.color || 'var(--green)', 
+                              margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                              overflow: 'hidden', cursor: m.homeTeam?.logo ? 'pointer' : 'default' 
+                            }}
+                          >
                             {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                           </div>
                           <div style={{ fontWeight: 800, fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.homeTeam?.name}</div>
                         </div>
+
 
                         <div style={{ padding: '0 16px', textAlign: 'center' }}>
                           {(m.status === 'live' || m.status === 'active') && m.homeScore !== null ? (
@@ -165,11 +176,19 @@ export default function Explore() {
                         </div>
 
                         <div style={{ flex: 1, textAlign: 'center' }}>
-                          <div style={{ width: 40, height: 40, borderRadius: 12, background: m.awayTeam?.color || 'var(--green)', margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                          <div 
+                            onClick={(e) => { e.preventDefault(); m.awayTeam?.logo && setPreviewImage(m.awayTeam.logo); }}
+                            style={{ 
+                              width: 40, height: 40, borderRadius: 12, background: m.awayTeam?.color || 'var(--green)', 
+                              margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                              overflow: 'hidden', cursor: m.awayTeam?.logo ? 'pointer' : 'default' 
+                            }}
+                          >
                             {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                           </div>
                           <div style={{ fontWeight: 800, fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.awayTeam?.name}</div>
                         </div>
+
                       </div>
                     </Link>
                   ))}
@@ -249,6 +268,23 @@ export default function Explore() {
           </>
         )}
       </div>
+      
+      {previewImage && (
+        <div 
+          className="modal-overlay animate-fade-in" 
+          onClick={() => setPreviewImage(null)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+        >
+          <button style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}><X size={32} /></button>
+          <img 
+            src={previewImage} 
+            alt="Preview" 
+            style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain', borderRadius: 12, boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }} 
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
+
   );
 }

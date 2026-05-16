@@ -22,6 +22,8 @@ export default function PublicTournament() {
   const [showSponsorModal, setShowSponsorModal] = useState(false);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+
 
   useEffect(() => {
     api.get(`/tournaments/public/${shareCode}`)
@@ -343,11 +345,20 @@ export default function PublicTournament() {
               {teams.map(t => (
                 <div key={t._id} className="card-glass" style={{ padding: 24, borderRadius: 20 }}>
                   <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-                    <div style={{ width: 56, height: 56, borderRadius: 16, background: t.color || 'var(--green)', border: '4px solid var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', boxShadow: '0 8px 20px rgba(0,0,0,0.3)' }}>
+                    <div 
+                      onClick={() => t.logo && setPreviewImage(t.logo)}
+                      style={{ 
+                        width: 56, height: 56, borderRadius: 16, background: t.color || 'var(--green)', 
+                        border: '4px solid var(--bg-card)', display: 'flex', alignItems: 'center', 
+                        justifyContent: 'center', overflow: 'hidden', boxShadow: '0 8px 20px rgba(0,0,0,0.3)',
+                        cursor: t.logo ? 'pointer' : 'default'
+                      }}
+                    >
                       {t.logo ? <img src={t.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 24 }}>👕</span>}
                     </div>
                     <div>
                       <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>{t.name}</h3>
+
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
                         <Users size={12} /> {t.players?.length || 0} Atletas
                       </div>
@@ -375,7 +386,24 @@ export default function PublicTournament() {
         <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 8 }}>O futebol do bairro, agora profissional.</p>
       </div>
       {showSubscribeModal && <SubscribeModal tournament={tournament} onClose={() => setShowSubscribeModal(false)} />}
+      
+      {previewImage && (
+        <div 
+          className="modal-overlay animate-fade-in" 
+          onClick={() => setPreviewImage(null)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+        >
+          <button style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}><X size={32} /></button>
+          <img 
+            src={previewImage} 
+            alt="Preview" 
+            style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain', borderRadius: 12, boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }} 
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
+
   );
 }
 
