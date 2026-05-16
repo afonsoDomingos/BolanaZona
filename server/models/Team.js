@@ -20,6 +20,8 @@ const teamSchema = new mongoose.Schema({
   amountPaid: { type: Number, default: 0 },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'approved' },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  invitationCode: { type: String, unique: true, sparse: true },
 }, { timestamps: true });
+
 
 module.exports = mongoose.model('Team', teamSchema);

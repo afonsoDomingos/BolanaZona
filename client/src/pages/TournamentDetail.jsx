@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save, MapPin, Edit2, Camera, MessageCircle, Shield, Trophy } from 'lucide-react';
 
 import MatchShareModal from '../components/MatchShareModal';
+import LinkManagerModal from '../components/LinkManagerModal';
+
 
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
 const statusBadge = { draft: 'badge-gray', registration: 'badge-blue', active: 'badge-green', finished: 'badge-yellow' };
@@ -32,6 +34,8 @@ export default function TournamentDetail() {
   const [generatingCalendar, setGeneratingCalendar] = useState(false);
   const [subscribers, setSubscribers] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
+  const [showLinkModal, setShowLinkModal] = useState(null);
+
 
   const { user: currentUser } = useAuth();
   const isOwner = currentUser && tournament && (
@@ -397,7 +401,27 @@ export default function TournamentDetail() {
                         </span>
                       )}
                     </div>
+
+                    {canManage && (
+                      <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                          {t.captain ? (
+                            <span style={{ color: 'var(--green)', fontWeight: 600 }}>✅ Gestor Vinculado</span>
+                          ) : (
+                            <span>⚠️ Sem gestor</span>
+                          )}
+                        </div>
+                        <button 
+                          className="btn btn-secondary btn-sm" 
+                          style={{ fontSize: 11, padding: '4px 10px' }}
+                          onClick={() => setShowLinkModal(t)}
+                        >
+                          {t.captain ? 'Alterar Gestor' : 'Vincular Gestor'}
+                        </button>
+                      </div>
+                    )}
                   </div>
+
                 ))}
               </div>
             )}
@@ -824,6 +848,17 @@ export default function TournamentDetail() {
         />
       )}
       
+      {showLinkModal && (
+        <LinkManagerModal 
+          team={showLinkModal} 
+          onClose={() => setShowLinkModal(null)} 
+          onLinked={() => { 
+            setShowLinkModal(null); 
+            load(); 
+          }} 
+        />
+      )}
+
       {previewImage && (
         <div 
           className="modal-overlay animate-fade-in" 
@@ -839,7 +874,10 @@ export default function TournamentDetail() {
           />
         </div>
       )}
+
+      )}
     </div>
+
 
   );
 }

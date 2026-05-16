@@ -20,7 +20,15 @@ export default function Login() {
         const res = await loginWithGoogle(tokenResponse.access_token);
         console.log('✅ Resposta do Servidor:', res);
         toast.success('Entraste com o Google! ⚽');
-        navigate('/dashboard');
+        
+        const redirect = sessionStorage.getItem('redirectAfterLogin');
+        if (redirect) {
+          sessionStorage.removeItem('redirectAfterLogin');
+          navigate(redirect);
+        } else {
+          navigate('/dashboard');
+        }
+
       } catch (err) {
         console.error('🔥 ERRO COMPLETO DO GOOGLE LOGIN:', err.response?.data);
         setError(err.response?.data?.detail || err.response?.data?.message || 'Erro no login com Google.');
@@ -50,10 +58,17 @@ export default function Login() {
         player: 'Bem-vindo, Craque da Zona! ⚽',
         viewer: 'Bem-vindo à Zona, Torcedor! 📣'
       };
-      const msg = greetings[result.user.role] || 'Bem-vindo de volta!';
       toast.success(msg);
       localStorage.setItem('bnz_welcome', 'true');
-      navigate('/dashboard');
+      
+      const redirect = sessionStorage.getItem('redirectAfterLogin');
+      if (redirect) {
+        sessionStorage.removeItem('redirectAfterLogin');
+        navigate(redirect);
+      } else {
+        navigate('/dashboard');
+      }
+
     } catch (err) {
       setError(err.response?.data?.message || 'Credenciais inválidas.');
     } finally { setLoading(false); }

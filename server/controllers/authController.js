@@ -196,3 +196,21 @@ exports.googleLogin = async (req, res) => {
     res.status(500).json({ message: 'Erro ao autenticar com Google.', detail: err.response?.data || err.message });
   }
 };
+
+exports.searchByPhone = async (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) return res.json([]);
+
+    // Normalizar query de telefone
+    let normalized = query.trim().replace(/\D/g, '');
+    if (normalized.length > 9) normalized = normalized.slice(-9);
+
+    const users = await User.find({ 
+      phone: { $regex: normalized, $options: 'i' } 
+    }).limit(5).select('name phone avatar email');
+    
+    res.json(users);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+

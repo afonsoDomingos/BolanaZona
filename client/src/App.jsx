@@ -37,6 +37,8 @@ import Privacy from './pages/legal/Privacy';
 import Terms from './pages/legal/Terms';
 import Cookies from './pages/legal/Cookies';
 import CookieSettings from './pages/legal/CookieSettings';
+import InviteAccept from './pages/InviteAccept';
+
 import './index.css';
 
 // Bola na Zona - Plataforma Oficial ⚽
@@ -70,6 +72,8 @@ function AppRoutes() {
           <Route path="/forgot-password" element={<GuestRoute><ForgotPassword /></GuestRoute>} />
           <Route path="/reset-password/:token" element={<GuestRoute><ResetPassword /></GuestRoute>} />
           <Route path="/t/:shareCode" element={<PublicTournament />} />
+          <Route path="/invite/team/:code" element={<InviteAccept />} />
+
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard/squads" element={<ProtectedRoute><MySquads /></ProtectedRoute>} />
           <Route path="/dashboard/squads/:id" element={<ProtectedRoute><SquadDetail /></ProtectedRoute>} />
