@@ -1375,7 +1375,8 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
   const [loading, setLoading] = useState(false);
 
   // Event form state
-  const [newEvent, setNewEvent] = useState({ type: 'goal', team: match.homeTeam._id, playerName: '' });
+  const [newEvent, setNewEvent] = useState({ type: 'goal', team: match.homeTeam._id, playerName: '', minute: '' });
+
 
   const homePlayers = teams.find(t => t._id === match.homeTeam._id)?.players || [];
   const awayPlayers = teams.find(t => t._id === match.awayTeam._id)?.players || [];
@@ -1383,24 +1384,30 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
 
   const handleAddEvent = () => {
     if (!newEvent.playerName) return toast.error('Seleciona ou escreve o nome do jogador.');
-    setEvents([...events, { ...newEvent, id: Date.now() }]);
-    setNewEvent({ ...newEvent, playerName: '' });
+    setEvents([...events, { ...newEvent, id: Date.now(), minute: newEvent.minute ? Number(newEvent.minute) : null }]);
+    setNewEvent({ ...newEvent, playerName: '', minute: '' });
   };
 
   const handleRemoveEvent = (id) => setEvents(events.filter(e => e.id !== id && e._id !== id));
 
-  const handleSave = async () => {
+  const handleSave = async (customStatus) => {
     if (home === '' || away === '') return toast.error('Insere os dois resultados.');
     setLoading(true);
     try {
       await api.put(`/tournaments/${tournamentId}/matches/${match._id}/result`, {
-        homeScore: Number(home), awayScore: Number(away), events, referee
+        homeScore: Number(home), 
+        awayScore: Number(away), 
+        events, 
+        referee,
+        status: customStatus || 'finished'
       });
-      toast.success('Resultado e eventos guardados!');
+      toast.success(customStatus === 'live' ? 'Live Atualizado! 📡' : 'Resultado e eventos guardados!');
       onSaved();
+      if (!customStatus || customStatus === 'finished') onClose();
     } catch { toast.error('Erro ao guardar resultado.'); }
     finally { setLoading(false); }
   };
+
 
   const eventIcons = { goal: '⚽', yellow_card: '🟨', red_card: '🟥' };
   const eventLabels = { goal: 'Golo', yellow_card: 'Cartão Amarelo', red_card: 'Cartão Vermelho' };
@@ -1447,19 +1454,29 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
                 <option value={match.awayTeam._id}>{match.awayTeam.name}</option>
               </select>
             </div>
-            <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input 
+                type="number"
+                className="form-input"
+                style={{ width: 70 }}
+                placeholder="Min"
+                value={newEvent.minute}
+                onChange={e => setNewEvent({...newEvent, minute: e.target.value})}
+              />
               <input 
                 list="players-list"
                 className="form-input" 
                 placeholder="Nome do jogador..." 
+                style={{ flex: 1 }}
                 value={newEvent.playerName} 
                 onChange={e => setNewEvent({...newEvent, playerName: e.target.value})}
               />
               <datalist id="players-list">
                 {currentTeamPlayers.map((p, i) => <option key={i} value={p.name} />)}
               </datalist>
-              <button className="btn btn-primary btn-sm" onClick={handleAddEvent}>Adicionar</button>
+              <button className="btn btn-primary btn-sm" onClick={handleAddEvent}>Add</button>
             </div>
+
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 200, overflowY: 'auto', paddingRight: 4 }}>
@@ -1472,19 +1489,33 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
                     <span style={{ fontSize: 16 }}>{eventIcons[e.type]}</span>
                     <div>
                       <span style={{ fontWeight: 700, fontSize: 14 }}>{e.playerName}</span>
+                      {e.minute && <span style={{ fontSize: 11, color: 'var(--green)', marginLeft: 6 }}>{e.minute}'</span>}
                       <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>({e.team === match.homeTeam._id ? 'Casa' : 'Fora'})</span>
                     </div>
                   </div>
                   <button onClick={() => handleRemoveEvent(e.id || e._id)} style={{ background: 'none', color: 'var(--red)', opacity: 0.6 }}><X size={14} /></button>
                 </div>
+
               ))
             )}
           </div>
         </div>
 
-        <button className="btn btn-primary" onClick={handleSave} disabled={loading} style={{ width: '100%', justifyContent: 'center', height: 48 }}>
-          {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><Save size={16} /> Finalizar e Guardar Tudo</>}
-        </button>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button 
+            className="btn btn-secondary" 
+            style={{ flex: 1, height: 48, justifyContent: 'center' }} 
+            onClick={() => handleSave('live')}
+            disabled={loading}
+          >
+            {loading ? '...' : 'Actualizar Live'}
+          </button>
+
+          <button className="btn btn-primary" onClick={handleSave} disabled={loading} style={{ flex: 2, justifyContent: 'center', height: 48 }}>
+            {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><Save size={16} /> Finalizar e Guardar Tudo</>}
+          </button>
+        </div>
+
       </div>
     </div>
   );

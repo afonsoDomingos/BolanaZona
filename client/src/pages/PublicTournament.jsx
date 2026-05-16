@@ -25,18 +25,31 @@ export default function PublicTournament() {
   const [previewImage, setPreviewImage] = useState(null);
 
 
-  useEffect(() => {
+  const loadData = () => {
     api.get(`/tournaments/public/${shareCode}`)
       .then(res => {
         setData(res.data);
-        // Só abrir o modal automaticamente se estiver em inscrições e tiver o parâmetro reg=true
         if (res.data.tournament.status === 'registration' && showRegisterAction) {
           setShowRegistrationModal(true);
         }
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
-  }, [shareCode, showRegisterAction]);
+  };
+
+  useEffect(() => {
+    loadData();
+
+    const interval = setInterval(() => {
+      if (data?.matches?.some(m => m.status === 'live' || m.status === 'active')) {
+        console.log('📡 Atualizando dados em direto...');
+        loadData();
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [shareCode, showRegisterAction, data?.matches?.length]);
+
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
