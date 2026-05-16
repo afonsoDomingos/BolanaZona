@@ -45,7 +45,9 @@ app.use((req, res, next) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tournaments', require('./routes/tournaments'));
 app.use('/api/tournaments/:tournamentId/teams', require('./routes/teams'));
+app.use('/api/teams', require('./routes/teams'));
 app.use('/api/tournaments/:tournamentId/matches', require('./routes/matches'));
+
 app.use('/api/notifications', require('./routes/notifications'));
 
 app.use('/api/upload', require('./routes/upload'));

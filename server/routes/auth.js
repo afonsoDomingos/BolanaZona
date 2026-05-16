@@ -9,7 +9,8 @@ router.post('/google', authCtrl.googleLogin);
 router.get('/me', protect, authCtrl.me);
 router.post('/forgot-password', authCtrl.forgotPassword);
 router.patch('/reset-password/:token', authCtrl.resetPassword);
-router.get('/search', protect, authCtrl.searchByPhone);
+router.get('/search', protect, authCtrl.searchUsers);
+
 
 
 module.exports = router;

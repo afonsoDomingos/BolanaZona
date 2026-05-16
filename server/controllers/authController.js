@@ -197,20 +197,25 @@ exports.googleLogin = async (req, res) => {
   }
 };
 
-exports.searchByPhone = async (req, res) => {
+exports.searchUsers = async (req, res) => {
   try {
     const { query } = req.query;
     if (!query) return res.json([]);
 
-    // Normalizar query de telefone
-    let normalized = query.trim().replace(/\D/g, '');
-    if (normalized.length > 9) normalized = normalized.slice(-9);
+    const cleanQuery = query.trim();
+    let phoneQuery = cleanQuery.replace(/\D/g, '');
+    if (phoneQuery.length > 9) phoneQuery = phoneQuery.slice(-9);
 
     const users = await User.find({ 
-      phone: { $regex: normalized, $options: 'i' } 
+      $or: [
+        { phone: { $regex: phoneQuery.length >= 3 ? phoneQuery : 'impossible_match', $options: 'i' } },
+        { email: { $regex: cleanQuery, $options: 'i' } },
+        { name: { $regex: cleanQuery, $options: 'i' } }
+      ]
     }).limit(5).select('name phone avatar email');
     
     res.json(users);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
+
 

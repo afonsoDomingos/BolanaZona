@@ -108,7 +108,8 @@ export default function LinkManagerModal({ team, onClose, onLinked }) {
             <input
               type="text"
               className="form-input"
-              placeholder="Pesquisar por telefone (Ex: 847877405)"
+              placeholder="Pesquisar por telefone ou email"
+
               style={{ paddingLeft: 40 }}
               value={query}
               onChange={e => setQuery(e.target.value)}
@@ -154,7 +155,8 @@ export default function LinkManagerModal({ team, onClose, onLinked }) {
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: 20, color: 'var(--text-muted)', fontSize: 13 }}>
-              Digita pelo menos 3 números para pesquisar...
+              Digita pelo menos 3 caracteres para pesquisar...
+
             </div>
           )}
         </div>
