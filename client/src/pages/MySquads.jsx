@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Shield, Plus, ArrowRight, User, Swords, Check, X, Calendar, MapPin } from 'lucide-react';
+import { Shield, Plus, ArrowRight, User, Swords, Check, X, Calendar, MapPin, Trophy, LogOut } from 'lucide-react';
+
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import SquadDetailsModal from '../components/SquadDetailsModal';
@@ -24,16 +25,20 @@ export default function MySquads() {
   const [showResultModal, setShowResultModal] = useState(null);
   const [showEditDetailsModal, setShowEditDetailsModal] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [managedTeams, setManagedTeams] = useState([]);
   const navigate = useNavigate();
+
 
   const fetchSquads = async () => {
     try {
-      const [sqRes, chRes] = await Promise.all([
+      const [sqRes, chRes, teamsRes] = await Promise.all([
         api.get('/squads/my-squads'),
-        api.get('/challenges/my-challenges')
+        api.get('/challenges/my-challenges'),
+        api.get('/teams/my-managed-teams')
       ]);
       setSquads(sqRes.data);
       setChallenges(chRes.data);
+      setManagedTeams(teamsRes.data);
     } catch {
       toast.error('Erro ao carregar as tuas equipas.');
     } finally {
@@ -83,6 +88,15 @@ export default function MySquads() {
     }
   };
 
+  const handleUnlink = async (teamId) => {
+    if (!confirm('Queres mesmo sair da gestão desta equipa?')) return;
+    try {
+      await api.put(`/teams/${teamId}/unlink`);
+      toast.success('Desvinculado com sucesso.');
+      setManagedTeams(prev => prev.filter(t => t._id !== teamId));
+    } catch { toast.error('Erro ao desvincular.'); }
+  };
+
   const btnTabStyle = (t) => ({
     padding: '12px 0', background: 'none', border: 'none', flexShrink: 0,
     color: tab === t ? 'var(--green)' : 'var(--text-muted)',
@@ -90,6 +104,7 @@ export default function MySquads() {
     fontWeight: 800, fontSize: 16, cursor: 'pointer', transition: '0.2s',
     display: 'flex', alignItems: 'center', gap: 8
   });
+
 
   const renderContent = () => {
     if (loading) return <div className="loading-center"><div className="spinner" /></div>;
@@ -135,6 +150,52 @@ export default function MySquads() {
       );
     }
 
+    if (tab === 'tournaments') {
+      if (managedTeams.length === 0) {
+        return (
+          <div className="empty-state card-glass">
+            <Trophy size={56} color="var(--text-muted)" style={{ marginBottom: 20 }} />
+            <h3 style={{ fontSize: 24, fontWeight: 800 }}>Sem equipas em torneios</h3>
+            <p style={{ maxWidth: 400, margin: '12px auto 32px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              Quando um organizador te vincular a uma equipa de torneio, ela aparecerá aqui.
+            </p>
+          </div>
+        );
+      }
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {managedTeams.map(team => (
+            <div key={team._id} className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: team.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid rgba(255,255,255,0.1)', flexShrink: 0 }}>
+                  {team.logo ? <img src={team.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }} /> : <Shield size={26} color="#fff" />}
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 4px', color: '#fff' }}>{team.name}</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12, color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+                    <span>🏆 {team.tournament?.name}</span>
+                    <span className={`badge ${team.tournament?.status === 'active' ? 'badge-green' : team.tournament?.status === 'finished' ? 'badge-yellow' : 'badge-gray'}`} style={{ fontSize: 10 }}>
+                      {team.tournament?.status === 'active' ? 'A Decorrer' : team.tournament?.status === 'finished' ? 'Concluído' : 'Inscrições'}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
+                    <User size={12} style={{ display: 'inline', marginRight: 4 }} />{team.players?.length || 0} jogadores
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
+                <Link to={`/t/${team.tournament?.shareCode}`} className="btn btn-primary btn-sm" style={{ height: 36, display: 'flex', alignItems: 'center', gap: 6, padding: '0 14px', fontSize: 12 }}>
+                  <Trophy size={13} /> Ver Torneio
+                </Link>
+                <button onClick={() => handleUnlink(team._id)} className="btn btn-secondary btn-sm" style={{ height: 36, color: 'var(--red)', borderColor: 'rgba(255,0,0,0.15)', fontSize: 12, gap: 6 }}>
+                  <LogOut size={13} /> Sair
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
     if (tab === 'challenges') {
       const filtered = challenges.filter(c => c.status !== 'accepted' && c.status !== 'completed');
       if (filtered.length === 0) {
@@ -145,6 +206,7 @@ export default function MySquads() {
           </div>
         );
       }
+
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {filtered.map(c => {
@@ -352,6 +414,10 @@ export default function MySquads() {
 
         <div style={{ display: 'flex', gap: 24, marginBottom: 32, borderBottom: '1px solid rgba(255,255,255,0.1)', overflowX: 'auto', whiteSpace: 'nowrap' }}>
           <button onClick={() => setTab('squads')} style={btnTabStyle('squads')}>A Minha Garagem</button>
+          <button onClick={() => setTab('tournaments')} style={btnTabStyle('tournaments')}>
+            Torneios 🏆
+            {managedTeams.length > 0 && <span style={{ background: 'var(--blue)', color: '#fff', fontSize: 10, padding: '2px 6px', borderRadius: 100 }}>{managedTeams.length}</span>}
+          </button>
           <button onClick={() => setTab('challenges')} style={btnTabStyle('challenges')}>
             Desafios ⚔️
             {challenges.filter(c => c.status === 'pending').length > 0 && <span style={{ background: 'var(--red)', color: '#fff', fontSize: 10, padding: '2px 6px', borderRadius: 100 }}>{challenges.filter(c => c.status === 'pending').length}</span>}
@@ -362,6 +428,7 @@ export default function MySquads() {
           </button>
           <button onClick={() => setTab('results')} style={btnTabStyle('results')}>Resultados 🏁</button>
         </div>
+
 
 
 
