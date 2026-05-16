@@ -885,7 +885,92 @@ export default function TournamentDetail() {
   );
 }
 
+function MatchScheduleModal({ match, tournamentId, onClose, onSaved }) {
+  const toLocalDatetime = (isoDate) => {
+    if (!isoDate) return '';
+    const d = new Date(isoDate);
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const [form, setForm] = useState({
+    date: toLocalDatetime(match.date),
+    location: match.location || '',
+    referee: match.referee || '',
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      await api.put(`/tournaments/${tournamentId}/matches/${match._id}`, form);
+      toast.success('Jogo atualizado! 📅');
+      onSaved();
+    } catch { toast.error('Erro ao atualizar jogo.'); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{ maxWidth: 440 }}>
+        <div className="modal-header">
+          <h2 className="modal-title">✏️ Editar Detalhes do Jogo</h2>
+          <button className="modal-close" onClick={onClose}><X size={18} /></button>
+        </div>
+
+        {/* Match info */}
+        <div style={{ textAlign: 'center', marginBottom: 24, padding: '12px 0', background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ fontWeight: 800, fontSize: 16 }}>
+            {match.homeTeam?.name} <span style={{ color: 'var(--text-muted)' }}>vs</span> {match.awayTeam?.name}
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Jornada {match.round}</div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="form-group">
+            <label className="form-label">📅 Data e Hora do Jogo</label>
+            <input
+              type="datetime-local"
+              className="form-input"
+              value={form.date}
+              onChange={e => setForm({...form, date: e.target.value})}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">🏟️ Local / Campo</label>
+            <input
+              className="form-input"
+              placeholder="Ex: Campo Municipal da Zona"
+              value={form.location}
+              onChange={e => setForm({...form, location: e.target.value})}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">🏁 Árbitro (Opcional)</label>
+            <input
+              className="form-input"
+              placeholder="Nome do árbitro"
+              value={form.referee}
+              onChange={e => setForm({...form, referee: e.target.value})}
+            />
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+          <button className="btn btn-secondary" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Cancelar</button>
+          <button className="btn btn-primary" onClick={handleSave} disabled={loading} style={{ flex: 2, justifyContent: 'center' }}>
+            {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><Save size={16} /> Guardar Alterações</>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ManualMatchModal({ tournamentId, teams, onClose, onSaved }) {
+
   const [form, setForm] = useState({ homeTeam: '', awayTeam: '', round: 1, roundName: 'Jornada 1', date: '', location: '', referee: '' });
   const [loading, setLoading] = useState(false);
 
