@@ -278,10 +278,13 @@ export default function PublicTournament() {
                         {roundMatches.map(m => (
                           <div key={m._id} style={{ position: 'relative' }}>
                             <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }}>
-                              <button onClick={() => captureImage(`print-match-${m._id}`, `Jogo_${m.homeTeam?.name}_vs_${m.awayTeam?.name}`)} className="btn btn-secondary btn-sm" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', padding: 4 }} title="Guardar Resultado">
-                                <Camera size={16} />
-                              </button>
+                              {m.status === 'finished' && (
+                                <button onClick={() => captureImage(`print-match-${m._id}`, `Jogo_${m.homeTeam?.name}_vs_${m.awayTeam?.name}`)} className="btn btn-secondary btn-sm" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', padding: 4 }} title="Guardar Resultado">
+                                  <Camera size={16} />
+                                </button>
+                              )}
                             </div>
+
                             <div id={`print-match-${m._id}`} className="match-card animate-slide-up" style={{ padding: 0, overflow: 'hidden' }}>
                               <div style={{ display: 'flex', alignItems: 'center', padding: '20px 32px', gap: 24, flexWrap: 'wrap' }}>
                               <div style={{ flex: 1, textAlign: 'right', fontWeight: 800, fontSize: 18 }}>{m.homeTeam?.name}</div>

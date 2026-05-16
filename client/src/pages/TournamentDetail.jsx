@@ -3,7 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save, MapPin, Edit2, Camera, MessageCircle, Shield } from 'lucide-react';
+import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save, MapPin, Edit2, Camera, MessageCircle, Shield, Trophy } from 'lucide-react';
+
 import MatchShareModal from '../components/MatchShareModal';
 
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
@@ -479,7 +480,20 @@ export default function TournamentDetail() {
                                 {canManage && (
                                   <>
                                     <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Agendar"><Calendar size={14} /></button>
-                                    <button className="btn btn-primary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowResultModal(m)} title="Resultado"><Trophy size={14} /></button>
+                                    <button 
+                                      className="btn btn-primary btn-sm" 
+                                      style={{ padding: '6px 8px', opacity: (!m.date || new Date(m.date) > new Date()) ? 0.5 : 1, cursor: (!m.date || new Date(m.date) > new Date()) ? 'not-allowed' : 'pointer' }} 
+                                      onClick={() => {
+                                        if (!m.date || new Date(m.date) > new Date()) {
+                                          return toast.error('Apenas podes colocar resultados após a data/hora do jogo.');
+                                        }
+                                        setShowResultModal(m);
+                                      }} 
+                                      title="Resultado"
+                                    >
+                                      <Trophy size={14} />
+                                    </button>
+
                                     <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowShareModal(m)} title="Partilhar"><Camera size={14} /></button>
                                   </>
                                 )}
