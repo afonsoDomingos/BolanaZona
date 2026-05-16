@@ -148,9 +148,10 @@ export default function MySquads() {
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {filtered.map(c => {
-            const isChallenger = squads.some(s => s._id === c.challengerSquad?._id);
+            const isChallenger = squads.some(s => String(s._id) === String(c.challengerSquad?._id || c.challengerSquad));
             const mySquad = isChallenger ? c.challengerSquad : c.challengedSquad;
             const opponentSquad = isChallenger ? c.challengedSquad : c.challengerSquad;
+
             return (
               <div key={c._id} className="card-glass" style={{ padding: 24, borderRadius: 20, borderLeft: c.status === 'pending' ? '4px solid var(--yellow)' : '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 16 }}>
@@ -231,9 +232,10 @@ export default function MySquads() {
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {filtered.map(c => {
-            const isChallenger = squads.some(s => s._id === c.challengerSquad?._id);
+            const isChallenger = squads.some(s => String(s._id) === String(c.challengerSquad?._id || c.challengerSquad));
             const mySquad = isChallenger ? c.challengerSquad : c.challengedSquad;
             const opponentSquad = isChallenger ? c.challengedSquad : c.challengerSquad;
+
             return (
               <div key={c._id} className="card-glass" style={{ padding: 24, borderRadius: 20, borderLeft: '4px solid var(--green)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 16 }}>
@@ -300,9 +302,10 @@ export default function MySquads() {
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {filtered.map(c => {
-            const isChallenger = squads.some(s => s._id === c.challengerSquad?._id);
+            const isChallenger = squads.some(s => String(s._id) === String(c.challengerSquad?._id || c.challengerSquad));
             const myScore = isChallenger ? c.result?.challengerScore : c.result?.challengedScore;
             const opponentScore = isChallenger ? c.result?.challengedScore : c.result?.challengerScore;
+
             const isWin = myScore > opponentScore;
             const isDraw = myScore === opponentScore;
             return (
