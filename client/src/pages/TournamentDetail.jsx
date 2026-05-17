@@ -505,14 +505,9 @@ export default function TournamentDetail() {
                                     <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Editar Jogo"><Edit2 size={14} /></button>
                                     <button 
                                       className="btn btn-primary btn-sm" 
-                                      style={{ padding: '6px 8px', opacity: (!m.date || new Date(m.date) > new Date()) ? 0.5 : 1, cursor: (!m.date || new Date(m.date) > new Date()) ? 'not-allowed' : 'pointer' }} 
-                                      onClick={() => {
-                                        if (!m.date || new Date(m.date) > new Date()) {
-                                          return toast.error('Apenas podes colocar resultados após a data/hora do jogo.');
-                                        }
-                                        setShowResultModal(m);
-                                      }} 
-                                      title="Resultado"
+                                      style={{ padding: '6px 8px', cursor: 'pointer' }} 
+                                      onClick={() => setShowResultModal(m)} 
+                                      title="Lançar Resultado e Marcadores"
                                     >
                                       <Trophy size={14} />
                                     </button>
