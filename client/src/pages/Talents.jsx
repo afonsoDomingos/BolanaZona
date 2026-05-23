@@ -64,9 +64,18 @@ export default function Talents() {
                     width: 50, height: 50, borderRadius: 12, 
                     background: i === 0 ? 'var(--yellow)' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'var(--bg-secondary)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 20, fontWeight: 900, color: i < 3 ? '#000' : 'var(--text-muted)'
+                    fontSize: 20, fontWeight: 900, color: i < 3 ? '#000' : 'var(--text-muted)',
+                    flexShrink: 0
                   }}>
                     {i + 1}
+                  </div>
+
+                  <div style={{ width: 50, height: 50, borderRadius: '50%', overflow: 'hidden', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(255,255,255,0.1)' }}>
+                    {p.photo ? (
+                      <img src={p.photo} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <Users size={24} color="var(--text-muted)" />
+                    )}
                   </div>
 
                   <div style={{ flex: 1 }}>

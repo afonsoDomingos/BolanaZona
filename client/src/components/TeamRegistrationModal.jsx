@@ -16,6 +16,8 @@ export default function TeamRegistrationModal({ tournament, onClose }) {
   const [step, setStep] = useState(0);
   const [playerName, setPlayerName] = useState('');
   const [playerNumber, setPlayerNumber] = useState('');
+  const [playerPhoto, setPlayerPhoto] = useState('');
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [loading, setLoading] = useState(false);
   const [availableTournaments, setAvailableTournaments] = useState([tournament]);
   const [selectedTournament, setSelectedTournament] = useState(tournament._id);
@@ -63,11 +65,32 @@ export default function TeamRegistrationModal({ tournament, onClose }) {
       ...prev, 
       players: [...prev.players, { 
         name: playerName.trim(), 
-        number: playerNumber ? Number(playerNumber) : null 
+        number: playerNumber ? Number(playerNumber) : null,
+        photo: playerPhoto
       }] 
     }));
     setPlayerName('');
     setPlayerNumber('');
+    setPlayerPhoto('');
+  };
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      const res = await api.post('/upload/public', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setPlayerPhoto(res.data.url);
+      toast.success('Foto carregada!');
+    } catch (err) {
+      toast.error('Erro ao carregar foto.');
+    } finally {
+      setUploadingPhoto(false);
+    }
   };
 
   const removePlayer = (i) => setForm(prev => ({ ...prev, players: prev.players.filter((_, idx) => idx !== i) }));
@@ -180,7 +203,11 @@ export default function TeamRegistrationModal({ tournament, onClose }) {
               <div className="form-group">
                 <label className="form-label"><Users size={14} style={{ display: 'inline', marginRight: 4 }} /> Adicionar Jogadores (Mín. 5)</label>
                 <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Identifica os teus craques para as estatísticas.</p>
-                <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 12, alignItems: 'center' }}>
+                  <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 42, height: 42, background: playerPhoto ? 'var(--green)' : 'rgba(255,255,255,0.05)', borderRadius: 8, border: '1px solid var(--border)', flexShrink: 0 }}>
+                    {uploadingPhoto ? <span className="spinner" style={{ width: 14, height: 14 }} /> : <User size={18} color={playerPhoto ? '#000' : 'var(--text-muted)'} />}
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoUpload} disabled={uploadingPhoto} />
+                  </label>
                   <input className="form-input" style={{ width: '70px', textAlign: 'center' }} placeholder="Nº" type="number" value={playerNumber} onChange={e => setPlayerNumber(e.target.value)} onKeyDown={e => e.key === 'Enter' && addPlayer()} />
                   <input className="form-input" style={{ flex: 1 }} placeholder="Nome do craque..." value={playerName} onChange={e => setPlayerName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addPlayer()} />
                   <button className="btn btn-secondary btn-sm" onClick={addPlayer} style={{ padding: 12 }}><Plus size={18} /></button>

@@ -379,9 +379,14 @@ export default function Landing() {
             <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 20, marginBottom: 40, fontWeight: 500 }}>
               Cria o teu primeiro torneio em menos de 2 minutos.
             </p>
-            <Link to="/register" className="btn btn-lg" style={{ background: '#000', color: '#fff', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
-              Criar Torneio Agora <ArrowRight size={18} />
-            </Link>
+            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Link to="/register" className="btn btn-lg" style={{ background: '#000', color: '#fff', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+                Criar Torneio Agora <ArrowRight size={18} />
+              </Link>
+              <Link to="/guia" className="btn btn-lg" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.4)', color: '#fff', backdropFilter: 'blur(5px)' }}>
+                Guia de Torneios
+              </Link>
+            </div>
           </div>
         </div>
       </section>

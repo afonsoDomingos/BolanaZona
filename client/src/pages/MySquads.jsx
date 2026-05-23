@@ -904,6 +904,8 @@ function TeamEditModal({ team, onClose, onSaved }) {
   });
   const [playerName, setPlayerName] = useState('');
   const [playerNumber, setPlayerNumber] = useState('');
+  const [playerPhoto, setPlayerPhoto] = useState('');
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -956,11 +958,32 @@ function TeamEditModal({ team, onClose, onSaved }) {
       ...prev,
       players: [...prev.players, {
         name: playerName.trim(),
-        number: playerNumber ? Number(playerNumber) : null
+        number: playerNumber ? Number(playerNumber) : null,
+        photo: playerPhoto
       }]
     }));
     setPlayerName('');
     setPlayerNumber('');
+    setPlayerPhoto('');
+  };
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      const res = await api.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setPlayerPhoto(res.data.url);
+      toast.success('Foto carregada! 📸');
+    } catch (err) {
+      toast.error('Erro ao carregar foto.');
+    } finally {
+      setUploadingPhoto(false);
+    }
   };
 
   const removePlayer = (index) => {
@@ -1053,10 +1076,14 @@ function TeamEditModal({ team, onClose, onSaved }) {
             </h3>
 
             {/* Add Player Box */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center' }}>
+              <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, background: playerPhoto ? 'var(--green)' : 'rgba(255,255,255,0.05)', borderRadius: 8, border: '1px solid var(--border)', flexShrink: 0 }}>
+                {uploadingPhoto ? <span className="spinner" style={{ width: 14, height: 14 }} /> : <User size={16} color={playerPhoto ? '#000' : 'var(--text-muted)'} />}
+                <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhotoUpload} disabled={uploadingPhoto} />
+              </label>
               <input style={{ flex: 3, height: 38, fontSize: 13 }} className="form-input" placeholder="Nome do jogador" value={playerName} onChange={e => setPlayerName(e.target.value)} onKeyDown={e => e.key === 'Enter' && addPlayer()} />
               <input style={{ flex: 1, height: 38, fontSize: 13, textAlign: 'center' }} className="form-input" placeholder="Nº" type="number" value={playerNumber} onChange={e => setPlayerNumber(e.target.value)} onKeyDown={e => e.key === 'Enter' && addPlayer()} />
-              <button className="btn btn-primary" onClick={addPlayer} style={{ padding: '0 16px', height: 38 }}><Plus size={16} /></button>
+              <button type="button" className="btn btn-primary" onClick={addPlayer} style={{ padding: '0 16px', height: 38 }}><Plus size={16} /></button>
             </div>
 
             {/* Players List scrollable */}
