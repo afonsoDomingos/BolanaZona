@@ -277,22 +277,33 @@ export default function PublicTournament() {
               <div className="empty-state"><h3>Calendário em breve</h3><p>O organizador está a preparar as jornadas.</p></div>
             ) : (
               <div>
-                <div className="view-switcher" style={{ marginBottom: 20, display: 'flex', gap: 4, justifyContent: 'center' }}>
-                  <button 
-                    className={`switcher-btn ${viewMode === 'bracket' ? 'active' : ''}`} 
-                    onClick={() => setViewMode('bracket')}
-                  >
-                    🌳 Árvore
-                  </button>
-                  <button 
-                    className={`switcher-btn ${viewMode === 'list' ? 'active' : ''}`} 
-                    onClick={() => setViewMode('list')}
-                  >
-                    📋 Lista
-                  </button>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 16 }}>
+                  <div className="view-switcher" style={{ display: 'flex', gap: 4 }}>
+                    <button 
+                      className={`switcher-btn ${viewMode === 'bracket' ? 'active' : ''}`} 
+                      onClick={() => setViewMode('bracket')}
+                    >
+                      🌳 Árvore
+                    </button>
+                    <button 
+                      className={`switcher-btn ${viewMode === 'list' ? 'active' : ''}`} 
+                      onClick={() => setViewMode('list')}
+                    >
+                      📋 Lista
+                    </button>
+                  </div>
+                  {viewMode === 'bracket' && (
+                    <button 
+                      onClick={() => captureImage('print-bracket', `Arvore_${tournament.name}`)} 
+                      className="btn btn-secondary btn-sm" 
+                      style={{ border: '1px solid var(--green)', color: 'var(--green)' }}
+                    >
+                      <Camera size={14} /> Guardar Árvore
+                    </button>
+                  )}
                 </div>
                 {viewMode === 'bracket' ? (
-                  <div className="bracket-scroll-container full-width-bleed" style={{
+                  <div id="print-bracket" className="bracket-scroll-container full-width-bleed" style={{
                     position: 'relative',
                     backgroundImage: 'url(/loginbg1.png)',
                     backgroundSize: 'cover',
