@@ -25,7 +25,7 @@ export default function PublicTournament() {
   const [previewImage, setPreviewImage] = useState(null);
   const [viewMode, setViewMode] = useState('bracket');
   const bracketContainerRef = useRef(null);
-  const [bracketScale, setBracketScale] = useState(1);
+  const [bracketZoom, setBracketZoom] = useState(1);
 
 
   const loadData = () => {
@@ -53,22 +53,27 @@ export default function PublicTournament() {
     return () => clearInterval(interval);
   }, [shareCode, showRegisterAction, data?.matches?.length]);
 
-  // Auto-scale bracket to fit viewport width on mobile
+  // Auto-zoom bracket to fit viewport width on mobile
   useEffect(() => {
-    const updateScale = () => {
-      if (!bracketContainerRef.current) return;
-      const containerWidth = bracketContainerRef.current.scrollWidth;
+    const updateZoom = () => {
+      const el = bracketContainerRef.current;
+      if (!el) return;
+      // Reset zoom first so we measure the real content width
+      el.style.zoom = '1';
+      const contentWidth = el.scrollWidth;
       const viewportWidth = window.innerWidth;
-      if (containerWidth > viewportWidth) {
-        setBracketScale(viewportWidth / containerWidth);
+      if (contentWidth > viewportWidth) {
+        const zoom = (viewportWidth / contentWidth) * 0.97; // 3% breathing room
+        setBracketZoom(zoom);
+        el.style.zoom = String(zoom);
       } else {
-        setBracketScale(1);
+        setBracketZoom(1);
+        el.style.zoom = '1';
       }
     };
-    // Small delay to allow render
-    const timer = setTimeout(updateScale, 300);
-    window.addEventListener('resize', updateScale);
-    return () => { clearTimeout(timer); window.removeEventListener('resize', updateScale); };
+    const timer = setTimeout(updateZoom, 300);
+    window.addEventListener('resize', updateZoom);
+    return () => { clearTimeout(timer); window.removeEventListener('resize', updateZoom); };
   }, [data, viewMode]);
 
 
@@ -345,10 +350,6 @@ export default function PublicTournament() {
                       style={{
                         position: 'relative',
                         zIndex: 1,
-                        transform: `scale(${bracketScale})`,
-                        transformOrigin: 'top center',
-                        transition: 'transform 0.3s ease',
-                        marginBottom: bracketScale < 1 ? `calc(${bracketContainerRef.current?.scrollHeight || 0}px * (${bracketScale} - 1))` : 0
                       }}
                     >
                       {(() => {
