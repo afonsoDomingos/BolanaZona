@@ -640,7 +640,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
 /* ===== CARTÃO DE JOGO - Estilo Road to Istanbul ===== */
 .bracket-match-card {
-  background: rgba(10, 11, 92, 0.4);
+  background: rgba(10, 11, 92, 0.2);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;

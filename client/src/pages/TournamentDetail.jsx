@@ -609,8 +609,8 @@ export default function TournamentDetail() {
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
-                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%)',
-                    maskImage: 'linear-gradient(to bottom, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%)'
+                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 150px, black calc(100% - 150px), transparent 100%)',
+                    maskImage: 'linear-gradient(to bottom, transparent 0%, black 150px, black calc(100% - 150px), transparent 100%)'
                   }}>
                     {/* Dark overlay */}
                     <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,5,36,0.85)', zIndex: 0 }} />
@@ -655,7 +655,34 @@ export default function TournamentDetail() {
                         const awayWinner = m.status === 'finished' && m.awayScore > m.homeScore;
                         return (
                           <div key={m._id} className="bracket-match-node">
-                            <div className="bracket-match-card">
+                            <div className="bracket-match-card" style={{ position: 'relative', opacity: m.status === 'finished' ? 0.65 : 1 }}>
+                              {canManage && m.status !== 'finished' && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setShowResultModal(m); }}
+                                  style={{
+                                    position: 'absolute',
+                                    top: '-12px',
+                                    right: '-30px',
+                                    background: 'var(--green)',
+                                    color: '#000',
+                                    border: '1px solid rgba(255,255,255,0.4)',
+                                    padding: '4px 8px',
+                                    borderRadius: '12px',
+                                    fontSize: '9px',
+                                    fontWeight: '900',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 4px 12px rgba(0, 200, 83, 0.5)',
+                                    zIndex: 20,
+                                    textTransform: 'uppercase',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                  }}
+                                  title="Lançar Resultado"
+                                >
+                                  <Trophy size={10} /> Lançar Resultado
+                                </button>
+                              )}
                               {/* Casa */}
                               <div className={`bracket-team-row ${homeWinner ? 'winner' : ''}`}>
                                 <div className="bracket-team-info">
@@ -691,6 +718,16 @@ export default function TournamentDetail() {
                                 <div className="bracket-meta-date">
                                   {m.status === 'live' || m.status === 'active' ? (
                                     <span style={{ color: 'var(--green)', fontWeight: 800 }}>● LIVE</span>
+                                  ) : m.status === 'finished' ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                                      <span style={{ color: 'var(--green)', fontWeight: 900, background: 'rgba(0,200,83,0.15)', padding: '2px 6px', borderRadius: '4px', fontSize: '8px' }}>✓ TERMINADO</span>
+                                      {m.date && (
+                                        <span>
+                                          {new Date(m.date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }) + ' ' +
+                                           new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                      )}
+                                    </div>
                                   ) : m.date ? (
                                     new Date(m.date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }) + ' ' +
                                     new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
@@ -719,7 +756,11 @@ export default function TournamentDetail() {
                                         className="bracket-action-btn" 
                                         onClick={() => setShowResultModal(m)} 
                                         title="Lançar Resultado"
-                                        style={{ background: 'rgba(0, 200, 83, 0.1)', color: 'var(--green)', borderColor: 'rgba(0, 200, 83, 0.2)' }}
+                                        style={
+                                          m.status !== 'finished' 
+                                            ? { background: 'var(--green)', color: '#000', borderColor: 'var(--green)', opacity: 1, boxShadow: '0 0 10px rgba(0,200,83,0.5)' }
+                                            : { background: 'rgba(0, 200, 83, 0.1)', color: 'var(--green)', borderColor: 'rgba(0, 200, 83, 0.2)' }
+                                        }
                                       >
                                         <Trophy size={11} />
                                       </button>
@@ -917,9 +958,14 @@ export default function TournamentDetail() {
                     <tr>
                       <th>#</th>
                       <th>Equipa</th>
-                      <th>J</th><th>V</th><th>E</th><th>D</th>
-                      <th>GM</th><th>GS</th><th>DG</th>
-                      <th style={{ color: 'var(--green)' }}>Pts</th>
+                      <th title="Jogos disputados" style={{ cursor: 'help' }}>J</th>
+                      <th title="Vitórias" style={{ cursor: 'help' }}>V</th>
+                      <th title="Empates" style={{ cursor: 'help' }}>E</th>
+                      <th title="Derrotas" style={{ cursor: 'help' }}>D</th>
+                      <th title="Golos Marcados" style={{ cursor: 'help' }}>GM</th>
+                      <th title="Golos Sofridos" style={{ cursor: 'help' }}>GS</th>
+                      <th title="Diferença de Golos" style={{ cursor: 'help' }}>DG</th>
+                      <th title="Pontos" style={{ color: 'var(--green)', cursor: 'help' }}>Pts</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -948,6 +994,16 @@ export default function TournamentDetail() {
                     ))}
                   </tbody>
                 </table>
+                <div style={{ marginTop: 16, padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: 12, fontSize: 11, color: 'var(--text-muted)', display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <span><strong>J:</strong> Jogos</span>
+                  <span><strong>V:</strong> Vitórias</span>
+                  <span><strong>E:</strong> Empates</span>
+                  <span><strong>D:</strong> Derrotas</span>
+                  <span><strong>GM:</strong> Golos Marcados</span>
+                  <span><strong>GS:</strong> Golos Sofridos</span>
+                  <span><strong>DG:</strong> Diferença Golos</span>
+                  <span><strong>PTS:</strong> Pontos</span>
+                </div>
               </div>
             )}
           </div>
@@ -1937,7 +1993,7 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
             {loading ? '...' : 'Actualizar Live'}
           </button>
 
-          <button className="btn btn-primary" onClick={handleSave} disabled={loading} style={{ flex: 2, justifyContent: 'center', height: 48 }}>
+          <button className="btn btn-primary" onClick={() => handleSave('finished')} disabled={loading} style={{ flex: 2, justifyContent: 'center', height: 48 }}>
             {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><Save size={16} /> Finalizar e Guardar Tudo</>}
           </button>
         </div>

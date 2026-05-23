@@ -266,8 +266,12 @@ export default function PublicTournament() {
                   <thead>
                     <tr>
                       <th style={{ width: 50 }}>#</th><th>Equipa</th>
-                      <th>J</th><th>V</th><th>E</th><th>D</th>
-                      <th>DG</th><th style={{ color: 'var(--green)', textAlign: 'center' }}>Pts</th>
+                      <th title="Jogos disputados" style={{ cursor: 'help' }}>J</th>
+                      <th title="Vitórias" style={{ cursor: 'help' }}>V</th>
+                      <th title="Empates" style={{ cursor: 'help' }}>E</th>
+                      <th title="Derrotas" style={{ cursor: 'help' }}>D</th>
+                      <th title="Diferença de Golos" style={{ cursor: 'help' }}>DG</th>
+                      <th title="Pontos" style={{ color: 'var(--green)', textAlign: 'center', cursor: 'help' }}>Pts</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -292,6 +296,14 @@ export default function PublicTournament() {
                     ))}
                   </tbody>
                 </table>
+                <div style={{ marginTop: 16, padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: 12, fontSize: 11, color: 'var(--text-muted)', display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <span><strong>J:</strong> Jogos</span>
+                  <span><strong>V:</strong> Vitórias</span>
+                  <span><strong>E:</strong> Empates</span>
+                  <span><strong>D:</strong> Derrotas</span>
+                  <span><strong>DG:</strong> Diferença Golos</span>
+                  <span><strong>PTS:</strong> Pontos</span>
+                </div>
               </div>
               </div>
             )
@@ -339,8 +351,8 @@ export default function PublicTournament() {
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
-                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%)',
-                    maskImage: 'linear-gradient(to bottom, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%)'
+                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 150px, black calc(100% - 150px), transparent 100%)',
+                    maskImage: 'linear-gradient(to bottom, transparent 0%, black 150px, black calc(100% - 150px), transparent 100%)'
                   }}>
                     {/* Dark overlay */}
                     <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,5,36,0.85)', zIndex: 0 }} />

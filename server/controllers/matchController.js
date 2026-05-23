@@ -78,6 +78,36 @@ exports.updateResult = async (req, res) => {
       }
     }
     
+    // 4. Progressão Automática na Árvore (Mata-Mata)
+    if (match.phase === 'knockout' && match.status === 'finished') {
+      const winnerId = match.homeScore > match.awayScore ? match.homeTeam : 
+                       (match.awayScore > match.homeScore ? match.awayTeam : null);
+      
+      if (winnerId) {
+        const allMatches = await Match.find({ tournament: match.tournament._id, phase: 'knockout' }).sort({ round: 1, _id: 1 });
+        const currentRoundMatches = allMatches.filter(m => m.round === match.round);
+        const matchIndex = currentRoundMatches.findIndex(m => m._id.toString() === match._id.toString());
+        
+        if (matchIndex !== -1) {
+          const nextRoundMatches = allMatches.filter(m => m.round === match.round + 1);
+          if (nextRoundMatches.length > 0) {
+            const nextMatchIndex = Math.floor(matchIndex / 2);
+            const nextMatch = nextRoundMatches[nextMatchIndex];
+            
+            if (nextMatch) {
+              const isHome = matchIndex % 2 === 0;
+              if (isHome) {
+                nextMatch.homeTeam = winnerId;
+              } else {
+                nextMatch.awayTeam = winnerId;
+              }
+              await nextMatch.save();
+            }
+          }
+        }
+      }
+    }
+
     const updatedMatch = await Match.findById(match._id)
       .populate('homeTeam', 'name color logo')
       .populate('awayTeam', 'name color logo');
