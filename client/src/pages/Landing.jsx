@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, Users, Calendar, BarChart2, Share2, ArrowRight, CheckCircle, ClipboardList, Handshake, Camera } from 'lucide-react';
 import LandingBracketPreview from '../components/LandingBracketPreview';
@@ -13,6 +13,116 @@ const features = [
   { icon: <Handshake size={28} />, title: 'Patrocínios e Apoios', desc: 'Atrai patrocinadores locais com um botão de contacto na página.' },
   { icon: <Camera size={28} />, title: 'Prints Oficiais', desc: 'Gera imagens com qualidade da classificação e jogos para partilhar.' },
 ];
+
+const HISTORIC_ARTICLE = `A Selecção Nacional de Futebol Sub-17 de Moçambique garantiu, esta noite, apuramento ao Campeonato do Mundo da categoria, ao derrotar a Etiópia, por 5-4, no desempate através da marcação de grandes penalidades, após empate a uma bola no tempo regulamentar, em partida do "play-off" do Campeonato Africano das Nações (CAN) Marrocos-2026, disputada no Terrain 8 do Complexe Mohammed VI, em Rabat.
+
+Os "Mambinhas" entraram determinados em alcançar a inédita qualificação e criaram a primeira situação de perigo aos 12 minutos, quando Mubai, na sequência de um cruzamento de Steys, desviou de cabeça para defesa segura do guarda-redes etíope, Temesgen Tadesse.
+
+Apesar do bom início moçambicano, foi a Etiópia quem inaugurou o marcador aos 15 minutos, por intermédio de Zé Amir Muzemil, que concluiu com sucesso uma jogada construída pela zona central.
+
+Em desvantagem, o combinado nacional reagiu e procurou o empate ainda na primeira parte. Diego Pelembe, aos 27 minutos, e Júlio, aos 42, tentaram a sorte, mas os seus remates saíram ao lado da baliza defendida por Tadesse. Com o 1-0 a favor dos etíopes o senhor Mohammed Aouina mandou todo mundo ao intervalo.
+
+No reatamento, os etíopes estiveram perto de ampliar a vantagem. Aos 52 minutos, Biruk aproveitou uma recuperação de bola e rematou forte de pé esquerdo, obrigando João a uma intervenção decisiva para canto.
+
+A persistência moçambicana acabou recompensada aos 55 minutos. Nhampule Jr. descobriu Diego Pelembe já no interior da grande área e o capitão dos "Mambinhas" não desperdiçou, restabelecendo a igualdade e relançando a partida.
+
+O empate manteve-se até ao apito final, levando a decisão para as grandes penalidades, onde Moçambique mostrou maior frieza e eficácia, vencendo por 5-4 e assegurando, assim, presença no Mundial Sub-17 Qatar-2026.
+
+João Jofrisse foi o herói improvável ao defender uma grande penalidade da Etiópia.
+
+No "Mundial", que terá lugar no Qatar em Novembro próximo, Moçambique estará inserido no Grupo "B", juntamente com o Equador, Nova Caledónia e República da Korea.`;
+
+function HistoricNewsCard() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ marginTop: 52, maxWidth: 760, margin: '52px auto 0' }}>
+      {/* Trigger button */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: '100%',
+          background: open ? 'rgba(0,200,83,0.12)' : 'rgba(255,255,255,0.04)',
+          border: '1px solid ' + (open ? 'rgba(0,200,83,0.5)' : 'rgba(255,255,255,0.12)'),
+          borderRadius: open ? '16px 16px 0 0' : 16,
+          padding: '18px 24px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+          textAlign: 'left',
+          transition: 'all 0.3s ease',
+          backdropFilter: 'blur(12px)',
+        }}
+      >
+        {/* Pulsing star badge */}
+        <div style={{
+          flexShrink: 0,
+          width: 44, height: 44,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #ffd700, #ff8c00)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 22,
+          boxShadow: '0 0 20px rgba(255,200,0,0.5)',
+          animation: 'pulse-gold 2s ease-in-out infinite',
+        }}>⭐</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <span style={{ background: 'rgba(255,200,0,0.15)', border: '1px solid rgba(255,200,0,0.4)', color: '#ffd700', fontSize: 10, fontWeight: 900, padding: '2px 10px', borderRadius: 50, letterSpacing: 1, textTransform: 'uppercase' }}>
+              1ª vez na história
+            </span>
+            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>Futebol Moçambicano</span>
+          </div>
+          <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, lineHeight: 1.4 }}>
+            🇲🇿 Mambinhas garantem apuramento inédito ao Mundial Sub-17 Qatar 2026
+          </div>
+        </div>
+        <div style={{
+          color: 'var(--green)', fontSize: 22, fontWeight: 300,
+          transform: open ? 'rotate(45deg)' : 'rotate(0deg)',
+          transition: 'transform 0.3s ease',
+          flexShrink: 0,
+        }}>+</div>
+      </button>
+
+      {/* Expandable content */}
+      <div style={{
+        overflow: 'hidden',
+        maxHeight: open ? '1000px' : '0',
+        transition: 'max-height 0.5s cubic-bezier(0.4,0,0.2,1)',
+        borderRadius: '0 0 16px 16px',
+        border: open ? '1px solid rgba(0,200,83,0.5)' : 'none',
+        borderTop: 'none',
+        background: 'rgba(5,5,30,0.85)',
+        backdropFilter: 'blur(16px)',
+      }}>
+        <div style={{ padding: '24px 28px 28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+            <span style={{ fontSize: 20 }}>🏆</span>
+            <span style={{ fontSize: 12, color: 'var(--green)', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>CAN Sub-17 · Rabat, Marrocos</span>
+            <span style={{ marginLeft: 'auto', fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>Moçambique 1–1 (5–4 pen.) Etiópia</span>
+          </div>
+          {HISTORIC_ARTICLE.split('\n\n').map((para, i) => (
+            <p key={i} style={{ color: 'rgba(255,255,255,0.78)', fontSize: 14, lineHeight: 1.85, marginBottom: 14 }}>
+              {para}
+            </p>
+          ))}
+          <div style={{ marginTop: 20, padding: '14px 20px', background: 'rgba(0,200,83,0.08)', borderRadius: 12, border: '1px solid rgba(0,200,83,0.2)', textAlign: 'center' }}>
+            <span style={{ fontSize: 13, color: 'var(--green)', fontWeight: 800 }}>
+              🌍 Grupo B · Qatar 2026 · Equador · Nova Caledónia · República da Korea
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes pulse-gold {
+          0%, 100% { box-shadow: 0 0 20px rgba(255,200,0,0.5); }
+          50% { box-shadow: 0 0 35px rgba(255,200,0,0.9); }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 export default function Landing() {
   const [scrollOpacity, setScrollOpacity] = useState(1);
@@ -195,14 +305,14 @@ export default function Landing() {
         {/* Bottom fade */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to top, var(--bg-main), transparent)', zIndex: 1 }} />
 
-        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '120px 24px', maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '80px 24px', maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
           {/* Flag / origin badge */}
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: 'rgba(0,200,83,0.12)', border: '1px solid rgba(0,200,83,0.3)', padding: '8px 20px', borderRadius: 50, marginBottom: 32 }}>
             <span style={{ fontSize: 22 }}>🇲🇿</span>
             <span style={{ color: 'var(--green)', fontWeight: 800, fontSize: 12, letterSpacing: 2, textTransform: 'uppercase' }}>Feito para Moçambique</span>
           </div>
 
-          <h2 style={{ fontSize: 'clamp(32px, 6vw, 56px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 28, letterSpacing: '-0.5px' }}>
+          <h2 className="font-syne" style={{ fontSize: 'clamp(32px, 6vw, 56px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 28, letterSpacing: '-0.5px' }}>
             Os próximos{' '}
             <span style={{ color: 'var(--green)', textShadow: '0 0 30px rgba(0,200,83,0.5)' }}>Craques Nacionais</span>
             <br />nascem das comunidades.
@@ -217,9 +327,9 @@ export default function Landing() {
           {/* 3 Pillars */}
           <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap' }}>
             {[
-              { emoji: '🏘️', title: 'Das Comunidades', desc: 'O talento existe em cada bairro. Nós damos-lhe um palco.' },
-              { emoji: '📊', title: 'Com Dados Reais', desc: 'Estatísticas, golos e classificações registados digitalmente.' },
-              { emoji: '🏆', title: 'Para o Futuro', desc: 'Jogadores visíveis. Recrutadores atentos. Caminhos abertos.' },
+              { title: 'Das Comunidades', desc: 'O talento existe em cada bairro. Nós damos-lhe um palco.' },
+              { title: 'Com Dados Reais', desc: 'Estatísticas, golos e classificações registados digitalmente.' },
+              { title: 'Para o Futuro', desc: 'Jogadores visíveis. Recrutadores atentos. Caminhos abertos.' },
             ].map((p, i) => (
               <div key={i} style={{
                 background: 'rgba(255,255,255,0.05)',
@@ -235,12 +345,14 @@ export default function Landing() {
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.borderColor = 'rgba(0,200,83,0.4)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
               >
-                <div style={{ fontSize: 36, marginBottom: 12 }}>{p.emoji}</div>
-                <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 8, color: '#fff' }}>{p.title}</div>
+                <div className="font-syne" style={{ fontWeight: 800, fontSize: 16, marginBottom: 8, color: '#fff' }}>{p.title}</div>
                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>{p.desc}</div>
               </div>
             ))}
           </div>
+
+          {/* Historic news card */}
+          <HistoricNewsCard />
         </div>
       </section>
 
