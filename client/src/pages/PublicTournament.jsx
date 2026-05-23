@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { Trophy, Calendar, BarChart2, Users, Share2, MapPin, ArrowLeft, Star, Clock, Camera } from 'lucide-react';
@@ -24,6 +24,8 @@ export default function PublicTournament() {
   const [notFound, setNotFound] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [viewMode, setViewMode] = useState('bracket');
+  const bracketContainerRef = useRef(null);
+  const [bracketScale, setBracketScale] = useState(1);
 
 
   const loadData = () => {
@@ -50,6 +52,24 @@ export default function PublicTournament() {
 
     return () => clearInterval(interval);
   }, [shareCode, showRegisterAction, data?.matches?.length]);
+
+  // Auto-scale bracket to fit viewport width on mobile
+  useEffect(() => {
+    const updateScale = () => {
+      if (!bracketContainerRef.current) return;
+      const containerWidth = bracketContainerRef.current.scrollWidth;
+      const viewportWidth = window.innerWidth;
+      if (containerWidth > viewportWidth) {
+        setBracketScale(viewportWidth / containerWidth);
+      } else {
+        setBracketScale(1);
+      }
+    };
+    // Small delay to allow render
+    const timer = setTimeout(updateScale, 300);
+    window.addEventListener('resize', updateScale);
+    return () => { clearTimeout(timer); window.removeEventListener('resize', updateScale); };
+  }, [data, viewMode]);
 
 
   const copyLink = () => {
@@ -319,7 +339,18 @@ export default function PublicTournament() {
                   }}>
                     {/* Dark overlay */}
                     <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,5,36,0.85)', zIndex: 0 }} />
-                    <div className="bracket-container" style={{ position: 'relative', zIndex: 1 }}>
+                    <div
+                      ref={bracketContainerRef}
+                      className="bracket-container"
+                      style={{
+                        position: 'relative',
+                        zIndex: 1,
+                        transform: `scale(${bracketScale})`,
+                        transformOrigin: 'top center',
+                        transition: 'transform 0.3s ease',
+                        marginBottom: bracketScale < 1 ? `calc(${bracketContainerRef.current?.scrollHeight || 0}px * (${bracketScale} - 1))` : 0
+                      }}
+                    >
                       {(() => {
                       const bracketMatches = matches;
 

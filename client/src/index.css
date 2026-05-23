@@ -1069,9 +1069,10 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   /* ===== BRACKET RESPONSIVE - Mobile ===== */
   .bracket-scroll-container {
     border-radius: 16px;
-    margin: 0 -4px; /* Extend slightly to use full width */
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x proximity;
+    margin: 0 -4px;
+    overflow-x: hidden !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
   }
   .bracket-container {
     padding: 32px 16px;
