@@ -227,64 +227,52 @@ export default function Explore() {
             </div>
             
             <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-              gap: '32px 24px',
+              display: 'flex', 
+              flexDirection: 'column',
+              gap: '12px',
               maxWidth: 1200, 
               margin: '0 auto' 
             }}>
               {filtered.map((t, idx) => (
-                <Link key={t._id} to={`/t/${t.shareCode}`} className="card-premium" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  <div className="card-image-wrapper">
-                    <img 
-                      src={`/banner${(idx % 3) + 1}.png`} 
-                      alt="Banner" 
-                      style={{ 
-                        position: 'absolute', 
-                        inset: 0, 
-                        width: '100%', 
-                        height: '100%', 
-                        objectFit: 'cover',
-                        opacity: 0.5,
-                        transition: 'transform 0.4s ease'
-                      }} 
-                      className="card-banner-img"
-                    />
-                    <div className="status-badge-wrapper" style={{ zIndex: 2 }}>
-                      <span className={`badge-premium ${statusBadge[t.status]}`}>{statusLabel[t.status]}</span>
-                    </div>
-                    <div className="card-icon-main" style={{ zIndex: 2, position: 'relative', textShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>⚽</div>
+                <Link key={t._id} to={`/t/${t.shareCode}`} className="hover-scale" style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 20,
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  borderRadius: 16,
+                  padding: '16px 20px',
+                  textDecoration: 'none',
+                  transition: 'all 0.3s ease',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
+                  
+                  {/* Icon/Avatar */}
+                  <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div style={{ fontSize: 24 }}>⚽</div>
                   </div>
                   
-                  <div className="card-body-premium" style={{ display: 'flex', flexDirection: 'column', flex: 1, position: 'relative', zIndex: 3 }}>
-                    <h3 className="card-title-premium" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      {t.name}
-                      {t.isOfficial && <Shield size={16} fill="var(--yellow)" color="var(--yellow)" style={{ flexShrink: 0 }} />}
-                    </h3>
-                    
-                    <div className="card-info-grid" style={{ flex: 1 }}>
-                      <div className="info-item">
-                        <MapPin size={16} className="text-green" />
-                        <span>{t.neighborhood}</span>
-                      </div>
-                      <div className="info-item">
-                        <Trophy size={16} className="text-yellow" />
-                        <span>{t.prize || 'Troféu & Glória'}</span>
-                      </div>
-                      <div className="info-item">
-                        <Users size={16} className="text-blue" />
-                        <span>Máx. {t.maxTeams} equipas</span>
-                      </div>
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {t.name}
+                      </h3>
+                      {t.isOfficial && <span title="Oficial" style={{ fontSize: 14 }}>🛡️</span>}
+                      <span className={`badge-premium ${statusBadge[t.status]}`} style={{ padding: '2px 8px', fontSize: 10 }}>{statusLabel[t.status]}</span>
                     </div>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px 20px', fontSize: 12, color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={12} className="text-green" /> {t.neighborhood}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Users size={12} className="text-blue" /> Máx. {t.maxTeams} equipas</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Trophy size={12} className="text-yellow" /> {t.prize || 'Troféu'}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Calendar size={12} /> {new Date(t.startDate).toLocaleDateString()}</span>
+                    </div>
+                  </div>
 
-                    <div className="card-footer-premium" style={{ marginTop: 'auto' }}>
-                      <div className="date-info">
-                        <Calendar size={14} />
-                        {new Date(t.startDate).toLocaleDateString()}
-                      </div>
-                      <div className="view-link">
-                        Explorar <ArrowRight size={16} />
-                      </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(0, 200, 83, 0.1)', color: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <ArrowRight size={16} />
                     </div>
                   </div>
                 </Link>

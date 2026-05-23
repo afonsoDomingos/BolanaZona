@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, Users, Calendar, BarChart2, Share2, ArrowRight, CheckCircle, ClipboardList, Handshake, Camera } from 'lucide-react';
+import LandingBracketPreview from '../components/LandingBracketPreview';
 
 const features = [
   { icon: <Trophy size={28} />, title: 'Criar Torneios', desc: 'Mata-mata ou fase de grupos. Configura em minutos.' },
@@ -174,6 +175,9 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      {/* Bracket Preview */}
+      <LandingBracketPreview />
 
       {/* CTA */}
       <section style={{ padding: '80px 0' }}>
