@@ -209,18 +209,31 @@ exports.generateCalendar = async (req, res) => {
       const shuffled = [...teams].sort(() => Math.random() - 0.5);
       let roundTeams = shuffled;
       let roundNum = 1;
-      const roundNames = ['Fase de Grupos', 'Oitavos', 'Quartos de Final', 'Meias-Final', 'Final'];
+      
+      // Calculate total rounds based on teams length to get correct round names
+      const totalRounds = Math.ceil(Math.log2(roundTeams.length));
+      
       while (roundTeams.length > 1) {
         const roundDate = new Date(currentDate);
         roundDate.setDate(roundDate.getDate() + (roundNum - 1) * 7);
+        
+        const distFromFinal = totalRounds - roundNum;
+        let rName = `Ronda ${roundNum}`;
+        if (distFromFinal === 0) rName = 'Final';
+        else if (distFromFinal === 1) rName = 'Meias-Finais';
+        else if (distFromFinal === 2) rName = 'Quartos de Final';
+        else if (distFromFinal === 3) rName = 'Oitavos de Final';
+        else if (distFromFinal === 4) rName = '16-avos de Final';
+        else if (distFromFinal === 5) rName = '32-avos de Final';
+
         for (let i = 0; i < roundTeams.length; i += 2) {
           if (roundTeams[i + 1]) {
             matches.push({
               tournament: tournament._id,
-              homeTeam: roundTeams[i]._id,
-              awayTeam: roundTeams[i + 1]._id,
+              homeTeam: roundNum === 1 ? roundTeams[i]._id : null,
+              awayTeam: roundNum === 1 ? roundTeams[i + 1]._id : null,
               round: roundNum,
-              roundName: roundNames[roundNum] || `Ronda ${roundNum}`,
+              roundName: rName,
               phase: 'knockout',
               date: roundDate,
               location: tournament.location,

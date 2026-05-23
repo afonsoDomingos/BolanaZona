@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 const matchSchema = new mongoose.Schema({
   tournament: { type: mongoose.Schema.Types.ObjectId, ref: 'Tournament', required: true },
-  homeTeam: { type: mongoose.Schema.Types.ObjectId, ref: 'Team', required: true },
-  awayTeam: { type: mongoose.Schema.Types.ObjectId, ref: 'Team', required: true },
+  homeTeam: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
+  awayTeam: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
   round: { type: Number, required: true },
   roundName: { type: String, default: '' }, // e.g. "Ronda 1", "Quartos de Final"
   phase: { type: String, enum: ['group', 'knockout'], default: 'group' },

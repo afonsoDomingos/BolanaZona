@@ -30,6 +30,7 @@ import TournamentNew from './pages/TournamentNew';
 import TournamentDetail from './pages/TournamentDetail';
 import PublicTournament from './pages/PublicTournament';
 import Profile from './pages/Profile';
+import GuideTournament from './pages/GuideTournament';
 import UserManagement from './pages/UserManagement';
 import AdminTeams from './pages/AdminTeams';
 import Community from './pages/Community';
@@ -85,6 +86,7 @@ function AppRoutes() {
           <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['superadmin']}><UserManagement /></ProtectedRoute>} />
           <Route path="/admin/teams" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminTeams /></ProtectedRoute>} />
           <Route path="/support" element={<Support />} />
+          <Route path="/como-criar-torneio" element={<GuideTournament />} />
           <Route path="/community" element={<Community />} />
           <Route path="/legal/privacy" element={<Privacy />} />
           <Route path="/legal/terms" element={<Terms />} />

@@ -50,12 +50,23 @@ export default function TournamentList() {
           <Link to="/dashboard/tournaments/new" className="btn btn-primary"><Plus size={16} /> Novo Torneio</Link>
         </div>
 
-        {/* Search */}
-        <div style={{ position: 'relative', marginBottom: 24 }}>
-          <Search size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          <input className="form-input" placeholder="Pesquisar por nome ou bairro..." value={search}
-            onChange={e => setSearch(e.target.value)} style={{ paddingLeft: 44 }} />
+        <div style={{ background: 'linear-gradient(to right, rgba(0,200,83,0.1), rgba(0,0,0,0))', borderLeft: '4px solid var(--green)', padding: '16px 20px', borderRadius: 8, marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+          <div>
+            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>Primeira vez a organizar?</h3>
+            <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Vê o nosso guia passo-a-passo de como gerir o teu torneio como um profissional.</p>
+          </div>
+          <Link to="/como-criar-torneio" className="btn btn-secondary btn-sm" style={{ padding: '8px 16px', background: 'var(--bg-main)', border: '1px solid rgba(255,255,255,0.1)' }}>
+            Ler o Guia <ArrowRight size={14} />
+          </Link>
         </div>
+
+        {tournaments.length > 0 && (
+          <div style={{ position: 'relative', marginBottom: 24 }}>
+            <Search size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <input className="form-input" placeholder="Pesquisar por nome ou bairro..." value={search}
+              onChange={e => setSearch(e.target.value)} style={{ paddingLeft: 44 }} />
+          </div>
+        )}
 
         {loading ? (
           <div className="loading-center"><div className="spinner" /></div>

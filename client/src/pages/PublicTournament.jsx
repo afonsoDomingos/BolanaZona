@@ -17,12 +17,13 @@ export default function PublicTournament() {
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState('standings');
+  const [tab, setTab] = useState('calendar');
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showSponsorModal, setShowSponsorModal] = useState(false);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
+  const [viewMode, setViewMode] = useState('bracket');
 
 
   const loadData = () => {
@@ -118,51 +119,49 @@ export default function PublicTournament() {
 
   return (
     <div className="animate-fade-in" style={{ minHeight: '100vh', background: 'var(--bg-main)' }}>
-      {/* Dynamic Header / Hero */}
+      {/* Dynamic Header / Hero - Compact */}
       <div style={{ 
         position: 'relative', 
-        padding: '60px 0 40px',
-        background: 'radial-gradient(circle at top right, rgba(0,200,83,0.15), transparent), radial-gradient(circle at bottom left, rgba(0,200,83,0.05), transparent)',
+        padding: '16px 0 12px',
+        background: 'radial-gradient(circle at top right, rgba(0,200,83,0.10), transparent)',
         borderBottom: '1px solid var(--border)',
         overflow: 'hidden'
       }}>
-        <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 32 }}>
-            <div style={{ flex: 1, minWidth: 300 }}>
-              <Link to="/explore" style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--green)', textDecoration: 'none', fontSize: 14, fontWeight: 600, marginBottom: 24 }}>
-                <ArrowLeft size={16} /> Voltar à Exploração
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <Link to="/explore" style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--green)', textDecoration: 'none', fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+                <ArrowLeft size={14} /> Voltar à Exploração
               </Link>
               
-              <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 24 }}>
-                <div className="spin-ball" style={{ width: 80, height: 80, borderRadius: 24, background: 'var(--green-subtle)', border: '2px solid rgba(0,200,83,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, boxShadow: '0 10px 30px rgba(0,200,83,0.2)' }}>⚽</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--green-subtle)', border: '2px solid rgba(0,200,83,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>⚽</div>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                    <h1 className="font-syne" style={{ fontSize: 'clamp(28px, 6vw, 44px)', fontWeight: 900, lineHeight: 1.1, display: 'flex', alignItems: 'center', gap: 12 }}>
-                      {tournament.name}
-                      {tournament.isOfficial && <Shield size={32} fill="var(--yellow)" color="var(--yellow)" />}
-                    </h1>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)', fontSize: 16 }}>
-                    <MapPin size={18} color="var(--green)" /> {tournament.location}, {tournament.neighborhood}
+                  <h1 className="font-syne" style={{ fontSize: 'clamp(18px, 3vw, 26px)', fontWeight: 900, lineHeight: 1.1, margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {tournament.name}
+                    {tournament.isOfficial && <Shield size={18} fill="var(--yellow)" color="var(--yellow)" />}
+                  </h1>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)', fontSize: 12, marginTop: 2 }}>
+                    <MapPin size={12} color="var(--green)" /> {tournament.location}, {tournament.neighborhood}
                   </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <span className={`badge ${tournament.status === 'active' ? 'badge-green' : tournament.status === 'registration' ? 'badge-blue' : 'badge-gray'}`} style={{ padding: '6px 16px', fontSize: 13 }}>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <span className={`badge ${tournament.status === 'active' ? 'badge-green' : tournament.status === 'registration' ? 'badge-blue' : 'badge-gray'}`} style={{ padding: '3px 10px', fontSize: 11 }}>
                   {statusLabel[tournament.status]}
                 </span>
-                <span className="badge badge-gray" style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 16px' }}>{formatLabel[tournament.format]}</span>
-                {tournament.prize && <span className="badge badge-yellow" style={{ padding: '6px 16px' }}>🏆 {tournament.prize}</span>}
+                <span className="badge badge-gray" style={{ background: 'rgba(255,255,255,0.05)', padding: '3px 10px', fontSize: 11 }}>{formatLabel[tournament.format]}</span>
+                {tournament.prize && <span className="badge badge-yellow" style={{ padding: '3px 10px', fontSize: 11 }}>🏆 {tournament.prize}</span>}
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <button onClick={copyLink} className="btn btn-secondary" style={{ borderRadius: 12, height: 48 }}><Share2 size={18} /> Partilhar</button>
-              <button onClick={() => setShowSubscribeModal(true)} className="btn btn-secondary" style={{ borderRadius: 12, height: 48, borderColor: 'var(--green)', color: 'var(--green)' }}><Clock size={18} /> Seguir Torneio</button>
-              <button onClick={() => setShowSponsorModal(true)} className="btn btn-secondary" style={{ borderRadius: 12, height: 48, borderColor: 'var(--yellow)', color: 'var(--yellow)' }}>🤝 Apoiar</button>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <button onClick={copyLink} className="btn btn-secondary" style={{ borderRadius: 10, height: 36, fontSize: 13, padding: '0 14px' }}><Share2 size={15} /> Partilhar</button>
+              <button onClick={() => setShowSubscribeModal(true)} className="btn btn-secondary" style={{ borderRadius: 10, height: 36, fontSize: 13, padding: '0 14px', borderColor: 'var(--green)', color: 'var(--green)' }}><Clock size={15} /> Seguir</button>
+              <button onClick={() => setShowSponsorModal(true)} className="btn btn-secondary" style={{ borderRadius: 10, height: 36, fontSize: 13, padding: '0 14px', borderColor: 'var(--yellow)', color: 'var(--yellow)' }}>🤝 Apoiar</button>
               {tournament.status === 'registration' && tournament.allowPublicRegistration && showRegisterAction && (
-                <button onClick={() => setShowRegistrationModal(true)} className="btn btn-primary" style={{ borderRadius: 12, height: 48, padding: '0 32px', fontWeight: 700 }}>Inscrever Equipa</button>
+                <button onClick={() => setShowRegistrationModal(true)} className="btn btn-primary" style={{ borderRadius: 10, height: 36, fontSize: 13, padding: '0 20px', fontWeight: 700 }}>Inscrever</button>
               )}
             </div>
           </div>
@@ -277,7 +276,229 @@ export default function PublicTournament() {
             matches.length === 0 ? (
               <div className="empty-state"><h3>Calendário em breve</h3><p>O organizador está a preparar as jornadas.</p></div>
             ) : (
-              (() => {
+              <div>
+                <div className="view-switcher" style={{ marginBottom: 20, display: 'flex', gap: 4, justifyContent: 'center' }}>
+                  <button 
+                    className={`switcher-btn ${viewMode === 'bracket' ? 'active' : ''}`} 
+                    onClick={() => setViewMode('bracket')}
+                  >
+                    🌳 Árvore
+                  </button>
+                  <button 
+                    className={`switcher-btn ${viewMode === 'list' ? 'active' : ''}`} 
+                    onClick={() => setViewMode('list')}
+                  >
+                    📋 Lista
+                  </button>
+                </div>
+                {viewMode === 'bracket' ? (
+                  <div className="bracket-scroll-container full-width-bleed" style={{
+                    position: 'relative',
+                    backgroundImage: 'url(/loginbg1.png)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    borderTop: '1px solid rgba(255,255,255,0.05)',
+                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    minHeight: 'calc(100vh - 280px)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%)',
+                    maskImage: 'linear-gradient(to bottom, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%)'
+                  }}>
+                    {/* Dark overlay */}
+                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,5,36,0.85)', zIndex: 0 }} />
+                    <div className="bracket-container" style={{ position: 'relative', zIndex: 1 }}>
+                      {(() => {
+                      const bracketMatches = matches;
+
+                      if (bracketMatches.length === 0) {
+                        return (
+                          <div className="empty-state" style={{ width: '100%' }}>
+                            <div className="empty-state-icon"><Trophy size={48} strokeWidth={1} /></div>
+                            <h3>Fase a Eliminar (Mata-Mata)</h3>
+                            <p>Os jogos das eliminatórias ainda não foram criados para este torneio.</p>
+                          </div>
+                        );
+                      }
+
+                      const rounds = [...new Set(bracketMatches.map(m => m.round))].sort((a, b) => a - b);
+                      const maxRound = Math.max(...rounds);
+                      const finalMatches = bracketMatches.filter(m => m.round === maxRound);
+
+                      // Smart round name based on matches count and distance from final
+                      const getRoundName = (round) => {
+                        const matchesInRound = bracketMatches.filter(m => m.round === round).length;
+                        const distFromFinal = maxRound - round; // 0 = final, 1 = semis, 2 = quarters, etc
+                        // Check if this round has legs (2 matches for same pair = mão dupla)
+                        const customName = bracketMatches.find(m => m.round === round)?.roundName;
+                        if (customName) return customName;
+                        if (distFromFinal === 0) return 'Final';
+                        if (distFromFinal === 1) return matchesInRound <= 2 ? 'Meias-Finais' : 'Semifinal';
+                        if (distFromFinal === 2) return 'Quartos de Final';
+                        if (distFromFinal === 3) return 'Oitavos de Final';
+                        if (distFromFinal === 4) return '1/16 de Final';
+                        if (distFromFinal === 5) return '1/32 de Final';
+                        return `Ronda ${round}`;
+                      };
+
+                      // Detect 2-legged rounds (same matchup appearing twice)
+                      const isDoubleLegged = (round) => {
+                        const rMatches = bracketMatches.filter(m => m.round === round);
+                        // If roundLeg field exists, use it
+                        return rMatches.some(m => m.leg === 2 || m.leg === '2');
+                      };
+
+                      const renderMatchCard = (m) => {
+                        const homeWinner = m.status === 'finished' && m.homeScore > m.awayScore;
+                        const awayWinner = m.status === 'finished' && m.awayScore > m.homeScore;
+                        const legLabel = m.leg === 2 || m.leg === '2' ? ' · Volta' : m.leg === 1 || m.leg === '1' ? ' · Ida' : '';
+                        return (
+                          <div key={m._id} className="bracket-match-node">
+                            <div className="bracket-match-card">
+                              {/* Casa */}
+                              <div className={`bracket-team-row ${homeWinner ? 'winner' : ''}`}>
+                                <div className="bracket-team-info">
+                                  <div className="bracket-team-logo" style={{ borderColor: m.homeTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
+                                    {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" /> : (m.homeTeam?.name ? m.homeTeam.name.charAt(0).toUpperCase() : '?')}
+                                  </div>
+                                  <span className="bracket-team-name" title={m.homeTeam?.name || 'A anunciar'}>
+                                    {m.homeTeam?.name || 'A anunciar'}
+                                  </span>
+                                </div>
+                                <span className="bracket-team-score">
+                                  {m.status === 'finished' || m.status === 'live' || m.status === 'active' ? m.homeScore : '—'}
+                                </span>
+                              </div>
+
+                              {/* Fora */}
+                              <div className={`bracket-team-row ${awayWinner ? 'winner' : ''}`}>
+                                <div className="bracket-team-info">
+                                  <div className="bracket-team-logo" style={{ borderColor: m.awayTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
+                                    {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" /> : (m.awayTeam?.name ? m.awayTeam.name.charAt(0).toUpperCase() : '?')}
+                                  </div>
+                                  <span className="bracket-team-name" title={m.awayTeam?.name || 'A anunciar'}>
+                                    {m.awayTeam?.name || 'A anunciar'}
+                                  </span>
+                                </div>
+                                <span className="bracket-team-score">
+                                  {m.status === 'finished' || m.status === 'live' || m.status === 'active' ? m.awayScore : '—'}
+                                </span>
+                              </div>
+
+                              {/* Info */}
+                              <div className="bracket-meta-bar">
+                                <div className="bracket-meta-date">
+                                  {m.status === 'live' || m.status === 'active' ? (
+                                    <span style={{ color: 'var(--green)', fontWeight: 800 }}>● LIVE</span>
+                                  ) : m.date ? (
+                                    new Date(m.date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }) + ' ' +
+                                    new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
+                                  ) : (
+                                    'Agendado'
+                                  )}
+                                  {legLabel && <span style={{ color: '#aaa', fontSize: 9 }}>{legLabel}</span>}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      };
+
+                      const nonFinalRounds = rounds.filter(r => r !== maxRound);
+                      
+                      const leftColumns = nonFinalRounds.map((round) => {
+                        const roundMatches = bracketMatches.filter(m => m.round === round);
+                        const leftMatches = roundMatches.slice(0, Math.ceil(roundMatches.length / 2));
+                        if (leftMatches.length === 0) return null;
+                        const roundName = getRoundName(round);
+                        const double = isDoubleLegged(round);
+                        return (
+                          <div key={`left-${round}`} className="bracket-column">
+                            <div className="bracket-round-title">
+                              {roundName}
+                              {double && <span style={{ fontSize: 8, marginLeft: 4, opacity: 0.7 }}>2 mãos</span>}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, gap: 16 }}>
+                              {leftMatches.map(renderMatchCard)}
+                            </div>
+                          </div>
+                        );
+                      });
+
+                      const rightColumns = nonFinalRounds.map((round) => {
+                        const roundMatches = bracketMatches.filter(m => m.round === round);
+                        const rightMatches = roundMatches.slice(Math.ceil(roundMatches.length / 2));
+                        if (rightMatches.length === 0) return null;
+                        const roundName = getRoundName(round);
+                        const double = isDoubleLegged(round);
+                        return (
+                          <div key={`right-${round}`} className="bracket-column right-side">
+                            <div className="bracket-round-title">
+                              {roundName}
+                              {double && <span style={{ fontSize: 8, marginLeft: 4, opacity: 0.7 }}>2 mãos</span>}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, gap: 16 }}>
+                              {rightMatches.map(renderMatchCard)}
+                            </div>
+                          </div>
+                        );
+                      }).reverse();
+
+                      const crownedChampion = tournament.winner || null;
+
+                      return (
+                        <>
+                          <div className="bracket-left-wing">
+                            {leftColumns}
+                          </div>
+
+                          {(() => {
+                            const finalMatch = finalMatches[0];
+                            return (
+                              <div className="bracket-center-final" style={{ background: 'rgba(10, 11, 92, 0.5)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', padding: '20px', borderRadius: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, position: 'relative', zIndex: 5, boxShadow: '0 8px 32px rgba(0,0,0,0.6)', minWidth: 140 }}>
+                                <div className="bracket-header-title" style={{ textAlign: 'center', width: '100%', marginBottom: 10 }}>
+                                  <div style={{ fontSize: 14, letterSpacing: 4, fontWeight: 300, color: '#fff', textTransform: 'uppercase' }}>ROAD TO</div>
+                                  <div style={{ fontSize: 24, fontFamily: 'serif', fontStyle: 'italic', fontWeight: 700, color: '#fff', marginTop: 4 }}>{tournament.name}</div>
+                                </div>
+                                
+                                {/* Home Team (Top) */}
+                                <div className="bracket-team-logo" style={{ borderColor: finalMatch?.homeTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff', width: 60, height: 60, fontSize: 24 }}>
+                                  {finalMatch?.homeTeam?.logo ? <img src={finalMatch.homeTeam.logo} alt="" /> : (finalMatch?.homeTeam?.name ? finalMatch.homeTeam.name.charAt(0).toUpperCase() : '?')}
+                                </div>
+                                
+                                <div className="bracket-trophy-column" style={{ margin: '20px 0' }}>
+                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                    <img src="/TACA.png" alt="Troféu" style={{ width: 90, height: 'auto', filter: 'drop-shadow(0 0 20px rgba(255, 214, 0, 0.4))', marginBottom: 8 }} />
+                                    <div style={{ fontSize: 14, fontFamily: 'serif', fontStyle: 'italic', fontWeight: 700, color: '#fff', marginTop: 8 }}>{tournament.name}</div>
+                                    <div style={{ fontSize: 10, letterSpacing: 2, fontWeight: 300, color: '#fff', marginTop: 4 }}>FINAL</div>
+                                    {crownedChampion && (
+                                      <div style={{ marginTop: 12, fontWeight: 900, color: crownedChampion.color || 'var(--yellow)', fontSize: 18 }}>
+                                        {crownedChampion.name}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Away Team (Bottom) */}
+                                <div className="bracket-team-logo" style={{ borderColor: finalMatch?.awayTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff', width: 60, height: 60, fontSize: 24 }}>
+                                  {finalMatch?.awayTeam?.logo ? <img src={finalMatch.awayTeam.logo} alt="" /> : (finalMatch?.awayTeam?.name ? finalMatch.awayTeam.name.charAt(0).toUpperCase() : '?')}
+                                </div>
+                              </div>
+                            );
+                          })()}
+
+                          <div className="bracket-right-wing">
+                            {rightColumns}
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+              ) : (
+                <div>
+              {(() => {
                 const rounds = [...new Set(matches.map(m => m.round))];
                 return rounds.map(round => {
                   const roundMatches = matches.filter(m => m.round === round);
@@ -353,6 +574,10 @@ export default function PublicTournament() {
                   );
                 });
               })()
+              }
+                </div>
+              )}
+            </div>
             )
           )}
 
@@ -394,13 +619,7 @@ export default function PublicTournament() {
       {showRegistrationModal && <TeamRegistrationModal tournament={tournament} onClose={() => setShowRegistrationModal(false)} />}
       {showSponsorModal && <SponsorProposalModal tournament={tournament} onClose={() => setShowSponsorModal(false)} />}
       
-      {/* Footer Branding */}
-      <div style={{ padding: '60px 0 40px', textAlign: 'center', background: 'linear-gradient(to top, rgba(0,200,83,0.05), transparent)' }}>
-        <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>
-          Powered by <Link to="/" style={{ color: 'var(--green)', fontWeight: 800, textDecoration: 'none' }}>BOLA NA ZONA</Link>
-        </p>
-        <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 8 }}>O futebol do bairro, agora profissional.</p>
-      </div>
+
       {showSubscribeModal && <SubscribeModal tournament={tournament} onClose={() => setShowSubscribeModal(false)} />}
       
       {previewImage && (

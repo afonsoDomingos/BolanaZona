@@ -221,9 +221,18 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
 /* ===== ALERTS / TOAST ===== */
 .alert {
-  padding: 14px 18px; border-radius: var(--radius-sm);
-  font-size: 14px; font-weight: 500;
-  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(0,200,83,0.08), rgba(0,200,83,0.02));
+  border: 1px solid var(--green);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  animation: fadeInSlide 0.4s ease;
 }
 .alert-error { background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.3); color: #ff8080; }
 .alert-success { background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.3); color: var(--green); }
@@ -248,6 +257,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes fadeInSlide { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
 /* SPLASH SCREENS */
 .splash-overlay {
   position: fixed;
@@ -350,6 +360,480 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .nav-link:hover { background: rgba(0, 0, 0, 0.04); color: var(--green); }
 .nav-link.active { color: var(--green); background: rgba(0, 200, 83, 0.05); }
 
+/* ===== BRACKET/ORGANOGRAMA MATA-MATA ===== */
+.full-width-bleed {
+  width: 100vw !important;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 0 !important;
+}
+
+.bracket-scroll-container {
+  overflow-x: auto;
+  width: 100%;
+  padding-bottom: 20px;
+  margin-top: 16px;
+  cursor: grab;
+}
+.bracket-scroll-container:active {
+  cursor: grabbing;
+}
+.bracket-container {
+  display: flex;
+  gap: 30px;
+  padding: 40px 20px;
+  min-width: max-content;
+  align-items: center;
+  justify-content: center;
+}
+.bracket-left-wing, .bracket-right-wing {
+  display: flex;
+  gap: 30px;
+  align-items: stretch;
+}
+.bracket-center-final {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+
+/* === 4 CANTOS NEON DA FINAL === */
+.final-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  z-index: 10;
+}
+/* Superior-esquerdo */
+.final-corner--tl {
+  top: -3px;
+  left: -3px;
+  border-top: 2px solid #00d2ff;
+  border-left: 2px solid #00d2ff;
+  border-radius: 3px 0 0 0;
+  box-shadow: -2px -2px 10px rgba(0, 210, 255, 1), 0 0 18px rgba(0, 210, 255, 0.6);
+}
+/* Superior-direito */
+.final-corner--tr {
+  top: -3px;
+  right: -3px;
+  border-top: 2px solid #00d2ff;
+  border-right: 2px solid #00d2ff;
+  border-radius: 0 3px 0 0;
+  box-shadow: 2px -2px 10px rgba(0, 210, 255, 1), 0 0 18px rgba(0, 210, 255, 0.6);
+}
+/* Inferior-esquerdo */
+.final-corner--bl {
+  bottom: -3px;
+  left: -3px;
+  border-bottom: 2px solid #00d2ff;
+  border-left: 2px solid #00d2ff;
+  border-radius: 0 0 0 3px;
+  box-shadow: -2px 2px 10px rgba(0, 210, 255, 1), 0 0 18px rgba(0, 210, 255, 0.6);
+}
+/* Inferior-direito */
+.final-corner--br {
+  bottom: -3px;
+  right: -3px;
+  border-bottom: 2px solid #00d2ff;
+  border-right: 2px solid #00d2ff;
+  border-radius: 0 0 3px 0;
+  box-shadow: 2px 2px 10px rgba(0, 210, 255, 1), 0 0 18px rgba(0, 210, 255, 0.6);
+}
+.bracket-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-width: 90px;
+  flex-shrink: 0;
+  position: relative;
+}
+.bracket-round-title {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(0, 200, 83, 0.06);
+  border: 1px solid rgba(0, 200, 83, 0.15);
+  padding: 4px 8px;
+  border-radius: 100px;
+  margin-bottom: 24px;
+  width: fit-content;
+  align-self: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.bracket-match-node {
+  position: relative;
+  width: 100%;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==== LINHAS DA ÁRVORE (BRACKET CONNECTORS) ==== */
+
+/* ALA ESQUERDA */
+/* Linha horizontal para a esquerda vinda das rondas interiores */
+.bracket-left-wing .bracket-column:not(:first-child) .bracket-match-node::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -15px;
+  width: 15px;
+  height: 2px;
+  background: linear-gradient(90deg, #00d2ff, #0050ff);
+  box-shadow: 0 0 8px rgba(0, 210, 255, 0.9), 0 0 16px rgba(0, 80, 255, 0.5);
+  z-index: 0;
+}
+
+/* Forma ']' nas rondas exteriores conectando pares */
+.bracket-left-wing .bracket-column:not(:last-child) .bracket-match-node:nth-child(odd)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -15px;
+  width: 15px;
+  height: calc(100% + 16px);
+  border-top: 2px solid #00d2ff;
+  border-right: 2px solid #00d2ff;
+  border-bottom: 2px solid #00d2ff;
+  border-radius: 0 4px 4px 0;
+  box-sizing: border-box;
+  box-shadow: 3px 0 10px -1px rgba(0, 210, 255, 0.8), 0 0 20px rgba(0, 80, 255, 0.4);
+  z-index: 0;
+}
+
+/* Linha direita da última coluna esquerda para a Final */
+.bracket-left-wing .bracket-column:last-child .bracket-match-node::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -30px;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(90deg, #00d2ff, #0050ff);
+  box-shadow: 0 0 8px rgba(0, 210, 255, 0.9), 0 0 16px rgba(0, 80, 255, 0.5);
+  z-index: 0;
+}
+
+/* ALA DIREITA */
+/* Linha horizontal para a direita vinda das rondas interiores (que na direita são :not(:last-child) porque está reversed) */
+.bracket-right-wing .bracket-column:not(:last-child) .bracket-match-node::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -15px;
+  width: 15px;
+  height: 2px;
+  background: linear-gradient(90deg, #0050ff, #00d2ff);
+  box-shadow: 0 0 8px rgba(0, 210, 255, 0.9), 0 0 16px rgba(0, 80, 255, 0.5);
+  z-index: 0;
+}
+
+/* Forma '[' nas rondas exteriores conectando pares */
+.bracket-right-wing .bracket-column:not(:first-child) .bracket-match-node:nth-child(odd)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -15px;
+  width: 15px;
+  height: calc(100% + 16px);
+  border-top: 2px solid #00d2ff;
+  border-left: 2px solid #00d2ff;
+  border-bottom: 2px solid #00d2ff;
+  border-radius: 4px 0 0 4px;
+  box-sizing: border-box;
+  box-shadow: -3px 0 10px -1px rgba(0, 210, 255, 0.8), 0 0 20px rgba(0, 80, 255, 0.4);
+  z-index: 0;
+}
+
+/* Linha esquerda da primeira coluna direita para a Final */
+.bracket-right-wing .bracket-column:first-child .bracket-match-node::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -30px;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(90deg, #0050ff, #00d2ff);
+  box-shadow: 0 0 8px rgba(0, 210, 255, 0.9), 0 0 16px rgba(0, 80, 255, 0.5);
+  z-index: 0;
+}
+
+/* Final - remover qualquer linha extra por precaução */
+.bracket-final-match .bracket-match-node::before,
+.bracket-final-match .bracket-match-node::after {
+  display: none;
+}
+
+/* ===== CARTÃO DE JOGO - Estilo Road to Istanbul ===== */
+.bracket-match-card {
+  background: rgba(10, 11, 92, 0.4);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 0;
+  width: 76px;
+  min-height: 150px;
+  height: auto;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s ease;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+.bracket-match-card:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 210, 255, 0.2);
+}
+
+/* Linha divisória entre as duas equipas */
+.bracket-match-card::after {
+  display: none;
+}
+
+/* ===== EQUIPA LINHA - só logo e nome pequeno ===== */
+.bracket-team-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 2px 0;
+  width: 100%;
+  border-bottom: none;
+}
+.bracket-team-row:last-child {
+  border-bottom: none;
+}
+.bracket-team-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  width: 100%;
+}
+.bracket-team-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 14px;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+.bracket-match-card:hover .bracket-team-logo {
+  box-shadow: 0 0 18px rgba(0, 210, 255, 0.35);
+}
+.bracket-team-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.bracket-team-name {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  max-width: 60px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+.bracket-team-score {
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+/* Destaque para vencedor */
+.bracket-team-row.winner .bracket-team-logo {
+  border-color: rgba(0, 210, 255, 0.8);
+  box-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+}
+.bracket-team-row.winner .bracket-team-name {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 800;
+}
+.bracket-team-row.winner .bracket-team-score {
+  color: #00d2ff;
+  text-shadow: 0 0 8px rgba(0, 210, 255, 0.6);
+}
+
+/* Meta-info e Ações */
+.bracket-meta-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+.bracket-meta-date {
+  white-space: nowrap;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.3px;
+}
+.bracket-actions { display: flex; gap: 6px; }
+.bracket-action-btn {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.4);
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  transition: var(--transition);
+}
+.bracket-action-btn:hover {
+  background: rgba(0, 210, 255, 0.15);
+  color: #00d2ff;
+  border-color: rgba(0, 210, 255, 0.4);
+}
+.bracket-action-btn.whatsapp:hover {
+  background: #25D366;
+  color: #fff;
+  border-color: #25D366;
+}
+
+/* ===== COLUNA CENTRAL - Troféu ===== */
+.bracket-trophy-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 160px;
+  flex-shrink: 0;
+  padding: 0 16px;
+}
+.bracket-trophy-card {
+  background: radial-gradient(circle at center, rgba(255,214,0,0.08) 0%, rgba(13,21,41,0.9) 100%);
+  border: 2px dashed rgba(255, 214, 0, 0.2);
+  border-radius: 24px;
+  padding: 40px 24px;
+  text-align: center;
+  width: 100%;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+  position: relative;
+  z-index: 2;
+  transition: var(--transition);
+  animation: floatTrophy 4s ease-in-out infinite;
+}
+.bracket-trophy-card.crowned {
+  border: 2px solid rgba(255, 214, 0, 0.4);
+  box-shadow: 0 20px 50px rgba(255, 214, 0, 0.15);
+}
+.bracket-trophy-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--yellow);
+}
+.bracket-trophy-icon {
+  font-size: 56px;
+  margin-bottom: 20px;
+  display: inline-block;
+  filter: drop-shadow(0 0 20px rgba(255, 214, 0, 0.4));
+  animation: glowTrophy 2s ease-in-out infinite alternate;
+}
+.bracket-trophy-card.crowned .bracket-trophy-icon {
+  animation: celebrateTrophy 1.5s ease-in-out infinite alternate;
+}
+.bracket-champion-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--yellow);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+}
+.bracket-champion-name {
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.bracket-trophy-card.crowned::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  background: radial-gradient(circle, rgba(255,214,0,0.15) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Animações da Taça */
+@keyframes floatTrophy {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes glowTrophy {
+  from { filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); opacity: 0.6; }
+  to { filter: drop-shadow(0 0 25px rgba(255, 214, 0, 0.3)); opacity: 1; }
+}
+@keyframes celebrateTrophy {
+  0% { transform: scale(1) rotate(-5deg); filter: drop-shadow(0 0 25px rgba(255, 214, 0, 0.4)); }
+  100% { transform: scale(1.1) rotate(5deg); filter: drop-shadow(0 0 40px rgba(255, 214, 0, 0.7)); }
+}
+
+/* Alternador de visualização (Switch Buttons) */
+.view-switcher {
+  display: flex;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+}
+.switcher-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+.switcher-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+.switcher-btn.active {
+  background: var(--green);
+  color: #000 !important;
+}
+
+
 /* ===== TABS ===== */
 .tabs { display: flex; gap: 4px; background: var(--bg-card); border-radius: var(--radius-sm); padding: 4px; border: 1px solid var(--border); }
 .tab { padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--text-secondary); background: none; transition: var(--transition); }
@@ -358,7 +842,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
 /* ===== DASHBOARD LAYOUT ===== */
 .dashboard-grid { display: grid; grid-template-columns: 1fr 340px; gap: 32px; align-items: flex-start; }
-.card-icon-sm { width: 44px; height: 44px; border-radius: 12px; background: var(--green-subtle); display: flex; align-items: center; justify-content: center; fontSize: 22px; flex-shrink: 0; }
+.card-icon-sm { width: 44px; height: 44px; border-radius: 12px; background: var(--green-subtle); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
 .recent-tournament-card { display: flex; align-items: center; gap: 16px; text-decoration: none; }
 
 
@@ -518,7 +1002,93 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .match-score { order: -1; margin-bottom: 8px; }
   
   .tabs { overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+
+  /* ===== BRACKET RESPONSIVE - Mobile ===== */
+  .bracket-scroll-container {
+    border-radius: 16px;
+    margin: 0 -4px; /* Extend slightly to use full width */
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
+  .bracket-container {
+    padding: 32px 16px;
+    gap: 0;
+    min-height: 400px;
+    align-items: center;
+  }
+  .bracket-left-wing, .bracket-right-wing {
+    gap: 0;
+  }
+  .bracket-column {
+    min-width: 72px;
+  }
+  .bracket-round-title {
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    padding: 4px 6px;
+    margin-bottom: 12px;
+  }
+  .bracket-match-node {
+    margin: 6px 0;
+  }
+  /* Linhas menores no mobile */
+  .bracket-left-wing .bracket-match-node::after,
+  .bracket-right-wing .bracket-match-node::before {
+    width: 16px;
+  }
+  .bracket-left-wing .bracket-match-node::after { right: -16px; }
+  .bracket-right-wing .bracket-match-node::before { left: -16px; }
+
+  .bracket-match-card {
+    width: 64px;
+    padding: 8px 6px;
+    border-radius: 10px;
+    gap: 4px;
+  }
+  .bracket-team-logo {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+    border-width: 1.5px;
+  }
+  .bracket-team-name {
+    font-size: 7px;
+    letter-spacing: 0px;
+    max-width: 54px;
+  }
+  .bracket-team-score {
+    font-size: 11px;
+  }
+  .bracket-trophy-column {
+    min-width: 100px;
+    padding: 0 8px;
+  }
+  .bracket-trophy-card {
+    width: 90px;
+    padding: 20px 12px;
+    border-radius: 14px;
+  }
+  .bracket-trophy-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  .bracket-champion-title {
+    font-size: 7px;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+  }
+  .bracket-champion-name {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  /* Linhas verticais entre colunas no mobile */
+  .bracket-left-wing .bracket-column:not(:first-child)::before,
+  .bracket-right-wing .bracket-column:not(:last-child)::after {
+    left: -16px;
+    right: -16px;
+  }
 }
+
 
 @media (max-width: 580px) {
   .card-premium { border-radius: 16px; }

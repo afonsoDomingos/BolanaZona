@@ -33,6 +33,7 @@ export default function Footer() {
           <Link to="/legal/terms" style={{ color: 'rgba(0,0,0,0.6)', fontSize: 12, textDecoration: 'none' }} className="hover-green">Termos</Link>
           <Link to="/legal/cookies" style={{ color: 'rgba(0,0,0,0.6)', fontSize: 12, textDecoration: 'none' }} className="hover-green">Cookies</Link>
           <Link to="/legal/cookie-settings" style={{ color: 'rgba(0,0,0,0.6)', fontSize: 12, textDecoration: 'none' }} className="hover-green">Definições</Link>
+          <Link to="/como-criar-torneio" style={{ color: 'var(--green)', fontSize: 12, fontWeight: 700, textDecoration: 'none' }} className="hover-green">Guia de Torneios</Link>
           <a 
             href="https://www.linkedin.com/in/afonso-domingos-6b59361a5/" 
             target="_blank" 

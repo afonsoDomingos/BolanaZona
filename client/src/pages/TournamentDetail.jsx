@@ -15,7 +15,7 @@ const statusBadge = { draft: 'badge-gray', registration: 'badge-blue', active: '
 export default function TournamentDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [tab, setTab] = useState('teams');
+  const [tab, setTab] = useState('calendar');
   const [tournament, setTournament] = useState(null);
   const [teams, setTeams] = useState([]);
   const [matches, setMatches] = useState([]);
@@ -34,7 +34,11 @@ export default function TournamentDetail() {
   const [generatingCalendar, setGeneratingCalendar] = useState(false);
   const [subscribers, setSubscribers] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
+  // Array para armazenar logs de depuração e helper para adicioná‑los
+  const [debugLogs, setDebugLogs] = useState([]);
+  const addLog = (msg) => setDebugLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${msg}`]);
   const [showLinkModal, setShowLinkModal] = useState(null);
+  const [viewMode, setViewMode] = useState('bracket');
 
 
   const { user: currentUser } = useAuth();
@@ -46,6 +50,7 @@ export default function TournamentDetail() {
   const canManage = isOwner || isSuperAdmin;
 
   const load = useCallback(async () => {
+    addLog('Starting load()');
     try {
       const [tRes, sRes, subRes, propRes, leadRes] = await Promise.all([
         api.get(`/tournaments/${id}`),
@@ -71,9 +76,11 @@ export default function TournamentDetail() {
       setLeads(leadRes.data);
     } catch (err) {
       console.error(err);
+      addLog(`Error in load(): ${err.message || err}`);
       toast.error('Erro ao carregar detalhes do torneio.');
     } finally {
       setLoading(false);
+      addLog('Finished load()');
     }
   }, [id]);
 
@@ -92,10 +99,29 @@ export default function TournamentDetail() {
   };
 
   const changeStatus = async (status, awards = {}) => {
+    if (status === 'active') {
+      const approvedTeams = teams.filter(t => t.status === 'approved');
+      if (approvedTeams.length < 2) {
+        toast.error('❌ Precisas de pelo menos 2 equipas confirmadas para iniciar o torneio.');
+        return;
+      }
+      if (matches.length === 0) {
+        toast.error('❌ Precisas de gerar o calendário primeiro antes de iniciar.');
+        setTab('calendar');
+        return;
+      }
+    }
+
     try {
-      const res = await api.put(`/tournaments/${id}`, { status, ...awards });
+      // Quando inicia a competição, fecha automaticamente as inscrições públicas
+      const extraPayload = status === 'active' ? { allowPublicRegistration: false } : {};
+      const res = await api.put(`/tournaments/${id}`, { status, ...extraPayload, ...awards });
       setTournament(res.data);
-      toast.success('Estado atualizado.');
+      if (status === 'active') {
+        toast.success('Torneio iniciado! Inscrições encerradas automaticamente. 🚀');
+      } else {
+        toast.success('Estado atualizado.');
+      }
     } catch { toast.error('Erro ao atualizar estado.'); }
   };
 
@@ -228,6 +254,96 @@ export default function TournamentDetail() {
             </div>
           </div>
         </div>
+
+        {/* Onboarding Checklist for Organizer */}
+        {canManage && tournament.status !== 'finished' && (
+          <div className="card" style={{ marginBottom: 24, background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 20 }}>⚡</span>
+                <h3 className="font-syne" style={{ fontSize: 18, fontWeight: 800 }}>Guia de Organização</h3>
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>
+                Progresso: <span style={{ color: 'var(--green)' }}>{Math.round(([true, tournament.status !== 'draft', teams.filter(t => t.status === 'approved').length >= 2, matches.length > 0, tournament.status === 'active'].filter(Boolean).length / 5) * 100)}%</span>
+              </div>
+            </div>
+            
+            {/* Progress Bar */}
+            <div style={{ width: '100%', height: 6, background: 'var(--border)', borderRadius: 3, marginBottom: 20, overflow: 'hidden' }}>
+              <div style={{ 
+                height: '100%', 
+                width: `${([true, tournament.status !== 'draft', teams.filter(t => t.status === 'approved').length >= 2, matches.length > 0, tournament.status === 'active'].filter(Boolean).length / 5) * 100}%`, 
+                background: 'var(--green)', 
+                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)' 
+              }} />
+            </div>
+
+            {/* Checklist Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 20 }}>
+              {[
+                { label: '1. Criar Torneio', done: true, action: null },
+                { label: '2. Abrir Inscrições', done: tournament.status !== 'draft', action: tournament.status === 'draft' ? () => changeStatus('registration') : null },
+                { label: `3. Equipas (${teams.filter(t => t.status === 'approved').length}/${tournament.maxTeams})`, done: teams.filter(t => t.status === 'approved').length >= 2, action: () => setTab('teams') },
+                { label: `4. Gerar Jogos (${matches.length})`, done: matches.length > 0, action: () => setTab('calendar') },
+                { label: '5. Iniciar Competição', done: tournament.status === 'active', action: tournament.status === 'registration' ? () => changeStatus('active') : null }
+              ].map((step, idx) => (
+                <div key={idx} 
+                  onClick={step.action}
+                  className={step.action && !step.done ? "pulse-animation" : ""}
+                  style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 8, 
+                  background: step.done ? 'rgba(0, 200, 83, 0.05)' : (step.action ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255,255,255,0.01)'), 
+                  border: step.done ? '1px solid rgba(0, 200, 83, 0.2)' : (step.action ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid var(--border)'),
+                  borderRadius: 12, 
+                  padding: '10px 14px', 
+                  fontSize: 13,
+                  color: step.done ? 'var(--text-primary)' : 'var(--text-muted)',
+                  transition: 'all 0.3s',
+                  cursor: step.action ? 'pointer' : 'default'
+                }}>
+                  <span style={{ color: step.done ? 'var(--green)' : (step.action ? '#fff' : 'var(--text-muted)'), fontWeight: 'bold' }}>
+                    {step.done ? '✓' : (step.action ? '▶' : '○')}
+                  </span>
+                  <span style={{ fontWeight: step.action && !step.done ? 600 : 400, color: step.action && !step.done ? '#fff' : 'inherit' }}>{step.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Alert/Action Message */}
+            <div className="alert" style={{ 
+              background: 'rgba(0, 200, 83, 0.04)', 
+              border: '1px solid rgba(0, 200, 83, 0.15)', 
+              color: '#fff',
+              fontSize: 14,
+              padding: '16px 20px',
+              borderRadius: 'var(--radius-sm)',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 12
+            }}>
+              <span style={{ fontSize: 18, marginTop: -2 }}>💡</span>
+              <div style={{ flex: 1 }}>
+                {tournament.status === 'draft' && (
+                  <span><strong>Próximo Passo:</strong> O teu torneio está em modo <em>Rascunho</em>. Clica em <strong>Abrir Inscrições</strong> no topo superior direito para permitir inscrições de equipas.</span>
+                )}
+                {tournament.status === 'registration' && teams.filter(t => t.status === 'approved').length < 2 && (
+                  <span><strong>Próximo Passo:</strong> As inscrições estão abertas! Partilha o link de inscrição com as equipas ou clica em <strong>Adicionar Equipa</strong> na aba de equipas abaixo. Precisas de pelo menos 2 equipas confirmadas.</span>
+                )}
+                {tournament.status === 'registration' && teams.filter(t => t.status === 'approved').length >= 2 && matches.length === 0 && (
+                  <span><strong>Próximo Passo:</strong> Tens {teams.filter(t => t.status === 'approved').length} equipas confirmadas! Acede à aba <strong>Calendário</strong> abaixo e clica em <strong>Gerar Calendário</strong> para criar a tabela de jogos.</span>
+                )}
+                {tournament.status === 'registration' && matches.length > 0 && (
+                  <span><strong>Próximo Passo:</strong> O calendário está pronto com {matches.length} jogos! Quando estiver tudo a postos para começar a primeira jornada, clica no botão <strong>Iniciar Torneio</strong> no topo direito.</span>
+                )}
+                {tournament.status === 'active' && (
+                  <span><strong>Torneio a Decorrer:</strong> Lança os golos e marcadores dos jogos na aba <strong>Calendário</strong> para atualizar a tabela de classificação automaticamente em tempo real!</span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Share & Registration Box */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16, marginBottom: 24 }}>
@@ -444,7 +560,25 @@ export default function TournamentDetail() {
         {tab === 'calendar' && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 700 }}>Calendário ({matches.length} jogos)</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                <h2 style={{ fontSize: 18, fontWeight: 700 }}>Calendário ({matches.length} jogos)</h2>
+                {matches.length > 0 && (
+                  <div className="view-switcher">
+                    <button 
+                      className={`switcher-btn ${viewMode === 'bracket' ? 'active' : ''}`} 
+                      onClick={() => setViewMode('bracket')}
+                    >
+                      🌳 Árvore
+                    </button>
+                    <button 
+                      className={`switcher-btn ${viewMode === 'list' ? 'active' : ''}`} 
+                      onClick={() => setViewMode('list')}
+                    >
+                      📋 Lista
+                    </button>
+                  </div>
+                )}
+              </div>
               {canManage && (
                 <div style={{ display: 'flex', gap: 10 }}>
                   <button className="btn btn-secondary btn-sm" onClick={() => setShowManualMatchModal(true)}>
@@ -460,78 +594,308 @@ export default function TournamentDetail() {
               <div className="empty-state">
                 <div className="empty-state-icon"><Calendar size={48} strokeWidth={1} /></div>
                 <h3>Calendário não gerado</h3>
-                <p style={{ marginBottom: 20 }}>Adiciona as equipas e gera o calendário automaticamente</p>
+                <p style={{ marginBottom: 20 }}>Adicione jogos manualmente ou gere o calendário automaticamente após aprovar as equipas</p>
               </div>
             ) : (
-              (() => {
-                const rounds = [...new Set(matches.map(m => m.round))];
-                return rounds.map(round => {
-                  const roundMatches = matches.filter(m => m.round === round);
-                  return (
-                    <div key={round} style={{ marginBottom: 28 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-                        <div style={{ background: 'var(--green)', color: '#000', fontWeight: 800, fontSize: 13, padding: '4px 14px', borderRadius: 100 }}>
-                          {roundMatches[0]?.roundName || `Ronda ${round}`}
-                        </div>
-                        <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-                      </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                          {roundMatches.map(m => (
-                          <div key={m._id} className="match-card" style={{ padding: '12px 16px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                              <div style={{ flex: 1, textAlign: 'right', fontWeight: 700, fontSize: 14, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.homeTeam?.name || '—'}</div>
-                              
-                                <div style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: 8, minWidth: 80, textAlign: 'center' }}>
-                                  {m.status === 'finished' ? (
-                                    <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</div>
-                                  ) : m.status === 'live' || m.status === 'active' ? (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                      <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore !== null ? m.homeScore : 0} - {m.awayScore !== null ? m.awayScore : 0}</div>
-                                      <div className="badge badge-green pulse-dot" style={{ fontSize: 9, padding: '2px 6px' }}>LIVE</div>
-                                    </div>
-                                  ) : m.status === 'cancelled' ? (
-                                    <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--red)' }}>CANCELADO</div>
+              viewMode === 'bracket' ? (
+                <div className="bracket-scroll-container full-width-bleed" style={{
+                    position: 'relative',
+                    backgroundImage: 'url(/loginbg1.png)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    borderTop: '1px solid rgba(255,255,255,0.05)',
+                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    minHeight: 'calc(100vh - 280px)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%)',
+                    maskImage: 'linear-gradient(to bottom, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%)'
+                  }}>
+                    {/* Dark overlay */}
+                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,5,36,0.85)', zIndex: 0 }} />
+                  <div className="bracket-container" style={{ position: 'relative', zIndex: 1 }}>
+                    {(() => {
+                      const bracketMatches = matches;
+
+                      if (bracketMatches.length === 0) {
+                        return (
+                          <div className="empty-state" style={{ width: '100%' }}>
+                            <div className="empty-state-icon"><Trophy size={48} strokeWidth={1} /></div>
+                            <h3>Fase a Eliminar (Mata-Mata)</h3>
+                            <p>Os jogos das eliminatórias ainda não foram criados para este torneio.</p>
+                          </div>
+                        );
+                      }
+
+                      const rounds = [...new Set(bracketMatches.map(m => m.round))].sort((a, b) => a - b);
+                      const maxRound = Math.max(...rounds);
+                      const finalMatches = bracketMatches.filter(m => m.round === maxRound);
+
+                      const getRoundName = (round) => {
+                        const matchesInRound = bracketMatches.filter(m => m.round === round).length;
+                        const distFromFinal = maxRound - round; // 0 = final, 1 = semis, 2 = quarters, etc
+                        const customName = bracketMatches.find(m => m.round === round)?.roundName;
+                        if (customName) return customName;
+                        if (distFromFinal === 0) return 'Final';
+                        if (distFromFinal === 1) return matchesInRound <= 2 ? 'Meias-Finais' : 'Semifinal';
+                        if (distFromFinal === 2) return 'Quartos de Final';
+                        if (distFromFinal === 3) return 'Oitavos de Final';
+                        if (distFromFinal === 4) return '1/16 de Final';
+                        return `Fase ${round}`;
+                      };
+
+                      const isDoubleLegged = (round) => {
+                        const rMatches = bracketMatches.filter(m => m.round === round);
+                        return rMatches.some(m => m.leg === 2 || m.leg === '2');
+                      };
+
+                      const renderMatchCard = (m) => {
+                        const homeWinner = m.status === 'finished' && m.homeScore > m.awayScore;
+                        const awayWinner = m.status === 'finished' && m.awayScore > m.homeScore;
+                        return (
+                          <div key={m._id} className="bracket-match-node">
+                            <div className="bracket-match-card">
+                              {/* Casa */}
+                              <div className={`bracket-team-row ${homeWinner ? 'winner' : ''}`}>
+                                <div className="bracket-team-info">
+                                  <div className="bracket-team-logo" style={{ borderColor: m.homeTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
+                                    {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" /> : (m.homeTeam?.name ? m.homeTeam.name.charAt(0).toUpperCase() : '?')}
+                                  </div>
+                                  <span className="bracket-team-name" title={m.homeTeam?.name || 'A anunciar'}>
+                                    {m.homeTeam?.name || 'A anunciar'}
+                                  </span>
+                                </div>
+                                <span className="bracket-team-score">
+                                  {m.status === 'finished' || m.status === 'live' || m.status === 'active' ? m.homeScore : '—'}
+                                </span>
+                              </div>
+
+                              {/* Fora */}
+                              <div className={`bracket-team-row ${awayWinner ? 'winner' : ''}`}>
+                                <div className="bracket-team-info">
+                                  <div className="bracket-team-logo" style={{ borderColor: m.awayTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
+                                    {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" /> : (m.awayTeam?.name ? m.awayTeam.name.charAt(0).toUpperCase() : '?')}
+                                  </div>
+                                  <span className="bracket-team-name" title={m.awayTeam?.name || 'A anunciar'}>
+                                    {m.awayTeam?.name || 'A anunciar'}
+                                  </span>
+                                </div>
+                                <span className="bracket-team-score">
+                                  {m.status === 'finished' || m.status === 'live' || m.status === 'active' ? m.awayScore : '—'}
+                                </span>
+                              </div>
+
+                              {/* Info & Ações */}
+                              <div className="bracket-meta-bar">
+                                <div className="bracket-meta-date">
+                                  {m.status === 'live' || m.status === 'active' ? (
+                                    <span style={{ color: 'var(--green)', fontWeight: 800 }}>● LIVE</span>
+                                  ) : m.date ? (
+                                    new Date(m.date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }) + ' ' +
+                                    new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
                                   ) : (
-                                    <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--text-muted)' }}>VS</div>
+                                    'Agendado'
                                   )}
                                 </div>
-
-                              <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 14 }}>{m.awayTeam?.name || '—'}</div>
-                              
-                              <div style={{ display: 'flex', gap: 6 }}>
-                                <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px', color: '#25D366' }} onClick={() => shareMatchWhatsApp(m)} title="WhatsApp"><MessageCircle size={14} /></button>
-                                {canManage && (
-                                  <>
-                                    <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Editar Jogo"><Edit2 size={14} /></button>
-                                    <button 
-                                      className="btn btn-primary btn-sm" 
-                                      style={{ padding: '6px 8px', cursor: 'pointer' }} 
-                                      onClick={() => setShowResultModal(m)} 
-                                      title="Lançar Resultado e Marcadores"
-                                    >
-                                      <Trophy size={14} />
-                                    </button>
-
-                                    <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowShareModal(m)} title="Partilhar"><Camera size={14} /></button>
-                                  </>
-                                )}
+                                <div className="bracket-actions">
+                                  <button 
+                                    className="bracket-action-btn whatsapp" 
+                                    onClick={() => shareMatchWhatsApp(m)} 
+                                    title="Partilhar WhatsApp"
+                                  >
+                                    <MessageCircle size={11} />
+                                  </button>
+                                  {canManage && (
+                                    <>
+                                      <button 
+                                        className="bracket-action-btn" 
+                                        onClick={() => setShowEditMatchModal(m)} 
+                                        title="Editar Jogo"
+                                      >
+                                        <Edit2 size={11} />
+                                      </button>
+                                      <button 
+                                        className="bracket-action-btn" 
+                                        onClick={() => setShowResultModal(m)} 
+                                        title="Lançar Resultado"
+                                        style={{ background: 'rgba(0, 200, 83, 0.1)', color: 'var(--green)', borderColor: 'rgba(0, 200, 83, 0.2)' }}
+                                      >
+                                        <Trophy size={11} />
+                                      </button>
+                                      <button 
+                                        className="bracket-action-btn" 
+                                        onClick={() => setShowShareModal(m)} 
+                                        title="Partilhar Imagem"
+                                      >
+                                        <Camera size={11} />
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                            {/* Date, location, referee info bar */}
-                            {(m.location || m.date || m.referee) && (
-                              <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 8, fontSize: 11, color: 'var(--text-muted)', flexWrap: 'wrap' }}>
-                                {m.date && <span>📅 {new Date(m.date).toLocaleDateString('pt-PT')} · {new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</span>}
-                                {m.location && <span>🏟️ {m.location}</span>}
-                                {m.referee && <span>🏁 {m.referee}</span>}
-                              </div>
-                            )}
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                });
-              })()
+                        );
+                      };
+
+                      const nonFinalRounds = rounds.filter(r => r !== maxRound);
+                      
+                      const leftColumns = nonFinalRounds.map((round) => {
+                        const roundMatches = bracketMatches.filter(m => m.round === round);
+                        const leftMatches = roundMatches.slice(0, Math.ceil(roundMatches.length / 2));
+                        if (leftMatches.length === 0) return null;
+                        const roundName = getRoundName(round);
+                        const double = isDoubleLegged(round);
+                        return (
+                          <div key={`left-${round}`} className="bracket-column">
+                            <div className="bracket-round-title">
+                              {roundName}
+                              {double && <span style={{ fontSize: 8, marginLeft: 4, opacity: 0.7 }}>2 mãos</span>}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, gap: 16 }}>
+                              {leftMatches.map(renderMatchCard)}
+                            </div>
+                          </div>
+                        );
+                      });
+
+                      const rightColumns = nonFinalRounds.map((round) => {
+                        const roundMatches = bracketMatches.filter(m => m.round === round);
+                        const rightMatches = roundMatches.slice(Math.ceil(roundMatches.length / 2));
+                        if (rightMatches.length === 0) return null;
+                        const roundName = getRoundName(round);
+                        const double = isDoubleLegged(round);
+                        return (
+                          <div key={`right-${round}`} className="bracket-column right-side">
+                            <div className="bracket-round-title">
+                              {roundName}
+                              {double && <span style={{ fontSize: 8, marginLeft: 4, opacity: 0.7 }}>2 mãos</span>}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, gap: 16 }}>
+                              {rightMatches.map(renderMatchCard)}
+                            </div>
+                          </div>
+                        );
+                      }).reverse();
+
+                      // For groups format, we don't have a single crowned champion from the final match
+                      // We rely on the tournament winner if set, or just leave it blank
+                      const crownedChampion = tournament.winner || null;
+
+                      return (
+                        <>
+                          <div className="bracket-left-wing">
+                            {leftColumns}
+                          </div>
+
+                          {(() => {
+                            const finalMatch = finalMatches[0];
+                            return (
+                              <div className="bracket-center-final" style={{ background: 'rgba(10, 11, 92, 0.5)', backdropFilter: 'blur(20px)', border: 'none', padding: '16px', borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, position: 'relative', zIndex: 5, boxShadow: '0 8px 32px rgba(0,0,0,0.6)', minWidth: 120 }}>
+                                {/* 4 cantos neon — um span por canto */}
+                                <span className="final-corner final-corner--tl" />
+                                <span className="final-corner final-corner--tr" />
+                                <span className="final-corner final-corner--bl" />
+                                <span className="final-corner final-corner--br" />
+
+                                <div className="bracket-header-title" style={{ textAlign: 'center', width: '100%', marginBottom: 8 }}>
+                                  <div style={{ fontSize: 12, letterSpacing: 4, fontWeight: 300, color: '#fff', textTransform: 'uppercase' }}>ROAD TO</div>
+                                  <div style={{ fontSize: 20, fontFamily: 'serif', fontStyle: 'italic', fontWeight: 700, color: '#fff', marginTop: 4 }}>{tournament.name}</div>
+                                </div>
+                                
+                                {/* Home Team (Top) */}
+                                <div className="bracket-team-logo" style={{ borderColor: finalMatch?.homeTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff', width: 48, height: 48, fontSize: 20 }}>
+                                  {finalMatch?.homeTeam?.logo ? <img src={finalMatch.homeTeam.logo} alt="" /> : (finalMatch?.homeTeam?.name ? finalMatch.homeTeam.name.charAt(0).toUpperCase() : '?')}
+                                </div>
+                                
+                                <div className="bracket-trophy-column" style={{ margin: '16px 0' }}>
+                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                    <img src="/TACA.png" alt="Troféu" style={{ width: 70, height: 'auto', filter: 'drop-shadow(0 0 20px rgba(255, 214, 0, 0.4))', marginBottom: 6 }} />
+                                    <div style={{ fontSize: 12, fontFamily: 'serif', fontStyle: 'italic', fontWeight: 700, color: '#fff', marginTop: 8 }}>{tournament.name}</div>
+                                    <div style={{ fontSize: 10, letterSpacing: 2, fontWeight: 300, color: '#fff', marginTop: 4 }}>FINAL</div>
+                                    {crownedChampion && (
+                                      <div style={{ marginTop: 10, fontWeight: 900, color: crownedChampion.color || 'var(--yellow)', fontSize: 16 }}>
+                                        {crownedChampion.name}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Away Team (Bottom) */}
+                                <div className="bracket-team-logo" style={{ borderColor: finalMatch?.awayTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff', width: 48, height: 48, fontSize: 20 }}>
+                                  {finalMatch?.awayTeam?.logo ? <img src={finalMatch.awayTeam.logo} alt="" /> : (finalMatch?.awayTeam?.name ? finalMatch.awayTeam.name.charAt(0).toUpperCase() : '?')}
+                                </div>
+                              </div>
+                            );
+                          })()}
+
+                          <div className="bracket-right-wing">
+                            {rightColumns}
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  {(() => {
+                    if (!matches || matches.length === 0) return <div className="error" style={{ color: 'var(--red)' }}>Nenhuma partida encontrada.</div>;
+                    try {
+                      const rounds = [...new Set(matches.map(m => m.round))].sort((a, b) => a - b);
+                      return rounds.map(round => {
+                        const roundMatches = matches.filter(m => m.round === round);
+                        return (
+                          <div key={round} style={{ marginBottom: 30 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                              <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic' }}>{roundMatches[0]?.roundName || `Ronda ${round}`}</div>
+                              <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                              {roundMatches.map(m => (
+                                <div key={m._id} className="match-card" style={{ padding: '12px 16px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                                    <div style={{ flex: 1, textAlign: 'right', fontWeight: 700, fontSize: 14, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.homeTeam?.name || '—'}</div>
+                                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: 8, minWidth: 80, textAlign: 'center' }}>
+                                      {m.status === 'finished' ? (
+                                        <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</div>
+                                      ) : m.status === 'live' || m.status === 'active' ? (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                          <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore !== null ? m.homeScore : 0} - {m.awayScore !== null ? m.awayScore : 0}</div>
+                                          <div className="badge badge-green pulse-dot" style={{ fontSize: 9, padding: '2px 6px' }}>LIVE</div>
+                                        </div>
+                                      ) : m.status === 'cancelled' ? (
+                                        <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--red)' }}>CANCELADO</div>
+                                      ) : (
+                                        <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--text-muted)' }}>VS</div>
+                                      )}
+                                    </div>
+                                    <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 14 }}>{m.awayTeam?.name || '—'}</div>
+                                    <div style={{ display: 'flex', gap: 6 }}>
+                                      <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px', color: '#25D366' }} onClick={() => shareMatchWhatsApp(m)} title="WhatsApp"><MessageCircle size={14} /></button>
+                                      {canManage && (
+                                        <>
+                                          <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Editar Jogo"><Edit2 size={14} /></button>
+                                          <button className="btn btn-primary btn-sm" style={{ padding: '6px 8px', cursor: 'pointer' }} onClick={() => setShowResultModal(m)} title="Lançar Resultado e Marcadores"><Trophy size={14} /></button>
+                                          <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowShareModal(m)} title="Partilhar"><Camera size={14} /></button>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      });
+                    } catch (err) {
+                      console.error('Error rendering matches:', err);
+                      return <div className="error" style={{ color: 'var(--red)' }}>Erro ao carregar partidas.</div>;
+                    }
+                  })()}
+                </div>
+              )
             )}
           </div>
         )}
@@ -594,26 +958,37 @@ export default function TournamentDetail() {
           <div className="animate-fade-in">
             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>Localização do Torneio</h2>
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-              <div style={{ padding: 20, borderBottom: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                  <MapPin size={18} color="var(--green)" />
-                  <span style={{ fontWeight: 700 }}>{tournament.location}</span>
+              <div style={{ padding: 20, borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                    <MapPin size={18} color="var(--green)" />
+                    <span style={{ fontWeight: 700 }}>{tournament.location}</span>
+                  </div>
+                  <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginLeft: 28 }}>{tournament.neighborhood}, Moçambique</p>
                 </div>
-                <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginLeft: 28 }}>{tournament.neighborhood}, Luanda</p>
+                
+                <a 
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(tournament.location + ' ' + (tournament.neighborhood || '') + ' Moçambique')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary btn-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}
+                >
+                  <MapPin size={14} /> Traçar Rota / Como Chegar
+                </a>
               </div>
-              <div style={{ width: '100%', height: 400, background: 'var(--bg-secondary)' }}>
+              <div style={{ width: '100%', height: 400, background: 'var(--bg-secondary)', position: 'relative' }}>
                 <iframe
                   title="Tournament Location"
                   width="100%"
                   height="100%"
                   frameBorder="0"
                   style={{ border: 0 }}
-                  src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY_HERE&q=${encodeURIComponent(tournament.location + ' ' + tournament.neighborhood)}`}
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(tournament.location + ' ' + (tournament.neighborhood || '') + ' Moçambique')}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                   allowFullScreen
                 ></iframe>
-                {/* Nota: Substituir YOUR_API_KEY_HERE por uma chave real ou usar Embed sem chave (limite menor) */}
-                <div style={{ padding: 20, textAlign: 'center', fontSize: 13, color: 'var(--text-muted)' }}>
-                  💡 Dica: Se o mapa não carregar, verifica o nome do campo nas configurações.
+                <div style={{ padding: 12, textAlign: 'center', fontSize: 13, color: 'var(--text-muted)' }}>
+                  💡 Dica: Podes usar a roda do rato ou os dedos para fazer zoom no mapa.
                 </div>
               </div>
             </div>
@@ -1005,7 +1380,21 @@ function TournamentEditModal({ tournament, onClose, onSaved }) {
   const [form, setForm] = useState({ ...tournament });
   const [loading, setLoading] = useState(false);
 
+  const provinces = [
+    'Maputo Cidade', 'Maputo Província', 'Gaza', 'Inhambane', 'Sofala', 
+    'Manica', 'Tete', 'Zambézia', 'Nampula', 'Niassa', 'Cabo Delgado'
+  ];
+
+  const formatOptions = [
+    { value: 'groups', label: '📊 Fase de Grupos' },
+    { value: 'knockout', label: '⚔️ Mata-mata' },
+    { value: 'groups_knockout', label: '🏆 Grupos + Mata-mata' },
+  ];
+
   const handleSave = async () => {
+    if (!form.name || !form.neighborhood || !form.location) {
+      return toast.error('Preenche os campos obrigatórios (Nome, Bairro, Local).');
+    }
     setLoading(true);
     try {
       const res = await api.put(`/tournaments/${tournament._id}`, form);
@@ -1017,7 +1406,7 @@ function TournamentEditModal({ tournament, onClose, onSaved }) {
 
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal" style={{ maxWidth: 500 }}>
+      <div className="modal" style={{ maxWidth: 560, maxHeight: '90vh', overflowY: 'auto' }}>
         <div className="modal-header">
           <h2 className="modal-title">Editar Torneio</h2>
           <button className="modal-close" onClick={onClose}><X size={18} /></button>
@@ -1035,38 +1424,82 @@ function TournamentEditModal({ tournament, onClose, onSaved }) {
               <input type="checkbox" checked={form.isOfficial} onChange={e => setForm({...form, isOfficial: e.target.checked})} style={{ width: 24, height: 24, accentColor: 'var(--yellow)' }} />
             </div>
           )}
+
+          {/* Nome */}
           <div className="form-group">
-            <label className="form-label">Nome do Torneio</label>
+            <label className="form-label">Nome do Torneio *</label>
             <input className="form-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
           </div>
-          <div className="form-grid form-grid-2">
+
+          {/* Localização */}
+          <div className="form-grid form-grid-3">
             <div className="form-group">
-              <label className="form-label">Cidade</label>
-              <input className="form-input" value={form.city} onChange={e => setForm({...form, city: e.target.value})} />
+              <label className="form-label">Província</label>
+              <select className="form-select" value={form.province || 'Maputo Cidade'} onChange={e => setForm({...form, province: e.target.value})}>
+                {provinces.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
             </div>
             <div className="form-group">
-              <label className="form-label">Bairro</label>
+              <label className="form-label">Bairro *</label>
               <input className="form-input" value={form.neighborhood} onChange={e => setForm({...form, neighborhood: e.target.value})} />
             </div>
+            <div className="form-group">
+              <label className="form-label">Local / Campo *</label>
+              <input className="form-input" value={form.location} onChange={e => setForm({...form, location: e.target.value})} />
+            </div>
           </div>
-          <div className="form-group">
-            <label className="form-label">Local / Campo</label>
-            <input className="form-input" value={form.location} onChange={e => setForm({...form, location: e.target.value})} />
-          </div>
+
+          {/* Formato e Nº de Equipas */}
           <div className="form-grid form-grid-2">
             <div className="form-group">
-              <label className="form-label">Taxa de Inscrição</label>
-              <input type="number" className="form-input" value={form.registrationFee} onChange={e => setForm({...form, registrationFee: Number(e.target.value)})} />
+              <label className="form-label">Formato</label>
+              <select className="form-select" value={form.format} onChange={e => setForm({...form, format: e.target.value})}
+                disabled={tournament.status === 'active'}
+                title={tournament.status === 'active' ? 'Não podes alterar o formato com o torneio a decorrer' : ''}>
+                {formatOptions.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+              </select>
+              {tournament.status === 'active' && <span style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>🔒 Bloqueado (torneio ativo)</span>}
             </div>
             <div className="form-group">
-              <label className="form-label">Prémio</label>
-              <input className="form-input" value={form.prize} onChange={e => setForm({...form, prize: e.target.value})} />
+              <label className="form-label">Nº Máximo de Equipas</label>
+              <select className="form-select" value={form.maxTeams} onChange={e => setForm({...form, maxTeams: Number(e.target.value)})}
+                disabled={tournament.status === 'active'}
+                title={tournament.status === 'active' ? 'Não podes alterar o nº de equipas com o torneio a decorrer' : ''}>
+                {[4,6,8,10,12,16,20,24,32].map(n => <option key={n} value={n}>{n} equipas</option>)}
+              </select>
+              {tournament.status === 'active' && <span style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>🔒 Bloqueado (torneio ativo)</span>}
             </div>
           </div>
-          <div className="form-group">
-            <label className="form-label">Link de Comunicação</label>
-            <input className="form-input" value={form.contactLink} onChange={e => setForm({...form, contactLink: e.target.value})} />
+
+          {/* Data e Financeiro */}
+          <div className="form-grid form-grid-2">
+            <div className="form-group">
+              <label className="form-label">Data de Início</label>
+              <input type="date" className="form-input" value={form.startDate ? new Date(form.startDate).toISOString().split('T')[0] : ''} onChange={e => setForm({...form, startDate: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Taxa de Inscrição (MT)</label>
+              <input type="number" className="form-input" value={form.registrationFee} onChange={e => setForm({...form, registrationFee: Number(e.target.value)})} />
+            </div>
           </div>
+
+          <div className="form-grid form-grid-2">
+            <div className="form-group">
+              <label className="form-label">Prémio / Troféu</label>
+              <input className="form-input" value={form.prize || ''} onChange={e => setForm({...form, prize: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Link de Comunicação</label>
+              <input className="form-input" placeholder="WhatsApp / Telegram" value={form.contactLink || ''} onChange={e => setForm({...form, contactLink: e.target.value})} />
+            </div>
+          </div>
+
+          {/* Descrição */}
+          <div className="form-group">
+            <label className="form-label">Descrição</label>
+            <textarea className="form-input" rows={3} value={form.description || ''} onChange={e => setForm({...form, description: e.target.value})} style={{ resize: 'vertical' }} />
+          </div>
+
           <button className="btn btn-primary" onClick={handleSave} disabled={loading} style={{ width: '100%', justifyContent: 'center' }}>
             {loading ? 'A guardar...' : 'Guardar Alterações'}
           </button>
@@ -1489,7 +1922,6 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
                   </div>
                   <button onClick={() => handleRemoveEvent(e.id || e._id)} style={{ background: 'none', color: 'var(--red)', opacity: 0.6 }}><X size={14} /></button>
                 </div>
-
               ))
             )}
           </div>
