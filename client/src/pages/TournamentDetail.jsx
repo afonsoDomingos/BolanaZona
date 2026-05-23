@@ -792,30 +792,30 @@ export default function TournamentDetail() {
                           {(() => {
                             const finalMatch = finalMatches[0];
                             return (
-                              <div className="bracket-center-final" style={{ background: 'rgba(10, 11, 92, 0.5)', backdropFilter: 'blur(20px)', border: 'none', padding: '16px', borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, position: 'relative', zIndex: 5, boxShadow: '0 8px 32px rgba(0,0,0,0.6)', minWidth: 120 }}>
+                              <div className="bracket-center-final">
                                 {/* 4 cantos neon — um span por canto */}
                                 <span className="final-corner final-corner--tl" />
                                 <span className="final-corner final-corner--tr" />
                                 <span className="final-corner final-corner--bl" />
                                 <span className="final-corner final-corner--br" />
 
-                                <div className="bracket-header-title" style={{ textAlign: 'center', width: '100%', marginBottom: 8 }}>
-                                  <div style={{ fontSize: 12, letterSpacing: 4, fontWeight: 300, color: '#fff', textTransform: 'uppercase' }}>ROAD TO</div>
-                                  <div style={{ fontSize: 20, fontFamily: 'serif', fontStyle: 'italic', fontWeight: 700, color: '#fff', marginTop: 4 }}>{tournament.name}</div>
+                                <div className="bracket-header-title" style={{ textAlign: 'center', width: '100%', marginBottom: 10 }}>
+                                  <div className="bracket-final-subtitle">ROAD TO</div>
+                                  <div className="bracket-final-title">{tournament.name}</div>
                                 </div>
                                 
                                 {/* Home Team (Top) */}
-                                <div className="bracket-team-logo" style={{ borderColor: finalMatch?.homeTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff', width: 48, height: 48, fontSize: 20 }}>
+                                <div className="bracket-team-logo bracket-final-team-logo" style={{ borderColor: finalMatch?.homeTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
                                   {finalMatch?.homeTeam?.logo ? <img src={finalMatch.homeTeam.logo} alt="" /> : (finalMatch?.homeTeam?.name ? finalMatch.homeTeam.name.charAt(0).toUpperCase() : '?')}
                                 </div>
                                 
-                                <div className="bracket-trophy-column" style={{ margin: '16px 0' }}>
+                                <div className="bracket-trophy-column" style={{ margin: '10px 0' }}>
                                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                    <img src="/TACA.png" alt="Troféu" style={{ width: 70, height: 'auto', filter: 'drop-shadow(0 0 20px rgba(255, 214, 0, 0.4))', marginBottom: 6 }} />
-                                    <div style={{ fontSize: 12, fontFamily: 'serif', fontStyle: 'italic', fontWeight: 700, color: '#fff', marginTop: 8 }}>{tournament.name}</div>
-                                    <div style={{ fontSize: 10, letterSpacing: 2, fontWeight: 300, color: '#fff', marginTop: 4 }}>FINAL</div>
+                                    <img src="/TACA.png" alt="Troféu" className="bracket-final-trophy-img" />
+                                    <div className="bracket-final-title">{tournament.name}</div>
+                                    <div className="bracket-final-subtitle">FINAL</div>
                                     {crownedChampion && (
-                                      <div style={{ marginTop: 10, fontWeight: 900, color: crownedChampion.color || 'var(--yellow)', fontSize: 16 }}>
+                                      <div style={{ marginTop: 12, fontWeight: 900, color: crownedChampion.color || 'var(--yellow)', fontSize: 16 }}>
                                         {crownedChampion.name}
                                       </div>
                                     )}
@@ -823,7 +823,7 @@ export default function TournamentDetail() {
                                 </div>
 
                                 {/* Away Team (Bottom) */}
-                                <div className="bracket-team-logo" style={{ borderColor: finalMatch?.awayTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff', width: 48, height: 48, fontSize: 20 }}>
+                                <div className="bracket-team-logo bracket-final-team-logo" style={{ borderColor: finalMatch?.awayTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
                                   {finalMatch?.awayTeam?.logo ? <img src={finalMatch.awayTeam.logo} alt="" /> : (finalMatch?.awayTeam?.name ? finalMatch.awayTeam.name.charAt(0).toUpperCase() : '?')}
                                 </div>
                               </div>

@@ -467,22 +467,22 @@ export default function PublicTournament() {
                           {(() => {
                             const finalMatch = finalMatches[0];
                             return (
-                              <div className="bracket-center-final" style={{ background: 'rgba(10, 11, 92, 0.5)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', padding: '20px', borderRadius: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, position: 'relative', zIndex: 5, boxShadow: '0 8px 32px rgba(0,0,0,0.6)', minWidth: 140 }}>
+                              <div className="bracket-center-final">
                                 <div className="bracket-header-title" style={{ textAlign: 'center', width: '100%', marginBottom: 10 }}>
-                                  <div style={{ fontSize: 14, letterSpacing: 4, fontWeight: 300, color: '#fff', textTransform: 'uppercase' }}>ROAD TO</div>
-                                  <div style={{ fontSize: 24, fontFamily: 'serif', fontStyle: 'italic', fontWeight: 700, color: '#fff', marginTop: 4 }}>{tournament.name}</div>
+                                  <div className="bracket-final-subtitle">ROAD TO</div>
+                                  <div className="bracket-final-title">{tournament.name}</div>
                                 </div>
                                 
                                 {/* Home Team (Top) */}
-                                <div className="bracket-team-logo" style={{ borderColor: finalMatch?.homeTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff', width: 60, height: 60, fontSize: 24 }}>
+                                <div className="bracket-team-logo bracket-final-team-logo" style={{ borderColor: finalMatch?.homeTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
                                   {finalMatch?.homeTeam?.logo ? <img src={finalMatch.homeTeam.logo} alt="" /> : (finalMatch?.homeTeam?.name ? finalMatch.homeTeam.name.charAt(0).toUpperCase() : '?')}
                                 </div>
                                 
-                                <div className="bracket-trophy-column" style={{ margin: '20px 0' }}>
+                                <div className="bracket-trophy-column" style={{ margin: '10px 0' }}>
                                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                    <img src="/TACA.png" alt="Troféu" style={{ width: 90, height: 'auto', filter: 'drop-shadow(0 0 20px rgba(255, 214, 0, 0.4))', marginBottom: 8 }} />
-                                    <div style={{ fontSize: 14, fontFamily: 'serif', fontStyle: 'italic', fontWeight: 700, color: '#fff', marginTop: 8 }}>{tournament.name}</div>
-                                    <div style={{ fontSize: 10, letterSpacing: 2, fontWeight: 300, color: '#fff', marginTop: 4 }}>FINAL</div>
+                                    <img src="/TACA.png" alt="Troféu" className="bracket-final-trophy-img" />
+                                    <div className="bracket-final-title">{tournament.name}</div>
+                                    <div className="bracket-final-subtitle">FINAL</div>
                                     {crownedChampion && (
                                       <div style={{ marginTop: 12, fontWeight: 900, color: crownedChampion.color || 'var(--yellow)', fontSize: 18 }}>
                                         {crownedChampion.name}
@@ -492,7 +492,7 @@ export default function PublicTournament() {
                                 </div>
 
                                 {/* Away Team (Bottom) */}
-                                <div className="bracket-team-logo" style={{ borderColor: finalMatch?.awayTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff', width: 60, height: 60, fontSize: 24 }}>
+                                <div className="bracket-team-logo bracket-final-team-logo" style={{ borderColor: finalMatch?.awayTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
                                   {finalMatch?.awayTeam?.logo ? <img src={finalMatch.awayTeam.logo} alt="" /> : (finalMatch?.awayTeam?.name ? finalMatch.awayTeam.name.charAt(0).toUpperCase() : '?')}
                                 </div>
                               </div>
