@@ -179,6 +179,71 @@ export default function Landing() {
       {/* Bracket Preview */}
       <LandingBracketPreview />
 
+      {/* Mission Section */}
+      <section style={{ position: 'relative', overflow: 'hidden', padding: 0 }}>
+        {/* Background image with overlay */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'url(/banner4mabinhas.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
+          filter: 'brightness(0.35)',
+          zIndex: 0
+        }} />
+        {/* Top fade */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to bottom, var(--bg-main), transparent)', zIndex: 1 }} />
+        {/* Bottom fade */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to top, var(--bg-main), transparent)', zIndex: 1 }} />
+
+        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '120px 24px', maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+          {/* Flag / origin badge */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: 'rgba(0,200,83,0.12)', border: '1px solid rgba(0,200,83,0.3)', padding: '8px 20px', borderRadius: 50, marginBottom: 32 }}>
+            <span style={{ fontSize: 22 }}>🇲🇿</span>
+            <span style={{ color: 'var(--green)', fontWeight: 800, fontSize: 12, letterSpacing: 2, textTransform: 'uppercase' }}>Feito para Moçambique</span>
+          </div>
+
+          <h2 style={{ fontSize: 'clamp(32px, 6vw, 56px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 28, letterSpacing: '-0.5px' }}>
+            Os próximos{' '}
+            <span style={{ color: 'var(--green)', textShadow: '0 0 30px rgba(0,200,83,0.5)' }}>Craques Nacionais</span>
+            <br />nascem das comunidades.
+          </h2>
+
+          <p style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', color: 'rgba(255,255,255,0.75)', maxWidth: 680, margin: '0 auto 48px', lineHeight: 1.8 }}>
+            A nossa missão é criar o espaço onde esse talento se revela.
+            De bairro em bairro, de torneio em torneio — a <strong style={{ color: '#fff' }}>Bola na Zona</strong> é a plataforma que organiza, regista e projecta os jogadores que um dia vão
+            vestir a camisola <strong style={{ color: '#fff' }}>Mamba Verde</strong>.
+          </p>
+
+          {/* 3 Pillars */}
+          <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap' }}>
+            {[
+              { emoji: '🏘️', title: 'Das Comunidades', desc: 'O talento existe em cada bairro. Nós damos-lhe um palco.' },
+              { emoji: '📊', title: 'Com Dados Reais', desc: 'Estatísticas, golos e classificações registados digitalmente.' },
+              { emoji: '🏆', title: 'Para o Futuro', desc: 'Jogadores visíveis. Recrutadores atentos. Caminhos abertos.' },
+            ].map((p, i) => (
+              <div key={i} style={{
+                background: 'rgba(255,255,255,0.05)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 20,
+                padding: '28px 24px',
+                flex: '1 1 220px',
+                maxWidth: 260,
+                textAlign: 'center',
+                transition: 'transform 0.3s ease, border-color 0.3s ease',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.borderColor = 'rgba(0,200,83,0.4)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+              >
+                <div style={{ fontSize: 36, marginBottom: 12 }}>{p.emoji}</div>
+                <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 8, color: '#fff' }}>{p.title}</div>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>{p.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section style={{ padding: '80px 0' }}>
         <div className="container">
