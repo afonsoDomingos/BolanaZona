@@ -244,13 +244,13 @@ export default function PublicTournament() {
         )}
 
         {/* Navigation Tabs */}
-        <div className="tabs" style={{ marginBottom: 40, justifyContent: 'center', background: 'rgba(255,255,255,0.03)', padding: 6, borderRadius: 100, maxWidth: 500, margin: '0 auto 40px' }}>
+        <div className="tabs" style={{ marginBottom: 20, justifyContent: 'center', background: 'rgba(255,255,255,0.03)', padding: 4, borderRadius: 100, maxWidth: 420, margin: '0 auto 20px' }}>
           {[
-            ['standings', <BarChart2 size={16} />, 'Classificação'],
-            ['calendar', <Calendar size={16} />, 'Jogos'],
-            ['teams', <Users size={16} />, 'Equipas']
+            ['standings', <BarChart2 size={14} />, 'Classificação'],
+            ['calendar', <Calendar size={14} />, 'Jogos'],
+            ['teams', <Users size={14} />, 'Equipas']
           ].map(([key, icon, label]) => (
-            <button key={key} className={`tab ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)} style={{ borderRadius: 100, flex: 1, height: 44 }}>
+            <button key={key} className={`tab ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)} style={{ borderRadius: 100, flex: 1, height: 34, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
               {icon} {label}
             </button>
           ))}
@@ -322,7 +322,7 @@ export default function PublicTournament() {
               <div className="empty-state"><h3>Calendário em breve</h3><p>O organizador está a preparar as jornadas.</p></div>
             ) : (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 12 }}>
                   <div className="view-switcher" style={{ display: 'flex', gap: 4 }}>
                     <button 
                       className={`switcher-btn ${viewMode === 'bracket' ? 'active' : ''}`} 
@@ -340,10 +340,10 @@ export default function PublicTournament() {
                   {viewMode === 'bracket' && (
                     <button 
                       onClick={() => captureImage('print-bracket', `Arvore_${tournament.name}`)} 
-                      className="btn btn-secondary" 
-                      style={{ border: '1px solid var(--green)', color: 'var(--green)', fontSize: 12, padding: '4px 12px', height: 32, width: 'auto', flex: 'none' }}
+                      className="btn btn-secondary btn-sm" 
+                      style={{ border: '1px solid var(--green)', color: 'var(--green)', fontSize: 11, padding: '3px 10px', height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', gap: 6, width: 'auto', flex: 'none' }}
                     >
-                      <Camera size={14} /> Screenshot
+                      <Camera size={13} /> Screenshot
                     </button>
                   )}
                 </div>
