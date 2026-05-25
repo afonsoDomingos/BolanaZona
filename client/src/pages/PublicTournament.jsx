@@ -54,30 +54,34 @@ export default function PublicTournament() {
     return () => clearInterval(interval);
   }, [shareCode, showRegisterAction, data?.matches?.length]);
 
-  // Auto-zoom bracket — entire tree always visible, no scrolling
+  // Auto-zoom bracket — entire tree always fully visible
   useEffect(() => {
     const updateZoom = () => {
       const el = bracketContainerRef.current;
-      const scroller = bracketScrollRef.current;
-      if (!el || !scroller) return;
-      // Reset zoom so we measure the real natural width
+      if (!el) return;
+      // Reset zoom to measure natural content width
       el.style.zoom = '1';
       requestAnimationFrame(() => {
-        // Measure on the scroll container (overflow-x:auto) — gets the true full width
-        const contentWidth = scroller.scrollWidth;
-        const availableWidth = window.innerWidth;
-        // Always scale to fit; cap at 0.78 so it's never too large
-        const zoom = Math.min(availableWidth / contentWidth, 0.78);
-        setBracketZoom(zoom);
-        el.style.zoom = String(zoom);
+        requestAnimationFrame(() => {
+          // Double rAF ensures layout is fully recalculated after zoom reset
+          const contentWidth = el.scrollWidth;
+          const availableWidth = window.innerWidth;
+          // If content wider than viewport: zoom to fit exactly
+          // If content fits: max zoom of 0.75 to keep it compact
+          const zoom = contentWidth > availableWidth
+            ? availableWidth / contentWidth
+            : Math.min(availableWidth / contentWidth, 0.75);
+          setBracketZoom(zoom);
+          el.style.zoom = String(zoom);
+        });
       });
     };
-    // Two passes: one early (layout likely ready) and one late (data may arrive slowly)
     const t1 = setTimeout(updateZoom, 150);
-    const t2 = setTimeout(updateZoom, 800);
+    const t2 = setTimeout(updateZoom, 900);
     window.addEventListener('resize', updateZoom);
     return () => { clearTimeout(t1); clearTimeout(t2); window.removeEventListener('resize', updateZoom); };
   }, [data, viewMode]);
+
 
 
   const copyLink = () => {
