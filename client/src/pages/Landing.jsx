@@ -54,32 +54,34 @@ function HistoricNewsCard() {
           backdropFilter: 'blur(12px)',
         }}
       >
-        {/* Pulsing star badge */}
+        {/* Clean Icon */}
         <div style={{
           flexShrink: 0,
-          width: 44, height: 44,
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, #ffd700, #ff8c00)',
+          width: 48, height: 48,
+          borderRadius: 14,
+          background: 'rgba(255,214,0,0.1)',
+          border: '1px solid rgba(255,214,0,0.2)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 22,
-          boxShadow: '0 0 20px rgba(255,200,0,0.5)',
-          animation: 'pulse-gold 2s ease-in-out infinite',
-        }}>⭐</div>
+          color: 'var(--yellow)'
+        }}>
+          <Trophy size={24} />
+        </div>
+        
+        {/* Text Content */}
         <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <span style={{ background: 'rgba(255,200,0,0.15)', border: '1px solid rgba(255,200,0,0.4)', color: '#ffd700', fontSize: 10, fontWeight: 900, padding: '2px 10px', borderRadius: 50, letterSpacing: 1, textTransform: 'uppercase' }}>
-              1ª vez na história
-            </span>
-            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>Futebol Moçambicano</span>
+          <div style={{ color: 'var(--yellow)', fontSize: 11, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4 }}>
+            Momento Histórico
           </div>
-          <div style={{ color: '#fff', fontWeight: 800, fontSize: 15, lineHeight: 1.4 }}>
-            🇲🇿 Mambinhas garantem apuramento inédito ao Mundial Sub-17 Qatar 2026
+          <div style={{ color: '#fff', fontWeight: 800, fontSize: 16, lineHeight: 1.3 }}>
+            Mambinhas garantem apuramento inédito ao Mundial Sub-17 Qatar 2026
           </div>
         </div>
+        
+        {/* Toggle Icon */}
         <div style={{
-          color: 'var(--green)', fontSize: 22, fontWeight: 300,
+          color: 'rgba(255,255,255,0.4)', fontSize: 24, fontWeight: 300,
           transform: open ? 'rotate(45deg)' : 'rotate(0deg)',
-          transition: 'transform 0.3s ease',
+          transition: 'all 0.3s ease',
           flexShrink: 0,
         }}>+</div>
       </button>
@@ -96,10 +98,9 @@ function HistoricNewsCard() {
         backdropFilter: 'blur(16px)',
       }}>
         <div style={{ padding: '24px 28px 28px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <span style={{ fontSize: 20 }}>🏆</span>
-            <span style={{ fontSize: 12, color: 'var(--green)', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>CAN Sub-17 · Rabat, Marrocos</span>
-            <span style={{ marginLeft: 'auto', fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>Moçambique 1–1 (5–4 pen.) Etiópia</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+            <span style={{ fontSize: 12, color: 'var(--green)', fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase' }}>CAN Sub-17 · Rabat, Marrocos</span>
+            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>Moçambique 1–1 (5–4 pen.) Etiópia</span>
           </div>
           {HISTORIC_ARTICLE.split('\n\n').map((para, i) => (
             <p key={i} style={{ color: 'rgba(255,255,255,0.78)', fontSize: 14, lineHeight: 1.85, marginBottom: 14 }}>
@@ -305,12 +306,7 @@ export default function Landing() {
         {/* Bottom fade */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to top, var(--bg-main), transparent)', zIndex: 1 }} />
 
-        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '80px 24px', maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
-          {/* Flag / origin badge */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: 'rgba(0,200,83,0.12)', border: '1px solid rgba(0,200,83,0.3)', padding: '8px 20px', borderRadius: 50, marginBottom: 32 }}>
-            <span style={{ fontSize: 22 }}>🇲🇿</span>
-            <span style={{ color: 'var(--green)', fontWeight: 800, fontSize: 12, letterSpacing: 2, textTransform: 'uppercase' }}>Feito para Moçambique</span>
-          </div>
+        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '40px 24px', maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
 
           <h2 className="font-syne" style={{ fontSize: 'clamp(32px, 6vw, 56px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 28, letterSpacing: '-0.5px' }}>
             Os próximos{' '}

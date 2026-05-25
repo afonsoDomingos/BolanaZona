@@ -394,69 +394,66 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
 .bracket-scroll-container {
   overflow-x: auto;
+  overflow-y: hidden;
   width: 100%;
-  padding-bottom: 20px;
-  margin-top: 16px;
-  cursor: grab;
-}
-.bracket-scroll-container:active {
-  cursor: grabbing;
+  padding-bottom: 12px;
+  margin-top: 8px;
 }
 .bracket-container {
   display: flex;
-  gap: 30px;
-  padding: 40px 20px;
+  gap: 16px;
+  padding: 20px 12px;
   min-width: max-content;
   align-items: center;
   justify-content: center;
 }
 .bracket-left-wing, .bracket-right-wing {
   display: flex;
-  gap: 30px;
+  gap: 16px;
   align-items: stretch;
 }
 .bracket-center-final {
   background: rgba(10, 11, 92, 0.5);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 24px;
+  padding: 12px;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 8px;
   position: relative;
   z-index: 5;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-  min-width: 140px;
+  min-width: 110px;
 }
 
 .bracket-final-team-logo {
-  width: 54px !important;
-  height: 54px !important;
-  font-size: 22px !important;
+  width: 38px !important;
+  height: 38px !important;
+  font-size: 16px !important;
 }
 
 .bracket-final-trophy-img {
-  width: 80px;
+  width: 52px;
   height: auto;
   filter: drop-shadow(0 0 20px rgba(255, 214, 0, 0.4));
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .bracket-final-title {
-  font-size: 22px;
+  font-size: 14px;
   font-family: serif;
   font-style: italic;
   font-weight: 700;
   color: #fff;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .bracket-final-subtitle {
-  font-size: 12px;
-  letter-spacing: 4px;
+  font-size: 8px;
+  letter-spacing: 2px;
   font-weight: 300;
   color: #fff;
   text-transform: uppercase;
@@ -512,22 +509,22 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  min-width: 90px;
+  min-width: 68px;
   flex-shrink: 0;
   position: relative;
 }
 .bracket-round-title {
   text-align: center;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 800;
   color: var(--green);
   text-transform: uppercase;
   letter-spacing: 1px;
   background: rgba(0, 200, 83, 0.06);
   border: 1px solid rgba(0, 200, 83, 0.15);
-  padding: 4px 8px;
+  padding: 3px 6px;
   border-radius: 100px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
   width: fit-content;
   align-self: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -569,7 +566,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   border-top: 2px solid #00d2ff;
   border-right: 2px solid #00d2ff;
   border-bottom: 2px solid #00d2ff;
-  border-radius: 0 4px 4px 0;
+  border-radius: 0 8px 8px 0;
   box-sizing: border-box;
   box-shadow: 3px 0 10px -1px rgba(0, 210, 255, 0.8), 0 0 20px rgba(0, 80, 255, 0.4);
   z-index: 0;
@@ -613,7 +610,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   border-top: 2px solid #00d2ff;
   border-left: 2px solid #00d2ff;
   border-bottom: 2px solid #00d2ff;
-  border-radius: 4px 0 0 4px;
+  border-radius: 8px 0 0 8px;
   box-sizing: border-box;
   box-shadow: -3px 0 10px -1px rgba(0, 210, 255, 0.8), 0 0 20px rgba(0, 80, 255, 0.4);
   z-index: 0;
@@ -643,10 +640,10 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   background: rgba(10, 11, 92, 0.2);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 12px 0;
-  width: 76px;
-  min-height: 150px;
+  border-radius: 10px;
+  padding: 8px 0;
+  width: 62px;
+  min-height: 110px;
   height: auto;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   transition: all 0.25s ease;
@@ -690,8 +687,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   width: 100%;
 }
 .bracket-team-logo {
-  width: 32px;
-  height: 32px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(8px);
@@ -699,9 +696,9 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  font-size: 14px;
+  font-size: 10px;
   flex-shrink: 0;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
 }
@@ -714,23 +711,23 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   object-fit: cover;
 }
 .bracket-team-name {
-  font-size: 10px;
+  font-size: 8px;
   color: rgba(255, 255, 255, 0.8);
   text-align: center;
-  max-width: 60px;
+  max-width: 54px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 .bracket-team-score {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 800;
   color: #fff;
   background: rgba(0, 0, 0, 0.3);
-  padding: 2px 6px;
+  padding: 1px 4px;
   border-radius: 4px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 /* Destaque para vencedor */
@@ -792,15 +789,15 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-width: 160px;
+  min-width: 110px;
   flex-shrink: 0;
-  padding: 0 16px;
+  padding: 0 8px;
 }
 .bracket-trophy-card {
   background: radial-gradient(circle at center, rgba(255,214,0,0.08) 0%, rgba(13,21,41,0.9) 100%);
   border: 2px dashed rgba(255, 214, 0, 0.2);
-  border-radius: 24px;
-  padding: 40px 24px;
+  border-radius: 16px;
+  padding: 20px 14px;
   text-align: center;
   width: 100%;
   box-shadow: 0 15px 40px rgba(0,0,0,0.5);

@@ -9,6 +9,8 @@ export default function LandingBracketPreview() {
   const [badgeText, setBadgeText] = useState('');
   const titleFull = 'A Emoção do Mata-Mata';
 
+  const bracketContainerRef = useRef(null);
+
   useEffect(() => {
     async function loadLatestBracket() {
       try {
@@ -43,6 +45,29 @@ export default function LandingBracketPreview() {
     }, 55);
     return () => clearInterval(interval);
   }, [tournament]);
+
+  // Auto-zoom bracket to fit viewport width on mobile
+  useEffect(() => {
+    const updateZoom = () => {
+      const el = bracketContainerRef.current;
+      if (!el) return;
+      // Reset zoom first so we measure the real content width
+      el.style.zoom = '1';
+      const contentWidth = el.scrollWidth;
+      const viewportWidth = window.innerWidth;
+      
+      // On desktop we might want 0.85 scale, on mobile auto-zoom
+      if (contentWidth > viewportWidth) {
+        const zoom = (viewportWidth / contentWidth) * 0.97;
+        el.style.zoom = String(zoom);
+      } else {
+        el.style.zoom = '0.85'; // default for desktop landing
+      }
+    };
+    const timer = setTimeout(updateZoom, 300);
+    window.addEventListener('resize', updateZoom);
+    return () => { clearTimeout(timer); window.removeEventListener('resize', updateZoom); };
+  }, [matches, tournament]);
 
   if (loading || matches.length === 0) {
     return null; 
@@ -174,7 +199,7 @@ export default function LandingBracketPreview() {
   const crownedChampion = tournament.winner || null;
 
   return (
-    <section style={{ padding: '100px 0', background: 'var(--bg-main)' }}>
+    <section style={{ padding: '40px 0', background: 'var(--bg-main)' }}>
       <div className="container" style={{ textAlign: 'center', marginBottom: 40 }}>
         <h2 className="font-syne" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 800, marginBottom: 16 }}>
           <span>{titleText}</span>
@@ -219,19 +244,25 @@ export default function LandingBracketPreview() {
         backgroundImage: 'url(/loginbg1.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        borderTop: '1px solid rgba(255,255,255,0.05)',
-        borderBottom: '1px solid rgba(255,255,255,0.05)',
-        minHeight: 'calc(100vh - 280px)',
+        padding: '20px 0',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 150px, black calc(100% - 150px), transparent 100%)',
-        maskImage: 'linear-gradient(to bottom, transparent 0%, black 150px, black calc(100% - 150px), transparent 100%)'
+        overflowX: 'auto',
+        overflowY: 'hidden'
       }}>
         {/* Dark overlay */}
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,5,36,0.85)', zIndex: 0 }} />
         
-        <div className="bracket-container" style={{ position: 'relative', zIndex: 1, transform: 'scale(0.85)', transformOrigin: 'center center' }}>
+        <div 
+          ref={bracketContainerRef}
+          className="bracket-container" 
+          style={{ 
+            position: 'relative', 
+            zIndex: 1,
+            transition: 'zoom 0.3s ease'
+          }}
+        >
           <div className="bracket-left-wing">
             {leftColumns}
           </div>

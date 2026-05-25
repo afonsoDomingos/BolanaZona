@@ -24,7 +24,8 @@ export default function PublicTournament() {
   const [notFound, setNotFound] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [viewMode, setViewMode] = useState('bracket');
-  const bracketContainerRef = useRef(null);
+  const bracketContainerRef = useRef(null); // inner bracket-container
+  const bracketScrollRef = useRef(null);    // outer scroll container
   const [bracketZoom, setBracketZoom] = useState(1);
 
 
@@ -53,27 +54,29 @@ export default function PublicTournament() {
     return () => clearInterval(interval);
   }, [shareCode, showRegisterAction, data?.matches?.length]);
 
-  // Auto-zoom bracket to fit viewport width on mobile
+  // Auto-zoom bracket — entire tree always visible, no scrolling
   useEffect(() => {
     const updateZoom = () => {
       const el = bracketContainerRef.current;
-      if (!el) return;
-      // Reset zoom first so we measure the real content width
+      const scroller = bracketScrollRef.current;
+      if (!el || !scroller) return;
+      // Reset zoom so we measure the real natural width
       el.style.zoom = '1';
-      const contentWidth = el.scrollWidth;
-      const viewportWidth = window.innerWidth;
-      if (contentWidth > viewportWidth) {
-        const zoom = (viewportWidth / contentWidth) * 0.97; // 3% breathing room
+      requestAnimationFrame(() => {
+        // Measure on the scroll container (overflow-x:auto) — gets the true full width
+        const contentWidth = scroller.scrollWidth;
+        const availableWidth = window.innerWidth;
+        // Always scale to fit; cap at 0.78 so it's never too large
+        const zoom = Math.min(availableWidth / contentWidth, 0.78);
         setBracketZoom(zoom);
         el.style.zoom = String(zoom);
-      } else {
-        setBracketZoom(1);
-        el.style.zoom = '1';
-      }
+      });
     };
-    const timer = setTimeout(updateZoom, 300);
+    // Two passes: one early (layout likely ready) and one late (data may arrive slowly)
+    const t1 = setTimeout(updateZoom, 150);
+    const t2 = setTimeout(updateZoom, 800);
     window.addEventListener('resize', updateZoom);
-    return () => { clearTimeout(timer); window.removeEventListener('resize', updateZoom); };
+    return () => { clearTimeout(t1); clearTimeout(t2); window.removeEventListener('resize', updateZoom); };
   }, [data, viewMode]);
 
 
@@ -143,7 +146,12 @@ export default function PublicTournament() {
   const { tournament, teams, matches, standings } = data;
 
   return (
-    <div className="animate-fade-in" style={{ minHeight: '100vh', background: 'var(--bg-main)' }}>
+    <div className="animate-fade-in" style={{ minHeight: '100vh', background: 'var(--bg-main)', position: 'relative' }}>
+      {/* Smooth transition to white navbar */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 40, background: 'linear-gradient(to bottom, #ffffff, transparent)', pointerEvents: 'none', zIndex: 0 }} />
+      {/* Smooth transition to white footer */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60, background: 'linear-gradient(to top, #ffffff, transparent)', pointerEvents: 'none', zIndex: 10 }} />
+      
       {/* Dynamic Header / Hero - Compact */}
       <div style={{ 
         position: 'relative', 
@@ -257,8 +265,8 @@ export default function PublicTournament() {
               <div style={{ position: 'relative' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 16 }}>
                   <h3 className="font-syne" style={{ fontSize: 20, fontWeight: 800 }}>Classificação Oficial</h3>
-                  <button onClick={() => captureImage('print-standings', `Classificacao_${tournament.name}`)} className="btn btn-secondary btn-sm" style={{ border: '1px solid var(--green)', color: 'var(--green)' }}>
-                    <Camera size={14} /> Guardar Tabela
+                  <button onClick={() => captureImage('print-standings', `Classificacao_${tournament.name}`)} className="btn btn-secondary btn-sm" style={{ border: '1px solid var(--green)', color: 'var(--green)', fontSize: 12, padding: '6px 12px', height: 'auto', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Camera size={14} /> Screenshot
                   </button>
                 </div>
                 <div id="print-standings" className="table-wrapper card-glass" style={{ borderRadius: 24, padding: 20 }}>
@@ -332,28 +340,28 @@ export default function PublicTournament() {
                   {viewMode === 'bracket' && (
                     <button 
                       onClick={() => captureImage('print-bracket', `Arvore_${tournament.name}`)} 
-                      className="btn btn-secondary btn-sm" 
-                      style={{ border: '1px solid var(--green)', color: 'var(--green)' }}
+                      className="btn btn-secondary" 
+                      style={{ border: '1px solid var(--green)', color: 'var(--green)', fontSize: 12, padding: '4px 12px', height: 32, width: 'auto', flex: 'none' }}
                     >
-                      <Camera size={14} /> Guardar Árvore
+                      <Camera size={14} /> Screenshot
                     </button>
                   )}
                 </div>
                 {viewMode === 'bracket' ? (
-                  <div id="print-bracket" className="bracket-scroll-container full-width-bleed" style={{
-                    position: 'relative',
-                    backgroundImage: 'url(/loginbg1.png)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    borderTop: '1px solid rgba(255,255,255,0.05)',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
-                    minHeight: 'calc(100vh - 280px)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 150px, black calc(100% - 150px), transparent 100%)',
-                    maskImage: 'linear-gradient(to bottom, transparent 0%, black 150px, black calc(100% - 150px), transparent 100%)'
-                  }}>
+                  <div
+                    id="print-bracket"
+                    ref={bracketScrollRef}
+                    className="bracket-scroll-container full-width-bleed"
+                    style={{
+                      position: 'relative',
+                      backgroundImage: 'url(/loginbg1.png)',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      padding: '20px 0',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                    }}>
                     {/* Dark overlay */}
                     <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,5,36,0.85)', zIndex: 0 }} />
                     <div
@@ -637,32 +645,37 @@ export default function PublicTournament() {
           )}
 
           {tab === 'teams' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
               {teams.map(t => (
-                <div key={t._id} className="card-glass" style={{ padding: 24, borderRadius: 20 }}>
-                  <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                <div key={t._id} className="card-glass" style={{ padding: '12px 16px', borderRadius: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                     <div 
                       onClick={() => t.logo && setPreviewImage(t.logo)}
                       style={{ 
-                        width: 56, height: 56, borderRadius: 16, background: t.color || 'var(--green)', 
-                        border: '4px solid var(--bg-card)', display: 'flex', alignItems: 'center', 
-                        justifyContent: 'center', overflow: 'hidden', boxShadow: '0 8px 20px rgba(0,0,0,0.3)',
-                        cursor: t.logo ? 'pointer' : 'default'
+                        width: 38, height: 38, borderRadius: 10, background: t.color || 'var(--green)', 
+                        border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', 
+                        justifyContent: 'center', overflow: 'hidden',
+                        cursor: t.logo ? 'pointer' : 'default', flexShrink: 0
                       }}
                     >
-                      {t.logo ? <img src={t.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 24 }}>👕</span>}
+                      {t.logo ? <img src={t.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 16 }}>👕</span>}
                     </div>
-                    <div>
-                      <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>{t.name}</h3>
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
-                        <Users size={12} /> {t.players?.length || 0} Atletas
+                    <div style={{ flex: 1 }}>
+                      <h3 style={{ fontSize: 15, fontWeight: 800, margin: 0 }}>{t.name}</h3>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                        <Users size={11} /> {t.players?.length || 0} Atletas
                       </div>
                     </div>
                   </div>
-                  <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between' }}>
-                    <div><div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Capitão</div><div style={{ fontSize: 13, fontWeight: 700 }}>{t.captainName || '—'}</div></div>
-                    <div style={{ textAlign: 'right' }}><div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Treinador</div><div style={{ fontSize: 13, fontWeight: 700 }}>{t.coachName || '—'}</div></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(255,255,255,0.03)', padding: '8px 12px', borderRadius: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 9, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Capitão:</span>
+                      <span style={{ fontSize: 11, fontWeight: 700 }}>{t.captainName || '—'}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 9, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Treinador:</span>
+                      <span style={{ fontSize: 11, fontWeight: 700 }}>{t.coachName || '—'}</span>
+                    </div>
                   </div>
                 </div>
               ))}
