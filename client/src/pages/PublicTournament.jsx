@@ -151,10 +151,6 @@ export default function PublicTournament() {
 
   return (
     <div className="animate-fade-in" style={{ minHeight: '100vh', background: 'var(--bg-main)', position: 'relative' }}>
-      {/* Smooth transition to white navbar */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 40, background: 'linear-gradient(to bottom, #ffffff, transparent)', pointerEvents: 'none', zIndex: 0 }} />
-      {/* Smooth transition to white footer */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60, background: 'linear-gradient(to top, #ffffff, transparent)', pointerEvents: 'none', zIndex: 10 }} />
       
       {/* Dynamic Header / Hero - Compact */}
       <div style={{ 
