@@ -164,11 +164,11 @@ export default function SocialFAB() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#00C853',
+          background: '#ffffff',
           color: '#000000',
-          boxShadow: '0 4px 12px rgba(0, 200, 83, 0.35)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          border: '1px solid #e2e8f0',
           transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-          border: 'none',
           cursor: 'pointer'
         }}
       >
@@ -215,8 +215,10 @@ export default function SocialFAB() {
 
         .social-fab-shop:hover {
           transform: scale(1.1) translateY(-3px);
-          background: #00e676 !important;
-          box-shadow: 0 0 15px rgba(0, 200, 83, 0.8), 0 8px 20px rgba(0, 200, 83, 0.4) !important;
+          background: #000000 !important;
+          color: #ffffff !important;
+          border-color: #000000 !important;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35) !important;
         }
 
         .social-fab-download:hover {
