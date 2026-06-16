@@ -45,28 +45,18 @@ export default function Store() {
   };
 
   const finalizePurchase = async (product, leadInfo) => {
-    // 1. Enviar para a BD como Lead para não perder o contacto
-    try {
-      await api.post('/leads', {
-        productId: product._id,
-        name: leadInfo.name,
-        contact: leadInfo.contact,
-        size: leadInfo.size,
-        color: leadInfo.color,
-        province: leadInfo.province
-      });
-      console.log('✅ Lead capturada com sucesso');
-    } catch (err) {
-      console.error('❌ Falha ao capturar lead:', err);
-    }
-
-    // 2. Preparar e abrir WhatsApp
+    // A lead já foi guardada na base de dados pelo LeadCaptureModal
     let details = '';
     if (leadInfo.size) details += `\n- *Tamanho:* ${leadInfo.size}`;
     if (leadInfo.color) details += `\n- *Cor:* ${leadInfo.color}`;
     if (leadInfo.province) details += `\n- *Província:* ${leadInfo.province}`;
 
-    const message = `Olá! Meu nome é *${leadInfo.name}*. Tenho interesse no produto "*${product.name}*" que vi na loja Bola na Zona.${details}\n\nPor favor, confirmem a disponibilidade.`;
+    const quantity = leadInfo.quantity || 1;
+    const totalVal = product.price * quantity;
+    details += `\n- *Quantidade:* ${quantity}`;
+    details += `\n- *Valor Total:* ${totalVal.toLocaleString()} MT`;
+
+    const message = `Olá! Meu nome é *${leadInfo.name}*. Tenho interesse em adquirir *${quantity}x* do produto "*${product.name}*" que vi na loja Bola na Zona.${details}\n\nPor favor, confirmem a disponibilidade.`;
     window.open(`https://wa.me/258847877405?text=${encodeURIComponent(message)}`, '_blank');
     setShowLeadModal(null);
   };

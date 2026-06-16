@@ -139,8 +139,13 @@ export default function Landing() {
     if (leadInfo.size) details += `\n- *Tamanho:* ${leadInfo.size}`;
     if (leadInfo.color) details += `\n- *Cor:* ${leadInfo.color}`;
     if (leadInfo.province) details += `\n- *Província:* ${leadInfo.province}`;
+    
+    const quantity = leadInfo.quantity || 1;
+    const totalVal = product.price * quantity;
+    details += `\n- *Quantidade:* ${quantity}`;
+    details += `\n- *Valor Total:* ${totalVal.toLocaleString()} MT`;
 
-    const message = `Olá! Meu nome é *${leadInfo.name}*. Tenho interesse no produto "*${product.name}*" que vi na página inicial do Bola na Zona.${details}\n\nPor favor, confirmem a disponibilidade.`;
+    const message = `Olá! Meu nome é *${leadInfo.name}*. Tenho interesse em adquirir *${quantity}x* do produto "*${product.name}*" que vi na página inicial do Bola na Zona.${details}\n\nPor favor, confirmem a disponibilidade.`;
     window.open(`https://wa.me/258847877405?text=${encodeURIComponent(message)}`, '_blank');
     setShowLeadModal(null);
   };

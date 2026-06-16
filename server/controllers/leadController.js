@@ -6,7 +6,7 @@ const User = require('../models/User');
 
 exports.create = async (req, res) => {
   try {
-    const { productId, tournamentId, name, contact, teamName, message, source, size, color, province } = req.body;
+    const { productId, tournamentId, name, contact, teamName, message, source, size, color, province, quantity } = req.body;
     
     const lead = await Lead.create({
       product: productId || null,
@@ -17,6 +17,7 @@ exports.create = async (req, res) => {
       size,
       color,
       province,
+      quantity: quantity || 1,
       message,
       source: source || 'store'
     });
@@ -41,7 +42,7 @@ exports.create = async (req, res) => {
           user: admin._id,
           type: 'info',
           title: 'Novo Lead de Venda! 🛍️',
-          message: `${name} tem interesse em "${product?.name}". Contacto: ${contact}`,
+          message: `${name} tem interesse em ${quantity || 1}x "${product?.name}". Contacto: ${contact}`,
           link: `/dashboard/analytics?tab=leads`
         });
       }

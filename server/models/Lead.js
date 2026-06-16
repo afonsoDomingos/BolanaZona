@@ -9,6 +9,7 @@ const leadSchema = new mongoose.Schema({
   size: { type: String }, // Tamanho do produto
   color: { type: String }, // Cor do produto
   province: { type: String }, // Província do lead
+  quantity: { type: Number, default: 1 }, // Quantidade encomendada
   message: { type: String },
   status: { type: String, enum: ['new', 'contacted', 'converted', 'lost'], default: 'new' },
   source: { type: String, default: 'store' }, // 'store' ou 'tournament_reg'

@@ -5,8 +5,11 @@ import { X, ShoppingBag } from 'lucide-react';
 
 export default function LeadCaptureModal({ product, onClose, onCaptured }) {
   const [form, setForm] = useState({ name: '', contact: '', size: '', color: '', province: '' });
+  const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
   const [activeField, setActiveField] = useState(null);
+
+  const totalPrice = product.price * quantity;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +23,8 @@ export default function LeadCaptureModal({ product, onClose, onCaptured }) {
         contact: form.contact,
         size: form.size,
         color: form.color,
-        province: form.province
+        province: form.province,
+        quantity: quantity
       });
       
       await api.post('/analytics/track', {
@@ -31,7 +35,7 @@ export default function LeadCaptureModal({ product, onClose, onCaptured }) {
       }).catch(() => {});
 
       toast.success('Dados registados! Redirecionando...');
-      onCaptured(form);
+      onCaptured({ ...form, quantity });
     } catch {
       toast.error('Erro ao registar interesse.');
     } finally { setLoading(false); }
@@ -123,8 +127,45 @@ export default function LeadCaptureModal({ product, onClose, onCaptured }) {
             <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#000000', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {product.name}
             </h4>
-            <div style={{ fontSize: '15px', fontWeight: 800, color: '#000000', marginTop: '4px' }}>
-              {product.price.toLocaleString()} MT
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: '#000000' }}>
+                {totalPrice.toLocaleString()} MT
+              </div>
+              
+              {/* Seletor de Quantidade */}
+              <div style={{ display: 'flex', alignItems: 'center', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '2px' }}>
+                <button
+                  type="button"
+                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                  style={{
+                    background: 'none', border: 'none', width: '24px', height: '24px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', fontWeight: 'bold', color: '#000000', fontSize: '14px',
+                    userSelect: 'none'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#f5f5f7'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                >
+                  -
+                </button>
+                <span style={{ fontSize: '13px', fontWeight: 700, minWidth: '24px', textAlign: 'center', color: '#000000', userSelect: 'none' }}>
+                  {quantity}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity(q => q + 1)}
+                  style={{
+                    background: 'none', border: 'none', width: '24px', height: '24px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', fontWeight: 'bold', color: '#000000', fontSize: '14px',
+                    userSelect: 'none'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#f5f5f7'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                >
+                  +
+                </button>
+              </div>
             </div>
           </div>
         </div>
