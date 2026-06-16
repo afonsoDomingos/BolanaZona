@@ -8,6 +8,7 @@ import InstallPrompt from './components/InstallPrompt';
 import Footer from './components/Footer';
 import FeedbackPopup from './components/FeedbackPopup';
 import CommunityFAB from './components/CommunityFAB';
+import SocialFAB from './components/SocialFAB';
 import ProtectedRoute from './components/ProtectedRoute';
 import CursorGlow from './components/CursorGlow';
 import ClickRipple from './components/ClickRipple';
@@ -99,6 +100,7 @@ function AppRoutes() {
       {!isCommunityPage && <CommunityFAB />}
       <FeedbackPopup />
       <ScrollToTop />
+      <SocialFAB />
       {!isCommunityPage && <InstallPrompt />}
       <Toaster
         position="top-right"
