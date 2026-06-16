@@ -124,11 +124,7 @@ export default function InstallPrompt() {
             </div>
           )}
         </div>
-      ) : (
-        <div className="install-mini animate-fade-in" onClick={handleInstall} title="Instalar Bola na Zona">
-          <Download size={22} color="#000" />
-        </div>
-      )}
+      ) : null}
 
       <style>{`
         .install-prompt {
@@ -148,10 +144,6 @@ export default function InstallPrompt() {
           z-index: 9999;
         }
 
-        .install-mini {
-          display: none;
-        }
-
         @media (max-width: 768px) {
           .install-prompt {
             bottom: 0;
@@ -164,23 +156,6 @@ export default function InstallPrompt() {
             border-right: none;
             border-bottom: none;
             padding: 16px 16px max(16px, env(safe-area-inset-bottom));
-          }
-
-          .install-mini {
-            display: flex;
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--green), #00e676);
-            border-radius: 50%;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 24px rgba(0, 200, 83, 0.4);
-            z-index: 9999;
-            cursor: pointer;
-            border: 2px solid var(--bg-primary);
           }
         }
       `}</style>
