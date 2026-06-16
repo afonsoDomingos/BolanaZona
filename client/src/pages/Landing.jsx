@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, Users, Calendar, BarChart2, Share2, ArrowRight, CheckCircle, ClipboardList, Handshake, Camera, ShoppingBag } from 'lucide-react';
 import LandingBracketPreview from '../components/LandingBracketPreview';
+import LeadCaptureModal from '../components/LeadCaptureModal';
 import api from '../services/api';
 
 const features = [
@@ -131,6 +132,18 @@ export default function Landing() {
   const [pageLoading, setPageLoading] = useState(true);
   const [storeProducts, setStoreProducts] = useState([]);
   const [storeLoading, setStoreLoading] = useState(true);
+  const [showLeadModal, setShowLeadModal] = useState(null);
+
+  const finalizePurchase = (product, leadInfo) => {
+    let details = '';
+    if (leadInfo.size) details += `\n- *Tamanho:* ${leadInfo.size}`;
+    if (leadInfo.color) details += `\n- *Cor:* ${leadInfo.color}`;
+    if (leadInfo.province) details += `\n- *Província:* ${leadInfo.province}`;
+
+    const message = `Olá! Meu nome é *${leadInfo.name}*. Tenho interesse no produto "*${product.name}*" que vi na página inicial do Bola na Zona.${details}\n\nPor favor, confirmem a disponibilidade.`;
+    window.open(`https://wa.me/258847877405?text=${encodeURIComponent(message)}`, '_blank');
+    setShowLeadModal(null);
+  };
 
   useEffect(() => {
     // Simular carregamento inicial
@@ -380,9 +393,9 @@ export default function Landing() {
                       <div style={{ fontSize: '16px', fontWeight: 800, color: '#000000' }}>
                         {p.price.toLocaleString()} MT
                       </div>
-                      <Link to="/shop" className="btn" style={{ width: '100%', background: '#1a1a1c', color: '#ffffff', border: 'none', borderRadius: '8px', justifyContent: 'center', padding: '10px 16px', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, transition: 'background-color 0.2s ease', boxShadow: 'none' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#000000'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#1a1a1c'}>
+                      <button onClick={() => setShowLeadModal(p)} className="btn" style={{ width: '100%', background: '#1a1a1c', color: '#ffffff', border: 'none', borderRadius: '8px', justifyContent: 'center', padding: '10px 16px', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, transition: 'background-color 0.2s ease', boxShadow: 'none' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#000000'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#1a1a1c'}>
                         <ShoppingBag size={14} /> Adicionar ao Carrinho
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -497,6 +510,14 @@ export default function Landing() {
           </p>
         </div>
       </footer>
+
+      {showLeadModal && (
+        <LeadCaptureModal 
+          product={showLeadModal} 
+          onClose={() => setShowLeadModal(null)} 
+          onCaptured={(leadInfo) => finalizePurchase(showLeadModal, leadInfo)} 
+        />
+      )}
 
       <style>{`
         @keyframes pulse-glow {
