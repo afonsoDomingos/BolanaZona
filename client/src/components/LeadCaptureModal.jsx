@@ -24,7 +24,7 @@ export default function LeadCaptureModal({ product, onClose, onCaptured }) {
       
       await api.post('/analytics/track', {
         type: 'purchase_attempt',
-        page: '/shop',
+        page: window.location.pathname,
         targetId: product._id,
         targetName: product.name
       }).catch(() => {});
