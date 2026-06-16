@@ -17,7 +17,7 @@ export default function CommunityFAB() {
       title="Entrar na Comunidade"
     >
       <div className="fab-badge">LIVE</div>
-      <MessageCircle size={28} />
+      <MessageCircle size={18} />
       
       <style>{`
         .fab-badge {
@@ -30,7 +30,7 @@ export default function CommunityFAB() {
           font-weight: 900;
           padding: 2px 7px;
           border-radius: 100px;
-          border: 2px solid #00C853; /* Match button color */
+          border: 2px solid #00C853;
           animation: pulse-red 2s infinite;
           z-index: 10;
           box-shadow: 0 2px 8px rgba(255, 23, 68, 0.4);

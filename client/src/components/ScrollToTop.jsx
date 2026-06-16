@@ -32,7 +32,7 @@ export default function ScrollToTop() {
       onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1) translateY(-5px)'}
       onMouseLeave={e => e.currentTarget.style.transform = 'scale(1) translateY(0)'}
     >
-      <ChevronUp size={24} strokeWidth={3} />
+      <ChevronUp size={16} strokeWidth={3} />
     </button>
   );
 }

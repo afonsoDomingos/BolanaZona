@@ -98,7 +98,7 @@ export default function SocialFAB() {
         bottom: '20px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px',
+        gap: '8px',
         zIndex: 9998
       }}
     >
@@ -110,21 +110,21 @@ export default function SocialFAB() {
         className="social-fab-item social-fab-youtube"
         title="Siga-nos no YouTube"
         style={{
-          width: '46px',
-          height: '46px',
+          width: '36px',
+          height: '36px',
           borderRadius: '50%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           background: '#FF0000',
           color: '#ffffff',
-          boxShadow: '0 4px 12px rgba(255, 0, 0, 0.35)',
+          boxShadow: '0 4px 10px rgba(255, 0, 0, 0.3)',
           transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           border: 'none',
           cursor: 'pointer'
         }}
       >
-        <Youtube size={20} strokeWidth={2} />
+        <Youtube size={15} strokeWidth={2} />
       </a>
 
       {/* TikTok Button */}
@@ -135,21 +135,21 @@ export default function SocialFAB() {
         className="social-fab-item social-fab-tiktok"
         title="Siga-nos no TikTok"
         style={{
-          width: '46px',
-          height: '46px',
+          width: '36px',
+          height: '36px',
           borderRadius: '50%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           background: '#000000',
           color: '#ffffff',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.35)',
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
           transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           border: 'none',
           cursor: 'pointer'
         }}
       >
-        <TiktokIcon size={18} />
+        <TiktokIcon size={14} />
       </a>
 
       {/* Loja / Shop Button */}
@@ -158,21 +158,21 @@ export default function SocialFAB() {
         className="social-fab-item social-fab-shop"
         title="Visitar Loja Oficial"
         style={{
-          width: '46px',
-          height: '46px',
+          width: '36px',
+          height: '36px',
           borderRadius: '50%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           background: '#ffffff',
           color: '#000000',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.08)',
           border: '1px solid #e2e8f0',
           transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           cursor: 'pointer'
         }}
       >
-        <ShoppingBag size={18} strokeWidth={2.2} />
+        <ShoppingBag size={14} strokeWidth={2.2} />
       </Link>
 
       {/* PWA Download Button */}
@@ -182,21 +182,21 @@ export default function SocialFAB() {
           className="social-fab-item social-fab-download"
           title="Instalar App"
           style={{
-            width: '46px',
-            height: '46px',
+            width: '36px',
+            height: '36px',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             background: '#1a1a1c',
             color: '#ffffff',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
             transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
             border: 'none',
             cursor: 'pointer'
           }}
         >
-          <Download size={18} strokeWidth={2.5} />
+          <Download size={14} strokeWidth={2.5} />
         </button>
       )}
 
@@ -229,17 +229,17 @@ export default function SocialFAB() {
 
         @media (max-width: 768px) {
           .social-fab-container {
-            left: 16px;
-            bottom: 16px;
-            gap: 10px;
+            left: 14px;
+            bottom: 14px;
+            gap: 7px;
           }
           .social-fab-item {
-            width: 40px !important;
-            height: 40px !important;
+            width: 32px !important;
+            height: 32px !important;
           }
           .social-fab-item svg {
-            width: 18px !important;
-            height: 18px !important;
+            width: 13px !important;
+            height: 13px !important;
           }
         }
       `}</style>
