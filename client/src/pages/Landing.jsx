@@ -307,21 +307,36 @@ export default function Landing() {
       <LandingBracketPreview />
 
       {/* Loja Oficial Showcase */}
-      <section style={{ padding: '100px 0', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+      <section style={{ padding: '100px 0', background: '#ffffff', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 48, flexWrap: 'wrap', gap: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 40, flexWrap: 'wrap', gap: 20 }}>
             <div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--green-subtle)', border: '1px solid rgba(0,200,83,0.2)', borderRadius: 100, padding: '6px 16px', marginBottom: 16 }}>
-                <ShoppingBag size={14} color="var(--green)" />
-                <span style={{ fontSize: 13, color: 'var(--green)', fontWeight: 600 }}>Loja Oficial</span>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#f5f5f7', border: '1px solid #e2e8f0', borderRadius: 100, padding: '6px 16px', marginBottom: 16 }}>
+                <ShoppingBag size={14} color="#000000" />
+                <span style={{ fontSize: 13, color: '#000000', fontWeight: 600 }}>Loja Oficial</span>
               </div>
-              <h2 className="font-syne scroll-reveal" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 800 }}>
-                Equipa-te como <span className="gradient-text">um Campeão</span>
+              <h2 className="font-syne scroll-reveal" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 800, color: '#000000' }}>
+                Equipa-te como <span style={{ background: 'linear-gradient(135deg, #000000, #333333)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>um Campeão</span>
               </h2>
             </div>
-            <Link to="/shop" className="btn btn-secondary scroll-reveal" style={{ borderRadius: 100 }}>
+            <Link to="/shop" className="btn scroll-reveal" style={{ background: '#000000', color: '#ffffff', borderRadius: 100, border: 'none', padding: '12px 24px', fontSize: '14px', fontWeight: 600 }}>
               Ver Loja Completa <ArrowRight size={16} />
             </Link>
+          </div>
+
+          {/* Subheader bar inspired by reference image */}
+          <div className="scroll-reveal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 40, borderBottom: '1px solid #f0f0f2', paddingBottom: 24, flexWrap: 'wrap', gap: 16 }}>
+            <div style={{ fontSize: 13, color: '#666668', fontWeight: 500 }}>
+              {storeProducts.length} itens encontrados
+            </div>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <Link to="/shop" style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 100, padding: '8px 20px', fontSize: 13, fontWeight: 600, color: '#000000', transition: 'all 0.2s ease' }} onMouseEnter={e => e.currentTarget.style.borderColor = '#000000'} onMouseLeave={e => e.currentTarget.style.borderColor = '#e2e8f0'}>
+                ⚙️ Filtros <span style={{ background: '#000000', color: '#ffffff', borderRadius: '50%', width: 18, height: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, marginLeft: 4 }}>0</span>
+              </Link>
+              <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 100, padding: '8px 20px', fontSize: 13, fontWeight: 600, color: '#000000', display: 'flex', alignItems: 'center', gap: 8 }}>
+                Novidades <span style={{ fontSize: 10 }}>▼</span>
+              </div>
+            </div>
           </div>
 
           {storeLoading ? (
@@ -329,31 +344,44 @@ export default function Landing() {
           ) : storeProducts.length === 0 ? (
             <div className="empty-state">
               <div className="empty-state-icon">🛍️</div>
-              <h3>Brevemente novos produtos</h3>
-              <p>Estamos a preparar os melhores equipamentos e artigos oficiais.</p>
+              <h3 style={{ color: '#000000' }}>Brevemente novos produtos</h3>
+              <p style={{ color: '#666668' }}>Estamos a preparar os melhores equipamentos e artigos oficiais.</p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 32 }}>
               {storeProducts.map((p, i) => (
-                <div key={p._id} className="card scroll-reveal" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', transitionDelay: `${(i % 4) * 0.1}s` }}>
-                  <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
+                <div key={p._id} className="scroll-reveal" style={{ display: 'flex', flexDirection: 'column', transitionDelay: `${(i % 4) * 0.1}s` }}>
+                  {/* Image wrapper with light grey background */}
+                  <div style={{ height: 260, overflow: 'hidden', position: 'relative', background: '#f5f5f7', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #f0f0f2' }}>
                     <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
-                    <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '4px 12px', borderRadius: 100, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>
+                    <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(255,255,255,0.9)', color: '#000000', padding: '4px 12px', borderRadius: 100, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', border: '1px solid #e2e8f0', letterSpacing: 0.5 }}>
                       {p.category}
                     </div>
                   </div>
-                  <div style={{ padding: 20, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, color: '#fff' }}>{p.name}</h3>
-                    <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20, flex: 1, lineHeight: 1.5 }}>
-                      {p.description && p.description.length > 80 ? p.description.substring(0, 80) + '...' : p.description}
-                    </p>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-                      <div>
-                        <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>A partir de</div>
-                        <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--green)' }}>{p.price.toLocaleString()} MT</div>
+
+                  {/* Brand and product details */}
+                  <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    <div style={{ fontSize: '10px', color: '#88888b', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '6px', marginTop: '16px' }}>
+                      Bola na Zona
+                    </div>
+                    <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#000000', marginBottom: '8px', lineHeight: '1.3', minHeight: '40px' }}>
+                      {p.name}
+                    </h3>
+                    
+                    {/* Visual Color swatches from inspiration image */}
+                    <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+                      {['#000000', '#ffffff', '#2e5a44', '#7d2e2e'].map((color, idx) => (
+                        <span key={idx} style={{ width: 12, height: 12, borderRadius: '50%', background: color, border: '1px solid #dcdcdf', display: 'inline-block', cursor: 'pointer', transition: 'transform 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
+                      ))}
+                    </div>
+
+                    {/* Price & Buy button container */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 'auto' }}>
+                      <div style={{ fontSize: '16px', fontWeight: 800, color: '#000000' }}>
+                        {p.price.toLocaleString()} MT
                       </div>
-                      <Link to="/shop" className="btn btn-primary btn-sm" style={{ padding: '8px 12px', borderRadius: 8 }}>
-                        Comprar
+                      <Link to="/shop" className="btn" style={{ width: '100%', background: '#1a1a1c', color: '#ffffff', border: 'none', borderRadius: '8px', justifyContent: 'center', padding: '10px 16px', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, transition: 'background-color 0.2s ease', boxShadow: 'none' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#000000'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#1a1a1c'}>
+                        <ShoppingBag size={14} /> Adicionar ao Carrinho
                       </Link>
                     </div>
                   </div>
