@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Users, Calendar, BarChart2, Share2, ArrowRight, CheckCircle, ClipboardList, Handshake, Camera } from 'lucide-react';
+import { Trophy, Users, Calendar, BarChart2, Share2, ArrowRight, CheckCircle, ClipboardList, Handshake, Camera, ShoppingBag } from 'lucide-react';
 import LandingBracketPreview from '../components/LandingBracketPreview';
+import api from '../services/api';
 
 const features = [
   { icon: <Trophy size={28} />, title: 'Criar Torneios', desc: 'Mata-mata ou fase de grupos. Configura em minutos.' },
@@ -128,11 +129,26 @@ function HistoricNewsCard() {
 export default function Landing() {
   const [scrollOpacity, setScrollOpacity] = useState(1);
   const [pageLoading, setPageLoading] = useState(true);
+  const [storeProducts, setStoreProducts] = useState([]);
+  const [storeLoading, setStoreLoading] = useState(true);
 
   useEffect(() => {
     // Simular carregamento inicial
     const timer = setTimeout(() => setPageLoading(false), 1200);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    api.get('/products')
+      .then(res => {
+        setStoreProducts(res.data.slice(0, 4));
+      })
+      .catch(err => {
+        console.error('Erro ao carregar produtos na landing:', err);
+      })
+      .finally(() => {
+        setStoreLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -163,7 +179,7 @@ export default function Landing() {
       window.removeEventListener('scroll', handleScroll);
       observer.disconnect();
     };
-  }, [pageLoading]);
+  }, [pageLoading, storeLoading]);
 
   if (pageLoading) {
     return (
@@ -289,6 +305,64 @@ export default function Landing() {
 
       {/* Bracket Preview */}
       <LandingBracketPreview />
+
+      {/* Loja Oficial Showcase */}
+      <section style={{ padding: '100px 0', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+        <div className="container">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 48, flexWrap: 'wrap', gap: 20 }}>
+            <div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--green-subtle)', border: '1px solid rgba(0,200,83,0.2)', borderRadius: 100, padding: '6px 16px', marginBottom: 16 }}>
+                <ShoppingBag size={14} color="var(--green)" />
+                <span style={{ fontSize: 13, color: 'var(--green)', fontWeight: 600 }}>Loja Oficial</span>
+              </div>
+              <h2 className="font-syne scroll-reveal" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 800 }}>
+                Equipa-te como <span className="gradient-text">um Campeão</span>
+              </h2>
+            </div>
+            <Link to="/shop" className="btn btn-secondary scroll-reveal" style={{ borderRadius: 100 }}>
+              Ver Loja Completa <ArrowRight size={16} />
+            </Link>
+          </div>
+
+          {storeLoading ? (
+            <div className="loading-center"><div className="spinner" /></div>
+          ) : storeProducts.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-state-icon">🛍️</div>
+              <h3>Brevemente novos produtos</h3>
+              <p>Estamos a preparar os melhores equipamentos e artigos oficiais.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 24 }}>
+              {storeProducts.map((p, i) => (
+                <div key={p._id} className="card scroll-reveal" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', transitionDelay: `${(i % 4) * 0.1}s` }}>
+                  <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
+                    <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
+                    <div style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: '4px 12px', borderRadius: 100, fontSize: 11, fontWeight: 700, textTransform: 'uppercase' }}>
+                      {p.category}
+                    </div>
+                  </div>
+                  <div style={{ padding: 20, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, color: '#fff' }}>{p.name}</h3>
+                    <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20, flex: 1, lineHeight: 1.5 }}>
+                      {p.description && p.description.length > 80 ? p.description.substring(0, 80) + '...' : p.description}
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
+                      <div>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>A partir de</div>
+                        <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--green)' }}>{p.price.toLocaleString()} MT</div>
+                      </div>
+                      <Link to="/shop" className="btn btn-primary btn-sm" style={{ padding: '8px 12px', borderRadius: 8 }}>
+                        Comprar
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Mission Section */}
       <section style={{ position: 'relative', overflow: 'hidden', padding: 0 }}>
