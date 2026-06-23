@@ -1339,7 +1339,16 @@ export default function TournamentDetail() {
       )}
 
       {/* RESULT MODAL */}
-      {showResultModal && <ResultModal match={showResultModal} tournamentId={id} teams={teams} onClose={() => setShowResultModal(null)} onSaved={() => { setShowResultModal(null); load(); }} />}
+      {showResultModal && (
+        <ResultModal 
+          match={showResultModal} 
+          tournamentId={id} 
+          teams={teams} 
+          matches={matches} 
+          onClose={() => setShowResultModal(null)} 
+          onSaved={() => { setShowResultModal(null); load(); }} 
+        />
+      )}
 
       {/* SHARE MODAL */}
       {showShareModal && <MatchShareModal match={showShareModal} tournament={tournament} onClose={() => setShowShareModal(null)} />}
@@ -1978,7 +1987,7 @@ function AddTeamModal({ tournamentId, initialData, onClose, onSaved }) {
   );
 }
 
-function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
+function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) {
   const [home, setHome] = useState(match.homeScore ?? '');
   const [away, setAway] = useState(match.awayScore ?? '');
   const [referee, setReferee] = useState(match.referee || '');
@@ -1992,10 +2001,20 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
   // Event form state
   const [newEvent, setNewEvent] = useState({ type: 'goal', team: homeTeamId, playerName: '', minute: '' });
 
-
   const homePlayers = teams.find(t => t._id === homeTeamId)?.players || [];
   const awayPlayers = teams.find(t => t._id === awayTeamId)?.players || [];
   const currentTeamPlayers = newEvent.team === homeTeamId ? homePlayers : awayPlayers;
+
+  // Validation Checks for Knockout Rounds
+  const prevRoundMatches = (match.phase === 'knockout' && match.round > 1)
+    ? (matches || []).filter(m => m.phase === 'knockout' && m.round === match.round - 1)
+    : [];
+  const pendingInPrevRound = prevRoundMatches.filter(m => m.status !== 'finished' && m.status !== 'cancelled');
+  const hasPendingPrevRound = pendingInPrevRound.length > 0;
+  const prevRoundName = prevRoundMatches[0]?.roundName || `Ronda ${match.round - 1}`;
+
+  const hasNoTeams = match.phase === 'knockout' && (!match.homeTeam || !match.awayTeam);
+  const isSubmissionBlocked = hasNoTeams || hasPendingPrevRound;
 
   const handleAddEvent = () => {
     if (!newEvent.playerName) return toast.error('Seleciona ou escreve o nome do jogador.');
@@ -2019,10 +2038,11 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
       toast.success(customStatus === 'live' ? 'Live Atualizado! 📡' : 'Resultado e eventos guardados!');
       onSaved();
       if (!customStatus || customStatus === 'finished') onClose();
-    } catch { toast.error('Erro ao guardar resultado.'); }
+    } catch (err) { 
+      toast.error(err.response?.data?.message || 'Erro ao guardar resultado.'); 
+    }
     finally { setLoading(false); }
   };
-
 
   const eventIcons = { goal: '⚽', yellow_card: '🟨', red_card: '🟥' };
   const eventLabels = { goal: 'Golo', yellow_card: 'Cartão Amarelo', red_card: 'Cartão Vermelho' };
@@ -2036,41 +2056,49 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
         </div>
         
         <div style={{ marginBottom: 24 }}>
-          {/* Show warning if teams not yet assigned to this match (e.g. final) */}
-          {(!match.homeTeam || !match.awayTeam) && (
-            <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 10, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: '#f59e0b', textAlign: 'center' }}>
-              ⚠️ As equipas finalistas ainda não foram apuradas. Podes lançar resultado agora, mas as equipas serão atualizadas automaticamente quando os semifinais terminarem.
+          {/* Show warning if teams not yet assigned to this match */}
+          {hasNoTeams && (
+            <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: '#ef4444', textAlign: 'center', fontWeight: 600 }}>
+              ⚠️ As equipas para este jogo ainda não foram apuradas. Não é possível lançar resultado.
             </div>
           )}
+
+          {/* Show warning if previous round has pending matches */}
+          {!hasNoTeams && hasPendingPrevRound && (
+            <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 10, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: '#f59e0b', textAlign: 'center', fontWeight: 600 }}>
+              ⚠️ Não é possível lançar resultado. Ainda há {pendingInPrevRound.length} jogo(s) por disputar na ronda anterior ({prevRoundName}). Termina esses jogos primeiro.
+            </div>
+          )}
+
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, marginBottom: 20 }}>
             <div style={{ flex: 1, textAlign: 'right' }}>
               <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 14 }}>{match.homeTeam?.name || 'Casa'}</div>
-              <input type="number" min="0" className="score-input" value={home} onChange={e => setHome(e.target.value)} />
+              <input type="number" min="0" className="score-input" value={home} onChange={e => setHome(e.target.value)} disabled={isSubmissionBlocked} />
             </div>
             <div style={{ fontWeight: 700, color: 'var(--text-muted)', fontSize: 20 }}>×</div>
             <div style={{ flex: 1, textAlign: 'left' }}>
               <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 14 }}>{match.awayTeam?.name || 'Fora'}</div>
-              <input type="number" min="0" className="score-input" value={away} onChange={e => setAway(e.target.value)} />
+              <input type="number" min="0" className="score-input" value={away} onChange={e => setAway(e.target.value)} disabled={isSubmissionBlocked} />
             </div>
           </div>
 
           <div className="form-group" style={{ marginBottom: 24 }}>
             <label className="form-label">Árbitro da Partida</label>
-            <input className="form-input" placeholder="Nome do árbitro..." value={referee} onChange={e => setReferee(e.target.value)} />
+            <input className="form-input" placeholder="Nome do árbitro..." value={referee} onChange={e => setReferee(e.target.value)} disabled={isSubmissionBlocked} />
           </div>
 
           <div className="divider" style={{ margin: '24px 0' }} />
 
           <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', letterSpacing: 0.5 }}>Eventos da Partida (Golos e Cartões)</h3>
           
-          <div style={{ background: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 12, border: '1px solid var(--border)', marginBottom: 20 }}>
+          <div style={{ background: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 12, border: '1px solid var(--border)', marginBottom: 20, opacity: isSubmissionBlocked ? 0.6 : 1 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
-              <select className="form-select" value={newEvent.type} onChange={e => setNewEvent({...newEvent, type: e.target.value})}>
+              <select className="form-select" value={newEvent.type} onChange={e => setNewEvent({...newEvent, type: e.target.value})} disabled={isSubmissionBlocked}>
                 <option value="goal">⚽ Golo</option>
                 <option value="yellow_card">🟨 Cartão Amarelo</option>
                 <option value="red_card">🟥 Cartão Vermelho</option>
               </select>
-              <select className="form-select" value={newEvent.team} onChange={e => setNewEvent({...newEvent, team: e.target.value})}>
+              <select className="form-select" value={newEvent.team} onChange={e => setNewEvent({...newEvent, team: e.target.value})} disabled={isSubmissionBlocked}>
                 {homeTeamId && <option value={homeTeamId}>{match.homeTeam?.name || 'Casa'}</option>}
                 {awayTeamId && <option value={awayTeamId}>{match.awayTeam?.name || 'Fora'}</option>}
                 {!homeTeamId && !awayTeamId && teams.map(t => <option key={t._id} value={t._id}>{t.name}</option>)}
@@ -2084,6 +2112,7 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
                 placeholder="Min"
                 value={newEvent.minute}
                 onChange={e => setNewEvent({...newEvent, minute: e.target.value})}
+                disabled={isSubmissionBlocked}
               />
               <input 
                 list="players-list"
@@ -2092,11 +2121,12 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
                 style={{ flex: 1 }}
                 value={newEvent.playerName} 
                 onChange={e => setNewEvent({...newEvent, playerName: e.target.value})}
+                disabled={isSubmissionBlocked}
               />
               <datalist id="players-list">
                 {currentTeamPlayers.map((p, i) => <option key={i} value={p.name} />)}
               </datalist>
-              <button className="btn btn-primary btn-sm" onClick={handleAddEvent}>Add</button>
+              <button className="btn btn-primary btn-sm" onClick={handleAddEvent} disabled={isSubmissionBlocked}>Add</button>
             </div>
 
           </div>
@@ -2115,7 +2145,7 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
                       <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>({e.team === homeTeamId ? (match.homeTeam?.name || 'Casa') : (match.awayTeam?.name || 'Fora')})</span>
                     </div>
                   </div>
-                  <button onClick={() => handleRemoveEvent(e.id || e._id)} style={{ background: 'none', color: 'var(--red)', opacity: 0.6 }}><X size={14} /></button>
+                  <button onClick={() => handleRemoveEvent(e.id || e._id)} style={{ background: 'none', color: 'var(--red)', opacity: 0.6 }} disabled={isSubmissionBlocked}><X size={14} /></button>
                 </div>
               ))
             )}
@@ -2125,14 +2155,19 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
         <div style={{ display: 'flex', gap: 12 }}>
           <button 
             className="btn btn-secondary" 
-            style={{ flex: 1, height: 48, justifyContent: 'center' }} 
+            style={{ flex: 1, height: 48, justifyContent: 'center', opacity: isSubmissionBlocked ? 0.5 : 1 }} 
             onClick={() => handleSave('live')}
-            disabled={loading}
+            disabled={loading || isSubmissionBlocked}
           >
             {loading ? '...' : 'Actualizar Live'}
           </button>
 
-          <button className="btn btn-primary" onClick={() => handleSave('finished')} disabled={loading} style={{ flex: 2, justifyContent: 'center', height: 48 }}>
+          <button 
+            className="btn btn-primary" 
+            onClick={() => handleSave('finished')} 
+            disabled={loading || isSubmissionBlocked} 
+            style={{ flex: 2, justifyContent: 'center', height: 48, opacity: isSubmissionBlocked ? 0.5 : 1 }}
+          >
             {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><Save size={16} /> Finalizar e Guardar Tudo</>}
           </button>
         </div>

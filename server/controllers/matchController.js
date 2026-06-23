@@ -32,11 +32,32 @@ exports.updateResult = async (req, res) => {
       return res.status(403).json({ message: 'Apenas o organizador do torneio pode inserir resultados.' });
     }
 
-    // 2. Verificar se o jogo já aconteceu (apenas se for para finalizar) - REMOVIDO para permitir lançar resultados antecipadamente
-    // const now = new Date();
-    // if ((!match.date || new Date(match.date) > now) && status === 'finished') {
-    //   return res.status(400).json({ message: 'Não podes finalizar um jogo que ainda não aconteceu.' });
-    // }
+    // 2. Bloquear se as equipas ainda não foram apuradas (slots null) em jogos de knockout
+    if (match.phase === 'knockout' && (!match.homeTeam || !match.awayTeam)) {
+      return res.status(400).json({
+        message: 'Não é possível atualizar este jogo. As equipas ainda não foram apuradas — termina os jogos da ronda anterior primeiro.'
+      });
+    }
+
+    // 3. Bloquear se a ronda anterior ainda tem jogos por disputar (Mata-Mata)
+    if (match.phase === 'knockout' && match.round > 1) {
+      const prevRoundMatches = await Match.find({
+        tournament: match.tournament._id,
+        phase: 'knockout',
+        round: match.round - 1
+      });
+
+      const pendingInPrevRound = prevRoundMatches.filter(m => m.status !== 'finished' && m.status !== 'cancelled');
+
+      if (pendingInPrevRound.length > 0) {
+        const roundName = pendingInPrevRound[0].roundName || `Ronda ${match.round - 1}`;
+        return res.status(400).json({
+          message: `Não é possível atualizar este jogo. Ainda há ${pendingInPrevRound.length} jogo(s) por disputar na ronda anterior (${roundName}). Termina esses jogos primeiro.`,
+          pendingMatches: pendingInPrevRound.length,
+          roundName
+        });
+      }
+    }
 
     // Proceder com a atualização
     match.homeScore = homeScore;
