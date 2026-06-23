@@ -43,10 +43,8 @@ export default function TournamentDetail() {
 
 
   const { user: currentUser } = useAuth();
-  const isOwner = currentUser && tournament && (
-    (typeof tournament.createdBy === 'string' && tournament.createdBy === currentUser._id) ||
-    (tournament.createdBy?._id === currentUser._id)
-  );
+  const ownerId = tournament?.createdBy?._id || tournament?.createdBy;
+  const isOwner = currentUser && tournament && ownerId && (String(ownerId) === String(currentUser._id));
   const isSuperAdmin = currentUser?.role === 'superadmin';
   const isAdmin = currentUser?.role === 'admin' || isSuperAdmin;
   const canManage = isOwner || isAdmin;
@@ -71,7 +69,7 @@ export default function TournamentDetail() {
 
       // Redirecionamento de segurança: Se não for dono, admin ou superadmin, vai para a página pública
       const ownerId = tRes.data.tournament.createdBy?._id || tRes.data.tournament.createdBy;
-      if (currentUser && currentUser.role !== 'superadmin' && currentUser.role !== 'admin' && ownerId !== currentUser._id) {
+      if (currentUser && currentUser.role !== 'superadmin' && currentUser.role !== 'admin' && String(ownerId) !== String(currentUser._id)) {
         navigate(`/t/${tRes.data.tournament.shareCode}`, { replace: true });
         return;
       }

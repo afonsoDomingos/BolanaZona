@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
-import { Trophy, Calendar, BarChart2, Users, Share2, MapPin, ArrowLeft, Star, Clock, Camera } from 'lucide-react';
+import { Trophy, Calendar, BarChart2, Users, Share2, MapPin, ArrowLeft, Star, Clock, Camera, X, CheckCircle } from 'lucide-react';
 import TeamRegistrationModal from '../components/TeamRegistrationModal';
 import SponsorProposalModal from '../components/SponsorProposalModal';
 import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
+import { useAuth } from '../context/AuthContext';
 
 const formatLabel = { groups: 'Todos contra Todos', knockout: 'Mata-mata', groups_knockout: 'Grupos + Eliminatórias' };
 const statusLabel = { draft: 'Brevemente', registration: 'Inscrições Abertas', active: 'A Decorrer', finished: 'Concluído' };
@@ -15,12 +16,14 @@ export default function PublicTournament() {
   const [searchParams] = useSearchParams();
   const showRegisterAction = searchParams.get('reg') === 'true';
 
+  const { currentUser } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('calendar');
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showSponsorModal, setShowSponsorModal] = useState(false);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(null);
   const [errorStatus, setErrorStatus] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [viewMode, setViewMode] = useState('bracket');
@@ -166,7 +169,15 @@ export default function PublicTournament() {
 
   const { tournament, teams, matches, standings } = data;
 
+  // Determina se o utilizador atual pode gerir este torneio
+  const ownerId = tournament.createdBy?._id || tournament.createdBy;
+  const isOwner = currentUser && ownerId && String(ownerId) === String(currentUser._id);
+  const isSuperAdmin = currentUser?.role === 'superadmin';
+  const isAdmin = currentUser?.role === 'admin' || isSuperAdmin;
+  const canManage = isOwner || isAdmin;
+
   return (
+    <>
     <div className="animate-fade-in" style={{ minHeight: '100vh', background: 'var(--bg-main)', position: 'relative' }}>
       
       {/* Dynamic Header / Hero - Compact */}
@@ -643,10 +654,30 @@ export default function PublicTournament() {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         {roundMatches.map(m => (
                           <div key={m._id} style={{ position: 'relative' }}>
-                            <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }}>
+                            <div style={{ position: 'absolute', top: 10, right: 12, zIndex: 10, display: 'flex', gap: 6, alignItems: 'center' }}>
                               {m.status === 'finished' && (
                                 <button onClick={() => captureImage(`print-match-${m._id}`, `Jogo_${m.homeTeam?.name}_vs_${m.awayTeam?.name}`)} className="btn btn-secondary btn-sm" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', padding: 4 }} title="Guardar Resultado">
                                   <Camera size={16} />
+                                </button>
+                              )}
+                              {canManage && m.status !== 'finished' && m.status !== 'cancelled' && (
+                                <button
+                                  onClick={() => setShowResultModal(m)}
+                                  className="btn btn-primary btn-sm animate-pulse-light"
+                                  style={{ fontSize: 11, padding: '4px 10px', height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', gap: 4 }}
+                                  title="Lançar resultado"
+                                >
+                                  <CheckCircle size={12} /> Lançar
+                                </button>
+                              )}
+                              {canManage && m.status === 'finished' && (
+                                <button
+                                  onClick={() => setShowResultModal(m)}
+                                  className="btn btn-secondary btn-sm"
+                                  style={{ fontSize: 11, padding: '4px 10px', height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', gap: 4, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-muted)' }}
+                                  title="Editar resultado"
+                                >
+                                  ✏️
                                 </button>
                               )}
                             </div>
@@ -779,6 +810,171 @@ export default function PublicTournament() {
       )}
     </div>
 
+      {/* Modal de resultado para o organizador na página pública */}
+      {showResultModal && (
+        <PublicResultModal
+          match={showResultModal}
+          tournamentId={tournament._id}
+          teams={teams}
+          matches={matches}
+          onClose={() => setShowResultModal(null)}
+          onSaved={() => { setShowResultModal(null); loadData(); }}
+        />
+      )}
+    </>
+  );
+}
+
+function PublicResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) {
+  const [home, setHome] = useState(match.homeScore ?? '');
+  const [away, setAway] = useState(match.awayScore ?? '');
+  const [referee, setReferee] = useState(match.referee || '');
+  const [events, setEvents] = useState(match.events || []);
+  const [saving, setSaving] = useState(false);
+
+  const homeTeamId = match.homeTeam?._id || '';
+  const awayTeamId = match.awayTeam?._id || '';
+  const homePlayers = teams.find(t => t._id === homeTeamId)?.players || [];
+  const awayPlayers = teams.find(t => t._id === awayTeamId)?.players || [];
+  const [newEvent, setNewEvent] = useState({ type: 'goal', team: homeTeamId, playerName: '', minute: '' });
+  const currentTeamPlayers = newEvent.team === homeTeamId ? homePlayers : awayPlayers;
+
+  const prevRoundMatches = (match.phase === 'knockout' && match.round > 1)
+    ? (matches || []).filter(m => m.phase === 'knockout' && m.round === match.round - 1)
+    : [];
+  const hasPendingPrevRound = prevRoundMatches.some(m => m.status !== 'finished' && m.status !== 'cancelled');
+  const hasNoTeams = match.phase === 'knockout' && (!match.homeTeam || !match.awayTeam);
+  const isBlocked = hasNoTeams || hasPendingPrevRound;
+
+  const handleAddEvent = () => {
+    if (!newEvent.playerName) return toast.error('Seleciona ou escreve o nome do jogador.');
+    setEvents([...events, { ...newEvent, id: Date.now(), minute: newEvent.minute ? Number(newEvent.minute) : null }]);
+    setNewEvent({ ...newEvent, playerName: '', minute: '' });
+  };
+  const handleRemoveEvent = (id) => setEvents(events.filter(e => e.id !== id && e._id !== id));
+
+  const handleSave = async (customStatus) => {
+    if (home === '' || away === '') return toast.error('Insere os dois resultados.');
+    setSaving(true);
+    try {
+      await api.put(`/tournaments/${tournamentId}/matches/${match._id}/result`, {
+        homeScore: Number(home),
+        awayScore: Number(away),
+        events,
+        referee,
+        status: customStatus || 'finished'
+      });
+      toast.success(customStatus === 'live' ? 'Live Atualizado! 📡' : 'Resultado guardado! ✅');
+      onSaved();
+      if (!customStatus || customStatus === 'finished') onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Erro ao guardar resultado.');
+    } finally { setSaving(false); }
+  };
+
+  const eventIcons = { goal: '⚽', yellow_card: '🟨', red_card: '🟥' };
+  const eventLabels = { goal: 'Golo', yellow_card: 'Cartão Amarelo', red_card: 'Cartão Vermelho' };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal animate-slide-up" style={{ maxWidth: 500 }}>
+        <div className="modal-header">
+          <h2 className="modal-title">Registo de Jogo</h2>
+          <button className="modal-close" onClick={onClose}><X size={18} /></button>
+        </div>
+
+        {hasNoTeams && (
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: '#ef4444', textAlign: 'center', fontWeight: 600 }}>
+            ⚠️ As equipas para este jogo ainda não foram apuradas.
+          </div>
+        )}
+        {hasPendingPrevRound && (
+          <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 10, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: '#f59e0b', textAlign: 'center', fontWeight: 600 }}>
+            ⚠️ Há jogos da ronda anterior ainda por terminar.
+          </div>
+        )}
+
+        <div style={{ marginBottom: 16 }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginBottom: 12, textAlign: 'center' }}>
+            {match.homeTeam?.name || '?'} vs {match.awayTeam?.name || '?'}
+          </p>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'center' }}>
+            <input
+              type="number" min="0" value={home} onChange={e => setHome(e.target.value)}
+              className="form-input" style={{ width: 70, textAlign: 'center', fontSize: 24, fontWeight: 900 }}
+              placeholder="0" disabled={isBlocked}
+            />
+            <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-muted)' }}>-</span>
+            <input
+              type="number" min="0" value={away} onChange={e => setAway(e.target.value)}
+              className="form-input" style={{ width: 70, textAlign: 'center', fontSize: 24, fontWeight: 900 }}
+              placeholder="0" disabled={isBlocked}
+            />
+          </div>
+        </div>
+
+        <div className="form-group" style={{ marginBottom: 16 }}>
+          <label className="form-label">Árbitro (opcional)</label>
+          <input className="form-input" placeholder="Nome do árbitro" value={referee} onChange={e => setReferee(e.target.value)} />
+        </div>
+
+        <div style={{ marginBottom: 16 }}>
+          <label className="form-label" style={{ marginBottom: 8, display: 'block' }}>Eventos do Jogo</label>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+            <select className="form-input" style={{ flex: '1 1 100px' }} value={newEvent.type} onChange={e => setNewEvent({ ...newEvent, type: e.target.value })}>
+              <option value="goal">⚽ Golo</option>
+              <option value="yellow_card">🟨 Amarelo</option>
+              <option value="red_card">🟥 Vermelho</option>
+            </select>
+            <select className="form-input" style={{ flex: '1 1 100px' }} value={newEvent.team} onChange={e => setNewEvent({ ...newEvent, team: e.target.value, playerName: '' })}>
+              {homeTeamId && <option value={homeTeamId}>{match.homeTeam?.name}</option>}
+              {awayTeamId && <option value={awayTeamId}>{match.awayTeam?.name}</option>}
+            </select>
+            {currentTeamPlayers.length > 0 ? (
+              <select className="form-input" style={{ flex: '2 1 140px' }} value={newEvent.playerName} onChange={e => setNewEvent({ ...newEvent, playerName: e.target.value })}>
+                <option value="">Jogador...</option>
+                {currentTeamPlayers.map((p, i) => <option key={i} value={p.name || p}>{p.name || p}</option>)}
+              </select>
+            ) : (
+              <input className="form-input" style={{ flex: '2 1 140px' }} placeholder="Nome do jogador" value={newEvent.playerName} onChange={e => setNewEvent({ ...newEvent, playerName: e.target.value })} />
+            )}
+            <input type="number" className="form-input" style={{ width: 60 }} placeholder="Min" value={newEvent.minute} onChange={e => setNewEvent({ ...newEvent, minute: e.target.value })} />
+            <button type="button" className="btn btn-secondary btn-sm" onClick={handleAddEvent} style={{ flexShrink: 0 }}>+</button>
+          </div>
+          {events.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+              {events.map((ev, i) => (
+                <div key={ev._id || ev.id || i} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg-secondary)', borderRadius: 8, padding: '4px 10px', fontSize: 12 }}>
+                  <span>{eventIcons[ev.type]}</span>
+                  <span>{ev.playerName}</span>
+                  {ev.minute && <span style={{ color: 'var(--text-muted)' }}>{ev.minute}'</span>}
+                  <button onClick={() => handleRemoveEvent(ev._id || ev.id)} style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: 14, lineHeight: 1 }}>×</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => handleSave('live')}
+            disabled={saving || isBlocked}
+            style={{ flex: 1, justifyContent: 'center', minWidth: 120 }}
+          >
+            📡 Atualizar Live
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={() => handleSave('finished')}
+            disabled={saving || isBlocked}
+            style={{ flex: 2, justifyContent: 'center', minWidth: 140 }}
+          >
+            {saving ? 'A guardar...' : '✅ Guardar Resultado Final'}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
