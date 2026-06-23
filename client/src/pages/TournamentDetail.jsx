@@ -858,6 +858,44 @@ export default function TournamentDetail() {
 
                           {showFinal && finalMatches[0] && (() => {
                             const finalMatch = finalMatches[0];
+                            const homeQualified = !!finalMatch?.homeTeam;
+                            const awayQualified = !!finalMatch?.awayTeam;
+                            const bothQualified = homeQualified && awayQualified;
+                            const finalFinished = finalMatch?.status === 'finished';
+                            const pendingCount = (!homeQualified ? 1 : 0) + (!awayQualified ? 1 : 0);
+
+                            const renderFinalTeam = (team, label) => {
+                              if (team) {
+                                return (
+                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                                    <div className="bracket-team-logo bracket-final-team-logo" style={{ borderColor: team.color || 'var(--green)', color: '#fff', boxShadow: `0 0 18px ${team.color || 'rgba(0,200,83,0.4)'}` }}>
+                                      {team.logo ? <img src={team.logo} alt="" /> : team.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div style={{ fontSize: 13, fontWeight: 800, color: '#fff', textAlign: 'center', maxWidth: 110, textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
+                                      {team.name}
+                                    </div>
+                                    <div style={{ fontSize: 10, color: 'var(--green)', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>
+                                      ✓ Apurado
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              // Slot vazio — a aguardar
+                              return (
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                                  <div className="bracket-team-logo bracket-final-team-logo" style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.03)', animation: 'pulse 2s ease-in-out infinite' }}>
+                                    ⏳
+                                  </div>
+                                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textAlign: 'center', maxWidth: 110 }}>
+                                    {label}
+                                  </div>
+                                  <div style={{ fontSize: 10, color: '#f59e0b', fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                                    Jogo em falta
+                                  </div>
+                                </div>
+                              );
+                            };
+
                             return (
                               <div className="bracket-center-final">
                                 {/* 4 cantos neon — um span por canto */}
@@ -870,39 +908,77 @@ export default function TournamentDetail() {
                                   <div className="bracket-final-subtitle">ROAD TO</div>
                                   <div className="bracket-final-title">{tournament.name}</div>
                                 </div>
-                                
+
+                                {/* Status badge when pending */}
+                                {!bothQualified && (
+                                  <div style={{
+                                    background: 'rgba(245,158,11,0.15)',
+                                    border: '1px solid rgba(245,158,11,0.4)',
+                                    borderRadius: 8,
+                                    padding: '5px 12px',
+                                    fontSize: 11,
+                                    color: '#f59e0b',
+                                    fontWeight: 700,
+                                    textAlign: 'center',
+                                    marginBottom: 10,
+                                    letterSpacing: 0.5
+                                  }}>
+                                    ⏳ {pendingCount === 2 ? 'Aguarda 2 jogos' : 'Aguarda 1 jogo'}
+                                  </div>
+                                )}
+
                                 {/* Home Team (Top) */}
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                                  <div className="bracket-team-logo bracket-final-team-logo" style={{ borderColor: finalMatch?.homeTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
-                                    {finalMatch?.homeTeam?.logo ? <img src={finalMatch.homeTeam.logo} alt="" /> : (finalMatch?.homeTeam?.name ? finalMatch.homeTeam.name.charAt(0).toUpperCase() : '?')}
-                                  </div>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: finalMatch?.homeTeam?.name ? '#fff' : 'var(--text-muted)', textAlign: 'center', maxWidth: 100 }}>
-                                    {finalMatch?.homeTeam?.name || 'A anunciar'}
-                                  </div>
-                                </div>
-                                
+                                {renderFinalTeam(finalMatch?.homeTeam, 'Finalista 1')}
+
                                 <div className="bracket-trophy-column" style={{ margin: '10px 0' }}>
                                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                     <img src="/TACA.png" alt="Troféu" className="bracket-final-trophy-img" />
                                     <div className="bracket-final-title">{tournament.name}</div>
                                     <div className="bracket-final-subtitle">FINAL</div>
+                                    {/* Show score if final is played */}
+                                    {finalFinished && (
+                                      <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <span style={{ fontWeight: 900, fontSize: 22, color: finalMatch.homeScore > finalMatch.awayScore ? 'var(--green)' : 'var(--text-muted)' }}>{finalMatch.homeScore}</span>
+                                        <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>-</span>
+                                        <span style={{ fontWeight: 900, fontSize: 22, color: finalMatch.awayScore > finalMatch.homeScore ? 'var(--green)' : 'var(--text-muted)' }}>{finalMatch.awayScore}</span>
+                                      </div>
+                                    )}
                                     {crownedChampion && (
                                       <div style={{ marginTop: 12, fontWeight: 900, color: crownedChampion.color || 'var(--yellow)', fontSize: 16 }}>
-                                        {crownedChampion.name}
+                                        🏆 {crownedChampion.name}
                                       </div>
                                     )}
                                   </div>
                                 </div>
 
                                 {/* Away Team (Bottom) */}
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                                  <div className="bracket-team-logo bracket-final-team-logo" style={{ borderColor: finalMatch?.awayTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
-                                    {finalMatch?.awayTeam?.logo ? <img src={finalMatch.awayTeam.logo} alt="" /> : (finalMatch?.awayTeam?.name ? finalMatch.awayTeam.name.charAt(0).toUpperCase() : '?')}
+                                {renderFinalTeam(finalMatch?.awayTeam, 'Finalista 2')}
+
+                                {/* Click to launch result */}
+                                {canManage && bothQualified && (
+                                  <div
+                                    onClick={() => setShowResultModal(finalMatch)}
+                                    style={{
+                                      marginTop: 12,
+                                      cursor: 'pointer',
+                                      background: finalFinished ? 'rgba(0,200,83,0.1)' : 'var(--green)',
+                                      color: finalFinished ? 'var(--green)' : '#000',
+                                      border: '1px solid var(--green)',
+                                      borderRadius: 8,
+                                      padding: '6px 16px',
+                                      fontSize: 11,
+                                      fontWeight: 800,
+                                      textAlign: 'center',
+                                      letterSpacing: 0.5,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 6,
+                                      justifyContent: 'center'
+                                    }}
+                                  >
+                                    {finalFinished ? '✓ Ver / Editar Resultado' : '🏆 Lançar Resultado Final'}
                                   </div>
-                                  <div style={{ fontSize: 13, fontWeight: 700, color: finalMatch?.awayTeam?.name ? '#fff' : 'var(--text-muted)', textAlign: 'center', maxWidth: 100 }}>
-                                    {finalMatch?.awayTeam?.name || 'A anunciar'}
-                                  </div>
-                                </div>
+                                )}
                               </div>
                             );
                           })()}
