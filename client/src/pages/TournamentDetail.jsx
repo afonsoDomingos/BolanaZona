@@ -1037,15 +1037,24 @@ export default function TournamentDetail() {
                                       </div>
                                       <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 13, minWidth: 0, wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{m.awayTeam?.name || '—'}</div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', flex: '1 1 150px' }}>
-                                      <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px', color: '#25D366' }} onClick={() => shareMatchWhatsApp(m)} title="WhatsApp"><MessageCircle size={14} /></button>
-                                      {canManage && (
-                                        <>
-                                          <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Editar Jogo"><Edit2 size={14} /></button>
-                                          <button className="btn btn-primary btn-sm" style={{ padding: '6px 8px', cursor: 'pointer' }} onClick={() => setShowResultModal(m)} title="Lançar Resultado e Marcadores"><Trophy size={14} /></button>
-                                          <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px' }} onClick={() => setShowShareModal(m)} title="Partilhar"><Camera size={14} /></button>
-                                        </>
+                                    <div style={{ width: '100%', display: 'flex', gap: 8, marginTop: 4, flexDirection: 'column' }}>
+                                      {canManage && m.status !== 'finished' && (
+                                        <button className="btn btn-primary btn-sm animate-pulse-light" style={{ width: '100%', padding: '8px', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} onClick={() => setShowResultModal(m)}>
+                                          <Trophy size={14} /> Lançar Resultado
+                                        </button>
                                       )}
+                                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+                                        <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px', color: '#25D366' }} onClick={() => shareMatchWhatsApp(m)} title="WhatsApp"><MessageCircle size={13} /></button>
+                                        {canManage && (
+                                          <>
+                                            <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Editar Jogo"><Edit2 size={13} /></button>
+                                            {m.status === 'finished' && (
+                                              <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px', color: 'var(--green)' }} onClick={() => setShowResultModal(m)} title="Editar Resultado"><Trophy size={13} /></button>
+                                            )}
+                                            <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }} onClick={() => setShowShareModal(m)} title="Partilhar"><Camera size={13} /></button>
+                                          </>
+                                        )}
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
