@@ -2071,140 +2071,147 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
         referee,
         status: customStatus || 'finished'
       });
-      toast.success(customStatus === 'live' ? 'Live Atualizado! 📡' : 'Resultado e eventos guardados!');
-      onSaved();
-      if (!customStatus || customStatus === 'finished') onClose();
-    } catch (err) { 
-      toast.error(err.response?.data?.message || 'Erro ao guardar resultado.'); 
-    }
-    finally { setLoading(false); }
-  };
-
-  const eventIcons = { goal: '⚽', yellow_card: '🟨', red_card: '🟥' };
-  const eventLabels = { goal: 'Golo', yellow_card: 'Cartão Amarelo', red_card: 'Cartão Vermelho' };
-
-  return (
+      toast.success(customStatus === 'live' ? 'Live Atualizado! 📡' : 'Resultado e ev  return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ maxWidth: 500 }}>
+
+        {/* Drag handle pill for mobile bottom-sheet feel */}
+        <div style={{ width: 40, height: 4, borderRadius: 4, background: 'rgba(255,255,255,0.15)', margin: '-4px auto 14px' }} />
+
         <div className="modal-header">
           <h2 className="modal-title">Registo de Jogo</h2>
           <button className="modal-close" onClick={onClose}><X size={18} /></button>
         </div>
-        
-        <div style={{ marginBottom: 24 }}>
-          {/* Show warning if teams not yet assigned to this match */}
-          {hasNoTeams && (
-            <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: '#ef4444', textAlign: 'center', fontWeight: 600 }}>
-              ⚠️ As equipas para este jogo ainda não foram apuradas. Não é possível lançar resultado.
-            </div>
-          )}
 
-          {/* Show warning if previous round has pending matches */}
-          {!hasNoTeams && hasPendingPrevRound && (
-            <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 10, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: '#f59e0b', textAlign: 'center', fontWeight: 600 }}>
-              ⚠️ Não é possível lançar resultado. Ainda há {pendingInPrevRound.length} jogo(s) por disputar na ronda anterior ({prevRoundName}). Termina esses jogos primeiro.
-            </div>
-          )}
+        {hasNoTeams && (
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, padding: '8px 12px', marginBottom: 12, fontSize: 12, color: '#ef4444', textAlign: 'center', fontWeight: 600 }}>
+            ⚠️ Equipas ainda não apuradas. Não é possível lançar resultado.
+          </div>
+        )}
+        {!hasNoTeams && hasPendingPrevRound && (
+          <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 10, padding: '8px 12px', marginBottom: 12, fontSize: 12, color: '#f59e0b', textAlign: 'center', fontWeight: 600 }}>
+            ⚠️ {pendingInPrevRound.length} jogo(s) por terminar em {prevRoundName}.
+          </div>
+        )}
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, marginBottom: 20 }}>
-            <div style={{ flex: 1, textAlign: 'right' }}>
-              <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 14 }}>{match.homeTeam?.name || 'Casa'}</div>
-              <input type="number" min="0" className="score-input" value={home} onChange={e => setHome(e.target.value)} disabled={isSubmissionBlocked} />
+        {/* Score Section */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 16 }}>
+          <div style={{ flex: 1, textAlign: 'center' }}>
+            <div style={{ fontWeight: 700, marginBottom: 6, fontSize: 12, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {match.homeTeam?.name || 'Casa'}
             </div>
-            <div style={{ fontWeight: 700, color: 'var(--text-muted)', fontSize: 20 }}>×</div>
-            <div style={{ flex: 1, textAlign: 'left' }}>
-              <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 14 }}>{match.awayTeam?.name || 'Fora'}</div>
-              <input type="number" min="0" className="score-input" value={away} onChange={e => setAway(e.target.value)} disabled={isSubmissionBlocked} />
+            <input type="number" min="0" className="score-input" value={home} onChange={e => setHome(e.target.value)} disabled={isSubmissionBlocked} style={{ width: '100%', maxWidth: 72 }} />
+          </div>
+          <div style={{ fontWeight: 700, color: 'var(--text-muted)', fontSize: 18, paddingTop: 22 }}>×</div>
+          <div style={{ flex: 1, textAlign: 'center' }}>
+            <div style={{ fontWeight: 700, marginBottom: 6, fontSize: 12, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {match.awayTeam?.name || 'Fora'}
             </div>
+            <input type="number" min="0" className="score-input" value={away} onChange={e => setAway(e.target.value)} disabled={isSubmissionBlocked} style={{ width: '100%', maxWidth: 72 }} />
+          </div>
+        </div>
+
+        {/* Referee */}
+        <div className="form-group" style={{ marginBottom: 14 }}>
+          <label className="form-label" style={{ fontSize: 11 }}>Árbitro (opcional)</label>
+          <input className="form-input" style={{ height: 38, fontSize: 13 }} placeholder="Nome do árbitro..." value={referee} onChange={e => setReferee(e.target.value)} disabled={isSubmissionBlocked} />
+        </div>
+
+        <div style={{ height: 1, background: 'var(--border)', margin: '14px 0' }} />
+
+        {/* Events */}
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10, color: 'var(--text-secondary)' }}>
+            Eventos (Golos &amp; Cartões)
           </div>
 
-          <div className="form-group" style={{ marginBottom: 24 }}>
-            <label className="form-label">Árbitro da Partida</label>
-            <input className="form-input" placeholder="Nome do árbitro..." value={referee} onChange={e => setReferee(e.target.value)} disabled={isSubmissionBlocked} />
-          </div>
-
-          <div className="divider" style={{ margin: '24px 0' }} />
-
-          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', letterSpacing: 0.5 }}>Eventos da Partida (Golos e Cartões)</h3>
-          
-          <div style={{ background: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 12, border: '1px solid var(--border)', marginBottom: 20, opacity: isSubmissionBlocked ? 0.6 : 1 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
-              <select className="form-select" value={newEvent.type} onChange={e => setNewEvent({...newEvent, type: e.target.value})} disabled={isSubmissionBlocked}>
+          <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--border)', opacity: isSubmissionBlocked ? 0.6 : 1 }}>
+            {/* Row 1: type + team */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+              <select className="form-select" style={{ height: 36, fontSize: 12 }} value={newEvent.type} onChange={e => setNewEvent({...newEvent, type: e.target.value})} disabled={isSubmissionBlocked}>
                 <option value="goal">⚽ Golo</option>
-                <option value="yellow_card">🟨 Cartão Amarelo</option>
-                <option value="red_card">🟥 Cartão Vermelho</option>
+                <option value="yellow_card">🟨 Amarelo</option>
+                <option value="red_card">🟥 Vermelho</option>
               </select>
-              <select className="form-select" value={newEvent.team} onChange={e => setNewEvent({...newEvent, team: e.target.value})} disabled={isSubmissionBlocked}>
+              <select className="form-select" style={{ height: 36, fontSize: 12 }} value={newEvent.team} onChange={e => setNewEvent({...newEvent, team: e.target.value})} disabled={isSubmissionBlocked}>
                 {homeTeamId && <option value={homeTeamId}>{match.homeTeam?.name || 'Casa'}</option>}
                 {awayTeamId && <option value={awayTeamId}>{match.awayTeam?.name || 'Fora'}</option>}
                 {!homeTeamId && !awayTeamId && teams.map(t => <option key={t._id} value={t._id}>{t.name}</option>)}
               </select>
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <input 
+            {/* Row 2: min + name + add */}
+            <div style={{ display: 'flex', gap: 6 }}>
+              <input
                 type="number"
                 className="form-input"
-                style={{ width: 70 }}
+                style={{ width: 54, height: 36, fontSize: 12, padding: '0 8px' }}
                 placeholder="Min"
                 value={newEvent.minute}
                 onChange={e => setNewEvent({...newEvent, minute: e.target.value})}
                 disabled={isSubmissionBlocked}
               />
-              <input 
+              <input
                 list="players-list"
-                className="form-input" 
-                placeholder="Nome do jogador..." 
-                style={{ flex: 1 }}
-                value={newEvent.playerName} 
+                className="form-input"
+                style={{ flex: 1, height: 36, fontSize: 12 }}
+                placeholder="Nome do jogador..."
+                value={newEvent.playerName}
                 onChange={e => setNewEvent({...newEvent, playerName: e.target.value})}
                 disabled={isSubmissionBlocked}
               />
               <datalist id="players-list">
                 {currentTeamPlayers.map((p, i) => <option key={i} value={p.name} />)}
               </datalist>
-              <button className="btn btn-primary btn-sm" onClick={handleAddEvent} disabled={isSubmissionBlocked}>Add</button>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={handleAddEvent}
+                disabled={isSubmissionBlocked}
+                style={{ height: 36, padding: '0 14px', flexShrink: 0, width: 'auto' }}
+              >
+                Add
+              </button>
             </div>
-
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 200, overflowY: 'auto', paddingRight: 4 }}>
+          {/* Events list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 160, overflowY: 'auto', paddingRight: 2, marginTop: 10 }}>
             {events.length === 0 ? (
-              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, padding: '10px 0' }}>Nenhum evento registado.</p>
+              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12, padding: '6px 0' }}>Nenhum evento registado.</p>
             ) : (
               events.map((e, i) => (
-                <div key={e.id || e._id || i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.02)', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 16 }}>{eventIcons[e.type]}</span>
+                <div key={e.id || e._id || i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.02)', padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 14 }}>{eventIcons[e.type]}</span>
                     <div>
-                      <span style={{ fontWeight: 700, fontSize: 14 }}>{e.playerName}</span>
-                      {e.minute && <span style={{ fontSize: 11, color: 'var(--green)', marginLeft: 6 }}>{e.minute}'</span>}
-                      <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>({e.team === homeTeamId ? (match.homeTeam?.name || 'Casa') : (match.awayTeam?.name || 'Fora')})</span>
+                      <span style={{ fontWeight: 700, fontSize: 13 }}>{e.playerName}</span>
+                      {e.minute && <span style={{ fontSize: 11, color: 'var(--green)', marginLeft: 5 }}>{e.minute}'</span>}
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 6 }}>({e.team === homeTeamId ? (match.homeTeam?.name || 'Casa') : (match.awayTeam?.name || 'Fora')})</span>
                     </div>
                   </div>
-                  <button onClick={() => handleRemoveEvent(e.id || e._id)} style={{ background: 'none', color: 'var(--red)', opacity: 0.6 }} disabled={isSubmissionBlocked}><X size={14} /></button>
+                  <button onClick={() => handleRemoveEvent(e.id || e._id)} style={{ background: 'none', color: 'var(--red)', opacity: 0.7, padding: 4 }} disabled={isSubmissionBlocked}><X size={13} /></button>
                 </div>
               ))
             )}
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 12 }}>
-          <button 
-            className="btn btn-secondary" 
-            style={{ flex: 1, height: 48, justifyContent: 'center', opacity: isSubmissionBlocked ? 0.5 : 1 }} 
+        {/* Action Buttons */}
+        <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+          <button
+            className="btn btn-secondary"
+            style={{ flex: 1, height: 44, justifyContent: 'center', fontSize: 13, opacity: isSubmissionBlocked ? 0.5 : 1 }}
             onClick={() => handleSave('live')}
             disabled={loading || isSubmissionBlocked}
           >
-            {loading ? '...' : 'Actualizar Live'}
+            {loading ? '...' : '📡 Live'}
           </button>
-
-          <button 
-            className="btn btn-primary" 
-            onClick={() => handleSave('finished')} 
-            disabled={loading || isSubmissionBlocked} 
-            style={{ flex: 2, justifyContent: 'center', height: 48, opacity: isSubmissionBlocked ? 0.5 : 1 }}
+          <button
+            className="btn btn-primary"
+            onClick={() => handleSave('finished')}
+            disabled={loading || isSubmissionBlocked}
+            style={{ flex: 2, justifyContent: 'center', height: 44, fontSize: 13, opacity: isSubmissionBlocked ? 0.5 : 1 }}
           >
-            {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><Save size={16} /> Finalizar e Guardar Tudo</>}
+            {loading ? <span className="spinner" style={{ width: 16, height: 16 }} /> : <><Save size={14} /> Guardar Resultado</>}
           </button>
         </div>
 
