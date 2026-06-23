@@ -37,6 +37,9 @@ export default function PublicTournament() {
         if (res.data.tournament.status === 'registration' && showRegisterAction) {
           setShowRegistrationModal(true);
         }
+        if (res.data.tournament?.format === 'groups') {
+          setViewMode('list');
+        }
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
@@ -324,20 +327,22 @@ export default function PublicTournament() {
             ) : (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 12 }}>
-                  <div className="view-switcher" style={{ display: 'flex', gap: 4 }}>
-                    <button 
-                      className={`switcher-btn ${viewMode === 'bracket' ? 'active' : ''}`} 
-                      onClick={() => setViewMode('bracket')}
-                    >
-                      🌳 Árvore
-                    </button>
-                    <button 
-                      className={`switcher-btn ${viewMode === 'list' ? 'active' : ''}`} 
-                      onClick={() => setViewMode('list')}
-                    >
-                      📋 Lista
-                    </button>
-                  </div>
+                  {tournament?.format !== 'groups' && (
+                    <div className="view-switcher" style={{ display: 'flex', gap: 4 }}>
+                      <button 
+                        className={`switcher-btn ${viewMode === 'bracket' ? 'active' : ''}`} 
+                        onClick={() => setViewMode('bracket')}
+                      >
+                        🌳 Árvore
+                      </button>
+                      <button 
+                        className={`switcher-btn ${viewMode === 'list' ? 'active' : ''}`} 
+                        onClick={() => setViewMode('list')}
+                      >
+                        📋 Lista
+                      </button>
+                    </div>
+                  )}
                   {viewMode === 'bracket' && (
                     <button 
                       onClick={() => captureImage('print-bracket', `Arvore_${tournament.name}`)} 
@@ -415,7 +420,7 @@ export default function PublicTournament() {
                       }}
                     >
                       {(() => {
-                      const bracketMatches = matches;
+                      const bracketMatches = matches.filter(m => m.phase === 'knockout');
 
                       if (bracketMatches.length === 0) {
                         return (

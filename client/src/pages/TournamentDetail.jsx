@@ -64,6 +64,10 @@ export default function TournamentDetail() {
       setTeams(tRes.data.teams);
       setMatches(tRes.data.matches);
 
+      if (tRes.data.tournament?.format === 'groups') {
+        setViewMode('list');
+      }
+
       // Redirecionamento de segurança: Se não for dono, admin ou superadmin, vai para a página pública
       const ownerId = tRes.data.tournament.createdBy?._id || tRes.data.tournament.createdBy;
       if (currentUser && currentUser.role !== 'superadmin' && currentUser.role !== 'admin' && ownerId !== currentUser._id) {
@@ -563,7 +567,7 @@ export default function TournamentDetail() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
                 <h2 style={{ fontSize: 18, fontWeight: 700 }}>Calendário ({matches.length} jogos)</h2>
-                {matches.length > 0 && (
+                {matches.length > 0 && tournament?.format !== 'groups' && (
                   <div className="view-switcher">
                     <button 
                       className={`switcher-btn ${viewMode === 'bracket' ? 'active' : ''}`} 
@@ -658,7 +662,7 @@ export default function TournamentDetail() {
                       <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,5,36,0.85)', zIndex: 0 }} />
                   <div className="bracket-container" style={{ position: 'relative', zIndex: 1 }}>
                     {(() => {
-                      const bracketMatches = matches;
+                      const bracketMatches = matches.filter(m => m.phase === 'knockout');
 
                       if (bracketMatches.length === 0) {
                         return (
