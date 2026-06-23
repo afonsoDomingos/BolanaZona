@@ -144,14 +144,44 @@ exports.create = async (req, res) => {
   }
 };
 
-// PUT /api/tournaments/:id
 exports.update = async (req, res) => {
   try {
-    const t = await Tournament.findOneAndUpdate(
-      { _id: req.params.id, createdBy: req.user._id },
-      req.body, { new: true }
-    );
-    if (!t) return res.status(404).json({ message: 'Torneio não encontrado.' });
+    const query = req.user.role === 'superadmin' ? { _id: req.params.id } : { _id: req.params.id, createdBy: req.user._id };
+    const existing = await Tournament.findOne(query);
+    if (!existing) return res.status(404).json({ message: 'Torneio não encontrado.' });
+
+    const oldStatus = existing.status;
+    const newStatus = req.body.status;
+
+    const t = await Tournament.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    if (newStatus && newStatus !== oldStatus) {
+      const teams = await Team.find({ tournament: t._id, status: 'approved' });
+      const captainIds = [...new Set(teams.flatMap(team => team.captains || []).map(id => id.toString()))];
+
+      if (newStatus === 'active') {
+        for (const captainId of captainIds) {
+          await createNotification(
+            captainId,
+            'O Torneio Começou! ⚽',
+            `O torneio "${t.name}" já está ativo. Consulta o teu calendário de jogos!`,
+            'info',
+            `/dashboard/tournaments/${t._id}`
+          );
+        }
+      } else if (newStatus === 'finished') {
+        for (const captainId of captainIds) {
+          await createNotification(
+            captainId,
+            'Torneio Concluído! 🏆',
+            `O torneio "${t.name}" terminou oficialmente. Obrigado pela participação!`,
+            'success',
+            `/dashboard/tournaments/${t._id}`
+          );
+        }
+      }
+    }
+
     res.json(t);
   } catch (err) {
     res.status(500).json({ message: err.message });

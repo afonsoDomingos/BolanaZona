@@ -1,5 +1,6 @@
 const Team = require('../models/Team');
 const Tournament = require('../models/Tournament');
+const { create: createNotification } = require('./notificationController');
 
 exports.getByTournament = async (req, res) => {
   try {
@@ -39,6 +40,15 @@ exports.registerPublicTeam = async (req, res) => {
       status: 'pending', 
       createdBy: tournament.createdBy // Atribuímos ao dono do torneio para gestão
     });
+
+    await createNotification(
+      tournament.createdBy,
+      'Nova Inscrição Pendente 📋',
+      `A equipa "${team.name}" submeteu uma inscrição para o torneio "${tournament.name}".`,
+      'info',
+      `/dashboard/tournaments/${tournament._id}`
+    );
+
     res.status(201).json({ message: 'Inscrição submetida com sucesso! Aguarda a aprovação do organizador.', team });
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
@@ -63,7 +73,38 @@ exports.update = async (req, res) => {
       return res.status(403).json({ message: 'Sem permissão para editar esta equipa.' });
     }
 
+    const oldStatus = team.status;
+    const newStatus = req.body.status;
+
     const updated = await Team.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('tournament');
+
+    if (newStatus && newStatus !== oldStatus) {
+      const notifyUsers = [updated.createdBy, ...(updated.captains || [])].filter(Boolean);
+      const uniqueNotifyUsers = [...new Set(notifyUsers.map(id => id.toString()))];
+
+      if (newStatus === 'approved') {
+        for (const captainId of uniqueNotifyUsers) {
+          await createNotification(
+            captainId,
+            'Inscrição Aprovada! 🏆',
+            `A tua equipa "${updated.name}" foi aceite no torneio "${updated.tournament.name}".`,
+            'success',
+            `/dashboard/tournaments/${updated.tournament._id}`
+          );
+        }
+      } else if (newStatus === 'rejected') {
+        for (const captainId of uniqueNotifyUsers) {
+          await createNotification(
+            captainId,
+            'Inscrição Recusada ❌',
+            `A inscrição da tua equipa "${updated.name}" no torneio "${updated.tournament.name}" foi recusada pelo organizador.`,
+            'warning',
+            `/explore`
+          );
+        }
+      }
+    }
+
     res.json(updated);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };

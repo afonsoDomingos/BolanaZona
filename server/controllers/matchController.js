@@ -24,6 +24,7 @@ exports.updateResult = async (req, res) => {
 
     const oldHomeScore = match.homeScore || 0;
     const oldAwayScore = match.awayScore || 0;
+    const oldStatus = match.status;
 
     // 1. Verificar Permissão
     const isOwner = match.tournament.createdBy.toString() === req.user._id.toString();
@@ -94,6 +95,28 @@ exports.updateResult = async (req, res) => {
           'GOLO AO VIVO! ⚽',
           goalMsg,
           'info',
+          `/dashboard/tournaments/${match.tournament._id}`
+        );
+      }
+    }
+
+    // 3.5. Notificação de Jogo Terminado (Final Score)
+    if (match.status === 'finished' && oldStatus !== 'finished') {
+      const populatedMatch = await Match.findById(match._id).populate('homeTeam awayTeam');
+      const homeName = populatedMatch.homeTeam?.name || 'Equipa A';
+      const awayName = populatedMatch.awayTeam?.name || 'Equipa B';
+      const finishMsg = `Jogo Terminado: ${homeName} ${homeScore} - ${awayScore} ${awayName}. Placar final confirmado! 🏁`;
+
+      const captains = await Team.find({ _id: { $in: [match.homeTeam, match.awayTeam] } }).select('captains');
+      const notifyUsers = [match.tournament.createdBy, ...captains.flatMap(c => c.captains).filter(Boolean)];
+      const uniqueNotifyUsers = [...new Set(notifyUsers.map(id => id.toString()))];
+
+      for (const userId of uniqueNotifyUsers) {
+        await createNotification(
+          userId,
+          'Jogo Terminado 🏁',
+          finishMsg,
+          'success',
           `/dashboard/tournaments/${match.tournament._id}`
         );
       }
