@@ -1043,9 +1043,14 @@ export default function TournamentDetail() {
                                       <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 13, minWidth: 0, wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{m.awayTeam?.name || '—'}</div>
                                     </div>
                                     <div style={{ width: '100%', display: 'flex', gap: 8, marginTop: 4, flexDirection: 'column' }}>
-                                      {canManage && m.status !== 'finished' && (
+                                      {canManage && m.status !== 'finished' && m.status !== 'cancelled' && (
                                         <button className="btn btn-primary btn-sm animate-pulse-light" style={{ width: '100%', padding: '8px', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} onClick={() => setShowResultModal(m)}>
                                           <Trophy size={14} /> Lançar Resultado
+                                        </button>
+                                      )}
+                                      {canManage && m.status === 'finished' && (
+                                        <button className="btn btn-secondary btn-sm" style={{ width: '100%', padding: '8px', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, border: '1px solid rgba(0,200,83,0.25)', color: 'var(--green)' }} onClick={() => setShowResultModal(m)}>
+                                          <Trophy size={14} /> Editar Resultado
                                         </button>
                                       )}
                                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
