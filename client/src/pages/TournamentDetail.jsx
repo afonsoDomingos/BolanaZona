@@ -46,8 +46,8 @@ export default function TournamentDetail() {
     (typeof tournament.createdBy === 'string' && tournament.createdBy === currentUser._id) ||
     (tournament.createdBy?._id === currentUser._id)
   );
-  const isSuperAdmin = currentUser?.role === 'superadmin';
-  const canManage = isOwner || isSuperAdmin;
+  const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
+  const canManage = isOwner || isAdmin;
 
   const load = useCallback(async () => {
     addLog('Starting load()');
@@ -63,9 +63,9 @@ export default function TournamentDetail() {
       setTeams(tRes.data.teams);
       setMatches(tRes.data.matches);
 
-      // Redirecionamento de segurança: Se não for dono nem superadmin, vai para a página pública
+      // Redirecionamento de segurança: Se não for dono, admin ou superadmin, vai para a página pública
       const ownerId = tRes.data.tournament.createdBy?._id || tRes.data.tournament.createdBy;
-      if (currentUser && currentUser.role !== 'superadmin' && ownerId !== currentUser._id) {
+      if (currentUser && currentUser.role !== 'superadmin' && currentUser.role !== 'admin' && ownerId !== currentUser._id) {
         navigate(`/t/${tRes.data.tournament.shareCode}`, { replace: true });
         return;
       }
@@ -1566,8 +1566,23 @@ function TournamentEditModal({ tournament, onClose, onSaved }) {
 }
 
 function MatchScheduleModal({ match, tournamentId, onClose, onSaved }) {
-  const [date, setDate] = useState(match.date ? new Date(match.date).toISOString().substring(0, 10) : '');
-  const [time, setTime] = useState(match.date ? new Date(match.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }).replace('h', ':') : '');
+  const getLocalDateString = (d) => {
+    if (!d) return '';
+    const dateObj = new Date(d);
+    const tzOffset = dateObj.getTimezoneOffset() * 60000;
+    return (new Date(dateObj.getTime() - tzOffset)).toISOString().slice(0, 10);
+  };
+
+  const getLocalTimeString = (d) => {
+    if (!d) return '';
+    const dateObj = new Date(d);
+    const hours = String(dateObj.getHours()).padStart(2, '0');
+    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
+  const [date, setDate] = useState(match.date ? getLocalDateString(match.date) : '');
+  const [time, setTime] = useState(match.date ? getLocalTimeString(match.date) : '');
   const [location, setLocation] = useState(match.location || '');
   const [referee, setReferee] = useState(match.referee || '');
   const [status, setStatus] = useState(match.status || 'scheduled');
