@@ -2071,7 +2071,17 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
         referee,
         status: customStatus || 'finished'
       });
-      toast.success(customStatus === 'live' ? 'Live Atualizado! 📡' : 'Resultado e ev  return (
+      toast.success(customStatus === 'live' ? 'Live Atualizado! 📡' : 'Resultado guardado!');
+      onSaved();
+      if (!customStatus || customStatus === 'finished') onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Erro ao guardar resultado.');
+    } finally { setLoading(false); }
+  };
+
+  const eventIcons = { goal: '⚽', yellow_card: '🟨', red_card: '🟥' };
+
+  return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ maxWidth: 500 }}>
 
