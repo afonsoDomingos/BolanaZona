@@ -27,8 +27,8 @@ exports.updateResult = async (req, res) => {
 
     // 1. Verificar Permissão
     const isOwner = match.tournament.createdBy.toString() === req.user._id.toString();
-    const isSuperAdmin = req.user.role === 'superadmin';
-    if (!isOwner && !isSuperAdmin) {
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({ message: 'Apenas o organizador do torneio pode inserir resultados.' });
     }
 
@@ -122,8 +122,8 @@ exports.update = async (req, res) => {
     if (!match) return res.status(404).json({ message: 'Jogo não encontrado.' });
 
     const isOwner = match.tournament.createdBy.toString() === req.user._id.toString();
-    const isSuperAdmin = req.user.role === 'superadmin';
-    if (!isOwner && !isSuperAdmin) {
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({ message: 'Sem permissão para editar este jogo.' });
     }
 
