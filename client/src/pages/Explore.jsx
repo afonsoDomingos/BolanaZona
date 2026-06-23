@@ -12,17 +12,20 @@ export default function Explore() {
   const [neighborhoodFilter, setNeighborhoodFilter] = useState('');
 
   const [matches, setMatches] = useState([]);
+  const [recentMatches, setRecentMatches] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
 
 
   useEffect(() => {
     Promise.all([
       api.get('/tournaments/public/all'),
-      api.get('/tournaments/public/matches/live')
+      api.get('/tournaments/public/matches/live'),
+      api.get('/tournaments/public/matches/recent')
     ])
-      .then(([tournamentsRes, matchesRes]) => {
+      .then(([tournamentsRes, matchesRes, recentRes]) => {
         setTournaments(tournamentsRes.data);
         setMatches(matchesRes.data);
+        setRecentMatches(recentRes.data);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -215,6 +218,42 @@ export default function Explore() {
                           {m.location && <span>🏟️ {m.location}</span>}
                         </div>
                       )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Recent Results Section */}
+            {recentMatches.length > 0 && (
+              <div style={{ marginBottom: 60 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+                  <h2 className="font-syne" style={{ fontSize: 24, fontWeight: 800 }}>Resultados Recentes ✅</h2>
+                  <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, var(--green), transparent)', opacity: 0.3 }} />
+                </div>
+                <div style={{ display: 'flex', overflowX: 'auto', gap: 12, paddingBottom: 16, margin: '0 -20px', padding: '0 20px 16px', scrollSnapType: 'x mandatory' }}>
+                  {recentMatches.map(m => (
+                    <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} style={{ textDecoration: 'none', minWidth: 240, maxWidth: 260, flexShrink: 0, scrollSnapAlign: 'start', background: 'rgba(0,200,83,0.04)', border: '1px solid rgba(0,200,83,0.12)', borderRadius: 16, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>{m.tournament?.name}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                        <div style={{ flex: 1, textAlign: 'right' }}>
+                          <div style={{ width: 32, height: 32, borderRadius: 10, background: m.homeTeam?.color || 'var(--green)', margin: '0 auto 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                          </div>
+                          <div style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 70 }}>{m.homeTeam?.name}</div>
+                        </div>
+                        <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                          <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--green)', letterSpacing: 2 }}>{m.homeScore} - {m.awayScore}</div>
+                          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 700 }}>FINAL</div>
+                        </div>
+                        <div style={{ flex: 1, textAlign: 'left' }}>
+                          <div style={{ width: 32, height: 32, borderRadius: 10, background: m.awayTeam?.color || 'rgba(255,255,255,0.1)', margin: '0 auto 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                            {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                          </div>
+                          <div style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 70 }}>{m.awayTeam?.name}</div>
+                        </div>
+                      </div>
+                      {m.date && <div style={{ fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>📅 {new Date(m.date).toLocaleDateString('pt-PT')}</div>}
                     </Link>
                   ))}
                 </div>

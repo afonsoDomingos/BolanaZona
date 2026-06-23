@@ -100,6 +100,26 @@ exports.getGlobalMatches = async (req, res) => {
   }
 };
 
+exports.getRecentFinishedMatches = async (req, res) => {
+  try {
+    const matches = await Match.find({ status: 'finished' })
+      .populate({
+        path: 'tournament',
+        match: { status: { $in: ['registration', 'active', 'finished'] } },
+        select: 'name shareCode neighborhood'
+      })
+      .populate('homeTeam', 'name logo color')
+      .populate('awayTeam', 'name logo color')
+      .sort({ updatedAt: -1 })
+      .limit(20);
+
+    const validMatches = matches.filter(m => m.tournament != null);
+    res.json(validMatches);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // POST /api/tournaments
 exports.create = async (req, res) => {
   try {

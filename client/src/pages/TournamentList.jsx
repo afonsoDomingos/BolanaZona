@@ -78,36 +78,39 @@ export default function TournamentList() {
             {!search && <Link to="/dashboard/tournaments/new" className="btn btn-primary"><Plus size={16} /> Criar Torneio</Link>}
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 20 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {filtered.map(t => (
-              <div key={t._id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                    <div className="spin-ball" style={{ width: 48, height: 48, borderRadius: 14, background: 'var(--green-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>⚽</div>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 16 }}>{t.name}</div>
-                      <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>📍 {t.neighborhood}</div>
-                    </div>
+              <div key={t._id} className="card" style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {/* Header row */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                  <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, background: 'var(--green-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>⚽</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: 15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>📍 {t.neighborhood}</div>
                   </div>
-                  <span className={`badge ${statusBadge[t.status]}`}>{statusLabel[t.status]}</span>
+                  <span className={`badge ${statusBadge[t.status]}`} style={{ fontSize: 10, padding: '3px 8px', letterSpacing: 0.3, flexShrink: 0, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+                    {t.status === 'active' ? '● A Decorrer' : statusLabel[t.status]}
+                  </span>
                 </div>
 
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <span className="badge badge-gray">👥 {t.maxTeams} equipas</span>
-                  <span className="badge badge-gray">{formatLabel[t.format]}</span>
+                {/* Meta row */}
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  <span className="badge badge-gray" style={{ fontSize: 11, padding: '3px 8px' }}>👥 {t.maxTeams} eq.</span>
+                  <span className="badge badge-gray" style={{ fontSize: 11, padding: '3px 8px' }}>{formatLabel[t.format]}</span>
                   {t.createdBy && (
-                    <span className="badge badge-gray" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <User size={10} /> {t.createdBy.name || 'Sistema'}
+                    <span className="badge badge-gray" style={{ fontSize: 11, padding: '3px 8px', display: 'flex', alignItems: 'center', gap: 3 }}>
+                      <User size={9} /> {t.createdBy.name || 'Sistema'}
                     </span>
                   )}
                 </div>
 
-                <div style={{ display: 'flex', gap: 8, marginTop: 'auto' }}>
-                  <Link to={`/dashboard/tournaments/${t._id}`} className="btn btn-primary btn-sm" style={{ flex: 1, justifyContent: 'center' }}>
-                    Gerir <ArrowRight size={14} />
+                {/* Action row */}
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <Link to={`/dashboard/tournaments/${t._id}`} className="btn btn-primary btn-sm" style={{ flex: 1, justifyContent: 'center', padding: '8px 12px', fontSize: 13 }}>
+                    Gerir <ArrowRight size={13} />
                   </Link>
-                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(t._id, t.name)}>
-                    <Trash2 size={14} />
+                  <button className="btn btn-danger btn-sm" style={{ padding: '8px 12px' }} onClick={() => handleDelete(t._id, t.name)}>
+                    <Trash2 size={13} />
                   </button>
                 </div>
               </div>
