@@ -662,7 +662,8 @@ export default function TournamentDetail() {
                       <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,5,36,0.85)', zIndex: 0 }} />
                   <div className="bracket-container" style={{ position: 'relative', zIndex: 1 }}>
                     {(() => {
-                      const bracketMatches = matches.filter(m => m.phase === 'knockout');
+                      const knockoutMatches = matches.filter(m => m.phase === 'knockout');
+                      const bracketMatches = knockoutMatches.length > 0 ? knockoutMatches : matches;
 
                       if (bracketMatches.length === 0) {
                         return (

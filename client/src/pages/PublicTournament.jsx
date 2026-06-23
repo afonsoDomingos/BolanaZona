@@ -420,7 +420,8 @@ export default function PublicTournament() {
                       }}
                     >
                       {(() => {
-                      const bracketMatches = matches.filter(m => m.phase === 'knockout');
+                      const knockoutMatches = matches.filter(m => m.phase === 'knockout');
+                      const bracketMatches = knockoutMatches.length > 0 ? knockoutMatches : matches;
 
                       if (bracketMatches.length === 0) {
                         return (
