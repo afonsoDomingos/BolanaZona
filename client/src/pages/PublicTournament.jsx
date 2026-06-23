@@ -6,7 +6,7 @@ import TeamRegistrationModal from '../components/TeamRegistrationModal';
 import SponsorProposalModal from '../components/SponsorProposalModal';
 import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const formatLabel = { groups: 'Todos contra Todos', knockout: 'Mata-mata', groups_knockout: 'Grupos + Eliminatórias' };
 const statusLabel = { draft: 'Brevemente', registration: 'Inscrições Abertas', active: 'A Decorrer', finished: 'Concluído' };
