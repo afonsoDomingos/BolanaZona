@@ -32,11 +32,11 @@ exports.updateResult = async (req, res) => {
       return res.status(403).json({ message: 'Apenas o organizador do torneio pode inserir resultados.' });
     }
 
-    // 2. Verificar se o jogo já aconteceu (apenas se for para finalizar)
-    const now = new Date();
-    if ((!match.date || new Date(match.date) > now) && status === 'finished') {
-      return res.status(400).json({ message: 'Não podes finalizar um jogo que ainda não aconteceu.' });
-    }
+    // 2. Verificar se o jogo já aconteceu (apenas se for para finalizar) - REMOVIDO para permitir lançar resultados antecipadamente
+    // const now = new Date();
+    // if ((!match.date || new Date(match.date) > now) && status === 'finished') {
+    //   return res.status(400).json({ message: 'Não podes finalizar um jogo que ainda não aconteceu.' });
+    // }
 
     // Proceder com a atualização
     match.homeScore = homeScore;
