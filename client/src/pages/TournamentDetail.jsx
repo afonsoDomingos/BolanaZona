@@ -39,6 +39,7 @@ export default function TournamentDetail() {
   const addLog = (msg) => setDebugLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${msg}`]);
   const [showLinkModal, setShowLinkModal] = useState(null);
   const [viewMode, setViewMode] = useState('bracket');
+  const [selectedRoundFilter, setSelectedRoundFilter] = useState('all');
 
 
   const { user: currentUser } = useAuth();
@@ -598,22 +599,63 @@ export default function TournamentDetail() {
               </div>
             ) : (
               viewMode === 'bracket' ? (
-                <div className="bracket-scroll-container full-width-bleed" style={{
-                    position: 'relative',
-                    backgroundImage: 'url(/loginbg1.png)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    borderTop: '1px solid rgba(255,255,255,0.05)',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
-                    minHeight: 'calc(100vh - 280px)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 150px, black calc(100% - 150px), transparent 100%)',
-                    maskImage: 'linear-gradient(to bottom, transparent 0%, black 150px, black calc(100% - 150px), transparent 100%)'
-                  }}>
-                    {/* Dark overlay */}
-                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,5,36,0.85)', zIndex: 0 }} />
+                <>
+                  {/* Round Filter */}
+                  {(() => {
+                    const rList = [...new Set(matches.map(m => m.round))].sort((a, b) => a - b);
+                    const maxR = Math.max(...rList);
+                    const getRName = (round) => {
+                      const mInRound = matches.filter(m => m.round === round).length;
+                      const distFromFinal = maxR - round;
+                      const customName = matches.find(m => m.round === round)?.roundName;
+                      if (customName) return customName;
+                      if (distFromFinal === 0) return 'Final';
+                      if (distFromFinal === 1) return mInRound <= 2 ? 'Meias-Finais' : 'Semifinal';
+                      if (distFromFinal === 2) return 'Quartos de Final';
+                      if (distFromFinal === 3) return 'Oitavos de Final';
+                      if (distFromFinal === 4) return '1/16 de Final';
+                      return `Fase ${round}`;
+                    };
+                    if (rList.length <= 1) return null;
+                    return (
+                      <div className="view-switcher" style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
+                        <button 
+                          className={`switcher-btn ${selectedRoundFilter === 'all' ? 'active' : ''}`}
+                          onClick={() => setSelectedRoundFilter('all')}
+                          style={{ fontSize: 12, padding: '6px 12px', height: 'auto', borderRadius: '8px' }}
+                        >
+                          🌳 Árvore Completa
+                        </button>
+                        {rList.map(r => (
+                          <button 
+                            key={r}
+                            className={`switcher-btn ${selectedRoundFilter === r.toString() ? 'active' : ''}`}
+                            onClick={() => setSelectedRoundFilter(r.toString())}
+                            style={{ fontSize: 12, padding: '6px 12px', height: 'auto', borderRadius: '8px' }}
+                          >
+                            {getRName(r)}
+                          </button>
+                        ))}
+                      </div>
+                    );
+                  })()}
+
+                  <div className="bracket-scroll-container full-width-bleed" style={{
+                      position: 'relative',
+                      backgroundImage: 'url(/loginbg1.png)',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      borderTop: '1px solid rgba(255,255,255,0.05)',
+                      borderBottom: '1px solid rgba(255,255,255,0.05)',
+                      minHeight: 'calc(100vh - 280px)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 150px, black calc(100% - 150px), transparent 100%)',
+                      maskImage: 'linear-gradient(to bottom, transparent 0%, black 150px, black calc(100% - 150px), transparent 100%)'
+                    }}>
+                      {/* Dark overlay */}
+                      <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,5,36,0.85)', zIndex: 0 }} />
                   <div className="bracket-container" style={{ position: 'relative', zIndex: 1 }}>
                     {(() => {
                       const bracketMatches = matches;
@@ -655,34 +697,16 @@ export default function TournamentDetail() {
                         const awayWinner = m.status === 'finished' && m.awayScore > m.homeScore;
                         return (
                           <div key={m._id} className="bracket-match-node">
-                            <div className="bracket-match-card" style={{ position: 'relative', opacity: m.status === 'finished' ? 0.65 : 1 }}>
-                              {canManage && m.status !== 'finished' && (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); setShowResultModal(m); }}
-                                  style={{
-                                    position: 'absolute',
-                                    top: '-12px',
-                                    right: '-30px',
-                                    background: 'var(--green)',
-                                    color: '#000',
-                                    border: '1px solid rgba(255,255,255,0.4)',
-                                    padding: '4px 8px',
-                                    borderRadius: '12px',
-                                    fontSize: '9px',
-                                    fontWeight: '900',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 4px 12px rgba(0, 200, 83, 0.5)',
-                                    zIndex: 20,
-                                    textTransform: 'uppercase',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '4px'
-                                  }}
-                                  title="Lançar Resultado"
-                                >
-                                  <Trophy size={10} /> Lançar Resultado
-                                </button>
-                              )}
+                            <div 
+                              className="bracket-match-card" 
+                              style={{ 
+                                position: 'relative', 
+                                opacity: m.status === 'finished' ? 0.65 : 1,
+                                cursor: canManage ? 'pointer' : 'default'
+                              }}
+                              onClick={canManage ? () => setShowResultModal(m) : undefined}
+                              title={canManage ? "Clique para lançar resultado" : undefined}
+                            >
                               {/* Casa */}
                               <div className={`bracket-team-row ${homeWinner ? 'winner' : ''}`}>
                                 <div className="bracket-team-info">
@@ -738,7 +762,7 @@ export default function TournamentDetail() {
                                 <div className="bracket-actions">
                                   <button 
                                     className="bracket-action-btn whatsapp" 
-                                    onClick={() => shareMatchWhatsApp(m)} 
+                                    onClick={(e) => { e.stopPropagation(); shareMatchWhatsApp(m); }} 
                                     title="Partilhar WhatsApp"
                                   >
                                     <MessageCircle size={11} />
@@ -747,14 +771,14 @@ export default function TournamentDetail() {
                                     <>
                                       <button 
                                         className="bracket-action-btn" 
-                                        onClick={() => setShowEditMatchModal(m)} 
+                                        onClick={(e) => { e.stopPropagation(); setShowEditMatchModal(m); }} 
                                         title="Editar Jogo"
                                       >
                                         <Edit2 size={11} />
                                       </button>
                                       <button 
                                         className="bracket-action-btn" 
-                                        onClick={() => setShowResultModal(m)} 
+                                        onClick={(e) => { e.stopPropagation(); setShowResultModal(m); }} 
                                         title="Lançar Resultado"
                                         style={
                                           m.status !== 'finished' 
@@ -766,7 +790,7 @@ export default function TournamentDetail() {
                                       </button>
                                       <button 
                                         className="bracket-action-btn" 
-                                        onClick={() => setShowShareModal(m)} 
+                                        onClick={(e) => { e.stopPropagation(); setShowShareModal(m); }} 
                                         title="Partilhar Imagem"
                                       >
                                         <Camera size={11} />
@@ -781,8 +805,9 @@ export default function TournamentDetail() {
                       };
 
                       const nonFinalRounds = rounds.filter(r => r !== maxRound);
+                      const filteredNonFinalRounds = nonFinalRounds.filter(r => selectedRoundFilter === 'all' || selectedRoundFilter === r.toString());
                       
-                      const leftColumns = nonFinalRounds.map((round) => {
+                      const leftColumns = filteredNonFinalRounds.map((round) => {
                         const roundMatches = bracketMatches.filter(m => m.round === round);
                         const leftMatches = roundMatches.slice(0, Math.ceil(roundMatches.length / 2));
                         if (leftMatches.length === 0) return null;
@@ -801,7 +826,7 @@ export default function TournamentDetail() {
                         );
                       });
 
-                      const rightColumns = nonFinalRounds.map((round) => {
+                      const rightColumns = filteredNonFinalRounds.map((round) => {
                         const roundMatches = bracketMatches.filter(m => m.round === round);
                         const rightMatches = roundMatches.slice(Math.ceil(roundMatches.length / 2));
                         if (rightMatches.length === 0) return null;
@@ -823,6 +848,7 @@ export default function TournamentDetail() {
                       // For groups format, we don't have a single crowned champion from the final match
                       // We rely on the tournament winner if set, or just leave it blank
                       const crownedChampion = tournament.winner || null;
+                      const showFinal = selectedRoundFilter === 'all' || selectedRoundFilter === maxRound.toString();
 
                       return (
                         <>
@@ -830,7 +856,7 @@ export default function TournamentDetail() {
                             {leftColumns}
                           </div>
 
-                          {(() => {
+                          {showFinal && finalMatches[0] && (() => {
                             const finalMatch = finalMatches[0];
                             return (
                               <div className="bracket-center-final">
@@ -879,6 +905,7 @@ export default function TournamentDetail() {
                     })()}
                   </div>
                 </div>
+                </>
               ) : (
                 <div>
                   {(() => {

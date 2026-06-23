@@ -24,6 +24,7 @@ export default function PublicTournament() {
   const [notFound, setNotFound] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [viewMode, setViewMode] = useState('bracket');
+  const [selectedRoundFilter, setSelectedRoundFilter] = useState('all');
   const bracketContainerRef = useRef(null); // inner bracket-container
   const bracketScrollRef = useRef(null);    // outer scroll container
   const [bracketZoom, setBracketZoom] = useState(1);
@@ -348,10 +349,51 @@ export default function PublicTournament() {
                   )}
                 </div>
                 {viewMode === 'bracket' ? (
-                  <div
-                    id="print-bracket"
-                    ref={bracketScrollRef}
-                    className="bracket-scroll-container full-width-bleed"
+                  <>
+                    {/* Round Filter */}
+                    {(() => {
+                      const rList = [...new Set(matches.map(m => m.round))].sort((a, b) => a - b);
+                      const maxR = Math.max(...rList);
+                      const getRName = (round) => {
+                        const mInRound = matches.filter(m => m.round === round).length;
+                        const distFromFinal = maxR - round;
+                        const customName = matches.find(m => m.round === round)?.roundName;
+                        if (customName) return customName;
+                        if (distFromFinal === 0) return 'Final';
+                        if (distFromFinal === 1) return mInRound <= 2 ? 'Meias-Finais' : 'Semifinal';
+                        if (distFromFinal === 2) return 'Quartos de Final';
+                        if (distFromFinal === 3) return 'Oitavos de Final';
+                        if (distFromFinal === 4) return '1/16 de Final';
+                        return `Fase ${round}`;
+                      };
+                      if (rList.length <= 1) return null;
+                      return (
+                        <div className="view-switcher" style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
+                          <button 
+                            className={`switcher-btn ${selectedRoundFilter === 'all' ? 'active' : ''}`}
+                            onClick={() => setSelectedRoundFilter('all')}
+                            style={{ fontSize: 12, padding: '6px 12px', height: 'auto', borderRadius: '8px' }}
+                          >
+                            🌳 Árvore Completa
+                          </button>
+                          {rList.map(r => (
+                            <button 
+                              key={r}
+                              className={`switcher-btn ${selectedRoundFilter === r.toString() ? 'active' : ''}`}
+                              onClick={() => setSelectedRoundFilter(r.toString())}
+                              style={{ fontSize: 12, padding: '6px 12px', height: 'auto', borderRadius: '8px' }}
+                            >
+                              {getRName(r)}
+                            </button>
+                          ))}
+                        </div>
+                      );
+                    })()}
+
+                    <div
+                      id="print-bracket"
+                      ref={bracketScrollRef}
+                      className="bracket-scroll-container full-width-bleed"
                     style={{
                       position: 'relative',
                       backgroundImage: 'url(/loginbg1.png)',
@@ -469,8 +511,9 @@ export default function PublicTournament() {
                       };
 
                       const nonFinalRounds = rounds.filter(r => r !== maxRound);
+                      const filteredNonFinalRounds = nonFinalRounds.filter(r => selectedRoundFilter === 'all' || selectedRoundFilter === r.toString());
                       
-                      const leftColumns = nonFinalRounds.map((round) => {
+                      const leftColumns = filteredNonFinalRounds.map((round) => {
                         const roundMatches = bracketMatches.filter(m => m.round === round);
                         const leftMatches = roundMatches.slice(0, Math.ceil(roundMatches.length / 2));
                         if (leftMatches.length === 0) return null;
@@ -489,7 +532,7 @@ export default function PublicTournament() {
                         );
                       });
 
-                      const rightColumns = nonFinalRounds.map((round) => {
+                      const rightColumns = filteredNonFinalRounds.map((round) => {
                         const roundMatches = bracketMatches.filter(m => m.round === round);
                         const rightMatches = roundMatches.slice(Math.ceil(roundMatches.length / 2));
                         if (rightMatches.length === 0) return null;
@@ -509,6 +552,7 @@ export default function PublicTournament() {
                       }).reverse();
 
                       const crownedChampion = tournament.winner || null;
+                      const showFinal = selectedRoundFilter === 'all' || selectedRoundFilter === maxRound.toString();
 
                       return (
                         <>
@@ -516,7 +560,7 @@ export default function PublicTournament() {
                             {leftColumns}
                           </div>
 
-                          {(() => {
+                          {showFinal && finalMatches[0] && (() => {
                             const finalMatch = finalMatches[0];
                             return (
                               <div className="bracket-center-final">
@@ -559,6 +603,7 @@ export default function PublicTournament() {
                     })()}
                   </div>
                 </div>
+                </>
               ) : (
                 <div>
               {(() => {
