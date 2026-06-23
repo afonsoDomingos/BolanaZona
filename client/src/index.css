@@ -1070,9 +1070,29 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .bracket-scroll-container {
     border-radius: 16px;
     margin: 0 -4px;
-    overflow-x: hidden !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
     -webkit-mask-image: none !important;
     mask-image: none !important;
+  }
+  .bracket-center-final {
+    padding: 8px;
+    min-width: 80px;
+    border-radius: 12px;
+  }
+  .bracket-final-subtitle {
+    font-size: 8px;
+  }
+  .bracket-final-title {
+    font-size: 10px;
+  }
+  .bracket-final-team-logo {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 12px !important;
+  }
+  .bracket-final-trophy-img {
+    width: 36px;
   }
   .bracket-container {
     padding: 32px 16px;

@@ -229,17 +229,24 @@ export default function SocialFAB() {
 
         @media (max-width: 768px) {
           .social-fab-container {
-            left: 14px;
-            bottom: 14px;
-            gap: 7px;
+            left: 50% !important;
+            transform: translateX(-50%);
+            bottom: 16px !important;
+            flex-direction: row !important;
+            gap: 12px !important;
+            background: rgba(10, 11, 92, 0.4);
+            backdrop-filter: blur(12px);
+            padding: 8px 16px;
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
           }
           .social-fab-item {
             width: 32px !important;
             height: 32px !important;
           }
           .social-fab-item svg {
-            width: 13px !important;
-            height: 13px !important;
+            width: 14px !important;
+            height: 14px !important;
           }
         }
       `}</style>

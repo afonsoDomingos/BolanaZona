@@ -200,8 +200,8 @@ export default function TournamentDetail() {
           </button>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                <h1 className="font-syne" style={{ fontSize: 28, fontWeight: 800 }}>{tournament.name}</h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
+                <h1 className="font-syne" style={{ fontSize: 28, fontWeight: 800, wordBreak: 'break-word' }}>{tournament.name}</h1>
                 {canManage && (
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }} onClick={() => setShowEditTournamentModal(true)} title="Editar"><Edit2 size={13} /></button>
@@ -1013,24 +1013,26 @@ export default function TournamentDetail() {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                               {roundMatches.map(m => (
                                 <div key={m._id} className="match-card" style={{ padding: '12px 16px' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                                    <div style={{ flex: 1, textAlign: 'right', fontWeight: 700, fontSize: 14, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.homeTeam?.name || '—'}</div>
-                                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: 8, minWidth: 80, textAlign: 'center' }}>
-                                      {m.status === 'finished' ? (
-                                        <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</div>
-                                      ) : m.status === 'live' || m.status === 'active' ? (
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                          <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore !== null ? m.homeScore : 0} - {m.awayScore !== null ? m.awayScore : 0}</div>
-                                          <div className="badge badge-green pulse-dot" style={{ fontSize: 9, padding: '2px 6px' }}>LIVE</div>
-                                        </div>
-                                      ) : m.status === 'cancelled' ? (
-                                        <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--red)' }}>CANCELADO</div>
-                                      ) : (
-                                        <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--text-muted)' }}>VS</div>
-                                      )}
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', width: '100%' }}>
+                                    <div style={{ display: 'flex', flex: '1 1 200px', alignItems: 'center', gap: 16, justifyContent: 'center' }}>
+                                      <div style={{ flex: 1, textAlign: 'right', fontWeight: 700, fontSize: 14, minWidth: 60, wordBreak: 'break-word' }}>{m.homeTeam?.name || '—'}</div>
+                                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: 8, minWidth: 80, textAlign: 'center' }}>
+                                        {m.status === 'finished' ? (
+                                          <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</div>
+                                        ) : m.status === 'live' || m.status === 'active' ? (
+                                          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                            <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore !== null ? m.homeScore : 0} - {m.awayScore !== null ? m.awayScore : 0}</div>
+                                            <div className="badge badge-green pulse-dot" style={{ fontSize: 9, padding: '2px 6px' }}>LIVE</div>
+                                          </div>
+                                        ) : m.status === 'cancelled' ? (
+                                          <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--red)' }}>CANCELADO</div>
+                                        ) : (
+                                          <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--text-muted)' }}>VS</div>
+                                        )}
+                                      </div>
+                                      <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 14, minWidth: 60, wordBreak: 'break-word' }}>{m.awayTeam?.name || '—'}</div>
                                     </div>
-                                    <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 14 }}>{m.awayTeam?.name || '—'}</div>
-                                    <div style={{ display: 'flex', gap: 6 }}>
+                                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', flex: '1 1 150px' }}>
                                       <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px', color: '#25D366' }} onClick={() => shareMatchWhatsApp(m)} title="WhatsApp"><MessageCircle size={14} /></button>
                                       {canManage && (
                                         <>
