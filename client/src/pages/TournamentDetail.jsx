@@ -47,7 +47,8 @@ export default function TournamentDetail() {
     (typeof tournament.createdBy === 'string' && tournament.createdBy === currentUser._id) ||
     (tournament.createdBy?._id === currentUser._id)
   );
-  const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
+  const isSuperAdmin = currentUser?.role === 'superadmin';
+  const isAdmin = currentUser?.role === 'admin' || isSuperAdmin;
   const canManage = isOwner || isAdmin;
 
   const load = useCallback(async () => {
@@ -211,6 +212,11 @@ export default function TournamentDetail() {
                   </div>
                 )}
                 <span className={`badge ${statusBadge[tournament.status]}`}>{statusLabel[tournament.status]}</span>
+                {tournament.isPrivate && (
+                  <span className="badge badge-red" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    🔒 Privado
+                  </span>
+                )}
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>📍 {tournament.neighborhood} · 🏟️ {tournament.location} · 👥 {teams.length}/{tournament.maxTeams} equipas</p>
               {tournament.createdBy && (
@@ -1623,6 +1629,17 @@ function TournamentEditModal({ tournament, onClose, onSaved }) {
               <input type="checkbox" checked={form.isOfficial} onChange={e => setForm({...form, isOfficial: e.target.checked})} style={{ width: 24, height: 24, accentColor: 'var(--yellow)' }} />
             </div>
           )}
+
+          <div style={{ background: 'rgba(255,255,255,0.02)', padding: 12, borderRadius: 12, border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Shield size={20} color="var(--text-muted)" />
+              <div>
+                <div style={{ fontWeight: 800, fontSize: 13 }}>Torneio Privado</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Ocultar o torneio de pesquisas e listas públicas.</div>
+              </div>
+            </div>
+            <input type="checkbox" checked={form.isPrivate || false} onChange={e => setForm({...form, isPrivate: e.target.checked})} style={{ width: 24, height: 24, accentColor: 'var(--green)' }} />
+          </div>
 
           {/* Nome */}
           <div className="form-group">

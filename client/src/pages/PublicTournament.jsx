@@ -21,27 +21,31 @@ export default function PublicTournament() {
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showSponsorModal, setShowSponsorModal] = useState(false);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
-  const [notFound, setNotFound] = useState(false);
+  const [errorStatus, setErrorStatus] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [viewMode, setViewMode] = useState('bracket');
   const [selectedRoundFilter, setSelectedRoundFilter] = useState('all');
   const bracketContainerRef = useRef(null); // inner bracket-container
   const bracketScrollRef = useRef(null);    // outer scroll container
   const [bracketZoom, setBracketZoom] = useState(1);
+  const isFirstLoadRef = useRef(true);
 
 
   const loadData = () => {
     api.get(`/tournaments/public/${shareCode}`)
       .then(res => {
         setData(res.data);
-        if (res.data.tournament.status === 'registration' && showRegisterAction) {
+        if (res.data.tournament.status === 'registration' && showRegisterAction && isFirstLoadRef.current) {
           setShowRegistrationModal(true);
+          isFirstLoadRef.current = false;
         }
         if (res.data.tournament?.format === 'groups') {
           setViewMode('list');
         }
       })
-      .catch(() => setNotFound(true))
+      .catch(err => {
+        setErrorStatus(err.response?.status || 404);
+      })
       .finally(() => setLoading(false));
   };
 
@@ -142,14 +146,23 @@ export default function PublicTournament() {
 
   if (loading) return <div className="loading-center" style={{ minHeight: '100vh' }}><div className="spinner" /></div>;
 
-  if (notFound) return (
-    <div className="page animate-fade-in" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 24 }}>
-      <div className="spin-ball" style={{ fontSize: 80, marginBottom: 24 }}>⚽</div>
-      <h1 className="font-syne" style={{ fontSize: 32, fontWeight: 800, marginBottom: 12 }}>Ups! Torneio não encontrado</h1>
-      <p style={{ color: 'var(--text-secondary)', maxWidth: 400, marginBottom: 32 }}>Parece que este link já não é válido ou o torneio foi removido pelo organizador.</p>
-      <Link to="/" className="btn btn-primary">Explorar outros torneios</Link>
-    </div>
-  );
+  if (errorStatus) {
+    const isPrivate = errorStatus === 403;
+    return (
+      <div className="page animate-fade-in" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 24 }}>
+        <div className="spin-ball" style={{ fontSize: 80, marginBottom: 24 }}>{isPrivate ? '🔒' : '⚽'}</div>
+        <h1 className="font-syne" style={{ fontSize: 32, fontWeight: 800, marginBottom: 12 }}>
+          {isPrivate ? 'Este torneio é privado' : 'Ups! Torneio não encontrado'}
+        </h1>
+        <p style={{ color: 'var(--text-secondary)', maxWidth: 400, marginBottom: 32 }}>
+          {isPrivate 
+            ? 'O organizador configurou este torneio como privado. As informações e resultados não estão acessíveis publicamente.' 
+            : 'Parece que este link já não é válido ou o torneio foi removido pelo organizador.'}
+        </p>
+        <Link to="/" className="btn btn-primary">Explorar outros torneios</Link>
+      </div>
+    );
+  }
 
   const { tournament, teams, matches, standings } = data;
 

@@ -53,6 +53,7 @@ exports.getPublic = async (req, res) => {
     const t = await Tournament.findOne({ shareCode: req.params.shareCode })
       .populate('winner', 'name logo color');
     if (!t) return res.status(404).json({ message: 'Torneio não encontrado.' });
+    if (t.isPrivate) return res.status(403).json({ message: 'Este torneio é privado.' });
     const teams = await Team.find({ tournament: t._id });
     const matches = await Match.find({ tournament: t._id })
       .populate('homeTeam', 'name color logo')
@@ -68,7 +69,8 @@ exports.getPublic = async (req, res) => {
 exports.getAllPublicTournaments = async (req, res) => {
   try {
     const tournaments = await Tournament.find({ 
-      status: { $in: ['registration', 'active'] } 
+      status: { $in: ['registration', 'active'] },
+      isPrivate: { $ne: true }
     }).sort('-createdAt');
     res.json(tournaments);
   } catch (err) {
@@ -79,11 +81,11 @@ exports.getAllPublicTournaments = async (req, res) => {
 exports.getGlobalMatches = async (req, res) => {
   try {
     const matches = await Match.find({ 
-      status: { $in: ['scheduled', 'live', 'active'] } // Support both legacy active and new live
+      status: { $in: ['scheduled', 'live', 'active'] }
     })
     .populate({
       path: 'tournament',
-      match: { status: { $in: ['registration', 'active'] } },
+      match: { status: { $in: ['registration', 'active'] }, isPrivate: { $ne: true } },
       select: 'name shareCode neighborhood'
     })
     .populate('homeTeam', 'name logo color')
@@ -91,9 +93,7 @@ exports.getGlobalMatches = async (req, res) => {
     .sort({ date: 1 })
     .limit(20);
 
-    // Filter out matches where tournament is null (due to populate match failing)
     const validMatches = matches.filter(m => m.tournament != null);
-    
     res.json(validMatches);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -105,7 +105,7 @@ exports.getRecentFinishedMatches = async (req, res) => {
     const matches = await Match.find({ status: 'finished' })
       .populate({
         path: 'tournament',
-        match: { status: { $in: ['registration', 'active', 'finished'] } },
+        match: { status: { $in: ['registration', 'active', 'finished'] }, isPrivate: { $ne: true } },
         select: 'name shareCode neighborhood'
       })
       .populate('homeTeam', 'name logo color')

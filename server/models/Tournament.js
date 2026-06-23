@@ -25,6 +25,7 @@ const tournamentSchema = new mongoose.Schema({
   bestScorer: { type: String, default: '' },
   bestGoalkeeper: { type: String, default: '' },
   isOfficial: { type: Boolean, default: false },
+  isPrivate: { type: Boolean, default: false },
 }, { timestamps: true });
 
 module.exports = mongoose.models.Tournament || mongoose.model('Tournament', tournamentSchema);
