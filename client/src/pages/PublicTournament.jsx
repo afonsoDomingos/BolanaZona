@@ -327,7 +327,7 @@ export default function PublicTournament() {
             ) : (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 12 }}>
-                  {tournament?.format !== 'groups' && (
+                  {matches.length > 0 && (
                     <div className="view-switcher" style={{ display: 'flex', gap: 4 }}>
                       <button 
                         className={`switcher-btn ${viewMode === 'bracket' ? 'active' : ''}`} 
@@ -617,9 +617,14 @@ export default function PublicTournament() {
                   const roundMatches = matches.filter(m => m.round === round);
                   return (
                     <div key={round} style={{ marginBottom: 40 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
-                        <h3 className="font-syne" style={{ fontSize: 18, fontWeight: 800, color: 'var(--green)', textTransform: 'uppercase' }}>{roundMatches[0]?.roundName || `Ronda ${round}`}</h3>
-                        <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, var(--green), transparent)', opacity: 0.2 }} />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <h3 className="font-syne" style={{ fontSize: 18, fontWeight: 800, color: 'var(--green)', textTransform: 'uppercase' }}>{roundMatches[0]?.roundName || `Ronda ${round}`}</h3>
+                          {roundMatches.length > 0 && roundMatches.every(m => m.status === 'finished') && (
+                            <span style={{ fontSize: 10, background: 'rgba(0,200,83,0.1)', color: 'var(--green)', padding: '2px 8px', borderRadius: 10, fontWeight: 800 }}>Ronda Concluída ✓</span>
+                          )}
+                        </div>
+                        <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, var(--green), transparent)', opacity: 0.2, minWidth: 50 }} />
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         {roundMatches.map(m => (

@@ -567,7 +567,7 @@ export default function TournamentDetail() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
                 <h2 style={{ fontSize: 18, fontWeight: 700 }}>Calendário ({matches.length} jogos)</h2>
-                {matches.length > 0 && tournament?.format !== 'groups' && (
+                {matches.length > 0 && (
                   <div className="view-switcher">
                     <button 
                       className={`switcher-btn ${viewMode === 'bracket' ? 'active' : ''}`} 
@@ -1006,8 +1006,13 @@ export default function TournamentDetail() {
                         const roundMatches = matches.filter(m => m.round === round);
                         return (
                           <div key={round} style={{ marginBottom: 30 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic' }}>{roundMatches[0]?.roundName || `Ronda ${round}`}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic' }}>{roundMatches[0]?.roundName || `Ronda ${round}`}</div>
+                                {roundMatches.length > 0 && roundMatches.every(m => m.status === 'finished') && (
+                                  <span style={{ fontSize: 10, background: 'rgba(0,200,83,0.1)', color: 'var(--green)', padding: '2px 8px', borderRadius: 10, fontWeight: 800 }}>Ronda Concluída ✓</span>
+                                )}
+                              </div>
                               <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
