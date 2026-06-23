@@ -633,34 +633,36 @@ export default function PublicTournament() {
                             </div>
 
                             <div id={`print-match-${m._id}`} className="match-card animate-slide-up" style={{ padding: 0, overflow: 'hidden' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', padding: '20px 32px', gap: 24, flexWrap: 'wrap' }}>
-                              <div style={{ flex: 1, textAlign: 'right', fontWeight: 800, fontSize: 18 }}>{m.homeTeam?.name}</div>
-                              
-                              <div style={{ 
-                                background: m.status === 'active' ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.05)', 
-                                padding: '12px 24px', 
-                                borderRadius: 16, 
-                                minWidth: 120, 
-                                textAlign: 'center',
-                                border: m.status === 'active' ? '1px solid var(--green)' : '1px solid var(--border)'
-                              }}>
-                                {m.status === 'finished' ? (
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-                                    <span style={{ fontSize: 28, fontWeight: 900, color: 'var(--green)' }}>{m.homeScore}</span>
-                                    <span style={{ fontSize: 18, color: 'var(--text-muted)' }}>-</span>
-                                    <span style={{ fontSize: 28, fontWeight: 900, color: 'var(--green)' }}>{m.awayScore}</span>
+                              <div style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', gap: 16, flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+                                <div style={{ display: 'flex', flex: '1 1 200px', alignItems: 'center', gap: 16, justifyContent: 'center' }}>
+                                  <div style={{ flex: 1, textAlign: 'right', fontWeight: 800, fontSize: 16, minWidth: 60, wordBreak: 'break-word' }}>{m.homeTeam?.name}</div>
+                                  
+                                  <div style={{ 
+                                    background: m.status === 'active' ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.05)', 
+                                    padding: '8px 16px', 
+                                    borderRadius: 12, 
+                                    minWidth: 80, 
+                                    textAlign: 'center',
+                                    border: m.status === 'active' ? '1px solid var(--green)' : '1px solid var(--border)'
+                                  }}>
+                                    {m.status === 'finished' ? (
+                                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                                        <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--green)' }}>{m.homeScore}</span>
+                                        <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>-</span>
+                                        <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--green)' }}>{m.awayScore}</span>
+                                      </div>
+                                    ) : m.status === 'cancelled' ? (
+                                      <div style={{ fontSize: 11, fontWeight: 900, color: 'var(--red)', letterSpacing: 1 }}>CANCELADO</div>
+                                    ) : (
+                                      <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-secondary)' }}>
+                                        VS
+                                      </div>
+                                    )}
                                   </div>
-                                ) : m.status === 'cancelled' ? (
-                                  <div style={{ fontSize: 12, fontWeight: 900, color: 'var(--red)', letterSpacing: 1 }}>CANCELADO</div>
-                                ) : (
-                                  <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.03)', padding: '6px 18px', borderRadius: 8, display: 'inline-block' }}>
-                                    VS
-                                  </div>
-                                )}
-                              </div>
 
-                              <div style={{ flex: 1, textAlign: 'left', fontWeight: 800, fontSize: 18 }}>{m.awayTeam?.name}</div>
-                            </div>
+                                  <div style={{ flex: 1, textAlign: 'left', fontWeight: 800, fontSize: 16, minWidth: 60, wordBreak: 'break-word' }}>{m.awayTeam?.name}</div>
+                                </div>
+                              </div>
 
                             <div style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 32px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap' }}>
                               {m.date && <div style={{ fontSize: 12, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}><Clock size={14} color="var(--green)" /> {new Date(m.date).toLocaleDateString('pt-PT')} · {new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</div>}
