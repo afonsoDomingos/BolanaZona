@@ -1,11 +1,25 @@
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
 
 export default function CommunityFAB() {
   const location = useLocation();
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    return localStorage.getItem('social-fab-collapsed') === 'true';
+  });
 
-  // Não mostrar na própria página da comunidade ou em páginas de admin
-  if (location.pathname === '/community' || location.pathname.startsWith('/admin')) {
+  useEffect(() => {
+    const handleToggle = () => {
+      setIsCollapsed(localStorage.getItem('social-fab-collapsed') === 'true');
+    };
+    window.addEventListener('social-fab-toggle', handleToggle);
+    return () => {
+      window.removeEventListener('social-fab-toggle', handleToggle);
+    };
+  }, []);
+
+  // Não mostrar na própria página da comunidade, em páginas de admin ou se estiver recolhido pelo utilizador
+  if (location.pathname === '/community' || location.pathname.startsWith('/admin') || isCollapsed) {
     return null;
   }
 

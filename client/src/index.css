@@ -219,6 +219,15 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .modal-close { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: var(--transition); }
 .modal-close:hover { color: var(--text-primary); border-color: var(--border-hover); }
 
+/* ===== HIDE FLOATING FABS WHEN MODAL IS OPEN ===== */
+body:has(.modal-overlay) .social-fab-container,
+body:has(.modal-overlay) .fab-item,
+body:has(.modal-overlay) .scroll-to-top,
+body:has(.modal-overlay) .social-fab-toggle-show {
+  display: none !important;
+}
+
+
 /* ===== ALERTS / TOAST ===== */
 .alert {
   padding: 14px 18px;
@@ -928,15 +937,15 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; gap: 16px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   
-  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal-overlay { padding: 12px; align-items: flex-end; }
   .modal {
-    padding: 20px 16px 32px;
-    margin: 0;
-    max-height: 92dvh;
+    padding: 20px 16px 24px;
+    margin: 0 0 12px 0;
+    max-height: 86dvh;
     width: 100%;
     max-width: 100%;
-    border-radius: 20px 20px 0 0;
-    border-bottom: none;
+    border-radius: 24px;
+    border-bottom: 1px solid var(--border);
   }
   .modal-title { font-size: 16px; }
   .modal-header { margin-bottom: 16px; }

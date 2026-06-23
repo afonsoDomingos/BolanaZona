@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Youtube, ShoppingBag, Download } from 'lucide-react';
+import { Youtube, ShoppingBag, Download, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const TiktokIcon = ({ size = 18 }) => (
@@ -23,6 +23,9 @@ export default function SocialFAB() {
   const location = useLocation();
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showDownload, setShowDownload] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    return localStorage.getItem('social-fab-collapsed') === 'true';
+  });
 
   useEffect(() => {
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
@@ -50,6 +53,23 @@ export default function SocialFAB() {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
+
+  useEffect(() => {
+    const handleToggle = () => {
+      setIsCollapsed(localStorage.getItem('social-fab-collapsed') === 'true');
+    };
+    window.addEventListener('social-fab-toggle', handleToggle);
+    return () => {
+      window.removeEventListener('social-fab-toggle', handleToggle);
+    };
+  }, []);
+
+  const toggleCollapsed = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem('social-fab-collapsed', String(newState));
+    window.dispatchEvent(new Event('social-fab-toggle'));
+  };
 
   const handleInstallClick = async () => {
     if (deferredPrompt) {
@@ -87,6 +107,52 @@ export default function SocialFAB() {
   // Não mostrar em páginas de admin ou de community
   if (location.pathname === '/community' || location.pathname.startsWith('/admin')) {
     return null;
+  }
+
+  if (isCollapsed) {
+    return (
+      <button 
+        onClick={toggleCollapsed}
+        className="social-fab-toggle-show"
+        title="Mostrar links de redes"
+        style={{
+          position: 'fixed',
+          left: '20px',
+          bottom: '20px',
+          width: '36px',
+          height: '36px',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(10, 11, 92, 0.65)',
+          color: '#ffffff',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          cursor: 'pointer',
+          zIndex: 9998,
+          transition: 'all 0.3s'
+        }}
+      >
+        <Eye size={16} strokeWidth={2.2} />
+        <style>{`
+          .social-fab-toggle-show:hover {
+            transform: scale(1.1);
+            background: rgba(10, 11, 92, 0.8) !important;
+            box-shadow: 0 6px 16px rgba(0, 200, 83, 0.4) !important;
+          }
+          @media (max-width: 768px) {
+            .social-fab-toggle-show {
+              left: 16px !important;
+              bottom: 16px !important;
+              width: 32px !important;
+              height: 32px !important;
+            }
+          }
+        `}</style>
+      </button>
+    );
   }
 
   return (
@@ -200,6 +266,29 @@ export default function SocialFAB() {
         </button>
       )}
 
+      {/* Toggle Hide Button */}
+      <button 
+        onClick={toggleCollapsed}
+        className="social-fab-item social-fab-close"
+        title="Ocultar links"
+        style={{
+          width: '36px',
+          height: '36px',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(255, 255, 255, 0.1)',
+          color: '#ffffff',
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+          cursor: 'pointer'
+        }}
+      >
+        <EyeOff size={14} strokeWidth={2.2} />
+      </button>
+
       <style>{`
         .social-fab-youtube:hover {
           transform: scale(1.1) translateY(-3px);
@@ -225,6 +314,13 @@ export default function SocialFAB() {
           transform: scale(1.1) translateY(-3px);
           background: #000000 !important;
           box-shadow: 0 0 15px rgba(255, 255, 255, 0.2), 0 8px 20px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .social-fab-close:hover {
+          transform: scale(1.1) translateY(-3px);
+          background: rgba(255, 68, 68, 0.8) !important;
+          border-color: rgba(255, 68, 68, 0.9) !important;
+          box-shadow: 0 8px 20px rgba(255, 68, 68, 0.4) !important;
         }
 
         @media (max-width: 768px) {
