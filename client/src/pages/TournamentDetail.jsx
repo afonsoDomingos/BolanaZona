@@ -2068,6 +2068,20 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
   const handleSave = async (customStatus) => {
     if (home === '' || away === '') return toast.error('Insere os dois resultados.');
     setLoading(true);
+
+    const totalGoals = Number(home) + Number(away);
+    const registeredGoals = events.filter(e => e.type === 'goal').length;
+
+    if (totalGoals > 0 && registeredGoals < totalGoals) {
+      const confirmSave = window.confirm(
+        `Registaste ${totalGoals} golo(s), mas só adicionaste ${registeredGoals} marcador(es) de golo nos eventos.\n\nRecomendamos associar todos os marcadores para que as estatísticas do campeonato fiquem corretas. Desejas guardar o resultado assim mesmo?`
+      );
+      if (!confirmSave) {
+        setLoading(false);
+        return;
+      }
+    }
+
     try {
       await api.put(`/tournaments/${tournamentId}/matches/${match._id}/result`, {
         homeScore: Number(home), 
