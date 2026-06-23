@@ -872,8 +872,13 @@ export default function TournamentDetail() {
                                 </div>
                                 
                                 {/* Home Team (Top) */}
-                                <div className="bracket-team-logo bracket-final-team-logo" style={{ borderColor: finalMatch?.homeTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
-                                  {finalMatch?.homeTeam?.logo ? <img src={finalMatch.homeTeam.logo} alt="" /> : (finalMatch?.homeTeam?.name ? finalMatch.homeTeam.name.charAt(0).toUpperCase() : '?')}
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                                  <div className="bracket-team-logo bracket-final-team-logo" style={{ borderColor: finalMatch?.homeTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
+                                    {finalMatch?.homeTeam?.logo ? <img src={finalMatch.homeTeam.logo} alt="" /> : (finalMatch?.homeTeam?.name ? finalMatch.homeTeam.name.charAt(0).toUpperCase() : '?')}
+                                  </div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: finalMatch?.homeTeam?.name ? '#fff' : 'var(--text-muted)', textAlign: 'center', maxWidth: 100 }}>
+                                    {finalMatch?.homeTeam?.name || 'A anunciar'}
+                                  </div>
                                 </div>
                                 
                                 <div className="bracket-trophy-column" style={{ margin: '10px 0' }}>
@@ -890,8 +895,13 @@ export default function TournamentDetail() {
                                 </div>
 
                                 {/* Away Team (Bottom) */}
-                                <div className="bracket-team-logo bracket-final-team-logo" style={{ borderColor: finalMatch?.awayTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
-                                  {finalMatch?.awayTeam?.logo ? <img src={finalMatch.awayTeam.logo} alt="" /> : (finalMatch?.awayTeam?.name ? finalMatch.awayTeam.name.charAt(0).toUpperCase() : '?')}
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                                  <div className="bracket-team-logo bracket-final-team-logo" style={{ borderColor: finalMatch?.awayTeam?.color || 'rgba(255,255,255,0.2)', color: '#fff' }}>
+                                    {finalMatch?.awayTeam?.logo ? <img src={finalMatch.awayTeam.logo} alt="" /> : (finalMatch?.awayTeam?.name ? finalMatch.awayTeam.name.charAt(0).toUpperCase() : '?')}
+                                  </div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: finalMatch?.awayTeam?.name ? '#fff' : 'var(--text-muted)', textAlign: 'center', maxWidth: 100 }}>
+                                    {finalMatch?.awayTeam?.name || 'A anunciar'}
+                                  </div>
                                 </div>
                               </div>
                             );
@@ -1899,13 +1909,17 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
   const [events, setEvents] = useState(match.events || []);
   const [loading, setLoading] = useState(false);
 
+  // Null-safe team IDs (final match may not have teams yet)
+  const homeTeamId = match.homeTeam?._id || '';
+  const awayTeamId = match.awayTeam?._id || '';
+
   // Event form state
-  const [newEvent, setNewEvent] = useState({ type: 'goal', team: match.homeTeam._id, playerName: '', minute: '' });
+  const [newEvent, setNewEvent] = useState({ type: 'goal', team: homeTeamId, playerName: '', minute: '' });
 
 
-  const homePlayers = teams.find(t => t._id === match.homeTeam._id)?.players || [];
-  const awayPlayers = teams.find(t => t._id === match.awayTeam._id)?.players || [];
-  const currentTeamPlayers = newEvent.team === match.homeTeam._id ? homePlayers : awayPlayers;
+  const homePlayers = teams.find(t => t._id === homeTeamId)?.players || [];
+  const awayPlayers = teams.find(t => t._id === awayTeamId)?.players || [];
+  const currentTeamPlayers = newEvent.team === homeTeamId ? homePlayers : awayPlayers;
 
   const handleAddEvent = () => {
     if (!newEvent.playerName) return toast.error('Seleciona ou escreve o nome do jogador.');
@@ -1946,14 +1960,20 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
         </div>
         
         <div style={{ marginBottom: 24 }}>
+          {/* Show warning if teams not yet assigned to this match (e.g. final) */}
+          {(!match.homeTeam || !match.awayTeam) && (
+            <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 10, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: '#f59e0b', textAlign: 'center' }}>
+              ⚠️ As equipas finalistas ainda não foram apuradas. Podes lançar resultado agora, mas as equipas serão atualizadas automaticamente quando os semifinais terminarem.
+            </div>
+          )}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, marginBottom: 20 }}>
             <div style={{ flex: 1, textAlign: 'right' }}>
-              <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 14 }}>{match.homeTeam?.name}</div>
+              <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 14 }}>{match.homeTeam?.name || 'Casa'}</div>
               <input type="number" min="0" className="score-input" value={home} onChange={e => setHome(e.target.value)} />
             </div>
             <div style={{ fontWeight: 700, color: 'var(--text-muted)', fontSize: 20 }}>×</div>
             <div style={{ flex: 1, textAlign: 'left' }}>
-              <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 14 }}>{match.awayTeam?.name}</div>
+              <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 14 }}>{match.awayTeam?.name || 'Fora'}</div>
               <input type="number" min="0" className="score-input" value={away} onChange={e => setAway(e.target.value)} />
             </div>
           </div>
@@ -1975,8 +1995,9 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
                 <option value="red_card">🟥 Cartão Vermelho</option>
               </select>
               <select className="form-select" value={newEvent.team} onChange={e => setNewEvent({...newEvent, team: e.target.value})}>
-                <option value={match.homeTeam._id}>{match.homeTeam.name}</option>
-                <option value={match.awayTeam._id}>{match.awayTeam.name}</option>
+                {homeTeamId && <option value={homeTeamId}>{match.homeTeam?.name || 'Casa'}</option>}
+                {awayTeamId && <option value={awayTeamId}>{match.awayTeam?.name || 'Fora'}</option>}
+                {!homeTeamId && !awayTeamId && teams.map(t => <option key={t._id} value={t._id}>{t.name}</option>)}
               </select>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -2015,7 +2036,7 @@ function ResultModal({ match, tournamentId, teams, onClose, onSaved }) {
                     <div>
                       <span style={{ fontWeight: 700, fontSize: 14 }}>{e.playerName}</span>
                       {e.minute && <span style={{ fontSize: 11, color: 'var(--green)', marginLeft: 6 }}>{e.minute}'</span>}
-                      <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>({e.team === match.homeTeam._id ? 'Casa' : 'Fora'})</span>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>({e.team === homeTeamId ? (match.homeTeam?.name || 'Casa') : (match.awayTeam?.name || 'Fora')})</span>
                     </div>
                   </div>
                   <button onClick={() => handleRemoveEvent(e.id || e._id)} style={{ background: 'none', color: 'var(--red)', opacity: 0.6 }}><X size={14} /></button>
