@@ -37,7 +37,7 @@ No "Mundial", que terá lugar no Qatar em Novembro próximo, Moçambique estará
 function HistoricNewsCard() {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ marginTop: 52, maxWidth: 760, margin: '52px auto 0' }}>
+    <div style={{ marginTop: 52, maxWidth: 760, margin: '52px auto 0', padding: '0 8px' }}>
       {/* Trigger button */}
       <button
         onClick={() => setOpen(o => !o)}
@@ -46,11 +46,11 @@ function HistoricNewsCard() {
           background: open ? 'rgba(0,200,83,0.12)' : 'rgba(255,255,255,0.04)',
           border: '1px solid ' + (open ? 'rgba(0,200,83,0.5)' : 'rgba(255,255,255,0.12)'),
           borderRadius: open ? '16px 16px 0 0' : 16,
-          padding: '18px 24px',
+          padding: '14px 16px',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
-          gap: 16,
+          gap: 12,
           textAlign: 'left',
           transition: 'all 0.3s ease',
           backdropFilter: 'blur(12px)',
@@ -59,22 +59,22 @@ function HistoricNewsCard() {
         {/* Clean Icon */}
         <div style={{
           flexShrink: 0,
-          width: 48, height: 48,
-          borderRadius: 14,
+          width: 40, height: 40,
+          borderRadius: 12,
           background: 'rgba(255,214,0,0.1)',
           border: '1px solid rgba(255,214,0,0.2)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: 'var(--yellow)'
         }}>
-          <Trophy size={24} />
+          <Trophy size={20} />
         </div>
         
         {/* Text Content */}
-        <div style={{ flex: 1 }}>
-          <div style={{ color: 'var(--yellow)', fontSize: 11, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ color: 'var(--yellow)', fontSize: 10, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4 }}>
             Momento Histórico
           </div>
-          <div style={{ color: '#fff', fontWeight: 800, fontSize: 16, lineHeight: 1.3 }}>
+          <div style={{ color: '#fff', fontWeight: 800, fontSize: 14, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
             Mambinhas garantem apuramento inédito ao Mundial Sub-17 Qatar 2026
           </div>
         </div>
@@ -471,6 +471,9 @@ export default function Landing() {
           <HistoricNewsCard />
         </div>
       </section>
+
+      {/* Extra padding at bottom to clear the FAB dock on mobile */}
+      <div style={{ height: 80 }} />
 
       {/* CTA */}
       <section style={{ padding: '80px 0' }}>
