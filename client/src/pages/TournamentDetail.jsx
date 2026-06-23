@@ -1014,23 +1014,23 @@ export default function TournamentDetail() {
                               {roundMatches.map(m => (
                                 <div key={m._id} className="match-card" style={{ padding: '12px 16px' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', width: '100%' }}>
-                                    <div style={{ display: 'flex', flex: '1 1 200px', alignItems: 'center', gap: 16, justifyContent: 'center' }}>
-                                      <div style={{ flex: 1, textAlign: 'right', fontWeight: 700, fontSize: 14, minWidth: 60, wordBreak: 'break-word' }}>{m.homeTeam?.name || '—'}</div>
-                                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '6px 12px', borderRadius: 8, minWidth: 80, textAlign: 'center' }}>
+                                    <div style={{ display: 'flex', flex: '1 1 200px', alignItems: 'center', gap: 12, justifyContent: 'center', flexWrap: 'nowrap' }}>
+                                      <div style={{ flex: 1, textAlign: 'right', fontWeight: 700, fontSize: 13, minWidth: 0, wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{m.homeTeam?.name || '—'}</div>
+                                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: 8, minWidth: 60, textAlign: 'center', flexShrink: 0 }}>
                                         {m.status === 'finished' ? (
-                                          <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</div>
+                                          <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</div>
                                         ) : m.status === 'live' || m.status === 'active' ? (
                                           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                            <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--green)' }}>{m.homeScore !== null ? m.homeScore : 0} - {m.awayScore !== null ? m.awayScore : 0}</div>
+                                            <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--green)' }}>{m.homeScore !== null ? m.homeScore : 0} - {m.awayScore !== null ? m.awayScore : 0}</div>
                                             <div className="badge badge-green pulse-dot" style={{ fontSize: 9, padding: '2px 6px' }}>LIVE</div>
                                           </div>
                                         ) : m.status === 'cancelled' ? (
-                                          <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--red)' }}>CANCELADO</div>
+                                          <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--red)' }}>CANC.</div>
                                         ) : (
-                                          <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--text-muted)' }}>VS</div>
+                                          <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-muted)' }}>VS</div>
                                         )}
                                       </div>
-                                      <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 14, minWidth: 60, wordBreak: 'break-word' }}>{m.awayTeam?.name || '—'}</div>
+                                      <div style={{ flex: 1, textAlign: 'left', fontWeight: 700, fontSize: 13, minWidth: 0, wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{m.awayTeam?.name || '—'}</div>
                                     </div>
                                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', flex: '1 1 150px' }}>
                                       <button className="btn btn-secondary btn-sm" style={{ padding: '6px 8px', color: '#25D366' }} onClick={() => shareMatchWhatsApp(m)} title="WhatsApp"><MessageCircle size={14} /></button>

@@ -633,34 +633,35 @@ export default function PublicTournament() {
                             </div>
 
                             <div id={`print-match-${m._id}`} className="match-card animate-slide-up" style={{ padding: 0, overflow: 'hidden' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', gap: 16, flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
-                                <div style={{ display: 'flex', flex: '1 1 200px', alignItems: 'center', gap: 16, justifyContent: 'center' }}>
-                                  <div style={{ flex: 1, textAlign: 'right', fontWeight: 800, fontSize: 16, minWidth: 60, wordBreak: 'break-word' }}>{m.homeTeam?.name}</div>
+                              <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', gap: 12, flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+                                <div style={{ display: 'flex', flex: '1 1 200px', alignItems: 'center', gap: 12, justifyContent: 'center', flexWrap: 'nowrap' }}>
+                                  <div style={{ flex: 1, textAlign: 'right', fontWeight: 800, fontSize: 13, minWidth: 0, wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{m.homeTeam?.name}</div>
                                   
                                   <div style={{ 
                                     background: m.status === 'active' ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.05)', 
-                                    padding: '8px 16px', 
-                                    borderRadius: 12, 
-                                    minWidth: 80, 
+                                    padding: '6px 12px', 
+                                    borderRadius: 10, 
+                                    minWidth: 64, 
                                     textAlign: 'center',
-                                    border: m.status === 'active' ? '1px solid var(--green)' : '1px solid var(--border)'
+                                    border: m.status === 'active' ? '1px solid var(--green)' : '1px solid var(--border)',
+                                    flexShrink: 0
                                   }}>
                                     {m.status === 'finished' ? (
                                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                                        <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--green)' }}>{m.homeScore}</span>
-                                        <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>-</span>
-                                        <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--green)' }}>{m.awayScore}</span>
+                                        <span style={{ fontSize: 18, fontWeight: 900, color: 'var(--green)' }}>{m.homeScore}</span>
+                                        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>-</span>
+                                        <span style={{ fontSize: 18, fontWeight: 900, color: 'var(--green)' }}>{m.awayScore}</span>
                                       </div>
                                     ) : m.status === 'cancelled' ? (
-                                      <div style={{ fontSize: 11, fontWeight: 900, color: 'var(--red)', letterSpacing: 1 }}>CANCELADO</div>
+                                      <div style={{ fontSize: 10, fontWeight: 900, color: 'var(--red)', letterSpacing: 1 }}>CANC.</div>
                                     ) : (
-                                      <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-secondary)' }}>
+                                      <div style={{ fontSize: 12, fontWeight: 900, color: 'var(--text-secondary)' }}>
                                         VS
                                       </div>
                                     )}
                                   </div>
 
-                                  <div style={{ flex: 1, textAlign: 'left', fontWeight: 800, fontSize: 16, minWidth: 60, wordBreak: 'break-word' }}>{m.awayTeam?.name}</div>
+                                  <div style={{ flex: 1, textAlign: 'left', fontWeight: 800, fontSize: 13, minWidth: 0, wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{m.awayTeam?.name}</div>
                                 </div>
                               </div>
 
