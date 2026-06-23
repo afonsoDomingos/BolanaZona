@@ -38,7 +38,7 @@ export default function TournamentDetail() {
   const [debugLogs, setDebugLogs] = useState([]);
   const addLog = (msg) => setDebugLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${msg}`]);
   const [showLinkModal, setShowLinkModal] = useState(null);
-  const [viewMode, setViewMode] = useState('bracket');
+  const [viewMode, setViewMode] = useState(window.innerWidth < 768 ? 'list' : 'bracket');
   const [selectedRoundFilter, setSelectedRoundFilter] = useState('all');
 
 
@@ -63,7 +63,7 @@ export default function TournamentDetail() {
       setTeams(tRes.data.teams);
       setMatches(tRes.data.matches);
 
-      if (tRes.data.tournament?.format === 'groups') {
+      if (tRes.data.tournament?.format === 'groups' || window.innerWidth < 768) {
         setViewMode('list');
       }
 

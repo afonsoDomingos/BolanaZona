@@ -26,7 +26,7 @@ export default function PublicTournament() {
   const [showResultModal, setShowResultModal] = useState(null);
   const [errorStatus, setErrorStatus] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  const [viewMode, setViewMode] = useState('bracket');
+  const [viewMode, setViewMode] = useState(window.innerWidth < 768 ? 'list' : 'bracket');
   const [selectedRoundFilter, setSelectedRoundFilter] = useState('all');
   const bracketContainerRef = useRef(null); // inner bracket-container
   const bracketScrollRef = useRef(null);    // outer scroll container
@@ -42,7 +42,7 @@ export default function PublicTournament() {
           setShowRegistrationModal(true);
           isFirstLoadRef.current = false;
         }
-        if (res.data.tournament?.format === 'groups') {
+        if (res.data.tournament?.format === 'groups' || window.innerWidth < 768) {
           setViewMode('list');
         }
       })
