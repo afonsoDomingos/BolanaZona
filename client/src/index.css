@@ -1080,48 +1080,54 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   /* ===== BRACKET RESPONSIVE - Mobile ===== */
   .bracket-scroll-container {
     border-radius: 16px;
-    margin: 0 -4px;
-    overflow-x: auto !important;
+    margin: 0 -16px;
+    padding: 0 0 12px;
+    overflow-x: scroll !important;
+    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
     -webkit-mask-image: none !important;
     mask-image: none !important;
   }
   .bracket-center-final {
-    padding: 8px;
-    min-width: 80px;
+    padding: 10px 8px;
+    min-width: 90px;
     border-radius: 12px;
   }
   .bracket-final-subtitle {
     font-size: 8px;
   }
   .bracket-final-title {
-    font-size: 10px;
+    font-size: 11px;
   }
   .bracket-final-team-logo {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 12px !important;
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 13px !important;
   }
   .bracket-final-trophy-img {
-    width: 36px;
+    width: 40px;
   }
   .bracket-container {
-    padding: 32px 16px;
+    padding: 24px 20px;
     gap: 0;
-    min-height: 400px;
+    min-height: 300px;
     align-items: center;
+    width: max-content;
+    min-width: 100%;
   }
   .bracket-left-wing, .bracket-right-wing {
     gap: 0;
   }
   .bracket-column {
-    min-width: 72px;
+    min-width: 84px;
   }
   .bracket-round-title {
-    font-size: 8px;
-    letter-spacing: 1.5px;
-    padding: 4px 6px;
-    margin-bottom: 12px;
+    font-size: 7px;
+    letter-spacing: 1px;
+    padding: 3px 5px;
+    margin-bottom: 10px;
+    white-space: nowrap;
   }
   .bracket-match-node {
     margin: 6px 0;
@@ -1129,59 +1135,65 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   /* Linhas menores no mobile */
   .bracket-left-wing .bracket-match-node::after,
   .bracket-right-wing .bracket-match-node::before {
-    width: 16px;
+    width: 14px;
   }
-  .bracket-left-wing .bracket-match-node::after { right: -16px; }
-  .bracket-right-wing .bracket-match-node::before { left: -16px; }
+  .bracket-left-wing .bracket-match-node::after { right: -14px; }
+  .bracket-right-wing .bracket-match-node::before { left: -14px; }
 
   .bracket-match-card {
-    width: 64px;
+    width: 78px;
     padding: 8px 6px;
     border-radius: 10px;
-    gap: 4px;
+    gap: 3px;
   }
   .bracket-team-logo {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
     border-width: 1.5px;
   }
   .bracket-team-name {
-    font-size: 7px;
-    letter-spacing: 0px;
-    max-width: 54px;
+    font-size: 8px;
+    letter-spacing: 0;
+    max-width: 64px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .bracket-team-score {
-    font-size: 11px;
+    font-size: 12px;
   }
   .bracket-trophy-column {
-    min-width: 100px;
-    padding: 0 8px;
+    min-width: 90px;
+    padding: 0 6px;
   }
   .bracket-trophy-card {
-    width: 90px;
-    padding: 20px 12px;
-    border-radius: 14px;
+    width: 82px;
+    padding: 16px 10px;
+    border-radius: 12px;
   }
   .bracket-trophy-icon {
-    font-size: 36px;
-    margin-bottom: 10px;
+    font-size: 32px;
+    margin-bottom: 8px;
   }
   .bracket-champion-title {
     font-size: 7px;
-    letter-spacing: 1.5px;
-    margin-bottom: 6px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
   }
   .bracket-champion-name {
-    font-size: 11px;
+    font-size: 10px;
     margin-bottom: 4px;
   }
   /* Linhas verticais entre colunas no mobile */
   .bracket-left-wing .bracket-column:not(:first-child)::before,
   .bracket-right-wing .bracket-column:not(:last-child)::after {
-    left: -16px;
-    right: -16px;
+    left: -14px;
+    right: -14px;
   }
+  /* Hide action buttons in bracket on mobile to save space */
+  .bracket-meta-bar { display: none; }
+  .bracket-actions { display: none; }
 }
 
 
