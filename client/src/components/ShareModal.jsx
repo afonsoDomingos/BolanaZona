@@ -11,6 +11,7 @@ import {
 
 export default function ShareModal({
   onClose,
+  onShared,
   url,
   title = 'Partilhar',
   subtitle,
@@ -29,6 +30,7 @@ export default function ShareModal({
     setBusy(key);
     try {
       await fn();
+      onShared?.();
     } catch (err) {
       if (err?.name !== 'AbortError') {
         console.error(err);

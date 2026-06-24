@@ -7,6 +7,7 @@ import ScrollToTop from './components/ScrollToTop';
 import InstallPrompt from './components/InstallPrompt';
 import Footer from './components/Footer';
 import FeedbackPopup from './components/FeedbackPopup';
+import ShareAppPrompt from './components/ShareAppPrompt';
 import CommunityFAB from './components/CommunityFAB';
 import SocialFAB from './components/SocialFAB';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -99,6 +100,7 @@ function AppRoutes() {
       <Footer />
       {!isCommunityPage && <CommunityFAB />}
       <FeedbackPopup />
+      {!isCommunityPage && <ShareAppPrompt />}
       <ScrollToTop />
       <SocialFAB />
       {!isCommunityPage && <InstallPrompt />}

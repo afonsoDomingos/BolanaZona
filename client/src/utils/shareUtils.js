@@ -59,6 +59,14 @@ export async function dataUrlToBlob(dataUrl) {
   return res.blob();
 }
 
+export function buildAppShareText(url) {
+  return (
+    `⚽ *Bola na Zona* — Futebol do bairro, online!\n\n` +
+    `Organiza torneios, acompanha classificação e partilha resultados com a malta.\n\n` +
+    `👉 ${url}`
+  );
+}
+
 export function buildTournamentShareText(tournament, url) {
   const location = [tournament.location, tournament.neighborhood].filter(Boolean).join(', ');
   return (
