@@ -110,11 +110,10 @@ export default function ShareAppPrompt() {
           right: 24px;
           z-index: 9998;
           width: clamp(290px, 88vw, 360px);
-          background: rgba(13, 21, 41, 0.97);
-          backdrop-filter: blur(16px);
-          border: 1px solid rgba(41, 121, 255, 0.35);
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.08);
           border-radius: 18px;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
           padding: 16px;
         }
 
@@ -124,17 +123,21 @@ export default function ShareAppPrompt() {
           right: 12px;
           background: none;
           border: none;
-          color: var(--text-muted);
+          color: rgba(0, 0, 0, 0.35);
           cursor: pointer;
           padding: 4px;
+        }
+
+        .share-app-prompt-close:hover {
+          color: rgba(0, 0, 0, 0.6);
         }
 
         .share-app-prompt-icon {
           width: 44px;
           height: 44px;
           border-radius: 12px;
-          background: rgba(41, 121, 255, 0.15);
-          color: #60a5fa;
+          background: rgba(0, 200, 83, 0.12);
+          color: var(--green);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -145,13 +148,13 @@ export default function ShareAppPrompt() {
           font-size: 15px;
           font-weight: 800;
           margin: 0 0 6px;
-          color: #fff;
+          color: #1a1a1a;
           padding-right: 24px;
         }
 
         .share-app-prompt-body p {
           font-size: 12px;
-          color: var(--text-secondary);
+          color: rgba(0, 0, 0, 0.55);
           margin: 0 0 14px;
           line-height: 1.45;
         }
@@ -165,14 +168,14 @@ export default function ShareAppPrompt() {
         .share-app-prompt-later {
           background: none;
           border: none;
-          color: var(--text-muted);
+          color: rgba(0, 0, 0, 0.45);
           font-size: 12px;
           cursor: pointer;
           padding: 0;
         }
 
         .share-app-prompt-later:hover {
-          color: var(--text-secondary);
+          color: rgba(0, 0, 0, 0.7);
         }
 
         @media (max-width: 768px) {
