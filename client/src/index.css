@@ -1080,7 +1080,7 @@ body:has(.modal-overlay) .social-fab-toggle-show {
   
   .table-wrapper table { min-width: 600px; } /* Force scroll for data integrity */
   
-  .match-card { padding: 16px; flex-direction: column; text-align: center; gap: 12px; }
+  .match-card { padding: 12px 14px; flex-direction: column; text-align: center; gap: 10px; }
   .match-team { text-align: center !important; }
   .match-score { order: -1; margin-bottom: 8px; }
   
@@ -1237,8 +1237,8 @@ body:has(.modal-overlay) .social-fab-toggle-show {
 /* ===== MATCH CARD ===== */
 .match-card {
   background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 20px 24px;
-  display: flex; align-items: center; gap: 20px;
+  border-radius: var(--radius); padding: 14px 18px;
+  display: flex; align-items: center; gap: 16px;
   transition: var(--transition);
 }
 .match-card:hover { border-color: var(--border-hover); }
