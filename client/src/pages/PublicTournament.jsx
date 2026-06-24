@@ -7,8 +7,10 @@ import SponsorProposalModal from '../components/SponsorProposalModal';
 import LikeButton from '../components/LikeButton';
 import MatchLikeButton from '../components/MatchLikeButton';
 import ScheduledBadge from '../components/ScheduledBadge';
+import ShareModal from '../components/ShareModal';
 import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
+import { buildTournamentShareText } from '../utils/shareUtils';
 import { useAuth } from '../contexts/AuthContext';
 
 const formatLabel = { groups: 'Todos contra Todos', knockout: 'Mata-mata', groups_knockout: 'Grupos + Eliminatórias' };
@@ -27,6 +29,7 @@ export default function PublicTournament() {
   const [showSponsorModal, setShowSponsorModal] = useState(false);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [showResultModal, setShowResultModal] = useState(null);
+  const [shareModal, setShareModal] = useState(null);
   const [errorStatus, setErrorStatus] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [viewMode, setViewMode] = useState(window.innerWidth < 768 ? 'list' : 'bracket');
@@ -175,9 +178,14 @@ export default function PublicTournament() {
       .catch(() => setLikeCount(prev => Math.max(0, prev - 1)));
   };
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast.success('Link copiado! Partilha com a tua equipa. ⚽');
+  const openTournamentShare = () => {
+    const url = window.location.href.split('?')[0];
+    setShareModal({
+      url,
+      shareText: buildTournamentShareText(data.tournament, url),
+      title: 'Partilhar torneio',
+      subtitle: data.tournament.name,
+    });
   };
 
   const captureImage = async (elementId, fileName) => {
@@ -208,16 +216,28 @@ export default function PublicTournament() {
 
     try {
       const canvas = await html2canvas(element, { 
-        backgroundColor: '#0f172a', // Cor de fundo do tema escuro
+        backgroundColor: '#0f172a',
         scale: 2, 
         useCORS: true 
       });
-      const url = canvas.toDataURL('image/png');
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${fileName}.png`;
-      a.click();
-      toast.success('Imagem guardada com sucesso!', { id: toastId });
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          toast.error('Erro ao capturar imagem.', { id: toastId });
+          return;
+        }
+        const previewUrl = canvas.toDataURL('image/png');
+        const url = window.location.href.split('?')[0];
+        setShareModal({
+          url,
+          shareText: buildTournamentShareText(data.tournament, url),
+          title: 'Partilhar imagem',
+          subtitle: fileName.replace(/_/g, ' '),
+          imageBlob: blob,
+          imagePreviewUrl: previewUrl,
+          imageFileName: `${fileName}.png`,
+        });
+        toast.dismiss(toastId);
+      }, 'image/png');
     } catch (err) {
       toast.error('Erro ao capturar imagem.', { id: toastId });
     } finally {
@@ -298,7 +318,7 @@ export default function PublicTournament() {
             </div>
 
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <button onClick={copyLink} className="btn btn-secondary" style={{ borderRadius: 10, height: 36, fontSize: 13, padding: '0 14px' }}><Share2 size={15} /> Partilhar</button>
+              <button onClick={openTournamentShare} className="btn btn-secondary" style={{ borderRadius: 10, height: 36, fontSize: 13, padding: '0 14px' }}><Share2 size={15} /> Partilhar</button>
               <button onClick={() => setShowSubscribeModal(true)} className="btn btn-secondary" style={{ borderRadius: 10, height: 36, fontSize: 13, padding: '0 14px', borderColor: 'var(--green)', color: 'var(--green)' }}><Clock size={15} /> Seguir</button>
               <button onClick={() => setShowSponsorModal(true)} className="btn btn-secondary" style={{ borderRadius: 10, height: 36, fontSize: 13, padding: '0 14px', borderColor: 'var(--yellow)', color: 'var(--yellow)' }}>🤝 Apoiar</button>
               {tournament.status === 'registration' && tournament.allowPublicRegistration && showRegisterAction && (
@@ -921,6 +941,13 @@ export default function PublicTournament() {
           matches={matches}
           onClose={() => setShowResultModal(null)}
           onSaved={() => { setShowResultModal(null); loadData(); }}
+        />
+      )}
+
+      {shareModal && (
+        <ShareModal
+          {...shareModal}
+          onClose={() => setShareModal(null)}
         />
       )}
     </>

@@ -6,9 +6,11 @@ import toast from 'react-hot-toast';
 import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save, MapPin, Edit2, Camera, MessageCircle, Shield, Trophy } from 'lucide-react';
 
 import MatchShareModal from '../components/MatchShareModal';
+import ShareModal from '../components/ShareModal';
 import LinkManagerModal from '../components/LinkManagerModal';
 import MatchLikeButton from '../components/MatchLikeButton';
 import ScheduledBadge from '../components/ScheduledBadge';
+import { buildTournamentShareText, buildMatchShareText, copyToClipboard } from '../utils/shareUtils';
 
 
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
@@ -29,6 +31,7 @@ export default function TournamentDetail() {
   const [editTeamData, setEditTeamData] = useState(null);
   const [showResultModal, setShowResultModal] = useState(null);
   const [showShareModal, setShowShareModal] = useState(null);
+  const [shareModal, setShareModal] = useState(null);
   const [showFinishModal, setShowFinishModal] = useState(false);
   const [showEditMatchModal, setShowEditMatchModal] = useState(null);
   const [showEditTournamentModal, setShowEditTournamentModal] = useState(false);
@@ -189,33 +192,28 @@ export default function TournamentDetail() {
 
   const shareUrl = `${window.location.origin}/t/${tournament?.shareCode}`;
 
-  const copyShare = () => {
-    navigator.clipboard.writeText(shareUrl);
-    toast.success('Link copiado!');
+  const openTournamentShare = () => {
+    setShareModal({
+      url: shareUrl,
+      shareText: buildTournamentShareText(tournament, shareUrl),
+      title: 'Partilhar torneio',
+      subtitle: tournament.name,
+    });
   };
 
-  const shareMatchWhatsApp = (m) => {
-    const homeName = m.homeTeam?.name || 'Casa';
-    const awayName = m.awayTeam?.name || 'Fora';
-    const scoreText = m.status === 'finished' ? `*${m.homeScore} - ${m.awayScore}*` : 'v';
-    
-    let eventsText = '';
-    if (m.events?.length > 0) {
-      eventsText = '\n⚽ *Golos/Cartões:* \n' + m.events.map(e => {
-        const icon = e.type === 'goal' ? '⚽' : e.type === 'yellow_card' ? '🟨' : '🟥';
-        return `${icon} ${e.playerName} (${e.team === m.homeTeam?._id ? 'Casa' : 'Fora'})`;
-      }).join('\n');
-    }
+  const copyShare = async () => {
+    const ok = await copyToClipboard(shareUrl);
+    if (ok) toast.success('Link copiado!');
+    else toast.error('Não foi possível copiar o link.');
+  };
 
-    const text = `🏆 *BOLA NA ZONA - RELATÓRIO* 🏆\n\n` +
-                 `🏟️ *Torneio:* ${tournament.name}\n` +
-                 `⚔️ *Jogo:* ${homeName} ${scoreText} ${awayName}\n` +
-                 `📍 *Local:* ${m.location || tournament.location}\n` +
-                 (m.referee ? `🏁 *Árbitro:* ${m.referee}\n` : '') +
-                 eventsText +
-                 `\n\n📊 *Ver Classificação:* ${shareUrl}`;
-
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  const openMatchShare = (m) => {
+    setShareModal({
+      url: shareUrl,
+      shareText: buildMatchShareText(m, tournament, shareUrl),
+      title: 'Partilhar jogo',
+      subtitle: `${m.homeTeam?.name} vs ${m.awayTeam?.name}`,
+    });
   };
 
   if (loading) return <div className="loading-center" style={{ minHeight: '80vh' }}><div className="spinner" /></div>;
@@ -291,7 +289,7 @@ export default function TournamentDetail() {
                   )}
                 </>
               )}
-              <button className="btn btn-secondary btn-sm" onClick={copyShare}><Share2 size={14} /> Partilhar</button>
+              <button className="btn btn-secondary btn-sm" onClick={openTournamentShare}><Share2 size={14} /> Partilhar</button>
             </div>
           </div>
         </div>
@@ -397,6 +395,7 @@ export default function TournamentDetail() {
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>Partilha com os adeptos para acompanharem a classificação e resultados.</p>
             <div style={{ display: 'flex', gap: 8, width: '100%', background: 'var(--bg-main)', padding: 8, borderRadius: 8 }}>
               <span className="share-url" style={{ flex: 1, fontSize: 12 }}>{shareUrl}</span>
+              <button className="btn btn-secondary btn-sm" onClick={openTournamentShare}><Share2 size={13} /> Partilhar</button>
               <button className="btn btn-secondary btn-sm" onClick={copyShare}><Copy size={13} /> Copiar</button>
               <Link to={`/t/${tournament.shareCode}`} target="_blank" className="btn btn-primary btn-sm">Ver</Link>
             </div>
@@ -811,8 +810,8 @@ export default function TournamentDetail() {
                                 <div className="bracket-actions">
                                   <button 
                                     className="bracket-action-btn whatsapp" 
-                                    onClick={(e) => { e.stopPropagation(); shareMatchWhatsApp(m); }} 
-                                    title="Partilhar WhatsApp"
+                                    onClick={(e) => { e.stopPropagation(); openMatchShare(m); }} 
+                                    title="Partilhar jogo"
                                   >
                                     <MessageCircle size={11} />
                                   </button>
@@ -1094,7 +1093,7 @@ export default function TournamentDetail() {
                                         </button>
                                       )}
                                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
-                                        <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px', color: '#25D366' }} onClick={() => shareMatchWhatsApp(m)} title="WhatsApp"><MessageCircle size={13} /></button>
+                                        <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px', color: '#25D366' }} onClick={() => openMatchShare(m)} title="Partilhar"><MessageCircle size={13} /></button>
                                         {canManage && (
                                           <>
                                             <button className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }} onClick={() => setShowEditMatchModal(m)} title="Editar Jogo"><Edit2 size={13} /></button>
@@ -1422,6 +1421,13 @@ export default function TournamentDetail() {
 
       {/* SHARE MODAL */}
       {showShareModal && <MatchShareModal match={showShareModal} tournament={tournament} onClose={() => setShowShareModal(null)} />}
+
+      {shareModal && (
+        <ShareModal
+          {...shareModal}
+          onClose={() => setShareModal(null)}
+        />
+      )}
 
       {/* FINISH TOURNAMENT MODAL */}
       {showFinishModal && (
