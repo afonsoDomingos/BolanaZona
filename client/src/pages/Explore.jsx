@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { Trophy, Users, MapPin, Calendar, ArrowRight, Search, X } from 'lucide-react';
 import MatchLikeButton from '../components/MatchLikeButton';
+import ScheduledBadge from '../components/ScheduledBadge';
 
 
 export default function Explore() {
@@ -182,9 +183,9 @@ export default function Explore() {
                         background: m.status === 'live' ? 'rgba(255, 23, 68, 0.12)' : m.status === 'finished' ? 'rgba(0, 200, 83, 0.12)' : 'rgba(0, 210, 255, 0.12)', 
                         color: m.status === 'live' ? '#ff1744' : m.status === 'finished' ? 'var(--green)' : '#00d2ff', 
                         border: '1px solid ' + (m.status === 'live' ? 'rgba(255, 23, 68, 0.25)' : m.status === 'finished' ? 'rgba(0, 200, 83, 0.25)' : 'rgba(0, 210, 255, 0.25)'),
-                        padding: '1px 4px', 
-                        borderRadius: 4, 
-                        fontSize: 7, 
+                        padding: '1px 3px', 
+                        borderRadius: 3, 
+                        fontSize: 6, 
                         fontWeight: 800, 
                         textTransform: 'uppercase', 
                         display: 'flex', 
@@ -196,7 +197,7 @@ export default function Explore() {
                         ) : m.status === 'finished' ? (
                           'CONCLUÍDO'
                         ) : (
-                          'AGENDADO'
+                          <ScheduledBadge size="xs" />
                         )}
                       </div>
                       

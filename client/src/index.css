@@ -1545,3 +1545,23 @@ body:has(.modal-overlay) .social-fab-toggle-show {
   height: 22px;
 }
 
+/* Compact scheduled badge */
+.scheduled-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-weight: 800;
+  color: #00d2ff;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.scheduled-badge--xs {
+  font-size: 6px;
+}
+
+.scheduled-badge--sm {
+  font-size: 7px;
+}
+

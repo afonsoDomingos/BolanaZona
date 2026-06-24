@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import api from '../services/api';
+import ScheduledBadge from './ScheduledBadge';
 
 export default function LandingBracketPreview() {
   const [matches, setMatches] = useState([]);
@@ -147,7 +148,7 @@ export default function LandingBracketPreview() {
                 new Date(m.date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }) + ' ' +
                 new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
               ) : (
-                'Agendado'
+                <ScheduledBadge size="sm" />
               )}
             </div>
           </div>

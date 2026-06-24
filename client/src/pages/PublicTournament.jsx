@@ -6,6 +6,7 @@ import TeamRegistrationModal from '../components/TeamRegistrationModal';
 import SponsorProposalModal from '../components/SponsorProposalModal';
 import LikeButton from '../components/LikeButton';
 import MatchLikeButton from '../components/MatchLikeButton';
+import ScheduledBadge from '../components/ScheduledBadge';
 import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
 import { useAuth } from '../contexts/AuthContext';
@@ -623,7 +624,7 @@ export default function PublicTournament() {
                                     new Date(m.date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }) + ' ' +
                                     new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
                                   ) : (
-                                    'Agendado'
+                                    <ScheduledBadge size="sm" />
                                   )}
                                   {legLabel && <span style={{ color: '#aaa', fontSize: 9 }}>{legLabel}</span>}
                                 </div>

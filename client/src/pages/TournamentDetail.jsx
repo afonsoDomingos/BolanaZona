@@ -8,6 +8,7 @@ import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy
 import MatchShareModal from '../components/MatchShareModal';
 import LinkManagerModal from '../components/LinkManagerModal';
 import MatchLikeButton from '../components/MatchLikeButton';
+import ScheduledBadge from '../components/ScheduledBadge';
 
 
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
@@ -796,7 +797,7 @@ export default function TournamentDetail() {
                                     new Date(m.date).toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }) + ' ' +
                                     new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
                                   ) : (
-                                    'Agendado'
+                                    <ScheduledBadge size="sm" />
                                   )}
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginRight: 'auto', marginLeft: 6 }}>
