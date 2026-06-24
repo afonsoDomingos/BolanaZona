@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAll, getOne, create, update, remove, generateCalendar, getStandings, getPublic, getAllPublicTournaments, getGlobalMatches, getRecentFinishedMatches } = require('../controllers/tournamentController');
+const { getAll, getOne, create, update, remove, generateCalendar, getStandings, getPublic, getAllPublicTournaments, getGlobalMatches, getRecentFinishedMatches, incrementViews, likeTournament, unlikeTournament } = require('../controllers/tournamentController');
 const sponsorCtrl = require('../controllers/sponsorController');
 const { protect } = require('../middleware/auth');
 
@@ -11,6 +11,9 @@ router.get('/public/all', getAllPublicTournaments);
 router.get('/public/matches/live', getGlobalMatches);
 router.get('/public/matches/recent', getRecentFinishedMatches);
 router.get('/public/:shareCode', getPublic);
+router.post('/public/:shareCode/view', incrementViews);
+router.post('/public/:shareCode/like', likeTournament);
+router.post('/public/:shareCode/unlike', unlikeTournament);
 router.post('/:tournamentId/sponsor-proposals', sponsorCtrl.create);
 router.post('/:id/subscribe', subCtrl.subscribe);
 

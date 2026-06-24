@@ -376,3 +376,45 @@ exports.removeMatch = async (req, res) => {
     res.json({ message: 'Jogo removido.' });
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
+
+exports.incrementViews = async (req, res) => {
+  try {
+    const t = await Tournament.findOneAndUpdate(
+      { shareCode: req.params.shareCode },
+      { $inc: { views: 1 } },
+      { new: true }
+    );
+    if (!t) return res.status(404).json({ message: 'Torneio não encontrado.' });
+    res.json({ views: t.views || 0 });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.likeTournament = async (req, res) => {
+  try {
+    const t = await Tournament.findOneAndUpdate(
+      { shareCode: req.params.shareCode },
+      { $inc: { likes: 1 } },
+      { new: true }
+    );
+    if (!t) return res.status(404).json({ message: 'Torneio não encontrado.' });
+    res.json({ likes: t.likes || 0 });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.unlikeTournament = async (req, res) => {
+  try {
+    const t = await Tournament.findOneAndUpdate(
+      { shareCode: req.params.shareCode },
+      { $inc: { likes: -1 } },
+      { new: true }
+    );
+    if (!t) return res.status(404).json({ message: 'Torneio não encontrado.' });
+    res.json({ likes: t.likes || 0 });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

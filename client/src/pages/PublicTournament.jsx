@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
-import { Trophy, Calendar, BarChart2, Users, Share2, MapPin, ArrowLeft, Star, Clock, Camera, X, CheckCircle } from 'lucide-react';
+import { Trophy, Calendar, BarChart2, Users, Share2, MapPin, ArrowLeft, Star, Clock, Camera, X, CheckCircle, Eye, Heart } from 'lucide-react';
 import TeamRegistrationModal from '../components/TeamRegistrationModal';
 import SponsorProposalModal from '../components/SponsorProposalModal';
 import toast from 'react-hot-toast';
@@ -33,11 +33,20 @@ export default function PublicTournament() {
   const [bracketZoom, setBracketZoom] = useState(1);
   const isFirstLoadRef = useRef(true);
 
+  // Views & Likes
+  const [viewCount, setViewCount] = useState(0);
+  const [likeCount, setLikeCount] = useState(0);
+  const [liked, setLiked] = useState(() => {
+    try { return localStorage.getItem(`liked_t_${shareCode}`) === 'true'; } catch { return false; }
+  });
+
 
   const loadData = () => {
     api.get(`/tournaments/public/${shareCode}`)
       .then(res => {
         setData(res.data);
+        setViewCount(res.data.tournament?.views || 0);
+        setLikeCount(res.data.tournament?.likes || 0);
         if (res.data.tournament.status === 'registration' && showRegisterAction && isFirstLoadRef.current) {
           setShowRegistrationModal(true);
           isFirstLoadRef.current = false;
@@ -93,7 +102,34 @@ export default function PublicTournament() {
     return () => { clearTimeout(t1); clearTimeout(t2); window.removeEventListener('resize', updateZoom); };
   }, [data, viewMode]);
 
+  // Track view (once per session per tournament)
+  useEffect(() => {
+    if (!shareCode) return;
+    const sessionKey = `viewed_t_${shareCode}`;
+    if (!sessionStorage.getItem(sessionKey)) {
+      sessionStorage.setItem(sessionKey, 'true');
+      api.post(`/tournaments/public/${shareCode}/view`)
+        .then(res => setViewCount(res.data.views ?? 0))
+        .catch(() => {});
+    }
+  }, [shareCode]);
 
+  const handleLikeToggle = () => {
+    const newLiked = !liked;
+    setLiked(newLiked);
+    setLikeCount(prev => prev + (newLiked ? 1 : -1));
+    try { localStorage.setItem(`liked_t_${shareCode}`, String(newLiked)); } catch {}
+    const endpoint = newLiked
+      ? `/tournaments/public/${shareCode}/like`
+      : `/tournaments/public/${shareCode}/unlike`;
+    api.post(endpoint)
+      .then(res => setLikeCount(res.data.likes ?? 0))
+      .catch(() => {
+        // revert on error
+        setLiked(!newLiked);
+        setLikeCount(prev => prev + (newLiked ? -1 : 1));
+      });
+  };
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -225,6 +261,29 @@ export default function PublicTournament() {
                 <button onClick={() => setShowRegistrationModal(true)} className="btn btn-primary" style={{ borderRadius: 10, height: 36, fontSize: 13, padding: '0 20px', fontWeight: 700 }}>Inscrever</button>
               )}
             </div>
+          </div>
+
+          {/* Views & Likes row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--text-secondary)', fontSize: 12 }}>
+              <Eye size={13} color="var(--text-muted)" />
+              <span style={{ fontWeight: 600 }}>{viewCount.toLocaleString('pt-PT')}</span> visualizações
+            </span>
+            <button
+              onClick={handleLikeToggle}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                background: liked ? 'rgba(255,60,80,0.12)' : 'rgba(255,255,255,0.05)',
+                border: `1px solid ${liked ? 'rgba(255,60,80,0.4)' : 'var(--border)'}`,
+                borderRadius: 20, padding: '4px 14px', cursor: 'pointer',
+                color: liked ? '#ff3c50' : 'var(--text-secondary)',
+                fontSize: 12, fontWeight: 700, transition: 'all 0.2s',
+                transform: liked ? 'scale(1.05)' : 'scale(1)'
+              }}
+            >
+              <Heart size={13} fill={liked ? '#ff3c50' : 'none'} color={liked ? '#ff3c50' : 'var(--text-muted)'} />
+              {likeCount.toLocaleString('pt-PT')} {liked ? 'Gostei' : 'Gosto'}
+            </button>
           </div>
         </div>
       </div>

@@ -147,21 +147,21 @@ export default function Explore() {
                         background: m.status === 'live' ? 'rgba(255, 23, 68, 0.12)' : m.status === 'finished' ? 'rgba(0, 200, 83, 0.12)' : 'rgba(0, 210, 255, 0.12)', 
                         color: m.status === 'live' ? '#ff1744' : m.status === 'finished' ? 'var(--green)' : '#00d2ff', 
                         border: '1px solid ' + (m.status === 'live' ? 'rgba(255, 23, 68, 0.25)' : m.status === 'finished' ? 'rgba(0, 200, 83, 0.25)' : 'rgba(0, 210, 255, 0.25)'),
-                        padding: '3px 8px', 
-                        borderRadius: 6, 
-                        fontSize: 9, 
+                        padding: '2px 6px', 
+                        borderRadius: 4, 
+                        fontSize: 8, 
                         fontWeight: 800, 
                         textTransform: 'uppercase', 
                         display: 'flex', 
                         alignItems: 'center', 
-                        gap: 4 
+                        gap: 3 
                       }}>
                         {m.status === 'live' ? (
-                          <><span className="pulse-dot" style={{ width: 6, height: 6, background: '#ff1744', borderRadius: '50%' }}></span> LIVE</>
+                          <><span className="pulse-dot" style={{ width: 5, height: 5, background: '#ff1744', borderRadius: '50%' }}></span> LIVE</>
                         ) : m.status === 'finished' ? (
                           'CONCLUÍDO'
                         ) : (
-                          '🗓️ AGENDADO'
+                          'AGENDADO'
                         )}
                       </div>
                       
