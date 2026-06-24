@@ -4,29 +4,29 @@ import { Trophy, Users, Calendar, Play, ChevronRight, CheckCircle2 } from 'lucid
 
 export default function GuideTournament() {
   return (
-    <div className="page" style={{ backgroundImage: 'url(/loginbg1.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
+    <div className="page guide-page" style={{ backgroundImage: 'url(/loginbg1.png)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
       {/* Dark overlay for readability */}
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(5,5,36,0.92)', zIndex: 0 }} />
+      <div className="guide-page-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(5,5,36,0.92)', zIndex: 0 }} />
 
-      <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: 800, padding: '60px 20px' }}>
+      <div className="container guide-container" style={{ position: 'relative', zIndex: 1, maxWidth: 800, padding: '60px 20px' }}>
         
-        <div style={{ textAlign: 'center', marginBottom: 60 }} className="animate-fade-in">
-          <div style={{ display: 'inline-flex', padding: '12px 24px', background: 'rgba(0, 200, 83, 0.1)', border: '1px solid rgba(0, 200, 83, 0.3)', borderRadius: 30, color: 'var(--green)', fontWeight: 700, marginBottom: 20, alignItems: 'center', gap: 10 }}>
+        <div className="guide-header animate-fade-in" style={{ textAlign: 'center', marginBottom: 60 }}>
+          <div className="guide-badge" style={{ display: 'inline-flex', padding: '12px 24px', background: 'rgba(0, 200, 83, 0.1)', border: '1px solid rgba(0, 200, 83, 0.3)', borderRadius: 30, color: 'var(--green)', fontWeight: 700, marginBottom: 20, alignItems: 'center', gap: 10 }}>
             <Trophy size={20} /> Guia Oficial
           </div>
-          <h1 className="font-syne" style={{ fontSize: 42, fontWeight: 800, marginBottom: 16 }}>
+          <h1 className="font-syne guide-title" style={{ fontWeight: 800, marginBottom: 16 }}>
             Como Criar e Gerir o Teu Torneio 🏆
           </h1>
-          <p style={{ fontSize: 18, color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 600, margin: '0 auto' }}>
+          <p className="guide-intro" style={{ color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: 600, margin: '0 auto' }}>
             A Bola na Zona simplifica todo o trabalho pesado. Segue estes 5 passos simples para teres o teu torneio a decorrer como os profissionais.
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+        <div className="guide-steps" style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
           
           {/* Step 1 */}
-          <div className="card animate-fade-in" style={{ padding: 32, display: 'flex', gap: 24, alignItems: 'flex-start' }}>
-            <div style={{ width: 48, height: 48, borderRadius: 24, background: 'var(--green)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 24, flexShrink: 0 }}>1</div>
+          <div className="card animate-fade-in guide-step-card" style={{ padding: 32, display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+            <div className="guide-step-number" style={{ width: 48, height: 48, borderRadius: 24, background: 'var(--green)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 24, flexShrink: 0 }}>1</div>
             <div>
               <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>Criar o Torneio</h2>
               <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 16 }}>
@@ -39,8 +39,8 @@ export default function GuideTournament() {
           </div>
 
           {/* Step 2 */}
-          <div className="card animate-fade-in" style={{ padding: 32, display: 'flex', gap: 24, alignItems: 'flex-start', animationDelay: '0.1s' }}>
-            <div style={{ width: 48, height: 48, borderRadius: 24, background: 'var(--yellow)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 24, flexShrink: 0 }}>2</div>
+          <div className="card animate-fade-in guide-step-card" style={{ padding: 32, display: 'flex', gap: 24, alignItems: 'flex-start', animationDelay: '0.1s' }}>
+            <div className="guide-step-number" style={{ width: 48, height: 48, borderRadius: 24, background: 'var(--yellow)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 24, flexShrink: 0 }}>2</div>
             <div>
               <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>Receber e Adicionar Equipas</h2>
               <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 16 }}>
@@ -54,8 +54,8 @@ export default function GuideTournament() {
           </div>
 
           {/* Step 3 */}
-          <div className="card animate-fade-in" style={{ padding: 32, display: 'flex', gap: 24, alignItems: 'flex-start', animationDelay: '0.2s' }}>
-            <div style={{ width: 48, height: 48, borderRadius: 24, background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 24, flexShrink: 0 }}>3</div>
+          <div className="card animate-fade-in guide-step-card" style={{ padding: 32, display: 'flex', gap: 24, alignItems: 'flex-start', animationDelay: '0.2s' }}>
+            <div className="guide-step-number" style={{ width: 48, height: 48, borderRadius: 24, background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 24, flexShrink: 0 }}>3</div>
             <div>
               <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>Gerar o Calendário (A Árvore)</h2>
               <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 16 }}>
@@ -69,8 +69,8 @@ export default function GuideTournament() {
           </div>
 
           {/* Step 4 */}
-          <div className="card animate-fade-in" style={{ padding: 32, display: 'flex', gap: 24, alignItems: 'flex-start', animationDelay: '0.3s' }}>
-            <div style={{ width: 48, height: 48, borderRadius: 24, background: 'var(--red)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 24, flexShrink: 0 }}>4</div>
+          <div className="card animate-fade-in guide-step-card" style={{ padding: 32, display: 'flex', gap: 24, alignItems: 'flex-start', animationDelay: '0.3s' }}>
+            <div className="guide-step-number" style={{ width: 48, height: 48, borderRadius: 24, background: 'var(--red)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 24, flexShrink: 0 }}>4</div>
             <div>
               <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>Lançar Resultados e Avançar</h2>
               <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
@@ -80,14 +80,14 @@ export default function GuideTournament() {
           </div>
 
           {/* Step 5 */}
-          <div className="card animate-fade-in" style={{ padding: 32, display: 'flex', gap: 24, alignItems: 'flex-start', animationDelay: '0.4s', border: '1px solid var(--green)' }}>
-            <div style={{ width: 48, height: 48, borderRadius: 24, background: 'linear-gradient(135deg, var(--green), var(--yellow))', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 24, flexShrink: 0 }}>5</div>
+          <div className="card animate-fade-in guide-step-card" style={{ padding: 32, display: 'flex', gap: 24, alignItems: 'flex-start', animationDelay: '0.4s', border: '1px solid var(--green)' }}>
+            <div className="guide-step-number" style={{ width: 48, height: 48, borderRadius: 24, background: 'linear-gradient(135deg, var(--green), var(--yellow))', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 24, flexShrink: 0 }}>5</div>
             <div>
               <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>Acompanhamento Público</h2>
               <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 16 }}>
                 Enquanto geres o torneio no teu painel, todos os adeptos podem ver os resultados em tempo real, a árvore atualizada, os melhores marcadores e partilhar a página pública nas redes sociais. A tua imagem será a de uma organização de topo!
               </p>
-              <Link to="/dashboard/tournaments/new" className="btn btn-primary" style={{ display: 'inline-flex', padding: '12px 24px', fontSize: 16 }}>
+              <Link to="/dashboard/tournaments/new" className="btn btn-primary guide-cta-btn" style={{ display: 'inline-flex', padding: '12px 24px', fontSize: 16 }}>
                 Criar o Meu Torneio Agora <Play size={16} fill="currentColor" style={{ marginLeft: 8 }} />
               </Link>
             </div>

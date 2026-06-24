@@ -411,7 +411,7 @@ export default function Landing() {
       </section>
 
       {/* Mission Section */}
-      <section style={{ position: 'relative', overflow: 'hidden', padding: 0 }}>
+      <section className="mission-section" style={{ position: 'relative', padding: 0 }}>
         {/* Background image with overlay */}
         <div style={{
           position: 'absolute', inset: 0,
@@ -426,15 +426,16 @@ export default function Landing() {
         {/* Bottom fade */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to top, var(--bg-main), transparent)', zIndex: 1 }} />
 
-        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '40px 24px', maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
+        <div className="container mission-content" style={{ position: 'relative', zIndex: 2, padding: '40px 16px', maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
 
-          <h2 className="font-syne" style={{ fontSize: 'clamp(32px, 6vw, 56px)', fontWeight: 900, lineHeight: 1.15, marginBottom: 28, letterSpacing: '-0.5px' }}>
+          <h2 className="font-syne mission-heading">
             Os próximos{' '}
-            <span style={{ color: 'var(--green)', textShadow: '0 0 30px rgba(0,200,83,0.5)' }}>Craques Nacionais</span>
-            <br />nascem das comunidades.
+            <span className="mission-heading-accent">Craques Nacionais</span>
+            <br />
+            nascem das comunidades.
           </h2>
 
-          <p style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', color: 'rgba(255,255,255,0.75)', maxWidth: 680, margin: '0 auto 48px', lineHeight: 1.8 }}>
+          <p className="mission-subtext" style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', color: 'rgba(255,255,255,0.75)', maxWidth: 680, margin: '0 auto 48px', lineHeight: 1.8 }}>
             A nossa missão é criar o espaço onde esse talento se revela.
             De bairro em bairro, de torneio em torneio — a <strong style={{ color: '#fff' }}>Bola na Zona</strong> é a plataforma que organiza, regista e projecta os jogadores que um dia vão
             vestir a camisola <strong style={{ color: '#fff' }}>Mamba Verde</strong>.
