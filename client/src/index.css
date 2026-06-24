@@ -1447,6 +1447,29 @@ body:has(.modal-overlay) .social-fab-toggle-show {
   flex-shrink: 0;
 }
 
+.match-share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.match-share-btn:hover {
+  color: var(--green);
+  background: rgba(0, 200, 83, 0.12);
+  border-color: rgba(0, 200, 83, 0.3);
+  transform: scale(1.08);
+}
+
 .match-view-pill {
   display: flex;
   align-items: center;
@@ -1699,11 +1722,18 @@ body:has(.modal-overlay) .social-fab-toggle-show {
 }
 
 /* Share modal */
+.modal-overlay:has(.share-modal) {
+  align-items: center;
+}
+
 .share-modal {
   max-width: 420px;
   width: calc(100% - 32px);
   padding: 0;
   overflow: hidden;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .share-modal-header {
@@ -1712,20 +1742,32 @@ body:has(.modal-overlay) .social-fab-toggle-show {
   justify-content: space-between;
   gap: 16px;
   padding: 20px 20px 12px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .share-modal-header h2 {
   font-size: 18px;
   font-weight: 800;
   margin: 0 0 4px;
+  color: #1a1a1a;
 }
 
 .share-modal-header p {
   margin: 0;
   font-size: 13px;
-  color: var(--text-secondary);
+  color: rgba(0, 0, 0, 0.55);
   line-height: 1.4;
+}
+
+.share-modal .modal-close {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.share-modal .modal-close:hover {
+  color: rgba(0, 0, 0, 0.7);
+  border-color: rgba(0, 0, 0, 0.15);
 }
 
 .share-modal-preview {
@@ -1748,10 +1790,10 @@ body:has(.modal-overlay) .social-fab-toggle-show {
   gap: 8px;
   margin: 16px 20px 0;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 10px;
-  color: var(--text-secondary);
+  color: rgba(0, 0, 0, 0.55);
   font-size: 11px;
 }
 
@@ -1775,17 +1817,17 @@ body:has(.modal-overlay) .social-fab-toggle-show {
   align-items: center;
   gap: 8px;
   padding: 12px 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 14px;
   cursor: pointer;
   transition: var(--transition);
-  color: var(--text-primary);
+  color: #1a1a1a;
 }
 
 .share-action-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: var(--border-hover);
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.12);
   transform: translateY(-2px);
 }
 
@@ -1803,7 +1845,7 @@ body:has(.modal-overlay) .social-fab-toggle-show {
   justify-content: center;
 }
 
-.share-action-icon--copy { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.share-action-icon--copy { background: rgba(0, 0, 0, 0.08); color: #1a1a1a; }
 .share-action-icon--whatsapp { background: rgba(37, 211, 102, 0.15); color: #25D366; }
 .share-action-icon--native { background: rgba(0, 200, 83, 0.15); color: var(--green); }
 .share-action-icon--instagram { background: rgba(225, 48, 108, 0.15); color: #E1306C; }
@@ -1812,27 +1854,40 @@ body:has(.modal-overlay) .social-fab-toggle-show {
 .share-action-label {
   font-size: 11px;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: rgba(0, 0, 0, 0.55);
   text-align: center;
 }
 
 .share-modal-divider {
   margin: 18px 20px 0;
   padding-top: 16px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: rgba(0, 0, 0, 0.4);
 }
 
 .share-modal-hint {
   margin: 16px 20px 20px;
   font-size: 12px;
-  color: var(--text-muted);
+  color: rgba(0, 0, 0, 0.45);
   text-align: center;
   line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .modal-overlay:has(.share-modal) {
+    align-items: center;
+    padding: 16px;
+  }
+
+  .modal.share-modal {
+    margin: 0;
+    border-radius: 18px;
+    max-height: 85dvh;
+  }
 }
 
 @media (max-width: 380px) {

@@ -180,10 +180,14 @@ export default function ShareAppPrompt() {
 
         @media (max-width: 768px) {
           .share-app-prompt {
-            bottom: max(16px, env(safe-area-inset-bottom));
-            right: 16px;
-            left: 16px;
-            width: auto;
+            bottom: auto;
+            right: auto;
+            top: 0;
+            left: 0;
+            inset: 0;
+            margin: auto;
+            width: clamp(290px, 88vw, 360px);
+            height: fit-content;
           }
         }
       `}</style>

@@ -42,7 +42,7 @@ export default function MatchShareModal({ match, tournament, onClose }) {
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
           <div className="modal share-modal" style={{ padding: 32, textAlign: 'center' }}>
             <div className="spinner" style={{ margin: '0 auto 16px' }} />
-            <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>A preparar imagem de partilha…</p>
+            <p style={{ color: 'rgba(0, 0, 0, 0.55)', fontSize: 14 }}>A preparar imagem de partilha…</p>
           </div>
         </div>
         <div aria-hidden="true" style={{ position: 'fixed', left: '-9999px', top: 0, pointerEvents: 'none' }}>

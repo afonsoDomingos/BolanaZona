@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { Trophy, Users, MapPin, Calendar, ArrowRight, Search, X } from 'lucide-react';
+import { Trophy, Users, MapPin, Calendar, ArrowRight, Search, X, Share2 } from 'lucide-react';
 import MatchLikeButton from '../components/MatchLikeButton';
 import ScheduledBadge from '../components/ScheduledBadge';
+import ShareModal from '../components/ShareModal';
+import { buildMatchShareText } from '../utils/shareUtils';
 
 
 export default function Explore() {
@@ -16,6 +18,18 @@ export default function Explore() {
   const [matches, setMatches] = useState([]);
   const [recentMatches, setRecentMatches] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
+  const [shareModal, setShareModal] = useState(null);
+
+  const openMatchShare = (match) => {
+    const tournament = match.tournament;
+    const url = `${window.location.origin}/t/${tournament?.shareCode}`;
+    setShareModal({
+      url,
+      shareText: buildMatchShareText(match, tournament, url),
+      title: 'Partilhar jogo',
+      subtitle: `${match.homeTeam?.name} vs ${match.awayTeam?.name}`,
+    });
+  };
 
   const handleMatchLike = (match) => {
     const tournamentId = match.tournament?._id || match.tournament;
@@ -268,11 +282,21 @@ export default function Explore() {
                           )}
                           {m.location && <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>🏟️ {m.location}</span>}
                         </div>
-                        <MatchLikeButton
-                          likes={m.likes || 0}
-                          views={m.views || 0}
-                          onLike={() => handleMatchLike(m)}
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                          <button
+                            type="button"
+                            className="match-share-btn"
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); openMatchShare(m); }}
+                            title="Partilhar jogo"
+                          >
+                            <Share2 size={11} />
+                          </button>
+                          <MatchLikeButton
+                            likes={m.likes || 0}
+                            views={m.views || 0}
+                            onLike={() => handleMatchLike(m)}
+                          />
+                        </div>
                       </div>
                     </Link>
                   ))}
@@ -311,11 +335,21 @@ export default function Explore() {
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 10, paddingTop: 4, borderTop: '1px solid rgba(0,200,83,0.08)', marginTop: 4 }}>
                         {m.date && <span style={{ color: 'var(--text-muted)' }}>📅 {new Date(m.date).toLocaleDateString('pt-PT')}</span>}
-                        <MatchLikeButton
-                          likes={m.likes || 0}
-                          views={m.views || 0}
-                          onLike={() => handleMatchLike(m)}
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                          <button
+                            type="button"
+                            className="match-share-btn"
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); openMatchShare(m); }}
+                            title="Partilhar jogo"
+                          >
+                            <Share2 size={11} />
+                          </button>
+                          <MatchLikeButton
+                            likes={m.likes || 0}
+                            views={m.views || 0}
+                            onLike={() => handleMatchLike(m)}
+                          />
+                        </div>
                       </div>
                     </Link>
                   ))}
@@ -384,6 +418,13 @@ export default function Explore() {
         )}
       </div>
       
+      {shareModal && (
+        <ShareModal
+          {...shareModal}
+          onClose={() => setShareModal(null)}
+        />
+      )}
+
       {previewImage && (
         <div 
           className="modal-overlay animate-fade-in" 
