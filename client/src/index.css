@@ -1438,3 +1438,110 @@ body:has(.modal-overlay) .social-fab-toggle-show {
   .fab-stack { right: 16px; bottom: 16px; gap: 8px; }
   .fab-item { width: 34px; height: 34px; }
 }
+
+/* ===== MATCH LIKE / VIEW PILLS ===== */
+.match-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.match-view-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  padding: 3px 7px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  white-space: nowrap;
+}
+
+.match-like-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+  padding: 3px 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+  position: relative;
+  overflow: visible;
+}
+
+.match-like-btn.liked {
+  color: #ff3c50;
+  background: rgba(255, 60, 80, 0.12);
+  border-color: rgba(255, 60, 80, 0.35);
+}
+
+.match-like-btn:hover {
+  transform: scale(1.08);
+}
+
+.match-like-btn.liked:hover {
+  background: rgba(255, 60, 80, 0.18);
+}
+
+/* Instagram heart pop animation */
+@keyframes heart-pop {
+  0%   { transform: scale(1); }
+  20%  { transform: scale(1.5); }
+  40%  { transform: scale(0.9); }
+  60%  { transform: scale(1.25); }
+  80%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes heart-burst {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+  50%  { opacity: 1; transform: translate(-50%, -50%) scale(1.8); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.5); }
+}
+
+.match-like-btn .heart-icon {
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+}
+
+.match-like-btn.animating .heart-icon {
+  animation: heart-pop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.28) forwards;
+}
+
+.heart-burst-ring {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,60,80,0.6) 0%, transparent 70%);
+  pointer-events: none;
+  animation: heart-burst 0.5s ease-out forwards;
+  z-index: 10;
+}
+
+.match-stats-row--sm .match-view-pill,
+.match-stats-row--sm .match-like-btn {
+  font-size: 9px;
+  padding: 2px 6px;
+  gap: 3px;
+}
+
+.match-stats-row--sm .heart-burst-ring {
+  left: 12px;
+  width: 22px;
+  height: 22px;
+}
+

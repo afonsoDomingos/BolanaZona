@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
-import { Trophy, Calendar, BarChart2, Users, Share2, MapPin, ArrowLeft, Star, Clock, Camera, X, CheckCircle, Eye, Heart } from 'lucide-react';
+import { Trophy, Calendar, BarChart2, Users, Share2, MapPin, ArrowLeft, Star, Clock, Camera, X, CheckCircle, Eye } from 'lucide-react';
 import TeamRegistrationModal from '../components/TeamRegistrationModal';
 import SponsorProposalModal from '../components/SponsorProposalModal';
+import LikeButton from '../components/LikeButton';
+import MatchLikeButton from '../components/MatchLikeButton';
 import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
 import { useAuth } from '../contexts/AuthContext';
@@ -36,37 +38,19 @@ export default function PublicTournament() {
   // Views & Likes
   const [viewCount, setViewCount] = useState(0);
   const [likeCount, setLikeCount] = useState(0);
-  const [liked, setLiked] = useState(() => {
-    try { return localStorage.getItem(`liked_t_${shareCode}`) === 'true'; } catch { return false; }
-  });
 
-  const [likedMatches, setLikedMatches] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('liked_matches') || '[]'); } catch { return []; }
-  });
+  const handleMatchLike = (match) => {
+    const tournamentId = match.tournament?._id || match.tournament;
 
-  const handleMatchLikeToggle = (match) => {
-    const isLiked = likedMatches.includes(match._id);
-    const newLiked = isLiked
-      ? likedMatches.filter(id => id !== match._id)
-      : [...likedMatches, match._id];
-    
-    setLikedMatches(newLiked);
-    try { localStorage.setItem('liked_matches', JSON.stringify(newLiked)); } catch {}
-
-    // Optimistically update
     setData(prev => {
       if (!prev) return prev;
       return {
         ...prev,
-        matches: prev.matches.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? -1 : 1) } : m)
+        matches: prev.matches.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + 1 } : m)
       };
     });
 
-    const endpoint = isLiked
-      ? `/tournaments/${match.tournament._id || match.tournament}/matches/${match._id}/unlike`
-      : `/tournaments/${match.tournament._id || match.tournament}/matches/${match._id}/like`;
-
-    api.post(endpoint)
+    api.post(`/tournaments/${tournamentId}/matches/${match._id}/like`)
       .then(res => {
         setData(prev => {
           if (!prev) return prev;
@@ -77,13 +61,11 @@ export default function PublicTournament() {
         });
       })
       .catch(() => {
-        // revert on error
-        setLikedMatches(prev => isLiked ? [...prev, match._id] : prev.filter(id => id !== match._id));
         setData(prev => {
           if (!prev) return prev;
           return {
             ...prev,
-            matches: prev.matches.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? 1 : -1) } : m)
+            matches: prev.matches.map(m => m._id === match._id ? { ...m, likes: Math.max(0, (m.likes || 0) - 1) } : m)
           };
         });
       });
@@ -185,21 +167,11 @@ export default function PublicTournament() {
     }
   }, [shareCode]);
 
-  const handleLikeToggle = () => {
-    const newLiked = !liked;
-    setLiked(newLiked);
-    setLikeCount(prev => prev + (newLiked ? 1 : -1));
-    try { localStorage.setItem(`liked_t_${shareCode}`, String(newLiked)); } catch {}
-    const endpoint = newLiked
-      ? `/tournaments/public/${shareCode}/like`
-      : `/tournaments/public/${shareCode}/unlike`;
-    api.post(endpoint)
+  const handleLike = () => {
+    setLikeCount(prev => prev + 1);
+    api.post(`/tournaments/public/${shareCode}/like`)
       .then(res => setLikeCount(res.data.likes ?? 0))
-      .catch(() => {
-        // revert on error
-        setLiked(!newLiked);
-        setLikeCount(prev => prev + (newLiked ? -1 : 1));
-      });
+      .catch(() => setLikeCount(prev => Math.max(0, prev - 1)));
   };
 
   const copyLink = () => {
@@ -340,21 +312,12 @@ export default function PublicTournament() {
               <Eye size={13} color="var(--text-muted)" />
               <span style={{ fontWeight: 600 }}>{viewCount.toLocaleString('pt-PT')}</span> visualizações
             </span>
-            <button
-              onClick={handleLikeToggle}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                background: liked ? 'rgba(255,60,80,0.12)' : 'rgba(255,255,255,0.05)',
-                border: `1px solid ${liked ? 'rgba(255,60,80,0.4)' : 'var(--border)'}`,
-                borderRadius: 20, padding: '4px 14px', cursor: 'pointer',
-                color: liked ? '#ff3c50' : 'var(--text-secondary)',
-                fontSize: 12, fontWeight: 700, transition: 'all 0.2s',
-                transform: liked ? 'scale(1.05)' : 'scale(1)'
-              }}
-            >
-              <Heart size={13} fill={liked ? '#ff3c50' : 'none'} color={liked ? '#ff3c50' : 'var(--text-muted)'} />
-              {likeCount.toLocaleString('pt-PT')} {liked ? 'Gostei' : 'Gosto'}
-            </button>
+            <LikeButton
+              likes={likeCount}
+              onLike={handleLike}
+              size="lg"
+              label="Gosto"
+            />
           </div>
         </div>
       </div>
@@ -665,23 +628,12 @@ export default function PublicTournament() {
                                   {legLabel && <span style={{ color: '#aaa', fontSize: 9 }}>{legLabel}</span>}
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
-                                  <span style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 8, color: 'rgba(255,255,255,0.35)' }} title={`${m.views || 0} visualizações`}>
-                                    <Eye size={10} color="rgba(255,255,255,0.4)" /> {m.views || 0}
-                                  </span>
-                                  <button 
-                                    onClick={(e) => { e.stopPropagation(); handleMatchLikeToggle(m); }}
-                                    style={{ 
-                                      display: 'flex', alignItems: 'center', gap: 2, fontSize: 8, 
-                                      color: likedMatches.includes(m._id) ? '#ff3c50' : 'rgba(255,255,255,0.35)',
-                                      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                                      transition: 'transform 0.1s ease'
-                                    }}
-                                    onMouseDown={e => e.currentTarget.style.transform = 'scale(1.2)'}
-                                    onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-                                    title="Gostar do jogo"
-                                  >
-                                    <Heart size={10} fill={likedMatches.includes(m._id) ? '#ff3c50' : 'none'} color={likedMatches.includes(m._id) ? '#ff3c50' : 'rgba(255,255,255,0.4)'} /> {m.likes || 0}
-                                  </button>
+                                  <MatchLikeButton
+                                    likes={m.likes || 0}
+                                    views={m.views || 0}
+                                    onLike={() => handleMatchLike(m)}
+                                    size="sm"
+                                  />
                                 </div>
                               </div>
                             </div>

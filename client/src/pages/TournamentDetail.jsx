@@ -3,10 +3,11 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save, MapPin, Edit2, Camera, MessageCircle, Shield, Trophy, Eye, Heart } from 'lucide-react';
+import { ArrowLeft, Users, Calendar, BarChart2, Plus, Trash2, Share2, Play, Copy, X, Save, MapPin, Edit2, Camera, MessageCircle, Shield, Trophy } from 'lucide-react';
 
 import MatchShareModal from '../components/MatchShareModal';
 import LinkManagerModal from '../components/LinkManagerModal';
+import MatchLikeButton from '../components/MatchLikeButton';
 
 
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
@@ -41,34 +42,17 @@ export default function TournamentDetail() {
   const [viewMode, setViewMode] = useState(window.innerWidth < 768 ? 'list' : 'bracket');
   const [selectedRoundFilter, setSelectedRoundFilter] = useState('all');
 
-  const [likedMatches, setLikedMatches] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('liked_matches') || '[]'); } catch { return []; }
-  });
+  const handleMatchLike = (match) => {
+    const tournamentId = match.tournament?._id || match.tournament || id;
 
-  const handleMatchLikeToggle = (match) => {
-    const isLiked = likedMatches.includes(match._id);
-    const newLiked = isLiked
-      ? likedMatches.filter(id => id !== match._id)
-      : [...likedMatches, match._id];
-    
-    setLikedMatches(newLiked);
-    try { localStorage.setItem('liked_matches', JSON.stringify(newLiked)); } catch {}
+    setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + 1 } : m));
 
-    // Optimistically update
-    setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? -1 : 1) } : m));
-
-    const endpoint = isLiked
-      ? `/tournaments/${match.tournament._id || match.tournament}/matches/${match._id}/unlike`
-      : `/tournaments/${match.tournament._id || match.tournament}/matches/${match._id}/like`;
-
-    api.post(endpoint)
+    api.post(`/tournaments/${tournamentId}/matches/${match._id}/like`)
       .then(res => {
         setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: res.data.likes ?? 0 } : m));
       })
       .catch(() => {
-        // revert on error
-        setLikedMatches(prev => isLiked ? [...prev, match._id] : prev.filter(id => id !== match._id));
-        setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? 1 : -1) } : m));
+        setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: Math.max(0, (m.likes || 0) - 1) } : m));
       });
   };
 
@@ -816,20 +800,12 @@ export default function TournamentDetail() {
                                   )}
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginRight: 'auto', marginLeft: 6 }}>
-                                  <span style={{ display: 'flex', alignItems: 'center', gap: 1, fontSize: 8, color: 'rgba(255,255,255,0.3)' }} title={`${m.views || 0} visualizações`}>
-                                    <Eye size={8} /> {m.views || 0}
-                                  </span>
-                                  <button 
-                                    onClick={(e) => { e.stopPropagation(); handleMatchLikeToggle(m); }}
-                                    style={{ 
-                                      display: 'flex', alignItems: 'center', gap: 1, fontSize: 8, 
-                                      color: likedMatches.includes(m._id) ? '#ff3c50' : 'rgba(255,255,255,0.3)',
-                                      background: 'none', border: 'none', cursor: 'pointer', padding: 0
-                                    }}
-                                    title="Gostar"
-                                  >
-                                    <Heart size={8} fill={likedMatches.includes(m._id) ? '#ff3c50' : 'none'} color={likedMatches.includes(m._id) ? '#ff3c50' : 'rgba(255,255,255,0.3)'} /> {m.likes || 0}
-                                  </button>
+                                  <MatchLikeButton
+                                    likes={m.likes || 0}
+                                    views={m.views || 0}
+                                    onLike={() => handleMatchLike(m)}
+                                    size="sm"
+                                  />
                                 </div>
                                 <div className="bracket-actions">
                                   <button 

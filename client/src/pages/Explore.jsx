@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { Trophy, Users, MapPin, Calendar, ArrowRight, Search, X, Eye, Heart } from 'lucide-react';
+import { Trophy, Users, MapPin, Calendar, ArrowRight, Search, X } from 'lucide-react';
+import MatchLikeButton from '../components/MatchLikeButton';
 
 
 export default function Explore() {
@@ -15,37 +16,20 @@ export default function Explore() {
   const [recentMatches, setRecentMatches] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
 
-  const [likedMatches, setLikedMatches] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('liked_matches') || '[]'); } catch { return []; }
-  });
+  const handleMatchLike = (match) => {
+    const tournamentId = match.tournament?._id || match.tournament;
 
-  const handleMatchLikeToggle = (match) => {
-    const isLiked = likedMatches.includes(match._id);
-    const newLiked = isLiked
-      ? likedMatches.filter(id => id !== match._id)
-      : [...likedMatches, match._id];
-    
-    setLikedMatches(newLiked);
-    try { localStorage.setItem('liked_matches', JSON.stringify(newLiked)); } catch {}
+    setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + 1 } : m));
+    setRecentMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + 1 } : m));
 
-    // Optimistically update
-    setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? -1 : 1) } : m));
-    setRecentMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? -1 : 1) } : m));
-
-    const endpoint = isLiked
-      ? `/tournaments/${match.tournament._id || match.tournament}/matches/${match._id}/unlike`
-      : `/tournaments/${match.tournament._id || match.tournament}/matches/${match._id}/like`;
-
-    api.post(endpoint)
+    api.post(`/tournaments/${tournamentId}/matches/${match._id}/like`)
       .then(res => {
         setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: res.data.likes ?? 0 } : m));
         setRecentMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: res.data.likes ?? 0 } : m));
       })
       .catch(() => {
-        // revert on error
-        setLikedMatches(prev => isLiked ? [...prev, match._id] : prev.filter(id => id !== match._id));
-        setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? 1 : -1) } : m));
-        setRecentMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? 1 : -1) } : m));
+        setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: Math.max(0, (m.likes || 0) - 1) } : m));
+        setRecentMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: Math.max(0, (m.likes || 0) - 1) } : m));
       });
   };
 
@@ -274,7 +258,7 @@ export default function Explore() {
                       </div>
 
                       {/* Match Details Footer */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 9, color: 'var(--text-secondary)', marginTop: 10, borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 9, color: 'var(--text-secondary)', marginTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10 }}>
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', minWidth: 0, overflow: 'hidden' }}>
                           {m.date && (
                             <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
@@ -283,21 +267,11 @@ export default function Explore() {
                           )}
                           {m.location && <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>🏟️ {m.location}</span>}
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                          <span style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 8, color: 'var(--text-muted)' }}>
-                            <Eye size={10} /> {m.views || 0}
-                          </span>
-                          <button 
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleMatchLikeToggle(m); }}
-                            style={{ 
-                              display: 'flex', alignItems: 'center', gap: 2, fontSize: 8, 
-                              color: likedMatches.includes(m._id) ? '#ff3c50' : 'var(--text-muted)',
-                              background: 'none', border: 'none', cursor: 'pointer', padding: 0
-                            }}
-                          >
-                            <Heart size={10} fill={likedMatches.includes(m._id) ? '#ff3c50' : 'none'} color={likedMatches.includes(m._id) ? '#ff3c50' : 'var(--text-muted)'} /> {m.likes || 0}
-                          </button>
-                        </div>
+                        <MatchLikeButton
+                          likes={m.likes || 0}
+                          views={m.views || 0}
+                          onLike={() => handleMatchLike(m)}
+                        />
                       </div>
                     </Link>
                   ))}
@@ -334,23 +308,13 @@ export default function Explore() {
                           <div style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 70 }}>{m.awayTeam?.name}</div>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 10 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 10, paddingTop: 4, borderTop: '1px solid rgba(0,200,83,0.08)', marginTop: 4 }}>
                         {m.date && <span style={{ color: 'var(--text-muted)' }}>📅 {new Date(m.date).toLocaleDateString('pt-PT')}</span>}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
-                          <span style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 9, color: 'var(--text-muted)' }}>
-                            <Eye size={10} /> {m.views || 0}
-                          </span>
-                          <button
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleMatchLikeToggle(m); }}
-                            style={{
-                              display: 'flex', alignItems: 'center', gap: 2, fontSize: 9,
-                              color: likedMatches.includes(m._id) ? '#ff3c50' : 'var(--text-muted)',
-                              background: 'none', border: 'none', cursor: 'pointer', padding: 0
-                            }}
-                          >
-                            <Heart size={10} fill={likedMatches.includes(m._id) ? '#ff3c50' : 'none'} color={likedMatches.includes(m._id) ? '#ff3c50' : 'var(--text-muted)'} /> {m.likes || 0}
-                          </button>
-                        </div>
+                        <MatchLikeButton
+                          likes={m.likes || 0}
+                          views={m.views || 0}
+                          onLike={() => handleMatchLike(m)}
+                        />
                       </div>
                     </Link>
                   ))}
