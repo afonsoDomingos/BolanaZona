@@ -177,3 +177,45 @@ exports.update = async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
+exports.incrementViews = async (req, res) => {
+  try {
+    const m = await Match.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { views: 1 } },
+      { new: true }
+    );
+    if (!m) return res.status(404).json({ message: 'Jogo não encontrado.' });
+    res.json({ views: m.views || 0 });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.likeMatch = async (req, res) => {
+  try {
+    const m = await Match.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { likes: 1 } },
+      { new: true }
+    );
+    if (!m) return res.status(404).json({ message: 'Jogo não encontrado.' });
+    res.json({ likes: m.likes || 0 });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.unlikeMatch = async (req, res) => {
+  try {
+    const m = await Match.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { likes: -1 } },
+      { new: true }
+    );
+    if (!m) return res.status(404).json({ message: 'Jogo não encontrado.' });
+    res.json({ likes: m.likes || 0 });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+

@@ -40,6 +40,77 @@ export default function PublicTournament() {
     try { return localStorage.getItem(`liked_t_${shareCode}`) === 'true'; } catch { return false; }
   });
 
+  const [likedMatches, setLikedMatches] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('liked_matches') || '[]'); } catch { return []; }
+  });
+
+  const handleMatchLikeToggle = (match) => {
+    const isLiked = likedMatches.includes(match._id);
+    const newLiked = isLiked
+      ? likedMatches.filter(id => id !== match._id)
+      : [...likedMatches, match._id];
+    
+    setLikedMatches(newLiked);
+    try { localStorage.setItem('liked_matches', JSON.stringify(newLiked)); } catch {}
+
+    // Optimistically update
+    setData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        matches: prev.matches.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? -1 : 1) } : m)
+      };
+    });
+
+    const endpoint = isLiked
+      ? `/tournaments/${match.tournament._id || match.tournament}/matches/${match._id}/unlike`
+      : `/tournaments/${match.tournament._id || match.tournament}/matches/${match._id}/like`;
+
+    api.post(endpoint)
+      .then(res => {
+        setData(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            matches: prev.matches.map(m => m._id === match._id ? { ...m, likes: res.data.likes ?? 0 } : m)
+          };
+        });
+      })
+      .catch(() => {
+        // revert on error
+        setLikedMatches(prev => isLiked ? [...prev, match._id] : prev.filter(id => id !== match._id));
+        setData(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            matches: prev.matches.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? 1 : -1) } : m)
+          };
+        });
+      });
+  };
+
+  // Track match views (once per session per match)
+  useEffect(() => {
+    if (!data?.matches) return;
+    data.matches.forEach(m => {
+      const sessionKey = `viewed_m_${m._id}`;
+      if (!sessionStorage.getItem(sessionKey)) {
+        sessionStorage.setItem(sessionKey, 'true');
+        api.post(`/tournaments/${m.tournament._id || m.tournament}/matches/${m._id}/view`)
+          .then(res => {
+            setData(prev => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                matches: prev.matches.map(item => item._id === m._id ? { ...item, views: res.data.views ?? 0 } : item)
+              };
+            });
+          })
+          .catch(() => {});
+      }
+    });
+  }, [data?.matches]);
+
 
   const loadData = () => {
     api.get(`/tournaments/public/${shareCode}`)
@@ -592,6 +663,25 @@ export default function PublicTournament() {
                                     'Agendado'
                                   )}
                                   {legLabel && <span style={{ color: '#aaa', fontSize: 9 }}>{legLabel}</span>}
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 8, color: 'rgba(255,255,255,0.35)' }} title={`${m.views || 0} visualizações`}>
+                                    <Eye size={10} color="rgba(255,255,255,0.4)" /> {m.views || 0}
+                                  </span>
+                                  <button 
+                                    onClick={(e) => { e.stopPropagation(); handleMatchLikeToggle(m); }}
+                                    style={{ 
+                                      display: 'flex', alignItems: 'center', gap: 2, fontSize: 8, 
+                                      color: likedMatches.includes(m._id) ? '#ff3c50' : 'rgba(255,255,255,0.35)',
+                                      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                                      transition: 'transform 0.1s ease'
+                                    }}
+                                    onMouseDown={e => e.currentTarget.style.transform = 'scale(1.2)'}
+                                    onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                                    title="Gostar do jogo"
+                                  >
+                                    <Heart size={10} fill={likedMatches.includes(m._id) ? '#ff3c50' : 'none'} color={likedMatches.includes(m._id) ? '#ff3c50' : 'rgba(255,255,255,0.4)'} /> {m.likes || 0}
+                                  </button>
                                 </div>
                               </div>
                             </div>

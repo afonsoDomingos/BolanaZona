@@ -765,10 +765,11 @@ body:has(.modal-overlay) .social-fab-toggle-show {
 }
 .bracket-meta-date {
   white-space: nowrap;
-  font-size: 8px;
+  font-size: 7px;
   color: rgba(255, 255, 255, 0.45);
   letter-spacing: 0.2px;
   text-align: left;
+  text-transform: uppercase;
 }
 .bracket-actions { display: flex; gap: 4px; }
 .bracket-action-btn {

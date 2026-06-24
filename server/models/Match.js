@@ -15,6 +15,8 @@ const matchSchema = new mongoose.Schema({
   awayScore: { type: Number, default: null },
   status: { type: String, enum: ['scheduled', 'live', 'finished', 'postponed'], default: 'scheduled' },
   reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  views: { type: Number, default: 0 },
+  likes: { type: Number, default: 0 },
   events: [{
     type: { type: String, enum: ['goal', 'yellow_card', 'red_card'], required: true },
     playerName: { type: String, required: true },

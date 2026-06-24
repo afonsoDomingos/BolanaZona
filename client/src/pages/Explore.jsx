@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { Trophy, Users, MapPin, Calendar, ArrowRight, Search, X } from 'lucide-react';
+import { Trophy, Users, MapPin, Calendar, ArrowRight, Search, X, Eye, Heart } from 'lucide-react';
 
 
 export default function Explore() {
@@ -15,6 +15,39 @@ export default function Explore() {
   const [recentMatches, setRecentMatches] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
 
+  const [likedMatches, setLikedMatches] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('liked_matches') || '[]'); } catch { return []; }
+  });
+
+  const handleMatchLikeToggle = (match) => {
+    const isLiked = likedMatches.includes(match._id);
+    const newLiked = isLiked
+      ? likedMatches.filter(id => id !== match._id)
+      : [...likedMatches, match._id];
+    
+    setLikedMatches(newLiked);
+    try { localStorage.setItem('liked_matches', JSON.stringify(newLiked)); } catch {}
+
+    // Optimistically update
+    setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? -1 : 1) } : m));
+    setRecentMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? -1 : 1) } : m));
+
+    const endpoint = isLiked
+      ? `/tournaments/${match.tournament._id || match.tournament}/matches/${match._id}/unlike`
+      : `/tournaments/${match.tournament._id || match.tournament}/matches/${match._id}/like`;
+
+    api.post(endpoint)
+      .then(res => {
+        setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: res.data.likes ?? 0 } : m));
+        setRecentMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: res.data.likes ?? 0 } : m));
+      })
+      .catch(() => {
+        // revert on error
+        setLikedMatches(prev => isLiked ? [...prev, match._id] : prev.filter(id => id !== match._id));
+        setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? 1 : -1) } : m));
+        setRecentMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + (isLiked ? 1 : -1) } : m));
+      });
+  };
 
   useEffect(() => {
     Promise.all([
@@ -30,6 +63,24 @@ export default function Explore() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  // Track match views (once per session per match)
+  useEffect(() => {
+    const allMatches = [...matches, ...recentMatches];
+    if (allMatches.length === 0) return;
+    allMatches.forEach(m => {
+      const sessionKey = `viewed_m_${m._id}`;
+      if (!sessionStorage.getItem(sessionKey)) {
+        sessionStorage.setItem(sessionKey, 'true');
+        api.post(`/tournaments/${m.tournament._id || m.tournament}/matches/${m._id}/view`)
+          .then(res => {
+            setMatches(prev => prev.map(item => item._id === m._id ? { ...item, views: res.data.views ?? 0 } : item));
+            setRecentMatches(prev => prev.map(item => item._id === m._id ? { ...item, views: res.data.views ?? 0 } : item));
+          })
+          .catch(() => {});
+      }
+    });
+  }, [matches.length, recentMatches.length]);
 
   const filtered = tournaments.filter(t => {
     const matchesSearch = t.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -147,9 +198,9 @@ export default function Explore() {
                         background: m.status === 'live' ? 'rgba(255, 23, 68, 0.12)' : m.status === 'finished' ? 'rgba(0, 200, 83, 0.12)' : 'rgba(0, 210, 255, 0.12)', 
                         color: m.status === 'live' ? '#ff1744' : m.status === 'finished' ? 'var(--green)' : '#00d2ff', 
                         border: '1px solid ' + (m.status === 'live' ? 'rgba(255, 23, 68, 0.25)' : m.status === 'finished' ? 'rgba(0, 200, 83, 0.25)' : 'rgba(0, 210, 255, 0.25)'),
-                        padding: '2px 6px', 
+                        padding: '1px 4px', 
                         borderRadius: 4, 
-                        fontSize: 8, 
+                        fontSize: 7, 
                         fontWeight: 800, 
                         textTransform: 'uppercase', 
                         display: 'flex', 
@@ -223,16 +274,31 @@ export default function Explore() {
                       </div>
 
                       {/* Match Details Footer */}
-                      {(m.date || m.location) && (
-                        <div style={{ display: 'flex', gap: 8, fontSize: 9, color: 'var(--text-secondary)', marginTop: 10, justifyContent: 'center', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 8, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 9, color: 'var(--text-secondary)', marginTop: 10, borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: 8 }}>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', minWidth: 0, overflow: 'hidden' }}>
                           {m.date && (
-                            <span>
-                              📅 {new Date(m.date).toLocaleDateString('pt-PT')} às {new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
+                            <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                              📅 {new Date(m.date).toLocaleDateString('pt-PT')}
                             </span>
                           )}
-                          {m.location && <span>🏟️ {m.location}</span>}
+                          {m.location && <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>🏟️ {m.location}</span>}
                         </div>
-                      )}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 8, color: 'var(--text-muted)' }}>
+                            <Eye size={10} /> {m.views || 0}
+                          </span>
+                          <button 
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleMatchLikeToggle(m); }}
+                            style={{ 
+                              display: 'flex', alignItems: 'center', gap: 2, fontSize: 8, 
+                              color: likedMatches.includes(m._id) ? '#ff3c50' : 'var(--text-muted)',
+                              background: 'none', border: 'none', cursor: 'pointer', padding: 0
+                            }}
+                          >
+                            <Heart size={10} fill={likedMatches.includes(m._id) ? '#ff3c50' : 'none'} color={likedMatches.includes(m._id) ? '#ff3c50' : 'var(--text-muted)'} /> {m.likes || 0}
+                          </button>
+                        </div>
+                      </div>
                     </Link>
                   ))}
                 </div>
@@ -268,7 +334,24 @@ export default function Explore() {
                           <div style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 70 }}>{m.awayTeam?.name}</div>
                         </div>
                       </div>
-                      {m.date && <div style={{ fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>📅 {new Date(m.date).toLocaleDateString('pt-PT')}</div>}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 10 }}>
+                        {m.date && <span style={{ color: 'var(--text-muted)' }}>📅 {new Date(m.date).toLocaleDateString('pt-PT')}</span>}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: 9, color: 'var(--text-muted)' }}>
+                            <Eye size={10} /> {m.views || 0}
+                          </span>
+                          <button
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleMatchLikeToggle(m); }}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 2, fontSize: 9,
+                              color: likedMatches.includes(m._id) ? '#ff3c50' : 'var(--text-muted)',
+                              background: 'none', border: 'none', cursor: 'pointer', padding: 0
+                            }}
+                          >
+                            <Heart size={10} fill={likedMatches.includes(m._id) ? '#ff3c50' : 'none'} color={likedMatches.includes(m._id) ? '#ff3c50' : 'var(--text-muted)'} /> {m.likes || 0}
+                          </button>
+                        </div>
+                      </div>
                     </Link>
                   ))}
                 </div>

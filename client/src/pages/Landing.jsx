@@ -279,7 +279,7 @@ export default function Landing() {
                 Criar Torneio Grátis <ArrowRight size={18} />
               </Link>
               <Link to="/explore" className="btn btn-secondary btn-lg" style={{ borderColor: 'var(--green)', color: 'var(--green)', minWidth: 'min(300px, 100%)' }}>
-                <span className="spin-ball">⚽</span> Explorar Torneios
+                <span className="spin-ball">⚽</span> Ver Torneios
               </Link>
             </div>
 
