@@ -15,14 +15,21 @@ export default function Footer() {
       color: '#1a1a1a'
     }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-        <p style={{ color: 'rgba(0,0,0,0.5)', fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
-          Feito com <Heart size={14} color="var(--red)" fill="var(--red)" /> por 
-          <a 
-            href="https://www.linkedin.com/in/afonso-domingos-6b59361a5/" 
-            target="_blank" 
+        <p style={{ color: 'rgba(0,0,0,0.5)', fontSize: 14, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
+          Feito com <Heart size={14} color="var(--red)" fill="var(--red)" /> por
+          <a
+            href="https://www.linkedin.com/in/afonso-domingos-6b59361a5/"
+            target="_blank"
             rel="noopener noreferrer"
-            style={{ color: 'var(--green)', fontWeight: 700, textDecoration: 'none' }}
+            style={{ color: 'var(--green)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}
           >
+            <img
+              src="/vibe-avatar.png"
+              alt="Vibe"
+              width={22}
+              height={22}
+              style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(0, 200, 83, 0.35)' }}
+            />
             Vibe
           </a>
         </p>

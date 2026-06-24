@@ -429,10 +429,12 @@ export default function Landing() {
         <div className="container mission-content" style={{ position: 'relative', zIndex: 2, padding: '40px 16px', maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
 
           <h2 className="font-syne mission-heading">
-            Os próximos{' '}
-            <span className="mission-heading-accent">Craques Nacionais</span>
+            <span className="mission-heading-line">
+              Os próximos{' '}
+              <span className="mission-heading-accent">Craques Nacionais</span>
+            </span>
             <br />
-            nascem das comunidades.
+            <span className="mission-heading-line">nascem das comunidades.</span>
           </h2>
 
           <p className="mission-subtext" style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', color: 'rgba(255,255,255,0.75)', maxWidth: 680, margin: '0 auto 48px', lineHeight: 1.8 }}>
