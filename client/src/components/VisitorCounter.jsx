@@ -2,6 +2,22 @@ import { useState, useEffect } from 'react';
 import { Eye, Youtube } from 'lucide-react';
 import api from '../services/api';
 
+const TiktokIcon = ({ size = 14 }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2.2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+  >
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
+
 const CountUp = ({ end }) => {
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -29,7 +45,7 @@ export default function VisitorCounter() {
   const [count, setCount] = useState(0);
   const [highlight, setHighlight] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [slide, setSlide] = useState('visits'); // 'visits' | 'youtube'
+  const [slide, setSlide] = useState('visits'); // 'visits' | 'youtube' | 'tiktok'
   const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
@@ -63,12 +79,18 @@ export default function VisitorCounter() {
     };
   }, []);
 
-  // 3. Alternar entre número de visitas e canal de YouTube
+  // 3. Alternar entre número de visitas, YouTube e TikTok
   useEffect(() => {
+    const slideOrder = {
+      visits: 'youtube',
+      youtube: 'tiktok',
+      tiktok: 'visits'
+    };
+
     const interval = setInterval(() => {
       setIsFading(true);
       setTimeout(() => {
-        setSlide(prev => prev === 'visits' ? 'youtube' : 'visits');
+        setSlide(prev => slideOrder[prev] || 'visits');
         setIsFading(false);
       }, 300); // 300ms de fade-out
     }, 6000); // muda a cada 6 segundos
@@ -79,6 +101,69 @@ export default function VisitorCounter() {
   const handleClick = () => {
     if (slide === 'youtube') {
       window.open('https://www.youtube.com/@bolanazonamz', '_blank', 'noopener,noreferrer');
+    } else if (slide === 'tiktok') {
+      window.open('https://vm.tiktok.com/ZS9McknUUSCBY-Jd9qr/', '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const getContainerStyle = () => {
+    const base = {
+      position: 'fixed',
+      right: '20px',
+      bottom: '162px',
+      zIndex: 9997,
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '8px 16px',
+      borderRadius: '100px',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+      color: '#ffffff',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      fontSize: '13px',
+      fontWeight: '600',
+      transition: 'all 0.5s ease',
+      userSelect: 'none',
+      pointerEvents: 'auto'
+    };
+
+    if (highlight) {
+      return {
+        ...base,
+        background: 'rgba(10, 15, 20, 0.85)',
+        border: '1px solid rgba(0, 200, 83, 0.8)',
+        boxShadow: '0 0 25px rgba(0, 200, 83, 0.6), inset 0 0 8px rgba(0, 200, 83, 0.4)',
+        cursor: 'default'
+      };
+    }
+
+    switch (slide) {
+      case 'youtube':
+        return {
+          ...base,
+          background: 'rgba(15, 10, 12, 0.85)',
+          border: '1px solid rgba(255, 0, 0, 0.3)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 0, 0, 0.1)',
+          cursor: 'pointer'
+        };
+      case 'tiktok':
+        return {
+          ...base,
+          background: 'rgba(10, 12, 15, 0.85)',
+          border: '1px solid rgba(0, 242, 234, 0.3)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 242, 234, 0.1)',
+          cursor: 'pointer'
+        };
+      case 'visits':
+      default:
+        return {
+          ...base,
+          background: 'rgba(10, 15, 20, 0.85)',
+          border: '1px solid rgba(0, 200, 83, 0.3)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 200, 83, 0.1)',
+          cursor: 'default'
+        };
     }
   };
 
@@ -86,37 +171,16 @@ export default function VisitorCounter() {
 
   return (
     <div 
-      className={`visitor-badge-container ${highlight ? 'sparkle-highlight' : ''} ${slide === 'youtube' ? 'clickable-youtube' : ''}`}
+      className={`visitor-badge-container ${highlight ? 'sparkle-highlight' : ''} ${slide === 'youtube' ? 'clickable-youtube' : ''} ${slide === 'tiktok' ? 'clickable-tiktok' : ''}`}
       onClick={handleClick}
-      style={{
-        position: 'fixed',
-        right: '20px',
-        bottom: '162px',
-        zIndex: 9997,
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        padding: '8px 16px',
-        borderRadius: '100px',
-        background: slide === 'youtube' ? 'rgba(15, 10, 12, 0.85)' : 'rgba(10, 15, 20, 0.85)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        border: slide === 'youtube' ? '1px solid rgba(255, 0, 0, 0.3)' : '1px solid rgba(0, 200, 83, 0.3)',
-        boxShadow: highlight 
-          ? '0 0 25px rgba(0, 200, 83, 0.6), inset 0 0 8px rgba(0, 200, 83, 0.4)' 
-          : slide === 'youtube'
-            ? '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 0, 0, 0.1)'
-            : '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 200, 83, 0.1)',
-        color: '#ffffff',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        fontSize: '13px',
-        fontWeight: '600',
-        transition: 'all 0.5s ease',
-        cursor: slide === 'youtube' ? 'pointer' : 'default',
-        userSelect: 'none',
-        pointerEvents: 'auto'
-      }}
-      title={slide === 'youtube' ? "Visitar o nosso Canal de YouTube" : "Total de visitas à plataforma Bola na Zona"}
+      style={getContainerStyle()}
+      title={
+        slide === 'youtube' 
+          ? "Visitar o nosso Canal de YouTube" 
+          : slide === 'tiktok' 
+            ? "Seguir no TikTok" 
+            : "Total de visitas à plataforma Bola na Zona"
+      }
     >
       <div 
         className="slide-content-wrapper"
@@ -129,7 +193,7 @@ export default function VisitorCounter() {
           transition: 'opacity 0.3s ease, transform 0.3s ease'
         }}
       >
-        {slide === 'visits' ? (
+        {slide === 'visits' && (
           <>
             <div 
               style={{
@@ -141,12 +205,10 @@ export default function VisitorCounter() {
                 boxShadow: '0 0 8px #00C853'
               }}
             />
-            
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: 0.9 }}>
               <Eye size={13} style={{ color: 'var(--green)', minWidth: '13px' }} />
               <span>Visitas:</span>
             </span>
-
             <span 
               style={{ 
                 color: 'var(--green)', 
@@ -160,7 +222,9 @@ export default function VisitorCounter() {
               <CountUp end={count} />
             </span>
           </>
-        ) : (
+        )}
+
+        {slide === 'youtube' && (
           <>
             <div 
               style={{
@@ -172,13 +236,36 @@ export default function VisitorCounter() {
                 boxShadow: '0 0 8px #FF0000'
               }}
             />
-            
             <span style={{ display: 'flex', alignItems: 'center', gap: '5px', opacity: 0.9 }}>
               <Youtube size={14} style={{ color: '#FF0000', minWidth: '14px' }} />
               <span style={{ color: '#ffffff' }}>Canal de YouTube</span>
             </span>
             <span style={{ color: 'var(--yellow)', fontWeight: '800', fontSize: '11px', letterSpacing: '0.5px' }}>
               ⚽ VER
+            </span>
+          </>
+        )}
+
+        {slide === 'tiktok' && (
+          <>
+            <div 
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: '#00f2ea',
+                animation: 'pulse-dot-tiktok 2s infinite',
+                boxShadow: '0 0 8px #00f2ea'
+              }}
+            />
+            <span style={{ display: 'flex', alignItems: 'center', gap: '5px', opacity: 0.9 }}>
+              <span style={{ color: '#00f2ea', display: 'flex', alignItems: 'center' }}>
+                <TiktokIcon size={13} />
+              </span>
+              <span style={{ color: '#ffffff' }}>Siga no TikTok</span>
+            </span>
+            <span style={{ color: '#ff0050', fontWeight: '800', fontSize: '11px', letterSpacing: '0.5px' }}>
+              ⚽ IR
             </span>
           </>
         )}
@@ -196,6 +283,12 @@ export default function VisitorCounter() {
           50% { transform: scale(1.4); opacity: 1; box-shadow: 0 0 12px #FF0000; }
           100% { transform: scale(1); opacity: 0.4; }
         }
+
+        @keyframes pulse-dot-tiktok {
+          0% { transform: scale(1); opacity: 0.4; }
+          50% { transform: scale(1.4); opacity: 1; box-shadow: 0 0 12px #00f2ea; }
+          100% { transform: scale(1); opacity: 0.4; }
+        }
         
         .visitor-badge-container {
           animation: slide-up-fade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -206,6 +299,13 @@ export default function VisitorCounter() {
           border-color: rgba(255, 0, 0, 0.6) !important;
           box-shadow: 0 10px 30px rgba(255, 0, 0, 0.25), 0 0 15px rgba(255, 0, 0, 0.15) !important;
           background: rgba(25, 12, 14, 0.9) !important;
+        }
+
+        .visitor-badge-container.clickable-tiktok:hover {
+          transform: translateY(-3px) scale(1.03);
+          border-color: rgba(0, 242, 234, 0.6) !important;
+          box-shadow: 0 10px 30px rgba(0, 242, 234, 0.25), 0 0 15px rgba(255, 0, 80, 0.2) !important;
+          background: rgba(12, 14, 25, 0.9) !important;
         }
 
         .sparkle-highlight {
