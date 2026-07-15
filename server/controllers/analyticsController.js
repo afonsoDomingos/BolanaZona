@@ -17,21 +17,25 @@ exports.track = async (req, res) => {
       await User.findByIdAndUpdate(req.user._id, { lastSeen: new Date() });
     }
 
-    const isNew = req.body.isNewVisitor;
-    
-    let visitorNumber = 0;
-    if (isNew) {
-      // Usar a contagem total de visitas para dar continuidade ao número real
-      const totalVisits = await Analytics.countDocuments({ type: 'visit' });
-      visitorNumber = totalVisits; // O documento atual já foi criado no início desta função
-    }
+    // Obter sempre o número total de visitas
+    const totalVisits = await Analytics.countDocuments({ type: 'visit' });
 
     res.status(201).json({ 
       message: 'Tracked', 
-      visitorNumber: visitorNumber > 0 ? visitorNumber : null 
+      visitorNumber: totalVisits 
     });
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
+
+exports.getTotalVisits = async (req, res) => {
+  try {
+    const totalVisits = await Analytics.countDocuments({ type: 'visit' });
+    res.json({ totalVisits });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 
 exports.getStats = async (req, res) => {
   try {

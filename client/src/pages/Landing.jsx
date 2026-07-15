@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { Trophy, Users, Calendar, BarChart2, Share2, ArrowRight, CheckCircle, ClipboardList, Handshake, Camera, ShoppingBag } from 'lucide-react';
 import LandingBracketPreview from '../components/LandingBracketPreview';
 import LeadCaptureModal from '../components/LeadCaptureModal';
+import PartnersSection from '../components/PartnersSection';
 import api from '../services/api';
+import VisitorCounter from '../components/VisitorCounter';
 
 const features = [
   { icon: <Trophy size={28} />, title: 'Criar Torneios', desc: 'Mata-mata ou fase de grupos. Configura em minutos.' },
@@ -410,6 +412,8 @@ export default function Landing() {
         </div>
       </section>
 
+      <PartnersSection />
+
       {/* Mission Section */}
       <section className="mission-section" style={{ position: 'relative', padding: 0 }}>
         {/* Background image with overlay */}
@@ -521,6 +525,8 @@ export default function Landing() {
           </p>
         </div>
       </footer>
+
+      <VisitorCounter />
 
       {showLeadModal && (
         <LeadCaptureModal 

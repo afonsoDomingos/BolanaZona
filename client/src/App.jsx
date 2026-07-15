@@ -35,6 +35,7 @@ import Profile from './pages/Profile';
 import GuideTournament from './pages/GuideTournament';
 import UserManagement from './pages/UserManagement';
 import AdminTeams from './pages/AdminTeams';
+import AdminPartners from './pages/AdminPartners';
 import Community from './pages/Community';
 import Privacy from './pages/legal/Privacy';
 import Terms from './pages/legal/Terms';
@@ -87,6 +88,7 @@ function AppRoutes() {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['superadmin']}><UserManagement /></ProtectedRoute>} />
           <Route path="/admin/teams" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminTeams /></ProtectedRoute>} />
+          <Route path="/admin/partners" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminPartners /></ProtectedRoute>} />
           <Route path="/support" element={<Support />} />
           <Route path="/como-criar-torneio" element={<GuideTournament />} />
           <Route path="/community" element={<Community />} />

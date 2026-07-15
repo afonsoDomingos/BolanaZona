@@ -59,28 +59,35 @@ export default function AnalyticsTracker() {
         if (res.data.visitorNumber) {
           localStorage.setItem('bnz_visitor_number', res.data.visitorNumber);
           
-            // Informar o visitante com um efeito de contagem dinâmica
-          toast.success((t) => (
-            <span>
-              És o visitante nº <b style={{ fontSize: '1.2em' }}><CountUp end={res.data.visitorNumber} /></b> na Zona! ⚽
-            </span>
-          ), {
-            duration: 6000,
-            position: 'bottom-left',
-            icon: '🏆',
-            style: {
-              border: '1px solid var(--green)',
-              padding: '16px',
-              color: '#fff',
-              background: 'rgba(13, 21, 41, 0.95)', // Mais escuro para ler a contagem
-              backdropFilter: 'blur(10px)',
-              fontWeight: 800,
-              fontSize: '14px',
-              marginBottom: '20px',
-              marginLeft: '20px',
-              boxShadow: '0 10px 40px rgba(0,200,83,0.2)'
-            }
-          });
+          // Disparar evento global para atualizar o contador fixo
+          window.dispatchEvent(new CustomEvent('bnz-visit-tracked', {
+            detail: { visitorNumber: res.data.visitorNumber }
+          }));
+          
+          // Informar o visitante com um efeito de contagem dinâmica apenas se for novo
+          if (isNew) {
+            toast.success((t) => (
+              <span>
+                És o visitante nº <b style={{ fontSize: '1.2em' }}><CountUp end={res.data.visitorNumber} /></b> na Zona! ⚽
+              </span>
+            ), {
+              duration: 6000,
+              position: 'bottom-left',
+              icon: '🏆',
+              style: {
+                border: '1px solid var(--green)',
+                padding: '16px',
+                color: '#fff',
+                background: 'rgba(13, 21, 41, 0.95)', // Mais escuro para ler a contagem
+                backdropFilter: 'blur(10px)',
+                fontWeight: 800,
+                fontSize: '14px',
+                marginBottom: '20px',
+                marginLeft: '20px',
+                boxShadow: '0 10px 40px rgba(0,200,83,0.2)'
+              }
+            });
+          }
         }
       }).catch(() => {});
     }, 2000); // 2 segundos de espera

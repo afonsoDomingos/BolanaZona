@@ -5,6 +5,7 @@ const { protect } = require('../middleware/auth');
 
 // Public tracking
 router.post('/track', analyticsCtrl.track);
+router.get('/total-visits', analyticsCtrl.getTotalVisits);
 
 // Admin only stats
 router.get('/stats', protect, analyticsCtrl.getStats);
