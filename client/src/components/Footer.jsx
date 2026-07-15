@@ -18,7 +18,7 @@ export default function Footer() {
         <p style={{ color: 'rgba(0,0,0,0.5)', fontSize: 14, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
           Feito com <Heart size={14} color="var(--red)" fill="var(--red)" /> por
           <a
-            href="https://www.linkedin.com/in/afonso-domingos-6b59361a5/"
+            href="http://isvibe.vercel.app/"
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: 'var(--green)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}
