@@ -18,8 +18,11 @@ api.interceptors.response.use(
     console.error(`[API ERROR] ${error.config?.method?.toUpperCase()} ${error.config?.url}:`, error.response?.data || error.message);
     if (error.response?.status === 401) {
       localStorage.removeItem('bnz_token');
-      // Redirecionamento suave via event listener (se necessário) ou deixamos a UI lidar
-      if (window.location.pathname !== '/login' && window.location.pathname !== '/' && window.location.pathname !== '/register') {
+      
+      const path = window.location.pathname;
+      const isPrivateRoute = path.startsWith('/dashboard') || path.startsWith('/admin') || path === '/profile';
+      
+      if (isPrivateRoute) {
         window.location.href = '/login';
       }
     }
