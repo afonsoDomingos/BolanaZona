@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell, Shield, Phone, ChevronLeft, ChevronRight, Handshake } from 'lucide-react';
+import MatchLikeButton from '../components/MatchLikeButton';
+import toast from 'react-hot-toast';
 
 function RecentActivity() {
   const [activities, setActivities] = useState([]);
@@ -93,6 +95,21 @@ export default function Dashboard() {
     } catch {
       toast.error('Erro ao desvincular.');
     }
+  };
+
+  const handleMatchLike = (match) => {
+    const tournamentId = match.tournament?._id || match.tournament;
+
+    // Incrementar localmente para feedback visual imediato
+    setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: (m.likes || 0) + 1 } : m));
+
+    api.post(`/tournaments/${tournamentId}/matches/${match._id}/like`)
+      .then(res => {
+        setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: res.data.likes ?? 0 } : m));
+      })
+      .catch(() => {
+        setMatches(prev => prev.map(m => m._id === match._id ? { ...m, likes: Math.max(0, (m.likes || 0) - 1) } : m));
+      });
   };
 
 
@@ -323,13 +340,19 @@ export default function Dashboard() {
                           </div>
                         </div>
                       </div>
-                      {/* Date + Location bar */}
-                      {(m.date || m.location) && (
-                        <div style={{ display: 'flex', gap: 10, fontSize: 9, color: 'var(--text-muted)', marginTop: 4, justifyContent: 'center', flexWrap: 'wrap' }}>
+                      {/* Date + Location + Likes row */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', gap: 6, fontSize: 9, color: 'var(--text-muted)' }}>
                           {m.date && <span>📅 {new Date(m.date).toLocaleDateString('pt-PT')} · {new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</span>}
                           {m.location && <span>🏟️ {m.location}</span>}
                         </div>
-                      )}
+                        <MatchLikeButton 
+                          likes={m.likes || 0} 
+                          views={m.views || 0} 
+                          onLike={() => handleMatchLike(m)} 
+                          size="sm" 
+                        />
+                      </div>
                     </Link>
 
                   ))}

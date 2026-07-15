@@ -6,6 +6,7 @@ import LeadCaptureModal from '../components/LeadCaptureModal';
 import PartnersSection from '../components/PartnersSection';
 import api from '../services/api';
 import VisitorCounter from '../components/VisitorCounter';
+import { useAuth } from '../contexts/AuthContext';
 
 const features = [
   { icon: <Trophy size={28} />, title: 'Criar Torneios', desc: 'Mata-mata ou fase de grupos. Configura em minutos.' },
@@ -129,7 +130,163 @@ function HistoricNewsCard() {
   );
 }
 
+const SHORTS_VIDEOS = [
+  { id: 'dQw4w9WgXcQ', title: 'Apresentação Oficial Copa Bola na Zona' },
+  { id: 'dQw4w9WgXcQ', title: 'Fases Eliminatórias - Momentos de Emoção' },
+  { id: 'dQw4w9WgXcQ', title: 'Análise Tática: Como os Craques Jogam' },
+  { id: 'dQw4w9WgXcQ', title: 'Mambinhas a Caminho do Mundial 2026' }
+];
+
+function YouTubeShortsSection() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const activeVideo = SHORTS_VIDEOS[currentIndex];
+
+  const handleNext = () => {
+    setCurrentIndex(prev => (prev + 1) % SHORTS_VIDEOS.length);
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex(prev => (prev - 1 + SHORTS_VIDEOS.length) % SHORTS_VIDEOS.length);
+  };
+
+  return (
+    <section style={{ 
+      padding: '80px 0', 
+      background: 'linear-gradient(180deg, #0a0f14 0%, #06090d 100%)',
+      borderTop: '1px solid rgba(255,255,255,0.03)',
+      borderBottom: '1px solid rgba(255,255,255,0.03)'
+    }}>
+      <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255, 0, 0, 0.1)', border: '1px solid rgba(255, 0, 0, 0.25)', borderRadius: 100, padding: '6px 16px', marginBottom: 16 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff0000', display: 'inline-block', animation: 'pulse-dot-red 2s infinite' }} />
+            <span style={{ fontSize: 13, color: '#ff0000', fontWeight: 600 }}>Bola na Zona Shorts</span>
+          </div>
+          <h2 className="font-syne scroll-reveal is-visible" style={{ fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 800, marginBottom: 16 }}>
+            Assiste aos nossos <span className="gradient-text">Shorts & Reels</span>
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 16, maxWidth: 520, margin: '0 auto', lineHeight: 1.6 }}>
+            Acompanha enquetes, palpites e toda a emoção do futebol comunitário diretamente na plataforma.
+          </p>
+        </div>
+
+        {/* Telemóvel Emulador */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, width: '100%' }}>
+          <div className="phone-mockup" style={{
+            width: '100%',
+            maxWidth: '300px',
+            aspectRatio: '9/16',
+            background: '#020408',
+            borderRadius: '36px',
+            border: '8px solid #1a2238',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.5), 0 0 30px rgba(0, 200, 83, 0.05)',
+            overflow: 'hidden',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {/* Câmara / Slot */}
+            <div style={{
+              position: 'absolute',
+              top: '10px',
+              width: '50px',
+              height: '4px',
+              background: '#1a2238',
+              borderRadius: '2px',
+              zIndex: 10
+            }} />
+
+            {/* Iframe */}
+            <iframe
+              width="100%"
+              height="100%"
+              src={`https://www.youtube.com/embed/${activeVideo.id}?autoplay=0&mute=1&loop=1&playlist=${activeVideo.id}`}
+              title={activeVideo.title}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                background: '#000'
+              }}
+            />
+          </div>
+
+          {/* Controlos e Info */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, width: '100%', maxWidth: '300px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <h4 style={{ fontWeight: 800, fontSize: 15, marginBottom: 4, color: '#fff' }}>
+                {activeVideo.title}
+              </h4>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                Vídeo {currentIndex + 1} de {SHORTS_VIDEOS.length}
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+              <button 
+                onClick={handlePrev}
+                className="btn btn-secondary"
+                style={{ 
+                  borderRadius: '50%', 
+                  width: 44, 
+                  height: 44, 
+                  padding: 0, 
+                  justifyContent: 'center',
+                  borderColor: 'rgba(255,255,255,0.1)'
+                }}
+                title="Anterior"
+              >
+                ←
+              </button>
+              <button 
+                onClick={handleNext}
+                className="btn btn-secondary"
+                style={{ 
+                  borderRadius: '50%', 
+                  width: 44, 
+                  height: 44, 
+                  padding: 0, 
+                  justifyContent: 'center',
+                  borderColor: 'rgba(255,255,255,0.1)'
+                }}
+                title="Seguinte"
+              >
+                →
+              </button>
+            </div>
+
+            <a 
+              href="https://www.youtube.com/@bolanazonamz/shorts"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn"
+              style={{
+                width: '100%',
+                background: 'rgba(255,0,0,0.12)',
+                border: '1px solid rgba(255,0,0,0.25)',
+                color: '#fff',
+                fontSize: 13,
+                fontWeight: 700,
+                justifyContent: 'center',
+                gap: 8,
+                marginTop: 8
+              }}
+            >
+              📺 Ver no YouTube Shorts
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Landing() {
+  const { user } = useAuth();
   const [scrollOpacity, setScrollOpacity] = useState(1);
   const [pageLoading, setPageLoading] = useState(true);
   const [storeProducts, setStoreProducts] = useState([]);
@@ -286,9 +443,15 @@ export default function Landing() {
               animationDelay: '0.4s',
               padding: '0 20px'
             }}>
-              <Link to="/register" className="btn btn-primary btn-lg shadow-green" style={{ minWidth: 'min(300px, 100%)' }}>
-                Criar Torneio Grátis <ArrowRight size={18} />
-              </Link>
+              {user ? (
+                <Link to="/dashboard" className="btn btn-primary btn-lg shadow-green" style={{ minWidth: 'min(300px, 100%)' }}>
+                  Ir para o Dashboard <ArrowRight size={18} />
+                </Link>
+              ) : (
+                <Link to="/register" className="btn btn-primary btn-lg shadow-green" style={{ minWidth: 'min(300px, 100%)' }}>
+                  Criar Torneio Grátis <ArrowRight size={18} />
+                </Link>
+              )}
               <Link to="/explore" className="btn btn-secondary btn-lg" style={{ borderColor: 'var(--green)', color: 'var(--green)', minWidth: 'min(300px, 100%)' }}>
                 <span className="spin-ball">⚽</span> Ver Torneios
               </Link>
@@ -427,6 +590,8 @@ export default function Landing() {
         </div>
       </section>
 
+      <YouTubeShortsSection />
+
       <PartnersSection />
 
       {/* Mission Section */}
@@ -521,9 +686,15 @@ export default function Landing() {
               Cria o teu primeiro torneio em menos de 2 minutos.
             </p>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to="/register" className="btn btn-lg" style={{ background: '#000', color: '#fff', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
-                Criar Torneio Agora <ArrowRight size={18} />
-              </Link>
+              {user ? (
+                <Link to="/dashboard" className="btn btn-lg" style={{ background: '#000', color: '#fff', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+                  Ir para o Dashboard <ArrowRight size={18} />
+                </Link>
+              ) : (
+                <Link to="/register" className="btn btn-lg" style={{ background: '#000', color: '#fff', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+                  Criar Torneio Agora <ArrowRight size={18} />
+                </Link>
+              )}
               <Link to="/como-criar-torneio" className="btn btn-lg" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.4)', color: '#fff', backdropFilter: 'blur(5px)' }}>
                 Guia de Torneios
               </Link>
