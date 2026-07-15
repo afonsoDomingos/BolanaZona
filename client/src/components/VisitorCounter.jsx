@@ -41,7 +41,7 @@ const CountUp = ({ end }) => {
   return <span>{count.toLocaleString()}</span>;
 };
 
-export default function VisitorCounter() {
+export default function VisitorCounter({ variant = 'fixed' }) {
   const [count, setCount] = useState(0);
   const [highlight, setHighlight] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -107,12 +107,14 @@ export default function VisitorCounter() {
   };
 
   const getContainerStyle = () => {
+    const isInline = variant === 'inline';
+    
     const base = {
-      position: 'fixed',
-      right: '20px',
-      bottom: '162px',
-      zIndex: 9997,
-      display: 'flex',
+      position: isInline ? 'relative' : 'fixed',
+      right: isInline ? 'auto' : '20px',
+      bottom: isInline ? 'auto' : '162px',
+      zIndex: isInline ? 'auto' : 9997,
+      display: 'inline-flex',
       alignItems: 'center',
       gap: '8px',
       padding: '8px 16px',
@@ -125,7 +127,8 @@ export default function VisitorCounter() {
       fontWeight: '600',
       transition: 'all 0.5s ease',
       userSelect: 'none',
-      pointerEvents: 'auto'
+      pointerEvents: 'auto',
+      margin: isInline ? '0 auto' : '0'
     };
 
     if (highlight) {
@@ -326,10 +329,10 @@ export default function VisitorCounter() {
 
         @media (max-width: 768px) {
           .visitor-badge-container {
-            right: 16px !important;
-            bottom: 156px !important;
-            padding: 6px 12px !important;
-            font-size: 12px !important;
+            right: auto !important;
+            bottom: auto !important;
+            padding: 8px 16px !important;
+            font-size: 13px !important;
           }
         }
       `}</style>

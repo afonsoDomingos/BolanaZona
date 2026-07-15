@@ -135,6 +135,7 @@ export default function Landing() {
   const [storeProducts, setStoreProducts] = useState([]);
   const [storeLoading, setStoreLoading] = useState(true);
   const [showLeadModal, setShowLeadModal] = useState(null);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
 
   const finalizePurchase = (product, leadInfo) => {
     let details = '';
@@ -156,6 +157,14 @@ export default function Landing() {
     // Simular carregamento inicial
     const timer = setTimeout(() => setPageLoading(false), 1200);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
@@ -284,6 +293,12 @@ export default function Landing() {
                 <span className="spin-ball">⚽</span> Ver Torneios
               </Link>
             </div>
+
+            {isMobile && (
+              <div style={{ marginTop: 24, display: 'flex', justifyContent: 'center' }}>
+                <VisitorCounter variant="inline" />
+              </div>
+            )}
 
             {/* Trust badges */}
             <div style={{ display: 'flex', gap: 24, justifyContent: 'center', marginTop: 48, flexWrap: 'wrap' }}>
@@ -526,7 +541,7 @@ export default function Landing() {
         </div>
       </footer>
 
-      <VisitorCounter />
+      {!isMobile && <VisitorCounter variant="fixed" />}
 
       {showLeadModal && (
         <LeadCaptureModal 
