@@ -365,45 +365,64 @@ export default function Explore() {
                             scrollSnapAlign: 'start', 
                             position: 'relative', 
                             background: '#ffffff', 
-                            border: '1px solid rgba(0, 0, 0, 0.08)', 
+                            border: '1px solid rgba(0, 0, 0, 0.06)', 
                             borderRadius: 16, 
-                            padding: '8px 8px 6px',
+                            padding: '10px',
                             display: 'flex',
                             flexDirection: 'column',
                             justifyContent: 'space-between',
                             alignItems: 'stretch',
                             overflow: 'hidden',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                            boxShadow: '0 8px 24px rgba(0,0,0,0.04)'
                           }}>
                             {/* Top row: Category & Price */}
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                                <ShoppingBag size={10} color="var(--green)" />
-                                <span style={{ fontSize: 7, color: 'var(--green)', fontWeight: 800, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                                <ShoppingBag size={9} color="#64748b" />
+                                <span style={{ fontSize: 8, color: '#64748b', fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>
                                   {activeProduct.category}
                                 </span>
                               </div>
-                              <span style={{ fontSize: 9, color: 'var(--green)', fontWeight: 800 }}>
+                              <span style={{ 
+                                fontSize: 9, 
+                                color: '#008b47', 
+                                fontWeight: 800, 
+                                background: 'rgba(0, 139, 71, 0.08)', 
+                                padding: '2px 6px', 
+                                borderRadius: 100 
+                              }}>
                                 {activeProduct.price.toLocaleString()} MT
                               </span>
                             </div>
                             
                             {/* Middle: Centered Product Image */}
                             {activeProduct.image && (
-                              <div style={{ display: 'flex', justifyContent: 'center', margin: '2px 0' }}>
-                                <div style={{ width: 56, height: 56, borderRadius: 8, background: '#f5f5f7', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)' }}>
+                              <div style={{ display: 'flex', justifyContent: 'center', margin: '4px 0' }}>
+                                <div style={{ width: 56, height: 56, borderRadius: 8, background: '#f8fafc', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.04)' }}>
                                   <img src={activeProduct.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
                               </div>
                             )}
 
                             {/* Product Name (Centered) */}
-                            <h3 className="font-syne" style={{ fontSize: 9, fontWeight: 800, color: '#0a0f14', textAlign: 'center', margin: '0', lineHeight: 1.1, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', width: '100%' }}>
+                            <h3 className="font-syne" style={{ fontSize: 10, fontWeight: 700, color: '#0f172a', textAlign: 'center', margin: '0 0 2px', lineHeight: 1.1, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>
                               {activeProduct.name}
                             </h3>
                             
-                            {/* Bottom row: Apreciar */}
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, color: 'var(--green)', fontSize: 9, fontWeight: 700, borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: 5, width: '100%' }}>
+                            {/* Bottom row: Apreciar Button */}
+                            <div style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              gap: 4, 
+                              color: '#ffffff', 
+                              background: '#0f172a',
+                              borderRadius: 100,
+                              padding: '5px 0',
+                              fontSize: 9, 
+                              fontWeight: 700,
+                              width: '100%'
+                            }}>
                               <span>Apreciar</span>
                               <span style={{ fontSize: 10 }}>🛒</span>
                             </div>
@@ -421,30 +440,43 @@ export default function Explore() {
                             scrollSnapAlign: 'start', 
                             position: 'relative', 
                             background: '#ffffff', 
-                            border: '1px solid rgba(0, 0, 0, 0.08)', 
+                            border: '1px solid rgba(0, 0, 0, 0.06)', 
                             borderRadius: 16, 
                             padding: '12px 10px',
                             display: 'flex',
                             flexDirection: 'column',
                             justifyContent: 'space-between',
+                            alignItems: 'stretch',
                             overflow: 'hidden',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                            boxShadow: '0 8px 24px rgba(0,0,0,0.04)'
                           }}>
                             <div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
-                                <ShoppingBag size={10} color="var(--green)" />
-                                <span style={{ fontSize: 7, color: 'var(--green)', fontWeight: 800, letterSpacing: 0.5 }}>LOJA OFICIAL</span>
+                                <ShoppingBag size={9} color="#64748b" />
+                                <span style={{ fontSize: 8, color: '#64748b', fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>LOJA OFICIAL</span>
                               </div>
                               
-                              <h3 className="font-syne" style={{ fontSize: 11, fontWeight: 700, color: '#0a0f14', marginBottom: 2, lineHeight: 1.2 }}>
+                              <h3 className="font-syne" style={{ fontSize: 11, fontWeight: 700, color: '#0f172a', marginBottom: 2, lineHeight: 1.2 }}>
                                 Equipa o teu Clube! 👕
                               </h3>
-                              <p style={{ fontSize: 9, color: '#666668', lineHeight: 1.2, margin: 0 }}>
-                                Equipamentos e acessórios.
+                              <p style={{ fontSize: 9, color: '#64748b', lineHeight: 1.2, margin: 0 }}>
+                                Equipamentos e acessórios oficiais.
                               </p>
                             </div>
                             
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--green)', fontSize: 9, fontWeight: 700, borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: 6 }}>
+                            <div style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              gap: 4, 
+                              color: '#ffffff', 
+                              background: '#0f172a',
+                              borderRadius: 100,
+                              padding: '5px 0',
+                              fontSize: 9, 
+                              fontWeight: 700,
+                              width: '100%'
+                            }}>
                               <span>Apreciar</span>
                               <span style={{ fontSize: 10 }}>🛒</span>
                             </div>
