@@ -142,6 +142,18 @@ const SHORTS_VIDEOS = [
 function YouTubeShortsSection() {
   const [videos, setVideos] = useState(SHORTS_VIDEOS);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     api.get('/settings/youtube_shorts')
@@ -221,8 +233,34 @@ function YouTubeShortsSection() {
               zIndex: 10
             }} />
 
-            {/* Iframe */}
-            {activeVideo.id && (
+            {/* If offline, show a custom processing/spinner overlay */}
+            {!isOnline ? (
+              <div style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 16,
+                background: '#0a0f14',
+                color: 'var(--text-secondary)',
+                padding: '0 24px',
+                textAlign: 'center',
+                zIndex: 2
+              }}>
+                <div className="spinner" style={{ 
+                  width: 32, 
+                  height: 32, 
+                  border: '3px solid rgba(0, 200, 83, 0.15)',
+                  borderTopColor: 'var(--green)',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }} />
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>A processar...</div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.4 }}>Sem ligação à Internet. Verifique a sua conexão.</div>
+              </div>
+            ) : activeVideo.id ? (
               <iframe
                 width="100%"
                 height="100%"
@@ -239,7 +277,7 @@ function YouTubeShortsSection() {
                   zIndex: 1
                 }}
               />
-            )}
+            ) : null}
 
             {/* Controlos Estilo TikTok (Vertical Overlay) */}
             <div style={{ 
