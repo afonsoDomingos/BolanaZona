@@ -390,7 +390,7 @@ export default function Explore() {
                             {/* Middle: Centered Product Image */}
                             {activeProduct.image && (
                               <div style={{ display: 'flex', justifyContent: 'center', margin: '2px 0' }}>
-                                <div style={{ width: 48, height: 48, borderRadius: 8, background: '#000', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
+                                <div style={{ width: 68, height: 68, borderRadius: 10, background: '#000', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
                                   <img src={activeProduct.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
                               </div>
