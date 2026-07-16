@@ -4,6 +4,7 @@ import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import ProductEditModal from '../components/ProductEditModal';
 import LeadCaptureModal from '../components/LeadCaptureModal';
+import ProductGalleryLightbox from '../components/ProductGalleryLightbox';
 
 const categories = [
   { id: '', name: 'Todos', icon: '⚽' },
@@ -16,7 +17,7 @@ const categories = [
   { id: 'treino', name: 'Equip. Treino', icon: '🏋️‍♂️' },
 ];
 
-function ProductCard({ p, isAdmin, onEdit, onBuy }) {
+function ProductCard({ p, isAdmin, onEdit, onBuy, onImageClick }) {
   const allImages = [p.image, ...(p.images || [])].filter(Boolean);
   const [activeImgIndex, setActiveImgIndex] = useState(0);
 
@@ -28,7 +29,8 @@ function ProductCard({ p, isAdmin, onEdit, onBuy }) {
           <img 
             src={allImages[activeImgIndex]} 
             alt={p.name} 
-            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} 
+            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease', cursor: 'zoom-in' }} 
+            onClick={() => onImageClick && onImageClick(allImages, activeImgIndex)}
             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'} 
             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} 
           />
@@ -122,6 +124,7 @@ export default function Store() {
   const [search, setSearch] = useState('');
   const [showEditModal, setShowEditModal] = useState(null);
   const [showLeadModal, setShowLeadModal] = useState(null);
+  const [activeLightbox, setActiveLightbox] = useState(null);
   const { user } = useAuth();
   const isAdmin = user?.role === 'superadmin';
 
@@ -268,6 +271,7 @@ export default function Store() {
                 isAdmin={isAdmin} 
                 onEdit={setShowEditModal} 
                 onBuy={handleBuy} 
+                onImageClick={(images, index) => setActiveLightbox({ images, index })}
               />
             ))}
           </div>
@@ -288,6 +292,14 @@ export default function Store() {
           product={showLeadModal} 
           onClose={() => setShowLeadModal(null)} 
           onCaptured={(leadInfo) => finalizePurchase(showLeadModal, leadInfo)} 
+        />
+      )}
+
+      {activeLightbox && (
+        <ProductGalleryLightbox 
+          images={activeLightbox.images}
+          initialIndex={activeLightbox.index}
+          onClose={() => setActiveLightbox(null)}
         />
       )}
     </>
