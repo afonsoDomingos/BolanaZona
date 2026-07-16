@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { Trophy, Users, MapPin, Calendar, ArrowRight, Search, X, Share2 } from 'lucide-react';
+import { Trophy, Users, MapPin, Calendar, ArrowRight, Search, X, Share2, ShoppingBag } from 'lucide-react';
 import MatchLikeButton from '../components/MatchLikeButton';
 import ScheduledBadge from '../components/ScheduledBadge';
 import ShareModal from '../components/ShareModal';
@@ -188,118 +188,168 @@ export default function Explore() {
                   padding: '0 20px 20px',
                   scrollSnapType: 'x mandatory' 
                 }}>
-                  {matches.map(m => (
-                    <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="match-card hover-scale" style={{ textDecoration: 'none', minWidth: 280, flexShrink: 0, scrollSnapAlign: 'start', position: 'relative', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: '18px 16px 12px' }}>
-                      <div style={{ 
-                        position: 'absolute', 
-                        top: 10, 
-                        right: 10, 
-                        background: m.status === 'live' ? 'rgba(255, 23, 68, 0.12)' : m.status === 'finished' ? 'rgba(0, 200, 83, 0.12)' : 'rgba(0, 210, 255, 0.12)', 
-                        color: m.status === 'live' ? '#ff1744' : m.status === 'finished' ? 'var(--green)' : '#00d2ff', 
-                        border: '1px solid ' + (m.status === 'live' ? 'rgba(255, 23, 68, 0.25)' : m.status === 'finished' ? 'rgba(0, 200, 83, 0.25)' : 'rgba(0, 210, 255, 0.25)'),
-                        padding: '1px 3px', 
-                        borderRadius: 3, 
-                        fontSize: 6, 
-                        fontWeight: 800, 
-                        textTransform: 'uppercase', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: 3 
-                      }}>
-                        {m.status === 'live' ? (
-                          <><span className="pulse-dot" style={{ width: 5, height: 5, background: '#ff1744', borderRadius: '50%' }}></span> LIVE</>
-                        ) : m.status === 'finished' ? (
-                          'CONCLUÍDO'
-                        ) : (
-                          <ScheduledBadge size="xs" />
-                        )}
-                      </div>
-                      
-                      <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, marginBottom: 10 }}>
-                        {m.tournament?.name}
-                      </div>
-
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 8 }}>
-                        {/* Home Team */}
-                        <div style={{ flex: 1, textAlign: 'center', minWidth: 0 }}>
-                          <div 
-                            onClick={(e) => { e.preventDefault(); m.homeTeam?.logo && setPreviewImage(m.homeTeam.logo); }}
-                            style={{ 
-                              width: 36, height: 36, borderRadius: 10, background: m.homeTeam?.color || 'var(--green)', 
-                              margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                              overflow: 'hidden', cursor: m.homeTeam?.logo ? 'pointer' : 'default', border: '1px solid rgba(255,255,255,0.05)'
-                            }}
-                          >
-                            {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
-                          </div>
-                          <div style={{ fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-primary)' }}>{m.homeTeam?.name}</div>
-                        </div>
-
-                        {/* Mid Section */}
-                        <div style={{ padding: '0 8px', textAlign: 'center', flexShrink: 0 }}>
-                          {m.status === 'live' && m.homeScore !== null ? (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 18, fontWeight: 900, color: 'var(--green)' }}>
-                              <span>{m.homeScore}</span>
-                              <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>-</span>
-                              <span>{m.awayScore}</span>
-                            </div>
-                          ) : m.status === 'finished' && m.homeScore !== null ? (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 18, fontWeight: 900, color: 'var(--text-muted)' }}>
-                              <span>{m.homeScore}</span>
-                              <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>-</span>
-                              <span>{m.awayScore}</span>
-                            </div>
+                  {matches.reduce((acc, m, idx) => {
+                    acc.push(
+                      <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="match-card hover-scale" style={{ textDecoration: 'none', minWidth: 280, flexShrink: 0, scrollSnapAlign: 'start', position: 'relative', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 16, padding: '18px 16px 12px' }}>
+                        <div style={{ 
+                          position: 'absolute', 
+                          top: 10, 
+                          right: 10, 
+                          background: m.status === 'live' ? 'rgba(255, 23, 68, 0.12)' : m.status === 'finished' ? 'rgba(0, 200, 83, 0.12)' : 'rgba(0, 210, 255, 0.12)', 
+                          color: m.status === 'live' ? '#ff1744' : m.status === 'finished' ? 'var(--green)' : '#00d2ff', 
+                          border: '1px solid ' + (m.status === 'live' ? 'rgba(255, 23, 68, 0.25)' : m.status === 'finished' ? 'rgba(0, 200, 83, 0.25)' : 'rgba(0, 210, 255, 0.25)'),
+                          padding: '1px 3px', 
+                          borderRadius: 3, 
+                          fontSize: 6, 
+                          fontWeight: 800, 
+                          textTransform: 'uppercase', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: 3 
+                        }}>
+                          {m.status === 'live' ? (
+                            <><span className="pulse-dot" style={{ width: 5, height: 5, background: '#ff1744', borderRadius: '50%' }}></span> LIVE</>
+                          ) : m.status === 'finished' ? (
+                            'CONCLUÍDO'
                           ) : (
-                            <div style={{ fontSize: 12, fontWeight: 900, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.04)', padding: '3px 10px', borderRadius: 6 }}>
-                              VS
+                            <ScheduledBadge size="xs" />
+                          )}
+                        </div>
+                        
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, marginBottom: 10 }}>
+                          {m.tournament?.name}
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 8 }}>
+                          {/* Home Team */}
+                          <div style={{ flex: 1, textAlign: 'center', minWidth: 0 }}>
+                            <div 
+                              onClick={(e) => { e.preventDefault(); m.homeTeam?.logo && setPreviewImage(m.homeTeam.logo); }}
+                              style={{ 
+                                width: 36, height: 36, borderRadius: 10, background: m.homeTeam?.color || 'var(--green)', 
+                                margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                                overflow: 'hidden', cursor: m.homeTeam?.logo ? 'pointer' : 'default', border: '1px solid rgba(255,255,255,0.05)'
+                              }}
+                            >
+                              {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                             </div>
-                          )}
-                        </div>
-
-                        {/* Away Team */}
-                        <div style={{ flex: 1, textAlign: 'center', minWidth: 0 }}>
-                          <div 
-                            onClick={(e) => { e.preventDefault(); m.awayTeam?.logo && setPreviewImage(m.awayTeam.logo); }}
-                            style={{ 
-                              width: 36, height: 36, borderRadius: 10, background: m.awayTeam?.color || 'var(--green)', 
-                              margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                              overflow: 'hidden', cursor: m.awayTeam?.logo ? 'pointer' : 'default', border: '1px solid rgba(255,255,255,0.05)'
-                            }}
-                          >
-                            {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                            <div style={{ fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-primary)' }}>{m.homeTeam?.name}</div>
                           </div>
-                          <div style={{ fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-primary)' }}>{m.awayTeam?.name}</div>
-                        </div>
-                      </div>
 
-                      {/* Match Details Footer */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 9, color: 'var(--text-secondary)', marginTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10 }}>
-                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', minWidth: 0, overflow: 'hidden' }}>
-                          {m.date && (
-                            <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                              📅 {new Date(m.date).toLocaleDateString('pt-PT')}
-                            </span>
-                          )}
-                          {m.location && <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>🏟️ {m.location}</span>}
+                          {/* Mid Section */}
+                          <div style={{ padding: '0 8px', textAlign: 'center', flexShrink: 0 }}>
+                            {m.status === 'live' && m.homeScore !== null ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 18, fontWeight: 900, color: 'var(--green)' }}>
+                                <span>{m.homeScore}</span>
+                                <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>-</span>
+                                <span>{m.awayScore}</span>
+                              </div>
+                            ) : m.status === 'finished' && m.homeScore !== null ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 18, fontWeight: 900, color: 'var(--text-muted)' }}>
+                                <span>{m.homeScore}</span>
+                                <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>-</span>
+                                <span>{m.awayScore}</span>
+                              </div>
+                            ) : (
+                              <div style={{ fontSize: 12, fontWeight: 900, color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.04)', padding: '3px 10px', borderRadius: 6 }}>
+                                VS
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Away Team */}
+                          <div style={{ flex: 1, textAlign: 'center', minWidth: 0 }}>
+                            <div 
+                              onClick={(e) => { e.preventDefault(); m.awayTeam?.logo && setPreviewImage(m.awayTeam.logo); }}
+                              style={{ 
+                                width: 36, height: 36, borderRadius: 10, background: m.awayTeam?.color || 'var(--green)', 
+                                margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                                overflow: 'hidden', cursor: m.awayTeam?.logo ? 'pointer' : 'default', border: '1px solid rgba(255,255,255,0.05)'
+                              }}
+                            >
+                              {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+                            </div>
+                            <div style={{ fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-primary)' }}>{m.awayTeam?.name}</div>
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                          <button
-                            type="button"
-                            className="match-share-btn"
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); openMatchShare(m); }}
-                            title="Partilhar jogo"
-                          >
-                            <Share2 size={11} />
-                          </button>
-                          <MatchLikeButton
-                            likes={m.likes || 0}
-                            views={m.views || 0}
-                            onLike={() => handleMatchLike(m)}
-                          />
+
+                        {/* Match Details Footer */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 9, color: 'var(--text-secondary)', marginTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10 }}>
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', minWidth: 0, overflow: 'hidden' }}>
+                            {m.date && (
+                              <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                📅 {new Date(m.date).toLocaleDateString('pt-PT')}
+                              </span>
+                            )}
+                            {m.location && <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>🏟️ {m.location}</span>}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                            <button
+                              type="button"
+                              className="match-share-btn"
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); openMatchShare(m); }}
+                              title="Partilhar jogo"
+                            >
+                              <Share2 size={11} />
+                            </button>
+                            <MatchLikeButton
+                              likes={m.likes || 0}
+                              views={m.views || 0}
+                              onLike={() => handleMatchLike(m)}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  ))}
+                      </Link>
+                    );
+
+                    // Inject store promo card right after the first match card
+                    if (idx === 0) {
+                      acc.push(
+                        <Link key="store-promo" to="/shop" className="match-card hover-scale" style={{ 
+                          textDecoration: 'none', 
+                          minWidth: 280, 
+                          flexShrink: 0, 
+                          scrollSnapAlign: 'start', 
+                          position: 'relative', 
+                          background: 'linear-gradient(135deg, rgba(0, 200, 83, 0.08) 0%, rgba(0, 229, 255, 0.08) 100%)', 
+                          border: '1px solid rgba(0, 200, 83, 0.25)', 
+                          borderRadius: 16, 
+                          padding: '18px 16px 12px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          minHeight: 145,
+                          overflow: 'hidden'
+                        }}>
+                          {/* Glow Effect */}
+                          <div style={{ position: 'absolute', top: -50, right: -50, width: 120, height: 120, borderRadius: '50%', background: 'rgba(0, 200, 83, 0.15)', filter: 'blur(30px)', pointerEvents: 'none' }} />
+                          
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                              <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(0, 200, 83, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <ShoppingBag size={14} color="var(--green)" />
+                              </div>
+                              <span className="badge badge-green" style={{ fontSize: 9, padding: '2px 8px', letterSpacing: 0.5, fontWeight: 700 }}>LOJA OFICIAL</span>
+                            </div>
+                            
+                            <h3 className="font-syne" style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginBottom: 6, lineHeight: 1.3 }}>
+                              Equipa o teu Clube! 👕
+                            </h3>
+                            <p style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.4, margin: 0 }}>
+                              Compra equipamentos completos, chuteiras e acessórios com preços comunitários.
+                            </p>
+                          </div>
+                          
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--green)', fontSize: 11, fontWeight: 700, marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10 }}>
+                            <span>Visitar Loja</span>
+                            <span style={{ fontSize: 13 }}>🛒</span>
+                          </div>
+                        </Link>
+                      );
+                    }
+
+                    return acc;
+                  }, [])}
                 </div>
               </div>
             )}
