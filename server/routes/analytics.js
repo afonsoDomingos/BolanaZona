@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const analyticsCtrl = require('../controllers/analyticsController');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 // Public tracking
 router.post('/track', analyticsCtrl.track);
 router.get('/total-visits', analyticsCtrl.getTotalVisits);
 
-// Admin only stats
-router.get('/stats', protect, analyticsCtrl.getStats);
+// Superadmin only stats
+router.get('/stats', protect, authorize('superadmin'), analyticsCtrl.getStats);
 
 module.exports = router;

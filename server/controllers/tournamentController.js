@@ -221,6 +221,14 @@ exports.generateCalendar = async (req, res) => {
   try {
     const tournament = await Tournament.findById(req.params.id);
     if (!tournament) return res.status(404).json({ message: 'Torneio não encontrado.' });
+
+    // Verificar Permissão
+    const isOwner = tournament.createdBy.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ message: 'Não tens permissão para gerar o calendário deste torneio.' });
+    }
+
     const teams = await Team.find({ tournament: tournament._id });
     if (teams.length < 2) return res.status(400).json({ message: 'São necessárias pelo menos 2 equipas.' });
 
@@ -365,6 +373,14 @@ exports.createMatch = async (req, res) => {
   try {
     const tournament = await Tournament.findById(req.params.id);
     if (!tournament) return res.status(404).json({ message: 'Torneio não encontrado.' });
+
+    // Verificar Permissão
+    const isOwner = tournament.createdBy.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ message: 'Não tens permissão para adicionar jogos a este torneio.' });
+    }
+
     const match = await Match.create({ ...req.body, tournament: tournament._id, status: 'scheduled' });
     res.status(201).json(match);
   } catch (err) { res.status(500).json({ message: err.message }); }
@@ -372,6 +388,16 @@ exports.createMatch = async (req, res) => {
 
 exports.removeMatch = async (req, res) => {
   try {
+    const tournament = await Tournament.findById(req.params.id);
+    if (!tournament) return res.status(404).json({ message: 'Torneio não encontrado.' });
+
+    // Verificar Permissão
+    const isOwner = tournament.createdBy.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ message: 'Não tens permissão para remover jogos deste torneio.' });
+    }
+
     await Match.findByIdAndDelete(req.params.matchId);
     res.json({ message: 'Jogo removido.' });
   } catch (err) { res.status(500).json({ message: err.message }); }

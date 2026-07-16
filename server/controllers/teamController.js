@@ -112,6 +112,17 @@ exports.update = async (req, res) => {
 
 exports.remove = async (req, res) => {
   try {
+    const team = await Team.findById(req.params.id).populate('tournament');
+    if (!team) return res.status(404).json({ message: 'Equipa não encontrada.' });
+
+    const isCaptain = team.captains && team.captains.some(c => c.toString() === req.user._id.toString());
+    const isOwner = team.tournament && team.tournament.createdBy.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
+
+    if (!isCaptain && !isOwner && !isAdmin) {
+      return res.status(403).json({ message: 'Não tens permissão para eliminar esta equipa.' });
+    }
+
     await Team.findByIdAndDelete(req.params.id);
     res.json({ message: 'Equipa eliminada.' });
   } catch (err) { res.status(500).json({ message: err.message }); }

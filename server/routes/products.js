@@ -6,9 +6,9 @@ const { protect, authorize } = require('../middleware/auth');
 router.get('/', productCtrl.getAll);
 router.get('/:id', productCtrl.getOne);
 
-// Superadmin only routes
+// Admin and Superadmin routes
 router.use(protect);
-router.use(authorize('superadmin'));
+router.use(authorize('superadmin', 'admin'));
 router.post('/', productCtrl.create);
 router.put('/:id', productCtrl.update);
 router.delete('/:id', productCtrl.remove);
