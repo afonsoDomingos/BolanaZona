@@ -4,9 +4,16 @@ import toast from 'react-hot-toast';
 import { X, Save, Camera, Link as LinkIcon, Trash2 } from 'lucide-react';
 
 export default function ProductEditModal({ product, onClose, onSaved }) {
-  const [form, setForm] = useState(product || { name: '', price: 0, category: 'camisolas', description: '', image: '' });
+  const [form, setForm] = useState(() => {
+    const base = product || { name: '', price: 0, category: 'camisolas', description: '', image: '' };
+    return {
+      ...base,
+      images: base.images || []
+    };
+  });
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingAdditional, setUploadingAdditional] = useState(false);
 
   const handleUpload = async (e) => {
     const file = e.target.files[0];
@@ -22,6 +29,25 @@ export default function ProductEditModal({ product, onClose, onSaved }) {
       toast.success('Imagem carregada!');
     } catch { toast.error('Erro no upload.'); }
     finally { setUploading(false); }
+  };
+
+  const handleAdditionalUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingAdditional(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await api.post('/upload', formData);
+      setForm(prev => ({
+        ...prev,
+        images: [...(prev.images || []), res.data.url]
+      }));
+      toast.success('Imagem adicional adicionada!');
+    } catch { toast.error('Erro no upload.'); }
+    finally { setUploadingAdditional(false); }
   };
 
   const handleSubmit = async (e) => {
@@ -112,6 +138,91 @@ export default function ProductEditModal({ product, onClose, onSaved }) {
                 <img src={form.image} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             )}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Imagens Adicionais (Upload ou Links)</label>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+              {(form.images || []).map((img, idx) => (
+                <div key={idx} style={{ position: 'relative', width: 68, height: 68, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border)' }}>
+                  <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = form.images.filter((_, i) => i !== idx);
+                      setForm({ ...form, images: updated });
+                    }}
+                    style={{
+                      position: 'absolute',
+                      top: 2,
+                      right: 2,
+                      background: 'rgba(255, 68, 68, 0.85)',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: 20,
+                      height: 20,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      padding: 0
+                    }}
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+              
+              <label className="btn btn-secondary" style={{ 
+                width: 68, 
+                height: 68, 
+                borderRadius: 8, 
+                display: 'flex', 
+                flexDirection: 'column',
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                cursor: 'pointer', 
+                padding: 0,
+                border: '1px dashed var(--border)',
+                background: 'transparent',
+                fontSize: 10,
+                flexShrink: 0
+              }}>
+                {uploadingAdditional ? (
+                  <span className="spinner" style={{ width: 14, height: 14 }} />
+                ) : (
+                  <>
+                    <Camera size={16} style={{ marginBottom: 4 }} />
+                    <span>+ Imagem</span>
+                  </>
+                )}
+                <input type="file" hidden onChange={handleAdditionalUpload} accept="image/*" />
+              </label>
+            </div>
+            
+            <div style={{ position: 'relative' }}>
+              <LinkIcon size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input 
+                className="form-input" 
+                style={{ paddingLeft: 36, fontSize: 13 }} 
+                placeholder="Ou cola o link de imagem adicional e prime Enter..." 
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const val = e.target.value.trim();
+                    if (val) {
+                      setForm(prev => ({
+                        ...prev,
+                        images: [...(prev.images || []), val]
+                      }));
+                      e.target.value = '';
+                      toast.success('Imagem adicional adicionada!');
+                    }
+                  }
+                }}
+              />
+            </div>
           </div>
 
           <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>

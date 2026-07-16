@@ -16,6 +16,105 @@ const categories = [
   { id: 'treino', name: 'Equip. Treino', icon: '🏋️‍♂️' },
 ];
 
+function ProductCard({ p, isAdmin, onEdit, onBuy }) {
+  const allImages = [p.image, ...(p.images || [])].filter(Boolean);
+  const [activeImgIndex, setActiveImgIndex] = useState(0);
+
+  return (
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column' }}>
+      {/* Image wrapper with light grey background */}
+      <div style={{ height: 260, overflow: 'hidden', position: 'relative', background: '#f5f5f7', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #f0f0f2' }}>
+        {allImages.length > 0 ? (
+          <img 
+            src={allImages[activeImgIndex]} 
+            alt={p.name} 
+            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} 
+            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'} 
+            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} 
+          />
+        ) : (
+          <div style={{ fontSize: 40 }}>🛍️</div>
+        )}
+        
+        {/* Dots pagination overlay */}
+        {allImages.length > 1 && (
+          <div style={{ 
+            position: 'absolute', 
+            bottom: 12, 
+            left: '50%', 
+            transform: 'translateX(-50%)', 
+            display: 'flex', 
+            gap: 6, 
+            zIndex: 12, 
+            background: 'rgba(255,255,255,0.75)', 
+            backdropFilter: 'blur(4px)',
+            padding: '4px 8px', 
+            borderRadius: 100,
+            border: '1px solid rgba(0,0,0,0.06)'
+          }}>
+            {allImages.map((_, idx) => (
+              <span 
+                key={idx} 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setActiveImgIndex(idx);
+                }}
+                style={{ 
+                  width: activeImgIndex === idx ? 12 : 6, 
+                  height: 6, 
+                  borderRadius: '100px', 
+                  background: activeImgIndex === idx ? '#000000' : 'rgba(0,0,0,0.25)', 
+                  cursor: 'pointer',
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
+                }} 
+              />
+            ))}
+          </div>
+        )}
+
+        <div style={{ position: 'absolute', top: 12, right: 12, display: 'flex', gap: 8, alignItems: 'center', zIndex: 10 }}>
+          {isAdmin && (
+            <button onClick={() => onEdit(p)} style={{ background: '#000000', color: '#fff', border: '1px solid #e2e8f0', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} onMouseEnter={e => e.currentTarget.style.background = '#222'} onMouseLeave={e => e.currentTarget.style.background = '#000'}>
+              <Edit size={12} />
+            </button>
+          )}
+          <div style={{ background: 'rgba(255,255,255,0.9)', color: '#000000', padding: '4px 12px', borderRadius: 100, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', border: '1px solid #e2e8f0', letterSpacing: 0.5 }}>
+            {p.category}
+          </div>
+        </div>
+      </div>
+      
+      {/* Details */}
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div style={{ fontSize: '10px', color: '#88888b', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '6px', marginTop: '16px' }}>
+          Bola na Zona
+        </div>
+        <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#000000', marginBottom: '8px', lineHeight: '1.3', minHeight: '40px' }}>
+          {p.name}
+        </h3>
+        
+        {/* Color swatches */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+          {['#000000', '#ffffff', '#2e5a44', '#7d2e2e'].map((color, idx) => (
+            <span key={idx} style={{ width: 12, height: 12, borderRadius: '50%', background: color, border: '1px solid #dcdcdf', display: 'inline-block', cursor: 'pointer', transition: 'transform 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
+          ))}
+        </div>
+
+        {/* Price & Buy button container */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 'auto' }}>
+          <div style={{ fontSize: '16px', fontWeight: 800, color: '#000000' }}>
+            {p.price.toLocaleString()} MT
+          </div>
+          <button onClick={() => onBuy(p)} className="btn" style={{ width: '100%', background: '#1a1a1c', color: '#ffffff', border: 'none', borderRadius: '8px', justifyContent: 'center', padding: '10px 16px', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, transition: 'background-color 0.2s ease', boxShadow: 'none', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#000000'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#1a1a1c'}>
+            <ShoppingBag size={14} /> Adicionar ao Carrinho
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Store() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -161,50 +260,14 @@ export default function Store() {
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 32 }}>
-            {filtered.map((p, i) => (
-              <div key={p._id} className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column' }}>
-                {/* Image wrapper with light grey background */}
-                <div style={{ height: 260, overflow: 'hidden', position: 'relative', background: '#f5f5f7', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #f0f0f2' }}>
-                  <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
-                  <div style={{ position: 'absolute', top: 12, right: 12, display: 'flex', gap: 8, alignItems: 'center', zIndex: 10 }}>
-                    {isAdmin && (
-                      <button onClick={() => setShowEditModal(p)} style={{ background: '#000000', color: '#fff', border: '1px solid #e2e8f0', width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} onMouseEnter={e => e.currentTarget.style.background = '#222'} onMouseLeave={e => e.currentTarget.style.background = '#000'}>
-                        <Edit size={12} />
-                      </button>
-                    )}
-                    <div style={{ background: 'rgba(255,255,255,0.9)', color: '#000000', padding: '4px 12px', borderRadius: 100, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', border: '1px solid #e2e8f0', letterSpacing: 0.5 }}>
-                      {p.category}
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Details */}
-                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                  <div style={{ fontSize: '10px', color: '#88888b', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '6px', marginTop: '16px' }}>
-                    Bola na Zona
-                  </div>
-                  <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#000000', marginBottom: '8px', lineHeight: '1.3', minHeight: '40px' }}>
-                    {p.name}
-                  </h3>
-                  
-                  {/* Color swatches */}
-                  <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
-                    {['#000000', '#ffffff', '#2e5a44', '#7d2e2e'].map((color, idx) => (
-                      <span key={idx} style={{ width: 12, height: 12, borderRadius: '50%', background: color, border: '1px solid #dcdcdf', display: 'inline-block', cursor: 'pointer', transition: 'transform 0.15s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
-                    ))}
-                  </div>
-
-                  {/* Price & Buy button container */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 'auto' }}>
-                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#000000' }}>
-                      {p.price.toLocaleString()} MT
-                    </div>
-                    <button onClick={() => handleBuy(p)} className="btn" style={{ width: '100%', background: '#1a1a1c', color: '#ffffff', border: 'none', borderRadius: '8px', justifyContent: 'center', padding: '10px 16px', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, transition: 'background-color 0.2s ease', boxShadow: 'none', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#000000'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#1a1a1c'}>
-                      <ShoppingBag size={14} /> Adicionar ao Carrinho
-                    </button>
-                  </div>
-                </div>
-              </div>
+            {filtered.map(p => (
+              <ProductCard 
+                key={p._id} 
+                p={p} 
+                isAdmin={isAdmin} 
+                onEdit={setShowEditModal} 
+                onBuy={handleBuy} 
+              />
             ))}
           </div>
         )}
