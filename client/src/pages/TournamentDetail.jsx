@@ -508,8 +508,14 @@ export default function TournamentDetail() {
               <div className="empty-state">
                 <div className="empty-state-icon"><Users size={48} strokeWidth={1} /></div>
                 <h3>Sem equipas confirmadas</h3>
-                <p style={{ marginBottom: 20 }}>Adiciona ou aprova equipas para começar</p>
-                <button className="btn btn-primary" onClick={() => setShowTeamModal(true)}><Plus size={16} /> Adicionar Equipa</button>
+                <p style={{ marginBottom: 20, color: 'var(--text-secondary)', fontSize: 14 }}>
+                  {canManage 
+                    ? 'Ainda não adicionou nenhuma equipa a este torneio. Comece por registar a primeira equipa!'
+                    : 'Ainda não existem equipas registadas e aprovadas para este torneio.'}
+                </p>
+                {canManage && (
+                  <button className="btn btn-primary" onClick={() => setShowTeamModal(true)}><Plus size={16} /> Adicionar Equipa</button>
+                )}
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
@@ -1043,7 +1049,15 @@ export default function TournamentDetail() {
               ) : (
                 <div>
                   {(() => {
-                    if (!matches || matches.length === 0) return <div className="error" style={{ color: 'var(--red)' }}>Nenhuma partida encontrada.</div>;
+                    if (!matches || matches.length === 0) return (
+                      <div style={{ textAlign: 'center', padding: '48px 20px', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                        <div style={{ fontSize: 40 }}>📅</div>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>Nenhum jogo agendado</div>
+                        <p style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 300, margin: 0, lineHeight: 1.5 }}>
+                          Ainda não foram gerados ou agendados jogos para este torneio.
+                        </p>
+                      </div>
+                    );
                     try {
                       const rounds = [...new Set(matches.map(m => m.round))].sort((a, b) => a - b);
                       return rounds.map(round => {
@@ -1131,7 +1145,11 @@ export default function TournamentDetail() {
               <div className="empty-state">
                 <div className="empty-state-icon"><BarChart2 size={48} strokeWidth={1} /></div>
                 <h3>Sem dados de classificação</h3>
-                <p>Insere resultados para ver a tabela actualizada</p>
+                <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
+                  {canManage 
+                    ? 'Registe os resultados das partidas para que a tabela de classificação seja gerada automaticamente.' 
+                    : 'A tabela de classificação estará disponível assim que os primeiros jogos forem disputados e os resultados registados.'}
+                </p>
               </div>
             ) : (
               <div className="table-wrapper">
@@ -1307,7 +1325,11 @@ export default function TournamentDetail() {
               <div className="empty-state">
                 <div className="empty-state-icon"><MessageCircle size={48} strokeWidth={1} /></div>
                 <h3>Sem seguidores ainda</h3>
-                <p>O público pode clicar em "Seguir Torneio" na página pública para aparecer aqui.</p>
+                <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
+                  {canManage 
+                    ? 'Os adeptos e jogadores que clicarem em "Seguir Torneio" na página pública serão listados aqui para receberem novidades por WhatsApp.' 
+                    : 'Ainda não existem seguidores registados para receber novidades deste torneio.'}
+                </p>
               </div>
             ) : (
               <div className="table-wrapper">
@@ -1351,8 +1373,10 @@ export default function TournamentDetail() {
             {leads.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-state-icon">⚡</div>
-                <h3>Sem interessados ainda</h3>
-                <p>Quando alguém começar a inscrever uma equipa, os dados aparecerão aqui.</p>
+                <h3>Sem interessados pendentes</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
+                  Não existem tentativas de inscrição incompletas. Todos os interessados concluíram a inscrição ou ainda não iniciaram o processo.
+                </p>
               </div>
             ) : (
               <div className="table-wrapper">
@@ -2251,7 +2275,7 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
           {/* Events list */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 160, overflowY: 'auto', paddingRight: 2, marginTop: 10 }}>
             {events.length === 0 ? (
-              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12, padding: '6px 0' }}>Nenhum evento registado.</p>
+              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12, padding: '12px 0' }}>Ainda não foram registados eventos (golos, cartões ou substituições) para esta partida.</p>
             ) : (
               events.map((e, i) => (
                 <div key={e.id || e._id || i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.02)', padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)' }}>

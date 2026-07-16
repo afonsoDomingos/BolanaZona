@@ -79,6 +79,9 @@ export default function Clubs() {
           <div className="empty-state">
             <Shield size={48} color="var(--text-muted)" />
             <h3>Nenhum clube encontrado</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
+              {search ? 'Tente utilizar outros termos na sua pesquisa.' : 'Ainda não foram registados clubes de futebol na plataforma.'}
+            </p>
           </div>
         ) : (
           <div className="grid">

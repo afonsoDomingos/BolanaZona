@@ -219,7 +219,17 @@ export default function AdminAnalytics() {
                         </td>
                       </tr>
                     ))}
-                    {leads.length === 0 && <tr><td colSpan="8" style={{ textAlign: 'center', padding: 40 }}>Sem leads no momento.</td></tr>}
+                    {leads.length === 0 && (
+                      <tr>
+                        <td colSpan="8" style={{ textAlign: 'center', padding: '48px 20px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                            <div style={{ fontSize: 40 }}>📋</div>
+                            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>Nenhum lead registado ainda</div>
+                            <div style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 320, lineHeight: 1.5 }}>Quando utilizadores mostrarem interesse em produtos da loja ou inscrições em torneios, os dados aparecerão aqui.</div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -230,7 +240,13 @@ export default function AdminAnalytics() {
             <div style={{ padding: 24 }}>
               <h3 style={{ marginBottom: 20 }}>Visitas por Página</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {stats.pageVisits.map(pv => (
+                {stats.pageVisits.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '48px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                    <div style={{ fontSize: 40 }}>📊</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>Ainda sem dados de visitas</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 320, lineHeight: 1.5 }}>As estatísticas de visitas por página serão exibidas assim que utilizadores começarem a navegar na plataforma.</div>
+                  </div>
+                ) : stats.pageVisits.map(pv => (
                   <div key={pv._id} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                     <div style={{ width: 150, fontSize: 14, fontWeight: 600 }}>{pv._id || 'Home'}</div>
                     <div style={{ flex: 1, height: 8, background: 'rgba(255,255,255,0.05)', borderRadius: 4, overflow: 'hidden' }}>
@@ -411,7 +427,17 @@ export default function AdminAnalytics() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stats.recentEvents.map(e => (
+                  {stats.recentEvents.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" style={{ textAlign: 'center', padding: '48px 20px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                          <div style={{ fontSize: 40 }}>🔍</div>
+                          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>Nenhuma atividade registada</div>
+                          <div style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 320, lineHeight: 1.5 }}>O log de atividades aparecerá aqui assim que utilizadores interagirem com a plataforma (visitas, compras, etc.).</div>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : stats.recentEvents.map(e => (
                     <tr key={e._id}>
                       <td>
                         <span style={{ 
@@ -475,7 +501,13 @@ export default function AdminAnalytics() {
           {activeTab === 'products' && (
             <div style={{ padding: 24 }}>
               <h3 style={{ marginBottom: 20 }}>Produtos Mais Clicados (Intenção de Compra)</h3>
-              {stats.topProducts.map((p, i) => (
+              {stats.topProducts.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '48px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                  <div style={{ fontSize: 40 }}>🛍️</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>Nenhum produto clicado ainda</div>
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 320, lineHeight: 1.5 }}>Assim que utilizadores clicarem em "Comprar" em produtos da loja, os dados de intenção de compra aparecerão aqui.</div>
+                </div>
+              ) : stats.topProducts.map((p, i) => (
                 <div key={p._id} style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 16 }}>
                   <div style={{ fontSize: 24, fontWeight: 900, color: 'rgba(255,255,255,0.1)', width: 30 }}>{i + 1}</div>
                   <div style={{ flex: 1 }}>

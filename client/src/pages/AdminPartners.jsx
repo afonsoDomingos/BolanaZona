@@ -52,10 +52,15 @@ export default function AdminPartners() {
         {loading ? (
           <div className="loading-center"><div className="spinner" /></div>
         ) : partners.length === 0 ? (
-          <div className="empty-state card">
-            <div className="empty-state-icon"><Handshake size={32} /></div>
-            <h3>Sem parceiros</h3>
-            <p>Adiciona o primeiro parceiro para aparecer na home.</p>
+          <div className="empty-state card" style={{ padding: '48px 24px' }}>
+            <div className="empty-state-icon"><Handshake size={48} strokeWidth={1.5} /></div>
+            <h3 style={{ fontSize: 18, fontWeight: 700, margin: '16px 0 8px' }}>Sem parceiros configurados</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 20 }}>
+              Adicione os parceiros/patrocinadores oficiais para que os seus logótipos e links sejam exibidos na página inicial.
+            </p>
+            <button type="button" className="btn btn-primary btn-sm" onClick={() => setShowCreate(true)} style={{ margin: '0 auto' }}>
+              <Plus size={16} /> Adicionar Primeiro Parceiro
+            </button>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>

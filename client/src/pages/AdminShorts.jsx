@@ -177,10 +177,15 @@ export default function AdminShorts() {
         {loading ? (
           <div className="loading-center"><div className="spinner" /></div>
         ) : shorts.length === 0 ? (
-          <div className="empty-state card">
-            <div className="empty-state-icon"><Youtube size={32} /></div>
-            <h3>Nenhum Short configurado</h3>
-            <p>Adiciona um short clicando no botão no topo direito.</p>
+          <div className="empty-state card" style={{ padding: '48px 24px' }}>
+            <div className="empty-state-icon"><Youtube size={48} strokeWidth={1.5} /></div>
+            <h3 style={{ fontSize: 18, fontWeight: 700, margin: '16px 0 8px' }}>Nenhum Short configurado</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 20 }}>
+              Os vídeos curtos (Shorts) enriquecem a experiência na app. Adicione links do YouTube Shorts para ativar o feed.
+            </p>
+            <button type="button" className="btn btn-secondary btn-sm" onClick={openAddModal} style={{ margin: '0 auto' }}>
+              <Plus size={16} /> Adicionar Primeiro Short
+            </button>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

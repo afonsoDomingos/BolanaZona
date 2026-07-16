@@ -162,8 +162,12 @@ export default function UserManagement() {
               </tbody>
             </table>
             {filteredUsers.length === 0 && (
-              <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
-                Nenhum utilizador encontrado com estes filtros.
+              <div style={{ padding: '60px 20px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                <div style={{ fontSize: 40 }}>👥</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>Nenhum utilizador encontrado</div>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 320, lineHeight: 1.5 }}>
+                  Não encontrámos nenhum utilizador com os filtros aplicados. Tente ajustar a sua pesquisa ou os filtros de cargo.
+                </div>
               </div>
             )}
           </div>

@@ -227,7 +227,13 @@ export default function AdminStore() {
                         </div>
                       ))}
                       {leads.length === 0 && (
-                        <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '20px 0', fontSize: 13 }}>Nenhuma venda registada.</div>
+                        <div style={{ textAlign: 'center', padding: '32px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                          <div style={{ fontSize: 32 }}>💸</div>
+                          <div style={{ fontWeight: 700, color: '#fff', fontSize: 14 }}>Sem transações recentes</div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: 12, maxWidth: 260, margin: '0 auto', lineHeight: 1.4 }}>
+                            As vendas confirmadas e pendentes da loja oficial aparecerão listadas aqui.
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -323,7 +329,18 @@ export default function AdminStore() {
                       ))}
                       {filteredProducts.length === 0 && (
                         <tr>
-                          <td colSpan="5" style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>Nenhum produto cadastrado.</td>
+                          <td colSpan="5" style={{ padding: '60px 20px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
+                              <div style={{ fontSize: 40 }}>📦</div>
+                              <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Nenhum produto cadastrado</div>
+                              <div style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 360, lineHeight: 1.5, marginBottom: 8 }}>
+                                Ainda não adicionou nenhum artigo à loja oficial. Comece por criar um novo produto!
+                              </div>
+                              <button onClick={() => setShowEditModal({})} className="btn btn-primary btn-sm" style={{ background: 'var(--green)', borderColor: 'var(--green)', color: '#000', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6, margin: '0 auto' }}>
+                                <Plus size={16} /> Criar Primeiro Produto
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                       )}
                     </tbody>
@@ -439,7 +456,15 @@ export default function AdminStore() {
                       ))}
                       {filteredLeads.length === 0 && (
                         <tr>
-                          <td colSpan="7" style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>Nenhuma encomenda registada.</td>
+                          <td colSpan="7" style={{ padding: '60px 20px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
+                              <div style={{ fontSize: 40 }}>🛒</div>
+                              <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Nenhuma encomenda registada</div>
+                              <div style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 360, lineHeight: 1.5 }}>
+                                {searchLead ? 'Não encontrámos nenhuma encomenda que coincida com a sua pesquisa.' : 'As intenções de compra e pedidos de checkout feitos pelos utilizadores serão listados aqui.'}
+                              </div>
+                            </div>
+                          </td>
                         </tr>
                       )}
                     </tbody>

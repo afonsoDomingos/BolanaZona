@@ -53,7 +53,9 @@ export default function Talents() {
           <div className="empty-state">
             <div className="empty-state-icon">💎</div>
             <h3>Nenhum talento encontrado</h3>
-            <p>Tenta pesquisar por outro nome.</p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
+              {search ? 'Não foi encontrado nenhum talento com este nome. Tente pesquisar outro termo.' : 'Os jovens talentos recomendados e registados na plataforma aparecerão listados aqui.'}
+            </p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
