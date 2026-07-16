@@ -114,21 +114,25 @@ export default function VisitorCounter({ variant = 'fixed' }) {
       right: isInline ? 'auto' : '20px',
       bottom: isInline ? 'auto' : '162px',
       zIndex: isInline ? 'auto' : 9997,
-      display: 'inline-flex',
+      display: isInline ? 'flex' : 'inline-flex',
       alignItems: 'center',
+      justifyContent: isInline ? 'center' : 'flex-start',
       gap: '8px',
-      padding: '8px 16px',
-      borderRadius: '100px',
+      padding: isInline ? '16px 24px' : '8px 16px',
+      borderRadius: isInline ? '12px' : '100px',
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',
       color: '#ffffff',
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '13px',
-      fontWeight: '600',
+      fontSize: isInline ? '15px' : '13px',
+      fontWeight: '700',
       transition: 'all 0.5s ease',
       userSelect: 'none',
       pointerEvents: 'auto',
-      margin: isInline ? '0 auto' : '0'
+      margin: isInline ? '0 auto' : '0',
+      width: isInline ? 'min(300px, 100%)' : 'auto',
+      minWidth: isInline ? 'min(300px, 100%)' : 'auto',
+      boxSizing: 'border-box'
     };
 
     if (highlight) {
@@ -174,7 +178,7 @@ export default function VisitorCounter({ variant = 'fixed' }) {
 
   return (
     <div 
-      className={`visitor-badge-container ${highlight ? 'sparkle-highlight' : ''} ${slide === 'youtube' ? 'clickable-youtube' : ''} ${slide === 'tiktok' ? 'clickable-tiktok' : ''}`}
+      className={`visitor-badge-container ${variant === 'inline' ? 'visitor-badge-container--inline' : 'visitor-badge-container--fixed'} ${highlight ? 'sparkle-highlight' : ''} ${slide === 'youtube' ? 'clickable-youtube' : ''} ${slide === 'tiktok' ? 'clickable-tiktok' : ''}`}
       onClick={handleClick}
       style={getContainerStyle()}
       title={
@@ -328,7 +332,7 @@ export default function VisitorCounter({ variant = 'fixed' }) {
         }
 
         @media (max-width: 768px) {
-          .visitor-badge-container {
+          .visitor-badge-container--fixed {
             right: auto !important;
             bottom: auto !important;
             padding: 8px 16px !important;
