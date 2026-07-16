@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -13,36 +14,40 @@ import SocialFAB from './components/SocialFAB';
 import ProtectedRoute from './components/ProtectedRoute';
 import CursorGlow from './components/CursorGlow';
 import ClickRipple from './components/ClickRipple';
+
+// Static import for Landing page to avoid initial flicker
 import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import Explore from './pages/Explore';
-import Clubs from './pages/Clubs';
-import Talents from './pages/Talents';
-import Store from './pages/Store';
-import AdminAnalytics from './pages/AdminAnalytics';
-import Support from './pages/Support';
-import ResetPassword from './pages/ResetPassword';
-import ForgotPassword from './pages/ForgotPassword';
-import MySquads from './pages/MySquads';
-import SquadDetail from './pages/SquadDetail';
-import TournamentList from './pages/TournamentList';
-import TournamentNew from './pages/TournamentNew';
-import TournamentDetail from './pages/TournamentDetail';
-import PublicTournament from './pages/PublicTournament';
-import Profile from './pages/Profile';
-import GuideTournament from './pages/GuideTournament';
-import UserManagement from './pages/UserManagement';
-import AdminTeams from './pages/AdminTeams';
-import AdminPartners from './pages/AdminPartners';
-import AdminShorts from './pages/AdminShorts';
-import Community from './pages/Community';
-import Privacy from './pages/legal/Privacy';
-import Terms from './pages/legal/Terms';
-import Cookies from './pages/legal/Cookies';
-import CookieSettings from './pages/legal/CookieSettings';
-import InviteAccept from './pages/InviteAccept';
+
+// Lazy load other pages to optimize initial bundle size
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Explore = lazy(() => import('./pages/Explore'));
+const Clubs = lazy(() => import('./pages/Clubs'));
+const Talents = lazy(() => import('./pages/Talents'));
+const Store = lazy(() => import('./pages/Store'));
+const AdminAnalytics = lazy(() => import('./pages/AdminAnalytics'));
+const Support = lazy(() => import('./pages/Support'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const MySquads = lazy(() => import('./pages/MySquads'));
+const SquadDetail = lazy(() => import('./pages/SquadDetail'));
+const TournamentList = lazy(() => import('./pages/TournamentList'));
+const TournamentNew = lazy(() => import('./pages/TournamentNew'));
+const TournamentDetail = lazy(() => import('./pages/TournamentDetail'));
+const PublicTournament = lazy(() => import('./pages/PublicTournament'));
+const Profile = lazy(() => import('./pages/Profile'));
+const GuideTournament = lazy(() => import('./pages/GuideTournament'));
+const UserManagement = lazy(() => import('./pages/UserManagement'));
+const AdminTeams = lazy(() => import('./pages/AdminTeams'));
+const AdminPartners = lazy(() => import('./pages/AdminPartners'));
+const AdminShorts = lazy(() => import('./pages/AdminShorts'));
+const Community = lazy(() => import('./pages/Community'));
+const Privacy = lazy(() => import('./pages/legal/Privacy'));
+const Terms = lazy(() => import('./pages/legal/Terms'));
+const Cookies = lazy(() => import('./pages/legal/Cookies'));
+const CookieSettings = lazy(() => import('./pages/legal/CookieSettings'));
+const InviteAccept = lazy(() => import('./pages/InviteAccept'));
 
 import './index.css';
 
@@ -66,40 +71,42 @@ function AppRoutes() {
       <CursorGlow />
       <ClickRipple />
       <main style={{ flex: 1, position: 'relative', zIndex: 2 }}>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/clubs" element={<Clubs />} />
-          <Route path="/talents" element={<Talents />} />
-          <Route path="/shop" element={<Store />} />
-          <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
-          <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
-          <Route path="/forgot-password" element={<GuestRoute><ForgotPassword /></GuestRoute>} />
-          <Route path="/reset-password/:token" element={<GuestRoute><ResetPassword /></GuestRoute>} />
-          <Route path="/t/:shareCode" element={<PublicTournament />} />
-          <Route path="/invite/team/:code" element={<InviteAccept />} />
+        <Suspense fallback={<div className="loading-center"><div className="spinner" /></div>}>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/clubs" element={<Clubs />} />
+            <Route path="/talents" element={<Talents />} />
+            <Route path="/shop" element={<Store />} />
+            <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+            <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
+            <Route path="/forgot-password" element={<GuestRoute><ForgotPassword /></GuestRoute>} />
+            <Route path="/reset-password/:token" element={<GuestRoute><ResetPassword /></GuestRoute>} />
+            <Route path="/t/:shareCode" element={<PublicTournament />} />
+            <Route path="/invite/team/:code" element={<InviteAccept />} />
 
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/dashboard/squads" element={<ProtectedRoute><MySquads /></ProtectedRoute>} />
-          <Route path="/dashboard/squads/:id" element={<ProtectedRoute><SquadDetail /></ProtectedRoute>} />
-          <Route path="/dashboard/tournaments" element={<ProtectedRoute><TournamentList /></ProtectedRoute>} />
-          <Route path="/dashboard/tournaments/new" element={<ProtectedRoute><TournamentNew /></ProtectedRoute>} />
-          <Route path="/dashboard/tournaments/:id" element={<ProtectedRoute><TournamentDetail /></ProtectedRoute>} />
-          <Route path="/dashboard/analytics" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminAnalytics /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['superadmin']}><UserManagement /></ProtectedRoute>} />
-          <Route path="/admin/teams" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminTeams /></ProtectedRoute>} />
-          <Route path="/admin/partners" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminPartners /></ProtectedRoute>} />
-          <Route path="/admin/shorts" element={<ProtectedRoute allowedRoles={['superadmin', 'admin']}><AdminShorts /></ProtectedRoute>} />
-          <Route path="/support" element={<Support />} />
-          <Route path="/como-criar-torneio" element={<GuideTournament />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/legal/privacy" element={<Privacy />} />
-          <Route path="/legal/terms" element={<Terms />} />
-          <Route path="/legal/cookies" element={<Cookies />} />
-          <Route path="/legal/cookie-settings" element={<CookieSettings />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/dashboard/squads" element={<ProtectedRoute><MySquads /></ProtectedRoute>} />
+            <Route path="/dashboard/squads/:id" element={<ProtectedRoute><SquadDetail /></ProtectedRoute>} />
+            <Route path="/dashboard/tournaments" element={<ProtectedRoute><TournamentList /></ProtectedRoute>} />
+            <Route path="/dashboard/tournaments/new" element={<ProtectedRoute><TournamentNew /></ProtectedRoute>} />
+            <Route path="/dashboard/tournaments/:id" element={<ProtectedRoute><TournamentDetail /></ProtectedRoute>} />
+            <Route path="/dashboard/analytics" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminAnalytics /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['superadmin']}><UserManagement /></ProtectedRoute>} />
+            <Route path="/admin/teams" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminTeams /></ProtectedRoute>} />
+            <Route path="/admin/partners" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminPartners /></ProtectedRoute>} />
+            <Route path="/admin/shorts" element={<ProtectedRoute allowedRoles={['superadmin', 'admin']}><AdminShorts /></ProtectedRoute>} />
+            <Route path="/support" element={<Support />} />
+            <Route path="/como-criar-torneio" element={<GuideTournament />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/legal/privacy" element={<Privacy />} />
+            <Route path="/legal/terms" element={<Terms />} />
+            <Route path="/legal/cookies" element={<Cookies />} />
+            <Route path="/legal/cookie-settings" element={<CookieSettings />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Suspense>
       </main>
       <Footer />
       {!isCommunityPage && <CommunityFAB />}
