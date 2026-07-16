@@ -104,6 +104,11 @@ export default function Navbar() {
                 <Link to="/profile" className={`nav-link ${isActive('/profile') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <User size={18} /> Perfil
                 </Link>
+                {(user.role === 'superadmin' || user.role === 'admin') && (
+                  <Link to="/admin/store" className={`nav-link ${isActive('/admin/store') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <ShoppingCart size={18} /> Painel Loja
+                  </Link>
+                )}
                 {user.role === 'superadmin' && (
                   <>
                     <Link to="/admin/users" className={`nav-link ${isActive('/admin/users') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
