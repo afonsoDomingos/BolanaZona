@@ -307,42 +307,39 @@ export default function Explore() {
                       acc.push(
                         <Link key="store-promo" to="/shop" className="match-card hover-scale" style={{ 
                           textDecoration: 'none', 
-                          minWidth: 280, 
+                          width: 220,
+                          minWidth: 220, 
+                          maxWidth: 220,
                           flexShrink: 0, 
                           scrollSnapAlign: 'start', 
                           position: 'relative', 
-                          background: 'linear-gradient(135deg, rgba(0, 200, 83, 0.08) 0%, rgba(0, 229, 255, 0.08) 100%)', 
-                          border: '1px solid rgba(0, 200, 83, 0.25)', 
+                          background: 'rgba(255,255,255,0.01)', 
+                          border: '1px solid rgba(0, 200, 83, 0.12)', 
                           borderRadius: 16, 
-                          padding: '18px 16px 12px',
+                          padding: '14px 12px 10px',
                           display: 'flex',
                           flexDirection: 'column',
                           justifyContent: 'space-between',
-                          minHeight: 145,
+                          minHeight: 135,
                           overflow: 'hidden'
                         }}>
-                          {/* Glow Effect */}
-                          <div style={{ position: 'absolute', top: -50, right: -50, width: 120, height: 120, borderRadius: '50%', background: 'rgba(0, 200, 83, 0.15)', filter: 'blur(30px)', pointerEvents: 'none' }} />
-                          
                           <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                              <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(0, 200, 83, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <ShoppingBag size={14} color="var(--green)" />
-                              </div>
-                              <span className="badge badge-green" style={{ fontSize: 9, padding: '2px 8px', letterSpacing: 0.5, fontWeight: 700 }}>LOJA OFICIAL</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                              <ShoppingBag size={12} color="var(--green)" />
+                              <span style={{ fontSize: 8, color: 'var(--green)', fontWeight: 800, letterSpacing: 0.5 }}>LOJA OFICIAL</span>
                             </div>
                             
-                            <h3 className="font-syne" style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginBottom: 6, lineHeight: 1.3 }}>
+                            <h3 className="font-syne" style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 4, lineHeight: 1.3 }}>
                               Equipa o teu Clube! 👕
                             </h3>
-                            <p style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.4, margin: 0 }}>
-                              Compra equipamentos completos, chuteiras e acessórios com preços comunitários.
+                            <p style={{ fontSize: 10, color: 'var(--text-secondary)', lineHeight: 1.3, margin: 0 }}>
+                              Equipamentos completos, chuteiras e acessórios personalizados.
                             </p>
                           </div>
                           
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--green)', fontSize: 11, fontWeight: 700, marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--green)', fontSize: 10, fontWeight: 700, marginTop: 10, borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 8 }}>
                             <span>Visitar Loja</span>
-                            <span style={{ fontSize: 13 }}>🛒</span>
+                            <span style={{ fontSize: 11 }}>🛒</span>
                           </div>
                         </Link>
                       );
