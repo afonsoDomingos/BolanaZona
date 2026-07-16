@@ -131,22 +131,38 @@ function HistoricNewsCard() {
 }
 
 const SHORTS_VIDEOS = [
-  { id: 'dQw4w9WgXcQ', title: 'Apresentação Oficial Copa Bola na Zona' },
-  { id: 'dQw4w9WgXcQ', title: 'Fases Eliminatórias - Momentos de Emoção' },
-  { id: 'dQw4w9WgXcQ', title: 'Análise Tática: Como os Craques Jogam' },
-  { id: 'dQw4w9WgXcQ', title: 'Mambinhas a Caminho do Mundial 2026' }
+  { id: 'ISre7YeuMIg', title: 'QUEM VENCE ESSAS SEMIFINAIS? Inglaterra Vs Argentina' },
+  { id: 'HtoUaLcAPTc', title: 'QUEM VENCE ESSAS SEMIFINAIS? Espanha Vs Franca' },
+  { id: 'L89dhZnJ0H0', title: 'Chi conquisterà la Coppa del Mondo 2026? Mbappé o Yamal?' },
+  { id: 'ptNBfKfWvSE', title: 'QUEM VENCE ESSE JOGO ? Argentina VS Suiça' },
+  { id: 'zR5uhBrJxVU', title: 'QUEM VENCE ESSE JOGO ? INGLATERA VS NORUEGA' },
+  { id: 'LobN4wGuhvk', title: 'QUEM VENCE ESSE JOGO ?  ESPANHA VS BELGICA' }
 ];
 
 function YouTubeShortsSection() {
+  const [videos, setVideos] = useState(SHORTS_VIDEOS);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const activeVideo = SHORTS_VIDEOS[currentIndex];
+
+  useEffect(() => {
+    api.get('/settings/youtube_shorts')
+      .then(res => {
+        if (res.data && res.data.value && Array.isArray(res.data.value) && res.data.value.length > 0) {
+          setVideos(res.data.value);
+        }
+      })
+      .catch(err => {
+        console.error('Erro ao carregar Shorts do YouTube:', err);
+      });
+  }, []);
+
+  const activeVideo = videos[currentIndex] || { id: '', title: '' };
 
   const handleNext = () => {
-    setCurrentIndex(prev => (prev + 1) % SHORTS_VIDEOS.length);
+    setCurrentIndex(prev => (prev + 1) % videos.length);
   };
 
   const handlePrev = () => {
-    setCurrentIndex(prev => (prev - 1 + SHORTS_VIDEOS.length) % SHORTS_VIDEOS.length);
+    setCurrentIndex(prev => (prev - 1 + videos.length) % videos.length);
   };
 
   return (
@@ -198,21 +214,23 @@ function YouTubeShortsSection() {
             }} />
 
             {/* Iframe */}
-            <iframe
-              width="100%"
-              height="100%"
-              src={`https://www.youtube.com/embed/${activeVideo.id}?autoplay=0&mute=1&loop=1&playlist=${activeVideo.id}`}
-              title={activeVideo.title}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none',
-                background: '#000'
-              }}
-            />
+            {activeVideo.id && (
+              <iframe
+                width="100%"
+                height="100%"
+                src={`https://www.youtube.com/embed/${activeVideo.id}?autoplay=0&mute=1&loop=1&playlist=${activeVideo.id}`}
+                title={activeVideo.title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                  background: '#000'
+                }}
+              />
+            )}
           </div>
 
           {/* Controlos e Info */}
@@ -222,7 +240,7 @@ function YouTubeShortsSection() {
                 {activeVideo.title}
               </h4>
               <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                Vídeo {currentIndex + 1} de {SHORTS_VIDEOS.length}
+                Vídeo {currentIndex + 1} de {videos.length}
               </p>
             </div>
 

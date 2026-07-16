@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell, Shield, Phone, ChevronLeft, ChevronRight, Handshake } from 'lucide-react';
+import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell, Shield, Phone, ChevronLeft, ChevronRight, Handshake, Youtube } from 'lucide-react';
 import MatchLikeButton from '../components/MatchLikeButton';
 import toast from 'react-hot-toast';
 
@@ -185,6 +185,7 @@ export default function Dashboard() {
                   <Link to="/admin/partners" className="btn btn-secondary"><Handshake size={16} /> Parceiros</Link>
                 )}
                 <Link to="/admin/teams" className="btn btn-secondary"><Shield size={16} /> Central de Equipas</Link>
+                <Link to="/admin/shorts" className="btn btn-secondary"><Youtube size={16} /> Configurar Shorts</Link>
               </div>
             )}
             <Link to="/dashboard/squads" className="btn btn-secondary"><Shield size={16} /> Meus Clubes</Link>
