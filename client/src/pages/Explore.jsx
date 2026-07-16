@@ -8,6 +8,12 @@ import ShareModal from '../components/ShareModal';
 import { buildMatchShareText } from '../utils/shareUtils';
 
 
+const WhatsAppIcon = ({ size = 11 }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
+    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.717-1.458L0 24zm6.59-11.758c.159.354.316.596.53.954.214.358.143.763.07 1.121-.07.358-.502 2.222-.502 2.222s-.229.832.32 1.282c.551.451 1.22.18 1.22.18s1.65-.89 2.222-1.222c.515-.315.654-.268.966-.027.311.242 1.341 1.056 1.341 1.056s.31.258.629.138c.32-.12.443-.654.443-.654s.517-2.03.654-2.502c.137-.472.072-.83-.143-1.056-.215-.226-1.12-1.121-1.12-1.121s-.317-.308-.093-.574c.224-.266.856-.913 1.173-1.24.317-.327.387-.454.492-.68.106-.226.035-.55-.072-.693-.106-.143-.889-2.062-.889-2.062s-.234-.515-.654-.42c-.42.096-.957.513-.957.513s-.654.673-.62 1.08c.033.407.228.983.228.983s-.502-.07-1.11-.34c-.608-.27-1.233-.794-1.233-.794s-.383-.346-.575-.152c-.191.194-.502.996-.502.996zm12.333-6.529C17.062 3.824 14.652 2.7 12.008 2.7 6.877 2.7 2.709 6.87 2.706 12c-.001 1.705.446 3.371 1.293 4.838L2.946 20.5l3.822-1.002c1.417.773 3.013 1.182 4.636 1.183h.005c5.13 0 9.297-4.17 9.301-9.3.002-2.486-.963-4.823-2.73-6.59z" />
+  </svg>
+);
+
 export default function Explore() {
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -292,6 +298,24 @@ export default function Explore() {
                             >
                               <Share2 size={11} />
                             </button>
+                            <button
+                              type="button"
+                              className="match-share-btn"
+                              style={{ 
+                                color: '#25D366', 
+                                background: 'rgba(37, 211, 102, 0.06)', 
+                                borderColor: 'rgba(37, 211, 102, 0.15)' 
+                              }}
+                              onClick={(e) => { 
+                                e.preventDefault(); 
+                                e.stopPropagation(); 
+                                const shareText = buildMatchShareText(m, m.tournament, `${window.location.origin}/t/${m.tournament?.shareCode}`);
+                                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+                              }}
+                              title="Partilhar no WhatsApp"
+                            >
+                              <WhatsAppIcon size={11} />
+                            </button>
                             <MatchLikeButton
                               likes={m.likes || 0}
                               views={m.views || 0}
@@ -382,21 +406,39 @@ export default function Explore() {
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 10, paddingTop: 4, borderTop: '1px solid rgba(0,200,83,0.08)', marginTop: 4 }}>
                         {m.date && <span style={{ color: 'var(--text-muted)' }}>📅 {new Date(m.date).toLocaleDateString('pt-PT')}</span>}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                          <button
-                            type="button"
-                            className="match-share-btn"
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); openMatchShare(m); }}
-                            title="Partilhar jogo"
-                          >
-                            <Share2 size={11} />
-                          </button>
-                          <MatchLikeButton
-                            likes={m.likes || 0}
-                            views={m.views || 0}
-                            onLike={() => handleMatchLike(m)}
-                          />
-                        </div>
+                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                           <button
+                             type="button"
+                             className="match-share-btn"
+                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); openMatchShare(m); }}
+                             title="Partilhar jogo"
+                           >
+                             <Share2 size={11} />
+                           </button>
+                           <button
+                             type="button"
+                             className="match-share-btn"
+                             style={{ 
+                               color: '#25D366', 
+                               background: 'rgba(37, 211, 102, 0.06)', 
+                               borderColor: 'rgba(37, 211, 102, 0.15)' 
+                             }}
+                             onClick={(e) => { 
+                               e.preventDefault(); 
+                               e.stopPropagation(); 
+                               const shareText = buildMatchShareText(m, m.tournament, `${window.location.origin}/t/${m.tournament?.shareCode}`);
+                               window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+                             }}
+                             title="Partilhar no WhatsApp"
+                           >
+                             <WhatsAppIcon size={11} />
+                           </button>
+                           <MatchLikeButton
+                             likes={m.likes || 0}
+                             views={m.views || 0}
+                             onLike={() => handleMatchLike(m)}
+                           />
+                         </div>
                       </div>
                     </Link>
                   ))}
