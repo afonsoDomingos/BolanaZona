@@ -186,9 +186,8 @@ function YouTubeShortsSection() {
           </p>
         </div>
 
-        {/* Telemóvel Emulador + Controlos Estilo TikTok */}
-        <div style={{ 
-          display: 'flex', 
+        <div style={{
+          display: 'flex',
           flexDirection: 'row', 
           alignItems: 'center', 
           justifyContent: 'center', 
@@ -196,7 +195,7 @@ function YouTubeShortsSection() {
           width: '100%',
           flexWrap: 'wrap'
         }}>
-          {/* Telefone */}
+          {/* Telefone com Controlos Integrados */}
           <div className="phone-mockup" style={{
             width: '100%',
             maxWidth: '300px',
@@ -236,70 +235,82 @@ function YouTubeShortsSection() {
                   width: '100%',
                   height: '100%',
                   border: 'none',
-                  background: '#000'
+                  background: '#000',
+                  zIndex: 1
                 }}
               />
             )}
-          </div>
 
-          {/* Controlos Estilo TikTok (Vertical) */}
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            gap: 20, 
-            background: 'rgba(255,255,255,0.03)', 
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: '24px', 
-            padding: '20px 14px',
-            minWidth: '70px'
-          }}>
-            {/* Botão de Cima (Anterior) */}
-            <button 
-              onClick={handlePrev}
-              className="btn btn-secondary"
-              style={{ 
-                borderRadius: '50%', 
-                width: 44, 
-                height: 44, 
-                padding: 0, 
-                justifyContent: 'center',
-                borderColor: 'rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.05)',
-                color: '#fff',
-                transition: 'all 0.2s ease-in-out'
-              }}
-              title="Anterior"
-            >
-              <ChevronUp size={20} />
-            </button>
+            {/* Controlos Estilo TikTok (Vertical Overlay) */}
+            <div style={{ 
+              position: 'absolute',
+              right: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              gap: 12, 
+              background: 'rgba(0,0,0,0.65)', 
+              backdropFilter: 'blur(4px)',
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: '20px', 
+              padding: '12px 8px',
+              zIndex: 10
+            }}>
+              {/* Botão de Cima (Anterior) */}
+              <button 
+                onClick={handlePrev}
+                className="btn btn-secondary"
+                style={{ 
+                  borderRadius: '50%', 
+                  width: 32, 
+                  height: 32, 
+                  padding: 0, 
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderColor: 'rgba(255,255,255,0.2)',
+                  background: 'rgba(255,255,255,0.1)',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out'
+                }}
+                title="Anterior"
+              >
+                <ChevronUp size={16} />
+              </button>
 
-            {/* Indicador de Vídeo */}
-            <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
-              <span style={{ color: '#fff', fontWeight: 800, fontSize: 13 }}>{currentIndex + 1}</span>
-              <div style={{ width: 12, height: 1, background: 'rgba(255,255,255,0.2)', margin: '4px auto' }} />
-              <span>{videos.length}</span>
+              {/* Indicador de Vídeo */}
+              <div style={{ textAlign: 'center', fontSize: 10, color: 'rgba(255,255,255,0.7)', userSelect: 'none' }}>
+                <span style={{ color: '#fff', fontWeight: 800, fontSize: 11 }}>{currentIndex + 1}</span>
+                <div style={{ width: 8, height: 1, background: 'rgba(255,255,255,0.3)', margin: '3px auto' }} />
+                <span>{videos.length}</span>
+              </div>
+
+              {/* Botão de Baixo (Seguinte) */}
+              <button 
+                onClick={handleNext}
+                className="btn btn-secondary"
+                style={{ 
+                  borderRadius: '50%', 
+                  width: 32, 
+                  height: 32, 
+                  padding: 0, 
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderColor: 'rgba(255,255,255,0.2)',
+                  background: 'rgba(255,255,255,0.1)',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out'
+                }}
+                title="Seguinte"
+              >
+                <ChevronDown size={16} />
+              </button>
             </div>
-
-            {/* Botão de Baixo (Seguinte) */}
-            <button 
-              onClick={handleNext}
-              className="btn btn-secondary"
-              style={{ 
-                borderRadius: '50%', 
-                width: 44, 
-                height: 44, 
-                padding: 0, 
-                justifyContent: 'center',
-                borderColor: 'rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.05)',
-                color: '#fff',
-                transition: 'all 0.2s ease-in-out'
-              }}
-              title="Seguinte"
-            >
-              <ChevronDown size={20} />
-            </button>
           </div>
         </div>
 
