@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Users, Calendar, BarChart2, Share2, ArrowRight, CheckCircle, ClipboardList, Handshake, Camera, ShoppingBag } from 'lucide-react';
+import { Trophy, Users, Calendar, BarChart2, Share2, ArrowRight, CheckCircle, ClipboardList, Handshake, Camera, ShoppingBag, ChevronUp, ChevronDown } from 'lucide-react';
 import LandingBracketPreview from '../components/LandingBracketPreview';
 import LeadCaptureModal from '../components/LeadCaptureModal';
 import PartnersSection from '../components/PartnersSection';
@@ -186,8 +186,17 @@ function YouTubeShortsSection() {
           </p>
         </div>
 
-        {/* Telemóvel Emulador */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, width: '100%' }}>
+        {/* Telemóvel Emulador + Controlos Estilo TikTok */}
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'row', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          gap: 20, 
+          width: '100%',
+          flexWrap: 'wrap'
+        }}>
+          {/* Telefone */}
           <div className="phone-mockup" style={{
             width: '100%',
             maxWidth: '300px',
@@ -233,70 +242,91 @@ function YouTubeShortsSection() {
             )}
           </div>
 
-          {/* Controlos e Info */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, width: '100%', maxWidth: '300px' }}>
-            <div style={{ textAlign: 'center' }}>
-              <h4 style={{ fontWeight: 800, fontSize: 15, marginBottom: 4, color: '#fff' }}>
-                {activeVideo.title}
-              </h4>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                Vídeo {currentIndex + 1} de {videos.length}
-              </p>
-            </div>
-
-            <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-              <button 
-                onClick={handlePrev}
-                className="btn btn-secondary"
-                style={{ 
-                  borderRadius: '50%', 
-                  width: 44, 
-                  height: 44, 
-                  padding: 0, 
-                  justifyContent: 'center',
-                  borderColor: 'rgba(255,255,255,0.1)'
-                }}
-                title="Anterior"
-              >
-                ←
-              </button>
-              <button 
-                onClick={handleNext}
-                className="btn btn-secondary"
-                style={{ 
-                  borderRadius: '50%', 
-                  width: 44, 
-                  height: 44, 
-                  padding: 0, 
-                  justifyContent: 'center',
-                  borderColor: 'rgba(255,255,255,0.1)'
-                }}
-                title="Seguinte"
-              >
-                →
-              </button>
-            </div>
-
-            <a 
-              href="https://www.youtube.com/@bolanazonamz/shorts"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn"
-              style={{
-                width: '100%',
-                background: 'rgba(255,0,0,0.12)',
-                border: '1px solid rgba(255,0,0,0.25)',
-                color: '#fff',
-                fontSize: 13,
-                fontWeight: 700,
+          {/* Controlos Estilo TikTok (Vertical) */}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            gap: 20, 
+            background: 'rgba(255,255,255,0.03)', 
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '24px', 
+            padding: '20px 14px',
+            minWidth: '70px'
+          }}>
+            {/* Botão de Cima (Anterior) */}
+            <button 
+              onClick={handlePrev}
+              className="btn btn-secondary"
+              style={{ 
+                borderRadius: '50%', 
+                width: 44, 
+                height: 44, 
+                padding: 0, 
                 justifyContent: 'center',
-                gap: 8,
-                marginTop: 8
+                borderColor: 'rgba(255,255,255,0.1)',
+                background: 'rgba(255,255,255,0.05)',
+                color: '#fff',
+                transition: 'all 0.2s ease-in-out'
               }}
+              title="Anterior"
             >
-              📺 Ver no YouTube Shorts
-            </a>
+              <ChevronUp size={20} />
+            </button>
+
+            {/* Indicador de Vídeo */}
+            <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
+              <span style={{ color: '#fff', fontWeight: 800, fontSize: 13 }}>{currentIndex + 1}</span>
+              <div style={{ width: 12, height: 1, background: 'rgba(255,255,255,0.2)', margin: '4px auto' }} />
+              <span>{videos.length}</span>
+            </div>
+
+            {/* Botão de Baixo (Seguinte) */}
+            <button 
+              onClick={handleNext}
+              className="btn btn-secondary"
+              style={{ 
+                borderRadius: '50%', 
+                width: 44, 
+                height: 44, 
+                padding: 0, 
+                justifyContent: 'center',
+                borderColor: 'rgba(255,255,255,0.1)',
+                background: 'rgba(255,255,255,0.05)',
+                color: '#fff',
+                transition: 'all 0.2s ease-in-out'
+              }}
+              title="Seguinte"
+            >
+              <ChevronDown size={20} />
+            </button>
           </div>
+        </div>
+
+        {/* Informação e Link Externo */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: '100%', maxWidth: '340px', marginTop: 24, textAlign: 'center' }}>
+          <h4 style={{ fontWeight: 800, fontSize: 15, color: '#fff', lineHeight: 1.4 }}>
+            {activeVideo.title}
+          </h4>
+          <a 
+            href={`https://www.youtube.com/shorts/${activeVideo.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn"
+            style={{
+              width: '100%',
+              background: 'rgba(255,0,0,0.12)',
+              border: '1px solid rgba(255,0,0,0.25)',
+              color: '#fff',
+              fontSize: 13,
+              fontWeight: 700,
+              justifyContent: 'center',
+              gap: 8,
+              marginTop: 4
+            }}
+          >
+            Ver no YouTube Shorts
+          </a>
         </div>
       </div>
     </section>
