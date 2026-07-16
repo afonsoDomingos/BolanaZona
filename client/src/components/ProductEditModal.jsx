@@ -5,10 +5,11 @@ import { X, Save, Camera, Link as LinkIcon, Trash2 } from 'lucide-react';
 
 export default function ProductEditModal({ product, onClose, onSaved }) {
   const [form, setForm] = useState(() => {
-    const base = product || { name: '', price: 0, category: 'camisolas', description: '', image: '' };
+    const base = product || { name: '', price: 0, category: 'camisolas', description: '', image: '', checkoutUrl: '' };
     return {
       ...base,
-      images: base.images || []
+      images: base.images || [],
+      checkoutUrl: base.checkoutUrl || ''
     };
   });
   const [loading, setLoading] = useState(false);
@@ -156,6 +157,20 @@ export default function ProductEditModal({ product, onClose, onSaved }) {
                 value={form.description} 
                 onChange={e => setForm({...form, description: e.target.value})} 
               />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-secondary)', marginBottom: 6 }}>Link de Checkout Direto (Opcional)</label>
+              <div style={{ position: 'relative' }}>
+                <LinkIcon size={12} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.4)' }} />
+                <input 
+                  className="form-input" 
+                  style={{ paddingLeft: 34, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '10px 12px', fontSize: 13 }} 
+                  placeholder="Ex: https://checkout.stripe.com/..." 
+                  value={form.checkoutUrl || ''} 
+                  onChange={e => setForm({...form, checkoutUrl: e.target.value})} 
+                />
+              </div>
             </div>
 
             <div className="form-group" style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 12 }}>

@@ -146,8 +146,14 @@ export default function Store() {
     setShowLeadModal(product);
   };
 
-  const finalizePurchase = async (product, leadInfo) => {
+  const finalizePurchase = async (product, leadInfo, checkoutType) => {
     // A lead já foi guardada na base de dados pelo LeadCaptureModal
+    if (checkoutType === 'direct' && product.checkoutUrl) {
+      window.open(product.checkoutUrl, '_blank', 'noopener,noreferrer');
+      setShowLeadModal(null);
+      return;
+    }
+
     let details = '';
     if (leadInfo.size) details += `\n- *Tamanho:* ${leadInfo.size}`;
     if (leadInfo.color) details += `\n- *Cor:* ${leadInfo.color}`;
@@ -291,7 +297,7 @@ export default function Store() {
         <LeadCaptureModal 
           product={showLeadModal} 
           onClose={() => setShowLeadModal(null)} 
-          onCaptured={(leadInfo) => finalizePurchase(showLeadModal, leadInfo)} 
+          onCaptured={(leadInfo, checkoutType) => finalizePurchase(showLeadModal, leadInfo, checkoutType)} 
         />
       )}
 

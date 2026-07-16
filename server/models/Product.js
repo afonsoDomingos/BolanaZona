@@ -11,6 +11,7 @@ const productSchema = new mongoose.Schema({
   },
   image: { type: String },
   images: { type: [String], default: [] },
+  checkoutUrl: { type: String, default: '' },
   stock: { type: Number, default: 0 },
 }, { timestamps: true });
 

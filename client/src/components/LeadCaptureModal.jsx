@@ -11,8 +11,8 @@ export default function LeadCaptureModal({ product, onClose, onCaptured }) {
 
   const totalPrice = product.price * quantity;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleCheckoutSubmit = async (e, checkoutType) => {
+    if (e) e.preventDefault();
     if (!form.name || !form.contact) return toast.error('Preenche pelo menos o Nome e Contacto.');
 
     setLoading(true);
@@ -24,18 +24,20 @@ export default function LeadCaptureModal({ product, onClose, onCaptured }) {
         size: form.size,
         color: form.color,
         province: form.province,
-        quantity: quantity
+        quantity: quantity,
+        checkoutType: checkoutType
       });
       
       await api.post('/analytics/track', {
         type: 'purchase_attempt',
         page: window.location.pathname,
         targetId: product._id,
-        targetName: product.name
+        targetName: product.name,
+        metadata: { checkoutType }
       }).catch(() => {});
 
       toast.success('Dados registados! Redirecionando...');
-      onCaptured({ ...form, quantity });
+      onCaptured({ ...form, quantity }, checkoutType);
     } catch {
       toast.error('Erro ao registar interesse.');
     } finally { setLoading(false); }
@@ -170,7 +172,7 @@ export default function LeadCaptureModal({ product, onClose, onCaptured }) {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <form onSubmit={e => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="form-group">
             <label style={labelStyle}>Nome Completo</label>
             <input 
@@ -256,7 +258,8 @@ export default function LeadCaptureModal({ product, onClose, onCaptured }) {
           </div>
 
           <button 
-            type="submit" 
+            type="button" 
+            onClick={(e) => handleCheckoutSubmit(e, 'whatsapp')}
             disabled={loading} 
             style={{ 
               width: '100%', 
@@ -297,6 +300,51 @@ export default function LeadCaptureModal({ product, onClose, onCaptured }) {
               </>
             )}
           </button>
+
+          {product.checkoutUrl && (
+            <button 
+              type="button" 
+              onClick={(e) => handleCheckoutSubmit(e, 'direct')}
+              disabled={loading} 
+              style={{ 
+                width: '100%', 
+                background: 'transparent', 
+                color: '#000000', 
+                border: '2px solid #000000', 
+                borderRadius: '8px', 
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center', 
+                gap: '10px',
+                height: '48px', 
+                fontSize: '13px',
+                fontWeight: 700, 
+                marginTop: '4px',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={e => {
+                if(!loading) {
+                  e.currentTarget.style.background = 'rgba(0,0,0,0.04)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }
+              }}
+              onMouseLeave={e => {
+                if(!loading) {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.transform = 'none';
+                }
+              }}
+            >
+              {loading ? (
+                <span className="spinner" style={{ width: 18, height: 18, borderTopColor: '#000000' }} />
+              ) : (
+                <>
+                  💳 Ir para o Checkout Direto
+                </>
+              )}
+            </button>
+          )}
         </form>
       </div>
     </div>
