@@ -2012,3 +2012,29 @@ body:has(.modal-overlay) .social-fab-toggle-show {
     padding: 10px 20px;
   }
 }
+
+/* ===== LIVE STREAM FLOATING HEARTS EFFECT ===== */
+@keyframes live-heart-float {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.3) rotate(0deg);
+  }
+  15% {
+    opacity: 0.95;
+    transform: translateY(-20px) scale(1) rotate(15deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-130px) scale(0.7) rotate(-25deg);
+  }
+}
+
+.live-floating-heart {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform-origin: center bottom;
+  pointer-events: none;
+  z-index: 999;
+  animation: live-heart-float 1.3s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
