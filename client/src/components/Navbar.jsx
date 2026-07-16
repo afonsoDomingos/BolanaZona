@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search, Trophy, Users, LogIn, Shield } from 'lucide-react';
+import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search, Trophy, Users, LogIn, Shield, Sun, Moon } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 
 export default function Navbar() {
@@ -10,6 +10,24 @@ export default function Navbar() {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLightMode, setIsLightMode] = useState(document.body.classList.contains('light-mode'));
+
+  useEffect(() => {
+    setIsLightMode(document.body.classList.contains('light-mode'));
+  }, []);
+
+  const toggleTheme = () => {
+    const isLight = document.body.classList.contains('light-mode');
+    if (isLight) {
+      document.body.classList.remove('light-mode');
+      localStorage.setItem('theme', 'dark');
+      setIsLightMode(false);
+    } else {
+      document.body.classList.add('light-mode');
+      localStorage.setItem('theme', 'light');
+      setIsLightMode(true);
+    }
+  };
 
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
 
@@ -97,6 +115,27 @@ export default function Navbar() {
               </div>
               <span className="hide-desktop">Loja</span>
             </Link>
+
+            <button 
+              onClick={toggleTheme} 
+              className="nav-link"
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                color: 'var(--text-secondary)', 
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 8,
+                padding: '6px 12px', 
+                borderRadius: '8px',
+                transition: 'var(--transition)'
+              }}
+              title={isLightMode ? "Ativar Modo Escuro" : "Ativar Modo Claro"}
+            >
+              {isLightMode ? <Moon size={20} /> : <Sun size={20} />}
+              <span className="hide-desktop">{isLightMode ? "Modo Escuro" : "Modo Claro"}</span>
+            </button>
 
             {user ? (
               <>
