@@ -126,7 +126,7 @@ export default function Store() {
   const [showLeadModal, setShowLeadModal] = useState(null);
   const [activeLightbox, setActiveLightbox] = useState(null);
   const { user } = useAuth();
-  const isAdmin = user?.role === 'superadmin';
+  const isAdmin = user?.role === 'superadmin' || user?.role === 'admin';
 
   const loadProducts = () => {
     setLoading(true);
