@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Tag, Search, Edit, Plus } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -118,6 +119,7 @@ function ProductCard({ p, isAdmin, onEdit, onBuy, onImageClick }) {
 }
 
 export default function Store() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('');
@@ -201,9 +203,14 @@ export default function Store() {
           </p>
 
           {isAdmin && (
-            <button className="btn" style={{ margin: '0 auto 32px', borderRadius: 100, background: '#000000', color: '#ffffff', border: 'none', padding: '12px 24px', fontSize: '14px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }} onClick={() => setShowEditModal({})}>
-              <Plus size={18} /> Adicionar Novo Produto
-            </button>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginBottom: 32, flexWrap: 'wrap' }}>
+              <button className="btn" style={{ borderRadius: 100, background: '#000000', color: '#ffffff', border: 'none', padding: '12px 24px', fontSize: '14px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }} onClick={() => setShowEditModal({})}>
+                <Plus size={18} /> Adicionar Novo Produto
+              </button>
+              <button className="btn" style={{ borderRadius: 100, background: '#ffffff', color: '#000000', border: '1px solid #e2e8f0', padding: '12px 24px', fontSize: '14px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer', transition: 'all 0.2s' }} onClick={() => navigate('/admin/store')} onMouseEnter={e => { e.currentTarget.style.background = '#f5f5f7'; }} onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; }}>
+                <ShoppingBag size={18} /> Painel de Vendas
+              </button>
+            </div>
           )}
 
           <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
