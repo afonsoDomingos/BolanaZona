@@ -9,8 +9,8 @@ import { buildMatchShareText } from '../utils/shareUtils';
 
 
 const WhatsAppIcon = ({ size = 11 }) => (
-  <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
-    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.717-1.458L0 24zm6.59-11.758c.159.354.316.596.53.954.214.358.143.763.07 1.121-.07.358-.502 2.222-.502 2.222s-.229.832.32 1.282c.551.451 1.22.18 1.22.18s1.65-.89 2.222-1.222c.515-.315.654-.268.966-.027.311.242 1.341 1.056 1.341 1.056s.31.258.629.138c.32-.12.443-.654.443-.654s.517-2.03.654-2.502c.137-.472.072-.83-.143-1.056-.215-.226-1.12-1.121-1.12-1.121s-.317-.308-.093-.574c.224-.266.856-.913 1.173-1.24.317-.327.387-.454.492-.68.106-.226.035-.55-.072-.693-.106-.143-.889-2.062-.889-2.062s-.234-.515-.654-.42c-.42.096-.957.513-.957.513s-.654.673-.62 1.08c.033.407.228.983.228.983s-.502-.07-1.11-.34c-.608-.27-1.233-.794-1.233-.794s-.383-.346-.575-.152c-.191.194-.502.996-.502.996zm12.333-6.529C17.062 3.824 14.652 2.7 12.008 2.7 6.877 2.7 2.709 6.87 2.706 12c-.001 1.705.446 3.371 1.293 4.838L2.946 20.5l3.822-1.002c1.417.773 3.013 1.182 4.636 1.183h.005c5.13 0 9.297-4.17 9.301-9.3.002-2.486-.963-4.823-2.73-6.59z" />
+  <svg viewBox="0 0 16 16" width={size} height={size} fill="currentColor">
+    <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232" />
   </svg>
 );
 
@@ -25,6 +25,29 @@ export default function Explore() {
   const [recentMatches, setRecentMatches] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
   const [shareModal, setShareModal] = useState(null);
+
+  const [storeProducts, setStoreProducts] = useState([]);
+  const [currentProductIndex, setCurrentProductIndex] = useState(0);
+
+  useEffect(() => {
+    api.get('/products')
+      .then(res => {
+        if (res.data && res.data.length > 0) {
+          setStoreProducts(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (storeProducts.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentProductIndex(prev => (prev + 1) % storeProducts.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [storeProducts]);
+
+  const activeProduct = storeProducts[currentProductIndex] || null;
 
   const openMatchShare = (match) => {
     const tournament = match.tournament;
@@ -329,43 +352,103 @@ export default function Explore() {
                     // Inject store promo card right after the first match card
                     if (idx === 0) {
                       acc.push(
-                        <Link key="store-promo" to="/shop" className="match-card hover-scale" style={{ 
-                          textDecoration: 'none', 
-                          width: 220,
-                          minWidth: 220, 
-                          maxWidth: 220,
-                          flexShrink: 0, 
-                          scrollSnapAlign: 'start', 
-                          position: 'relative', 
-                          background: 'rgba(255,255,255,0.01)', 
-                          border: '1px solid rgba(0, 200, 83, 0.12)', 
-                          borderRadius: 16, 
-                          padding: '14px 12px 10px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                          minHeight: 135,
-                          overflow: 'hidden'
-                        }}>
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                              <ShoppingBag size={12} color="var(--green)" />
-                              <span style={{ fontSize: 8, color: 'var(--green)', fontWeight: 800, letterSpacing: 0.5 }}>LOJA OFICIAL</span>
+                        activeProduct ? (
+                          <Link key="store-promo" to="/shop" className="match-card hover-scale" style={{ 
+                            textDecoration: 'none', 
+                            width: 160,
+                            minWidth: 160, 
+                            maxWidth: 160,
+                            height: 160,
+                            minHeight: 160,
+                            maxHeight: 160,
+                            flexShrink: 0, 
+                            scrollSnapAlign: 'start', 
+                            position: 'relative', 
+                            background: 'rgba(255,255,255,0.01)', 
+                            border: '1px solid rgba(0, 200, 83, 0.12)', 
+                            borderRadius: 16, 
+                            padding: '12px 10px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            overflow: 'hidden'
+                          }}>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4, marginBottom: 8 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                  <ShoppingBag size={10} color="var(--green)" />
+                                  <span style={{ fontSize: 7, color: 'var(--green)', fontWeight: 800, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                                    {activeProduct.category}
+                                  </span>
+                                </div>
+                                <span style={{ fontSize: 9, color: 'var(--green)', fontWeight: 800 }}>
+                                  {activeProduct.price.toLocaleString()} MT
+                                </span>
+                              </div>
+                              
+                              <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <h3 className="font-syne" style={{ fontSize: 11, fontWeight: 800, color: '#fff', marginBottom: 2, lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    {activeProduct.name}
+                                  </h3>
+                                  <p style={{ fontSize: 9, color: 'var(--text-secondary)', lineHeight: 1.2, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    {activeProduct.description}
+                                  </p>
+                                </div>
+                                {activeProduct.image && (
+                                  <div style={{ width: 34, height: 34, borderRadius: 6, background: '#000', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
+                                    <img src={activeProduct.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  </div>
+                                )}
+                              </div>
                             </div>
                             
-                            <h3 className="font-syne" style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 4, lineHeight: 1.3 }}>
-                              Equipa o teu Clube! 👕
-                            </h3>
-                            <p style={{ fontSize: 10, color: 'var(--text-secondary)', lineHeight: 1.3, margin: 0 }}>
-                              Equipamentos completos, chuteiras e acessórios personalizados.
-                            </p>
-                          </div>
-                          
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--green)', fontSize: 10, fontWeight: 700, marginTop: 10, borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 8 }}>
-                            <span>Visitar Loja</span>
-                            <span style={{ fontSize: 11 }}>🛒</span>
-                          </div>
-                        </Link>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--green)', fontSize: 9, fontWeight: 700, borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 6 }}>
+                              <span>Comprar</span>
+                              <span style={{ fontSize: 10 }}>🛒</span>
+                            </div>
+                          </Link>
+                        ) : (
+                          <Link key="store-promo" to="/shop" className="match-card hover-scale" style={{ 
+                            textDecoration: 'none', 
+                            width: 160,
+                            minWidth: 160, 
+                            maxWidth: 160,
+                            height: 160,
+                            minHeight: 160,
+                            maxHeight: 160,
+                            flexShrink: 0, 
+                            scrollSnapAlign: 'start', 
+                            position: 'relative', 
+                            background: 'rgba(255,255,255,0.01)', 
+                            border: '1px solid rgba(0, 200, 83, 0.12)', 
+                            borderRadius: 16, 
+                            padding: '12px 10px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            overflow: 'hidden'
+                          }}>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+                                <ShoppingBag size={10} color="var(--green)" />
+                                <span style={{ fontSize: 7, color: 'var(--green)', fontWeight: 800, letterSpacing: 0.5 }}>LOJA OFICIAL</span>
+                              </div>
+                              
+                              <h3 className="font-syne" style={{ fontSize: 11, fontWeight: 700, color: '#fff', marginBottom: 2, lineHeight: 1.2 }}>
+                                Equipa o teu Clube! 👕
+                              </h3>
+                              <p style={{ fontSize: 9, color: 'var(--text-secondary)', lineHeight: 1.2, margin: 0 }}>
+                                Equipamentos e acessórios.
+                              </p>
+                            </div>
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--green)', fontSize: 9, fontWeight: 700, borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 6 }}>
+                              <span>Ver Loja</span>
+                              <span style={{ fontSize: 10 }}>🛒</span>
+                            </div>
+                          </Link>
+                        )
                       );
                     }
 
