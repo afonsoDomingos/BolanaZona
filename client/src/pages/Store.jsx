@@ -161,7 +161,8 @@ export default function Store() {
   };
 
   return (
-    <div className="page store-light-page animate-fade-in" style={{ background: '#ffffff', color: '#000000', minHeight: '100vh', padding: '60px 0 100px', transition: 'background-color 0.3s ease' }}>
+    <>
+      <div className="page store-light-page animate-fade-in" style={{ background: '#ffffff', color: '#000000', minHeight: '100vh', padding: '60px 0 100px', transition: 'background-color 0.3s ease' }}>
       <style>{`
         .store-light-page {
           background: #ffffff !important;
@@ -272,6 +273,7 @@ export default function Store() {
           </div>
         )}
       </div>
+    </div>
 
       {showEditModal && (
         <ProductEditModal 
@@ -288,6 +290,6 @@ export default function Store() {
           onCaptured={(leadInfo) => finalizePurchase(showLeadModal, leadInfo)} 
         />
       )}
-    </div>
+    </>
   );
 }
