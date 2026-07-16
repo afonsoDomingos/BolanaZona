@@ -133,6 +133,8 @@ export default function AdminAnalytics() {
                       <th>Interesse</th>
                       <th>Detalhes</th>
                       <th>Província</th>
+                      <th>Pagamento</th>
+                      <th>Estado</th>
                       <th>Data</th>
                       <th>Ação</th>
                     </tr>
@@ -161,6 +163,48 @@ export default function AdminAnalytics() {
                           {l.message && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>"{l.message}"</div>}
                         </td>
                         <td><span style={{ fontSize: 13 }}>{l.province || 'N/A'}</span></td>
+                        <td>
+                          <div style={{ fontSize: 12 }}>
+                            <span style={{ 
+                              fontWeight: 700, 
+                              textTransform: 'uppercase', 
+                              color: l.paymentMethod === 'mpesa' ? '#e51a24' : l.paymentMethod === 'emola' ? '#ff6600' : l.paymentMethod === 'whatsapp' ? '#25D366' : 'var(--blue)' 
+                            }}>
+                              {l.paymentMethod || 'WhatsApp'}
+                            </span>
+                            {l.paymentPhone && <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{l.paymentPhone}</div>}
+                            {l.paymentDetails && <div style={{ fontSize: 10, color: 'var(--text-muted)', fontStyle: 'italic' }}>{l.paymentDetails}</div>}
+                          </div>
+                        </td>
+                        <td>
+                          <select
+                            value={l.status || 'new'}
+                            onChange={async (e) => {
+                              try {
+                                await api.put(`/leads/${l._id}/status`, { status: e.target.value });
+                                toast.success('Estado atualizado!');
+                                fetchLeads();
+                              } catch {
+                                toast.error('Erro ao atualizar estado.');
+                              }
+                            }}
+                            className={`badge ${
+                              l.status === 'converted' 
+                                ? 'badge-green' 
+                                : l.status === 'lost' 
+                                  ? 'badge-red' 
+                                  : l.status === 'contacted'
+                                    ? 'badge-blue'
+                                    : 'badge-yellow'
+                            }`}
+                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 11 }}
+                          >
+                            <option value="new" style={{ background: '#0a0f14', color: '#fff' }}>Pendente</option>
+                            <option value="contacted" style={{ background: '#0a0f14', color: '#fff' }}>Contactado</option>
+                            <option value="converted" style={{ background: '#0a0f14', color: '#fff' }}>Pago / Entregue</option>
+                            <option value="lost" style={{ background: '#0a0f14', color: '#fff' }}>Cancelado</option>
+                          </select>
+                        </td>
                         <td style={{ fontSize: 12 }}>{new Date(l.createdAt).toLocaleDateString()}</td>
                         <td>
                           <a 
@@ -175,7 +219,7 @@ export default function AdminAnalytics() {
                         </td>
                       </tr>
                     ))}
-                    {leads.length === 0 && <tr><td colSpan="6" style={{ textAlign: 'center', padding: 40 }}>Sem leads no momento.</td></tr>}
+                    {leads.length === 0 && <tr><td colSpan="8" style={{ textAlign: 'center', padding: 40 }}>Sem leads no momento.</td></tr>}
                   </tbody>
                 </table>
               </div>

@@ -11,6 +11,9 @@ const leadSchema = new mongoose.Schema({
   province: { type: String }, // Província do lead
   quantity: { type: Number, default: 1 }, // Quantidade encomendada
   message: { type: String },
+  paymentMethod: { type: String, default: 'whatsapp' },
+  paymentPhone: { type: String, default: '' },
+  paymentDetails: { type: String, default: '' },
   status: { type: String, enum: ['new', 'contacted', 'converted', 'lost'], default: 'new' },
   source: { type: String, default: 'store' }, // 'store' ou 'tournament_reg'
 }, { timestamps: true });

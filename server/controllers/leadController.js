@@ -6,7 +6,7 @@ const User = require('../models/User');
 
 exports.create = async (req, res) => {
   try {
-    const { productId, tournamentId, name, contact, teamName, message, source, size, color, province, quantity } = req.body;
+    const { productId, tournamentId, name, contact, teamName, message, source, size, color, province, quantity, paymentMethod, paymentPhone, paymentDetails } = req.body;
     
     const lead = await Lead.create({
       product: productId || null,
@@ -19,7 +19,10 @@ exports.create = async (req, res) => {
       province,
       quantity: quantity || 1,
       message,
-      source: source || 'store'
+      source: source || 'store',
+      paymentMethod: paymentMethod || 'whatsapp',
+      paymentPhone: paymentPhone || '',
+      paymentDetails: paymentDetails || ''
     });
 
     // Notificação
