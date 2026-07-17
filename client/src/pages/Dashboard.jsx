@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell, Shield, Phone, ChevronLeft, ChevronRight, Handshake, Youtube } from 'lucide-react';
+import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell, Shield, Phone, ChevronLeft, ChevronRight, Handshake, Youtube, ArrowLeft as BackIcon } from 'lucide-react';
 import MatchLikeButton from '../components/MatchLikeButton';
 import toast from 'react-hot-toast';
 
@@ -41,6 +41,7 @@ function RecentActivity() {
 export default function Dashboard() {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -165,16 +166,31 @@ export default function Dashboard() {
 
       <div className="container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 40, flexWrap: 'wrap', gap: 16 }}>
-          <div>
-            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Painel</p>
-            <h1 className="font-syne" style={{ fontSize: 32, fontWeight: 800 }}>
-              Olá, {
-                user?.role === 'superadmin' ? 'Chefe ' : 
-                user?.role === 'admin' ? 'Organizador ' : 
-                user?.role === 'player' ? 'Craque ' : 'Torcedor '
-              }{user?.name?.split(' ')[0]} 👋
-            </h1>
-            <p style={{ color: 'var(--text-secondary)', marginTop: 6 }}>Resumo dos teus torneios</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button 
+              onClick={() => navigate(-1)}
+              className="btn btn-secondary btn-sm"
+              style={{ 
+                padding: '8px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6
+              }}
+              title="Voltar"
+            >
+              <BackIcon size={16} /> Voltar
+            </button>
+            <div>
+              <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>Painel</p>
+              <h1 className="font-syne" style={{ fontSize: 32, fontWeight: 800 }}>
+                Olá, {
+                  user?.role === 'superadmin' ? 'Chefe ' : 
+                  user?.role === 'admin' ? 'Organizador ' : 
+                  user?.role === 'player' ? 'Craque ' : 'Torcedor '
+                }{user?.name?.split(' ')[0]} 👋
+              </h1>
+              <p style={{ color: 'var(--text-secondary)', marginTop: 6 }}>Resumo dos teus torneios</p>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', paddingRight: 4 }}>
             {(user?.role === 'superadmin' || user?.role === 'admin') && (
