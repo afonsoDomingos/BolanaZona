@@ -192,7 +192,7 @@ export default function AdminStore() {
             <h1 className="font-syne" style={{ fontSize: 32, fontWeight: 800, marginBottom: 8, color: '#ffffff' }}>Painel da Loja Oficial</h1>
             <p style={{ color: 'var(--text-secondary)' }}>Gerir produtos, encomendas, checkout e métricas de conversão</p>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className="hide-mobile" style={{ display: 'flex', gap: 10 }}>
             <button onClick={fetchData} className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.08)', color: '#fff' }}>
               Atualizar Dados
             </button>
@@ -210,6 +210,28 @@ export default function AdminStore() {
               <Plus size={16} /> Novo Produto
             </button>
           </div>
+        </div>
+        
+        {/* Mobile Action Buttons */}
+        <div className="show-mobile" style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button onClick={fetchData} className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.08)', color: '#fff', flex: 1, minWidth: 120 }}>
+              Atualizar Dados
+            </button>
+            {activeTab === 'products' && (
+              <button onClick={exportProductsCSV} className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.08)', color: '#fff', display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 120 }}>
+                <Download size={16} /> Exportar CSV
+              </button>
+            )}
+            {activeTab === 'sales' && (
+              <button onClick={exportSalesCSV} className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.08)', color: '#fff', display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 120 }}>
+                <Download size={16} /> Exportar CSV
+              </button>
+            )}
+          </div>
+          <button onClick={() => setShowEditModal({})} className="btn btn-primary btn-sm" style={{ background: 'var(--green)', borderColor: 'var(--green)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontWeight: 700, width: '100%' }}>
+            <Plus size={16} /> Novo Produto
+          </button>
         </div>
 
         {/* Tab Buttons (inspired by Lojou style) */}
@@ -408,8 +430,8 @@ export default function AdminStore() {
             {activeTab === 'products' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 {/* Search & Filters Header */}
-                <div className="card-glass" style={{ padding: 20, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12 }}>
-                  <div className="input-wrapper" style={{ flex: 1, minWidth: 280, display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 12px' }}>
+                <div className="card-glass" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12 }}>
+                  <div className="input-wrapper" style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '10px 12px' }}>
                     <Search size={18} color="var(--text-muted)" />
                     <input 
                       type="text" 
@@ -421,12 +443,12 @@ export default function AdminStore() {
                     />
                   </div>
                   
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                     <Filter size={16} color="var(--text-muted)" />
                     <select 
                       value={filterCategory}
                       onChange={e => setFilterCategory(e.target.value)}
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none' }}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none', flex: 1, minWidth: 140 }}
                     >
                       <option value="all" style={{ background: '#0a0f14', color: '#fff' }}>Todas Categorias</option>
                       <option value="camisolas" style={{ background: '#0a0f14', color: '#fff' }}>Camisolas</option>
@@ -441,7 +463,7 @@ export default function AdminStore() {
                     <select 
                       value={filterStock}
                       onChange={e => setFilterStock(e.target.value)}
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none' }}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none', flex: 1, minWidth: 120 }}
                     >
                       <option value="all" style={{ background: '#0a0f14', color: '#fff' }}>Todo Stock</option>
                       <option value="low" style={{ background: '#0a0f14', color: '#fff' }}>Stock Baixo (&lt;5)</option>
@@ -451,7 +473,7 @@ export default function AdminStore() {
                     <select 
                       value={sortProducts}
                       onChange={e => setSortProducts(e.target.value)}
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none' }}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none', flex: 1, minWidth: 140 }}
                     >
                       <option value="name" style={{ background: '#0a0f14', color: '#fff' }}>Nome</option>
                       <option value="price-asc" style={{ background: '#0a0f14', color: '#fff' }}>Preço: Baixo → Alto</option>
@@ -666,8 +688,8 @@ export default function AdminStore() {
             {activeTab === 'sales' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 {/* Search & Filters Header */}
-                <div className="card-glass" style={{ padding: 20, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12 }}>
-                  <div className="input-wrapper" style={{ flex: 1, minWidth: 280, display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 12px' }}>
+                <div className="card-glass" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12 }}>
+                  <div className="input-wrapper" style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '10px 12px' }}>
                     <Search size={18} color="var(--text-muted)" />
                     <input 
                       type="text" 
@@ -679,12 +701,12 @@ export default function AdminStore() {
                     />
                   </div>
                   
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                     <Filter size={16} color="var(--text-muted)" />
                     <select 
                       value={filterStatus}
                       onChange={e => setFilterStatus(e.target.value)}
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none' }}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none', flex: 1, minWidth: 130 }}
                     >
                       <option value="all" style={{ background: '#0a0f14', color: '#fff' }}>Todos Estados</option>
                       <option value="new" style={{ background: '#0a0f14', color: '#fff' }}>Pendente</option>
@@ -696,7 +718,7 @@ export default function AdminStore() {
                     <select 
                       value={filterPayment}
                       onChange={e => setFilterPayment(e.target.value)}
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none' }}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none', flex: 1, minWidth: 130 }}
                     >
                       <option value="all" style={{ background: '#0a0f14', color: '#fff' }}>Todos Pagamentos</option>
                       <option value="mpesa" style={{ background: '#0a0f14', color: '#fff' }}>M-Pesa</option>
@@ -709,7 +731,7 @@ export default function AdminStore() {
                     <select 
                       value={sortLeads}
                       onChange={e => setSortLeads(e.target.value)}
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none' }}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none', flex: 1, minWidth: 150 }}
                     >
                       <option value="date" style={{ background: '#0a0f14', color: '#fff' }}>Data (Mais Recente)</option>
                       <option value="amount" style={{ background: '#0a0f14', color: '#fff' }}>Valor (Maior Primeiro)</option>
