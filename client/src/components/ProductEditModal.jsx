@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { X, Save, Camera, Link as LinkIcon, Trash2 } from 'lucide-react';
+import { X, Save, Camera, Link as LinkIcon, Trash2, Package } from 'lucide-react';
 
 export default function ProductEditModal({ product, onClose, onSaved }) {
   const [form, setForm] = useState(() => {
-    const base = product || { name: '', price: 0, category: 'camisolas', description: '', image: '', checkoutUrl: '' };
+    const base = product || { name: '', price: 0, category: 'camisolas', description: '', image: '', checkoutUrl: '', stock: 0 };
     return {
       ...base,
       images: base.images || [],
-      checkoutUrl: base.checkoutUrl || ''
+      checkoutUrl: base.checkoutUrl || '',
+      stock: base.stock || 0
     };
   });
   const [loading, setLoading] = useState(false);
@@ -130,22 +131,34 @@ export default function ProductEditModal({ product, onClose, onSaved }) {
                 />
               </div>
               <div className="form-group">
-                <label className="form-label" style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-secondary)', marginBottom: 6 }}>Categoria</label>
-                <select 
-                  className="form-select" 
-                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '10px 12px', fontSize: 13, height: '40px', outline: 'none' }}
-                  value={form.category} 
-                  onChange={e => setForm({...form, category: e.target.value})}
-                >
-                  <option value="camisolas" style={{ background: '#0a0f14', color: '#fff' }}>Camisolas</option>
-                  <option value="personalizados" style={{ background: '#0a0f14', color: '#fff' }}>Personalizados</option>
-                  <option value="chuteiras" style={{ background: '#0a0f14', color: '#fff' }}>Chuteiras</option>
-                  <option value="meias" style={{ background: '#0a0f14', color: '#fff' }}>Meias</option>
-                  <option value="trofeus" style={{ background: '#0a0f14', color: '#fff' }}>Troféus</option>
-                  <option value="bolas" style={{ background: '#0a0f14', color: '#fff' }}>Bolas</option>
-                  <option value="treino" style={{ background: '#0a0f14', color: '#fff' }}>Equip. Treino</option>
-                </select>
+                <label className="form-label" style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-secondary)', marginBottom: 6 }}>Stock</label>
+                <input 
+                  type="number" 
+                  className="form-input" 
+                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '10px 12px', fontSize: 13 }}
+                  value={form.stock} 
+                  onChange={e => setForm({...form, stock: Number(e.target.value)})} 
+                  min="0"
+                />
               </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-secondary)', marginBottom: 6 }}>Categoria</label>
+              <select 
+                className="form-select" 
+                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '10px 12px', fontSize: 13, height: '40px', outline: 'none' }}
+                value={form.category} 
+                onChange={e => setForm({...form, category: e.target.value})}
+              >
+                <option value="camisolas" style={{ background: '#0a0f14', color: '#fff' }}>Camisolas</option>
+                <option value="personalizados" style={{ background: '#0a0f14', color: '#fff' }}>Personalizados</option>
+                <option value="chuteiras" style={{ background: '#0a0f14', color: '#fff' }}>Chuteiras</option>
+                <option value="meias" style={{ background: '#0a0f14', color: '#fff' }}>Meias</option>
+                <option value="trofeus" style={{ background: '#0a0f14', color: '#fff' }}>Troféus</option>
+                <option value="bolas" style={{ background: '#0a0f14', color: '#fff' }}>Bolas</option>
+                <option value="treino" style={{ background: '#0a0f14', color: '#fff' }}>Equip. Treino</option>
+              </select>
             </div>
 
             <div className="form-group">

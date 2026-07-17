@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { ShoppingBag, TrendingUp, Package, Users, Plus, Search, Edit, Trash2, Shield, Calendar, DollarSign, Activity } from 'lucide-react';
+import { ShoppingBag, TrendingUp, Package, Users, Plus, Search, Edit, Trash2, Shield, Calendar, DollarSign, Activity, AlertTriangle, Filter, Download, ArrowUpDown } from 'lucide-react';
 import ProductEditModal from '../components/ProductEditModal';
 
 export default function AdminStore() {
@@ -12,6 +12,16 @@ export default function AdminStore() {
   const [searchProduct, setSearchProduct] = useState('');
   const [searchLead, setSearchLead] = useState('');
   const [showEditModal, setShowEditModal] = useState(null);
+  
+  // Filters for products
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [filterStock, setFilterStock] = useState('all');
+  const [sortProducts, setSortProducts] = useState('name');
+  
+  // Filters for sales
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterPayment, setFilterPayment] = useState('all');
+  const [sortLeads, setSortLeads] = useState('date');
 
   // Fetch initial data
   const fetchData = async () => {
@@ -75,12 +85,85 @@ export default function AdminStore() {
   const whatsappSales = successfulSales.filter(l => l.paymentMethod === 'whatsapp' || !l.paymentMethod);
 
   // Filters
-  const filteredProducts = products.filter(p => p.name.toLowerCase().includes(searchProduct.toLowerCase()));
-  const filteredLeads = leads.filter(l => 
-    l.name.toLowerCase().includes(searchLead.toLowerCase()) || 
-    l.contact.includes(searchLead) ||
-    (l.product?.name && l.product.name.toLowerCase().includes(searchLead.toLowerCase()))
-  );
+  const filteredProducts = products
+    .filter(p => p.name.toLowerCase().includes(searchProduct.toLowerCase()))
+    .filter(p => filterCategory === 'all' || p.category === filterCategory)
+    .filter(p => {
+      if (filterStock === 'all') return true;
+      if (filterStock === 'low') return (p.stock || 0) > 0 && (p.stock || 0) < 5;
+      if (filterStock === 'out') return (p.stock || 0) === 0;
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortProducts === 'name') return a.name.localeCompare(b.name);
+      if (sortProducts === 'price-asc') return a.price - b.price;
+      if (sortProducts === 'price-desc') return b.price - a.price;
+      if (sortProducts === 'stock') return (a.stock || 0) - (b.stock || 0);
+      return 0;
+    });
+
+  const filteredLeads = leads
+    .filter(l => 
+      l.name.toLowerCase().includes(searchLead.toLowerCase()) || 
+      l.contact.includes(searchLead) ||
+      (l.product?.name && l.product.name.toLowerCase().includes(searchLead.toLowerCase()))
+    )
+    .filter(l => filterStatus === 'all' || l.status === filterStatus)
+    .filter(l => filterPayment === 'all' || l.paymentMethod === filterPayment || (filterPayment === 'whatsapp' && !l.paymentMethod))
+    .sort((a, b) => {
+      if (sortLeads === 'date') return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortLeads === 'amount') return (b.product?.price || 0) - (a.product?.price || 0);
+      return 0;
+    });
+
+  // Export to CSV
+  const exportProductsCSV = () => {
+    const headers = ['Nome', 'Categoria', 'Preço', 'Stock', 'Descrição', 'Checkout URL'];
+    const rows = filteredProducts.map(p => [
+      p.name,
+      p.category,
+      p.price,
+      p.stock || 0,
+      p.description || '',
+      p.checkoutUrl || ''
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'produtos_bolanazona.csv';
+    link.click();
+  };
+
+  const exportSalesCSV = () => {
+    const headers = ['Cliente', 'Contacto', 'Produto', 'Quantidade', 'Preço Total', 'Método Pagamento', 'Estado', 'Data'];
+    const rows = filteredLeads.map(l => [
+      l.name,
+      l.contact,
+      l.product?.name || 'N/A',
+      l.quantity || 1,
+      ((l.product?.price || 0) * (l.quantity || 1)).toLocaleString(),
+      l.paymentMethod || 'WhatsApp',
+      l.status,
+      new Date(l.createdAt).toLocaleDateString()
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'vendas_bolanazona.csv';
+    link.click();
+  };
 
   return (
     <div className="page animate-fade-in" style={{ background: '#0a0f14', minHeight: '100vh', color: '#ffffff', padding: '40px 0' }}>
@@ -95,6 +178,16 @@ export default function AdminStore() {
             <button onClick={fetchData} className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.08)', color: '#fff' }}>
               Atualizar Dados
             </button>
+            {activeTab === 'products' && (
+              <button onClick={exportProductsCSV} className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.08)', color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Download size={16} /> Exportar CSV
+              </button>
+            )}
+            {activeTab === 'sales' && (
+              <button onClick={exportSalesCSV} className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.08)', color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Download size={16} /> Exportar CSV
+              </button>
+            )}
             <button onClick={() => setShowEditModal({})} className="btn btn-primary btn-sm" style={{ background: 'var(--green)', borderColor: 'var(--green)', color: '#000', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}>
               <Plus size={16} /> Novo Produto
             </button>
@@ -208,43 +301,94 @@ export default function AdminStore() {
                     </div>
                   </div>
 
-                  {/* Vendas Recentes */}
+                  {/* Top Produtos */}
                   <div className="card-glass" style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: 24 }}>
-                    <h3 className="font-syne" style={{ fontSize: 16, fontWeight: 800, marginBottom: 20 }}>Últimas Transações</h3>
+                    <h3 className="font-syne" style={{ fontSize: 16, fontWeight: 800, marginBottom: 20 }}>Top Produtos</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                      {leads.slice(0, 5).map(l => (
-                        <div key={l._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: 10 }}>
-                          <div>
-                            <div style={{ fontSize: 13, fontWeight: 700 }}>{l.name}</div>
-                            <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{l.product?.name || 'Produto Desconhecido'} ({l.quantity || 1}x)</div>
+                      {(() => {
+                        const productSales = {};
+                        leads.forEach(l => {
+                          if (l.product?.name) {
+                            productSales[l.product.name] = (productSales[l.product.name] || 0) + (l.quantity || 1);
+                          }
+                        });
+                        const topProducts = Object.entries(productSales)
+                          .sort((a, b) => b[1] - a[1])
+                          .slice(0, 5);
+                        
+                        if (topProducts.length === 0) {
+                          return (
+                            <div style={{ textAlign: 'center', padding: '32px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                              <div style={{ fontSize: 32 }}>📊</div>
+                              <div style={{ fontWeight: 700, color: '#fff', fontSize: 14 }}>Sem dados de vendas</div>
+                            </div>
+                          );
+                        }
+                        
+                        return topProducts.map(([name, count], idx) => (
+                          <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: 10 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                              <div style={{ 
+                                width: 24, height: 24, borderRadius: '50%', 
+                                background: idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : idx === 2 ? '#CD7F32' : 'rgba(255,255,255,0.1)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: 11, fontWeight: 700, color: '#000'
+                              }}>
+                                {idx + 1}
+                              </div>
+                              <div style={{ fontSize: 13, fontWeight: 700 }}>{name}</div>
+                            </div>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--green)' }}>{count} vendas</div>
                           </div>
-                          <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--green)' }}>{((l.product?.price || 0) * (l.quantity || 1)).toLocaleString()} MT</div>
-                            <span className={`badge ${l.status === 'converted' ? 'badge-green' : l.status === 'lost' ? 'badge-red' : 'badge-yellow'}`} style={{ fontSize: 9, padding: '2px 6px', marginTop: 4, display: 'inline-block' }}>
-                              {l.status === 'converted' ? 'Pago' : l.status === 'lost' ? 'Cancelado' : 'Pendente'}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                      {leads.length === 0 && (
-                        <div style={{ textAlign: 'center', padding: '32px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-                          <div style={{ fontSize: 32 }}>💸</div>
-                          <div style={{ fontWeight: 700, color: '#fff', fontSize: 14 }}>Sem transações recentes</div>
-                          <div style={{ color: 'var(--text-muted)', fontSize: 12, maxWidth: 260, margin: '0 auto', lineHeight: 1.4 }}>
-                            As vendas confirmadas e pendentes da loja oficial aparecerão listadas aqui.
-                          </div>
-                        </div>
-                      )}
+                        ));
+                      })()}
                     </div>
                   </div>
                 </div>
+
+                {/* Alertas de Stock */}
+                {(() => {
+                  const lowStockProducts = products.filter(p => (p.stock || 0) < 5);
+                  if (lowStockProducts.length === 0) return null;
+                  
+                  return (
+                    <div className="card-glass" style={{ background: 'rgba(255,68,68,0.05)', border: '1px solid rgba(255,68,68,0.2)', borderRadius: 16, padding: 24 }}>
+                      <h3 className="font-syne" style={{ fontSize: 16, fontWeight: 800, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--red)' }}>
+                        <AlertTriangle size={18} /> Alertas de Stock
+                      </h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {lowStockProducts.map(p => (
+                          <div key={p._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: 'rgba(255,68,68,0.1)', borderRadius: 8 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                              {p.image && (
+                                <img src={p.image} alt="" style={{ width: 40, height: 40, borderRadius: 6, objectFit: 'cover' }} />
+                              )}
+                              <div>
+                                <div style={{ fontSize: 13, fontWeight: 700 }}>{p.name}</div>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.category}</div>
+                              </div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontSize: 14, fontWeight: 800, color: (p.stock || 0) === 0 ? 'var(--red)' : 'var(--yellow)' }}>
+                                {p.stock || 0} unidades
+                              </div>
+                              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                                {(p.stock || 0) === 0 ? 'Esgotado' : 'Stock Baixo'}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
             {/* Products Tab */}
             {activeTab === 'products' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                {/* Search Header */}
+                {/* Search & Filters Header */}
                 <div className="card-glass" style={{ padding: 20, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12 }}>
                   <div className="input-wrapper" style={{ flex: 1, minWidth: 280, display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 12px' }}>
                     <Search size={18} color="var(--text-muted)" />
@@ -257,6 +401,45 @@ export default function AdminStore() {
                       onChange={e => setSearchProduct(e.target.value)}
                     />
                   </div>
+                  
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <Filter size={16} color="var(--text-muted)" />
+                    <select 
+                      value={filterCategory}
+                      onChange={e => setFilterCategory(e.target.value)}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none' }}
+                    >
+                      <option value="all" style={{ background: '#0a0f14', color: '#fff' }}>Todas Categorias</option>
+                      <option value="camisolas" style={{ background: '#0a0f14', color: '#fff' }}>Camisolas</option>
+                      <option value="personalizados" style={{ background: '#0a0f14', color: '#fff' }}>Personalizados</option>
+                      <option value="chuteiras" style={{ background: '#0a0f14', color: '#fff' }}>Chuteiras</option>
+                      <option value="meias" style={{ background: '#0a0f14', color: '#fff' }}>Meias</option>
+                      <option value="trofeus" style={{ background: '#0a0f14', color: '#fff' }}>Troféus</option>
+                      <option value="bolas" style={{ background: '#0a0f14', color: '#fff' }}>Bolas</option>
+                      <option value="treino" style={{ background: '#0a0f14', color: '#fff' }}>Equip. Treino</option>
+                    </select>
+                    
+                    <select 
+                      value={filterStock}
+                      onChange={e => setFilterStock(e.target.value)}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none' }}
+                    >
+                      <option value="all" style={{ background: '#0a0f14', color: '#fff' }}>Todo Stock</option>
+                      <option value="low" style={{ background: '#0a0f14', color: '#fff' }}>Stock Baixo (&lt;5)</option>
+                      <option value="out" style={{ background: '#0a0f14', color: '#fff' }}>Esgotado</option>
+                    </select>
+                    
+                    <select 
+                      value={sortProducts}
+                      onChange={e => setSortProducts(e.target.value)}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none' }}
+                    >
+                      <option value="name" style={{ background: '#0a0f14', color: '#fff' }}>Nome</option>
+                      <option value="price-asc" style={{ background: '#0a0f14', color: '#fff' }}>Preço: Baixo → Alto</option>
+                      <option value="price-desc" style={{ background: '#0a0f14', color: '#fff' }}>Preço: Alto → Baixo</option>
+                      <option value="stock" style={{ background: '#0a0f14', color: '#fff' }}>Stock</option>
+                    </select>
+                  </div>
                 </div>
 
                 {/* Products Table */}
@@ -267,6 +450,7 @@ export default function AdminStore() {
                         <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Produto</th>
                         <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Categoria</th>
                         <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Preço</th>
+                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Stock</th>
                         <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Checkout link</th>
                         <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', textAlign: 'right' }}>Ações</th>
                       </tr>
@@ -297,6 +481,23 @@ export default function AdminStore() {
                           </td>
                           <td style={{ padding: '16px 20px', fontWeight: 800, color: 'var(--green)', fontSize: 14 }}>
                             {p.price.toLocaleString()} MT
+                          </td>
+                          <td style={{ padding: '16px 20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ 
+                                fontSize: 12, 
+                                fontWeight: 700, 
+                                color: (p.stock || 0) === 0 ? 'var(--red)' : (p.stock || 0) < 5 ? 'var(--yellow)' : '#fff'
+                              }}>
+                                {p.stock || 0}
+                              </span>
+                              {(p.stock || 0) === 0 && (
+                                <AlertTriangle size={12} color="var(--red)" title="Esgotado" />
+                              )}
+                              {(p.stock || 0) > 0 && (p.stock || 0) < 5 && (
+                                <AlertTriangle size={12} color="var(--yellow)" title="Stock Baixo" />
+                              )}
+                            </div>
                           </td>
                           <td style={{ padding: '16px 20px', fontSize: 12, color: 'var(--text-secondary)' }}>
                             {p.checkoutUrl ? (
@@ -329,7 +530,7 @@ export default function AdminStore() {
                       ))}
                       {filteredProducts.length === 0 && (
                         <tr>
-                          <td colSpan="5" style={{ padding: '60px 20px' }}>
+                          <td colSpan="6" style={{ padding: '60px 20px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
                               <div style={{ fontSize: 40 }}>📦</div>
                               <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Nenhum produto cadastrado</div>
@@ -352,7 +553,7 @@ export default function AdminStore() {
             {/* Sales Tab */}
             {activeTab === 'sales' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                {/* Search Header */}
+                {/* Search & Filters Header */}
                 <div className="card-glass" style={{ padding: 20, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12 }}>
                   <div className="input-wrapper" style={{ flex: 1, minWidth: 280, display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 12px' }}>
                     <Search size={18} color="var(--text-muted)" />
@@ -364,6 +565,43 @@ export default function AdminStore() {
                       value={searchLead}
                       onChange={e => setSearchLead(e.target.value)}
                     />
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <Filter size={16} color="var(--text-muted)" />
+                    <select 
+                      value={filterStatus}
+                      onChange={e => setFilterStatus(e.target.value)}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none' }}
+                    >
+                      <option value="all" style={{ background: '#0a0f14', color: '#fff' }}>Todos Estados</option>
+                      <option value="new" style={{ background: '#0a0f14', color: '#fff' }}>Pendente</option>
+                      <option value="contacted" style={{ background: '#0a0f14', color: '#fff' }}>Contactado</option>
+                      <option value="converted" style={{ background: '#0a0f14', color: '#fff' }}>Pago / Entregue</option>
+                      <option value="lost" style={{ background: '#0a0f14', color: '#fff' }}>Cancelado</option>
+                    </select>
+                    
+                    <select 
+                      value={filterPayment}
+                      onChange={e => setFilterPayment(e.target.value)}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none' }}
+                    >
+                      <option value="all" style={{ background: '#0a0f14', color: '#fff' }}>Todos Pagamentos</option>
+                      <option value="mpesa" style={{ background: '#0a0f14', color: '#fff' }}>M-Pesa</option>
+                      <option value="emola" style={{ background: '#0a0f14', color: '#fff' }}>e-Mola</option>
+                      <option value="card" style={{ background: '#0a0f14', color: '#fff' }}>Cartão</option>
+                      <option value="crypto" style={{ background: '#0a0f14', color: '#fff' }}>Criptomoeda</option>
+                      <option value="whatsapp" style={{ background: '#0a0f14', color: '#fff' }}>WhatsApp</option>
+                    </select>
+                    
+                    <select 
+                      value={sortLeads}
+                      onChange={e => setSortLeads(e.target.value)}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', borderRadius: 8, padding: '8px 12px', fontSize: 12, outline: 'none' }}
+                    >
+                      <option value="date" style={{ background: '#0a0f14', color: '#fff' }}>Data (Mais Recente)</option>
+                      <option value="amount" style={{ background: '#0a0f14', color: '#fff' }}>Valor (Maior Primeiro)</option>
+                    </select>
                   </div>
                 </div>
 
