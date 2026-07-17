@@ -326,19 +326,20 @@ export default function AdminStore() {
                         }
                         
                         return topProducts.map(([name, count], idx) => (
-                          <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: 10 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div key={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: 10, gap: 8 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
                               <div style={{ 
                                 width: 24, height: 24, borderRadius: '50%', 
                                 background: idx === 0 ? '#FFD700' : idx === 1 ? '#C0C0C0' : idx === 2 ? '#CD7F32' : 'rgba(255,255,255,0.1)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: 11, fontWeight: 700, color: '#000'
+                                fontSize: 11, fontWeight: 700, color: '#000',
+                                flexShrink: 0
                               }}>
                                 {idx + 1}
                               </div>
-                              <div style={{ fontSize: 13, fontWeight: 700 }}>{name}</div>
+                              <div style={{ fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
                             </div>
-                            <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--green)' }}>{count} vendas</div>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--green)', flexShrink: 0 }}>{count} vendas</div>
                           </div>
                         ));
                       })()}
