@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { User, Mail, Phone, Shield, Camera, Save, LogOut, MapPin, Bell, ToggleLeft, ToggleRight } from 'lucide-react';
+import { User, Mail, Phone, Shield, Camera, Save, LogOut, MapPin, Bell, ToggleLeft, ToggleRight, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { requestNotificationPermission, subscribeToPush, registerServiceWorker, isPushSupported } from '../services/pushNotifications';
 
 export default function Profile() {
   const { user, logout, setUser } = useAuth();
@@ -21,6 +22,8 @@ export default function Profile() {
     emailEnabled: false
   });
   const [savingPrefs, setSavingPrefs] = useState(false);
+  const [enablingPush, setEnablingPush] = useState(false);
+  const [pushSupported, setPushSupported] = useState(false);
 
   const provinces = [
     'Maputo Cidade', 'Maputo Província', 'Gaza', 'Inhambane', 'Sofala', 
@@ -53,6 +56,7 @@ export default function Profile() {
 
   useEffect(() => {
     fetchNotificationPrefs();
+    setPushSupported(isPushSupported());
   }, []);
 
   const handleFileUpload = async (e) => {
@@ -100,6 +104,39 @@ export default function Profile() {
       setNotificationPrefs(notificationPrefs);
     } finally {
       setSavingPrefs(false);
+    }
+  };
+
+  const handleEnablePush = async () => {
+    if (!pushSupported) {
+      toast.error('Este navegador não suporta notificações push');
+      return;
+    }
+
+    setEnablingPush(true);
+    try {
+      // Registrar service worker
+      const registration = await registerServiceWorker();
+      if (!registration) {
+        throw new Error('Falha ao registrar service worker');
+      }
+
+      // Solicitar permissão
+      const permissionGranted = await requestNotificationPermission();
+      if (!permissionGranted) {
+        throw new Error('Permissão negada');
+      }
+
+      // Subscrever para push
+      await subscribeToPush(registration);
+
+      // Atualizar preferências
+      await handleNotificationPrefChange('pushEnabled', true);
+      toast.success('Notificações push ativadas! 🎉');
+    } catch (err) {
+      toast.error(err.message || 'Erro ao ativar notificações push');
+    } finally {
+      setEnablingPush(false);
     }
   };
 
@@ -209,6 +246,70 @@ export default function Profile() {
               <h2 className="font-syne" style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Preferências de Notificação</h2>
               <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Escolhe que tipos de notificações queres receber</p>
             </div>
+          </div>
+
+          {/* Push Notifications Toggle */}
+          <div style={{ 
+            padding: 16, background: 'rgba(0,200,83,0.05)', borderRadius: 12,
+            border: '1px solid rgba(0,200,83,0.2)', marginBottom: 20
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Smartphone size={20} color="var(--green)" />
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700 }}>Notificações Push</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                    Recebe notificações no telemóvel mesmo quando a app está fechada
+                  </div>
+                </div>
+              </div>
+              {notificationPrefs.pushEnabled ? (
+                <button
+                  onClick={() => handleNotificationPrefChange('pushEnabled', false)}
+                  disabled={savingPrefs}
+                  style={{
+                    background: 'var(--green)',
+                    border: 'none',
+                    borderRadius: 24,
+                    padding: '8px 16px',
+                    cursor: savingPrefs ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <ToggleRight size={18} color="#000" /> Ativado
+                </button>
+              ) : (
+                <button
+                  onClick={handleEnablePush}
+                  disabled={enablingPush || !pushSupported}
+                  style={{
+                    background: enablingPush ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.1)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: 24,
+                    padding: '8px 16px',
+                    cursor: enablingPush || !pushSupported ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {enablingPush ? (
+                    <span className="spinner" style={{ width: 16, height: 16, borderColor: '#fff' }} />
+                  ) : (
+                    <><ToggleLeft size={18} color="var(--text-muted)" /> Ativar</>
+                  )}
+                </button>
+              )}
+            </div>
+            {!pushSupported && (
+              <div style={{ marginTop: 12, fontSize: 11, color: 'var(--text-muted)' }}>
+                ⚠️ Este navegador não suporta notificações push. Tenta usar Chrome ou Safari.
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

@@ -3,6 +3,7 @@ const Tournament = require('../models/Tournament');
 const Product = require('../models/Product');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
+const { sendPushNotification } = require('./pushController');
 
 exports.create = async (req, res) => {
   try {
@@ -31,11 +32,19 @@ exports.create = async (req, res) => {
       if (tournament && tournament.createdBy) {
         await Notification.create({
           user: tournament.createdBy._id,
-          type: 'info',
+          type: 'tournament',
           title: 'Nova Tentativa de Inscrição! ⚽',
           message: `${name} tentou inscrever a equipa "${teamName}". Contacto: ${contact}`,
           link: `/dashboard/tournaments/${tournamentId}?tab=leads`
         });
+        
+        // Push notification
+        await sendPushNotification(
+          tournament.createdBy._id,
+          'Nova Inscrição! ⚽',
+          `${name} quer inscrever "${teamName}"`,
+          { url: `/dashboard/tournaments/${tournamentId}?tab=leads` }
+        );
       }
     } else if (productId) {
       const product = await Product.findById(productId);
@@ -43,11 +52,19 @@ exports.create = async (req, res) => {
       for (const admin of admins) {
         await Notification.create({
           user: admin._id,
-          type: 'info',
-          title: 'Novo Lead de Venda! 🛍️',
-          message: `${name} tem interesse em ${quantity || 1}x "${product?.name}". Contacto: ${contact}`,
-          link: `/dashboard/analytics?tab=leads`
+          type: 'store',
+          title: 'Nova Venda! 🛍️',
+          message: `${name} comprou ${quantity || 1}x "${product?.name}" - ${((product?.price || 0) * (quantity || 1)).toLocaleString()} MT`,
+          link: `/admin/store?tab=sales`
         });
+        
+        // Push notification
+        await sendPushNotification(
+          admin._id,
+          'Nova Venda! 🛍️',
+          `${name} comprou ${quantity || 1}x ${product?.name} - ${((product?.price || 0) * (quantity || 1)).toLocaleString()} MT`,
+          { url: `/admin/store?tab=sales` }
+        );
       }
     }
 
