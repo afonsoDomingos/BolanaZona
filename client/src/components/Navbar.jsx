@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search, Trophy, Users, LogIn, Shield, Sun, Moon, Download } from 'lucide-react';
+import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search, Trophy, Users, LogIn, Shield, Sun, Moon, Download, ChevronDown, LayoutDashboard } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 
 export default function Navbar() {
@@ -15,6 +15,19 @@ export default function Navbar() {
   const [showInstallButton, setShowInstallButton] = useState(false);
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [showAdminDropdown, setShowAdminDropdown] = useState(false);
+
+  // Fechar dropdown quando clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showAdminDropdown && !event.target.closest('.admin-dropdown-container')) {
+        setShowAdminDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showAdminDropdown]);
 
   useEffect(() => {
     setIsLightMode(document.body.classList.contains('light-mode'));
@@ -245,19 +258,85 @@ export default function Navbar() {
                   <User size={18} /> Perfil
                 </Link>
                 {user.role === 'superadmin' && (
-                  <Link to="/admin/store" className={`nav-link ${isActive('/admin/store') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <ShoppingCart size={18} /> Painel Loja
-                  </Link>
-                )}
-                {user.role === 'superadmin' && (
-                  <>
-                    <Link to="/admin/users" className={`nav-link ${isActive('/admin/users') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Settings size={18} /> Gestão
-                    </Link>
-                    <Link to="/dashboard/analytics" className={`nav-link ${isActive('/dashboard/analytics') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Activity size={18} /> Analytics
-                    </Link>
-                  </>
+                  <div className="admin-dropdown-container" style={{ position: 'relative' }}>
+                    <button
+                      onClick={() => setShowAdminDropdown(!showAdminDropdown)}
+                      className={`nav-link ${isActive('/admin/') || isActive('/dashboard/analytics') ? 'active' : ''}`}
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 6,
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '6px 12px',
+                        borderRadius: '8px'
+                      }}
+                    >
+                      <LayoutDashboard size={18} /> Admin <ChevronDown size={14} style={{ transition: 'transform 0.2s', transform: showAdminDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }} />
+                    </button>
+                    {showAdminDropdown && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '100%',
+                        right: 0,
+                        marginTop: 8,
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 12,
+                        padding: 8,
+                        minWidth: 200,
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+                        zIndex: 1000
+                      }}>
+                        <Link 
+                          to="/admin/store" 
+                          className="nav-link" 
+                          onClick={() => { setIsMenuOpen(false); setShowAdminDropdown(false); }}
+                          style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 8,
+                            padding: '8px 12px',
+                            borderRadius: 8,
+                            fontSize: 14
+                          }}
+                        >
+                          <ShoppingCart size={16} /> Painel Loja
+                        </Link>
+                        <Link 
+                          to="/admin/users" 
+                          className="nav-link" 
+                          onClick={() => { setIsMenuOpen(false); setShowAdminDropdown(false); }}
+                          style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 8,
+                            padding: '8px 12px',
+                            borderRadius: 8,
+                            fontSize: 14
+                          }}
+                        >
+                          <Settings size={16} /> Gestão
+                        </Link>
+                        <Link 
+                          to="/dashboard/analytics" 
+                          className="nav-link" 
+                          onClick={() => { setIsMenuOpen(false); setShowAdminDropdown(false); }}
+                          style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 8,
+                            padding: '8px 12px',
+                            borderRadius: 8,
+                            fontSize: 14
+                          }}
+                        >
+                          <Activity size={16} /> Analytics
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 )}
                 <NotificationCenter />
                 <button 
