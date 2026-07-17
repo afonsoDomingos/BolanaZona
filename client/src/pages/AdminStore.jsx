@@ -28,15 +28,33 @@ export default function AdminStore() {
     setLoading(true);
     try {
       const [prodRes, leadRes] = await Promise.all([
-        api.get('/products'),
-        api.get('/leads')
+        api.get('/products').catch(err => {
+          console.error('Erro ao carregar produtos:', err);
+          return { data: [] };
+        }),
+        api.get('/leads').catch(err => {
+          console.error('Erro ao carregar leads:', err);
+          return { data: [] };
+        })
       ]);
-      setProducts(prodRes.data || []);
+      
+      const productsData = Array.isArray(prodRes.data) ? prodRes.data : [];
+      const leadsData = Array.isArray(leadRes.data) ? leadRes.data : [];
+      
+      setProducts(productsData);
       // Filter leads to keep only those related to products
-      const filteredLeads = (leadRes.data || []).filter(l => l.product || l.source === 'store');
+      const filteredLeads = leadsData.filter(l => l.product || l.source === 'store');
       setLeads(filteredLeads);
+      
+      console.log('✅ [AdminStore] Dados carregados:', { 
+        products: productsData.length, 
+        leads: filteredLeads.length 
+      });
     } catch (err) {
+      console.error('❌ [AdminStore] Erro ao carregar dados:', err);
       toast.error('Erro ao carregar dados do painel.');
+      setProducts([]);
+      setLeads([]);
     } finally {
       setLoading(false);
     }
