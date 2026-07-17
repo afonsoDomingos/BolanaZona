@@ -49,6 +49,7 @@ app.use('/api/teams', require('./routes/teams'));
 app.use('/api/tournaments/:tournamentId/matches', require('./routes/matches'));
 
 app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/push', require('./routes/push'));
 
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/players', require('./routes/players'));
