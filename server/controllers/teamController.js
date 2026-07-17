@@ -70,7 +70,7 @@ exports.update = async (req, res) => {
     const isSuperAdmin = req.user.role === 'superadmin';
 
     if (!isCaptain && !isOwner && !isSuperAdmin) {
-      return res.status(403).json({ message: 'Sem permissão para editar esta equipa.' });
+      return res.status(403).json({ message: 'Sem permissão para editar esta equipa. Apenas capitães, criador do torneio ou Superadmin.' });
     }
 
     const oldStatus = team.status;
@@ -117,10 +117,10 @@ exports.remove = async (req, res) => {
 
     const isCaptain = team.captains && team.captains.some(c => c.toString() === req.user._id.toString());
     const isOwner = team.tournament && team.tournament.createdBy.toString() === req.user._id.toString();
-    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
+    const isSuperAdmin = req.user.role === 'superadmin';
 
-    if (!isCaptain && !isOwner && !isAdmin) {
-      return res.status(403).json({ message: 'Não tens permissão para eliminar esta equipa.' });
+    if (!isCaptain && !isOwner && !isSuperAdmin) {
+      return res.status(403).json({ message: 'Não tens permissão para eliminar esta equipa. Apenas capitães, criador do torneio ou Superadmin.' });
     }
 
     await Team.findByIdAndDelete(req.params.id);

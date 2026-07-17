@@ -273,8 +273,7 @@ export default function PublicTournament() {
   const ownerId = tournament.createdBy?._id || tournament.createdBy;
   const isOwner = currentUser && ownerId && String(ownerId) === String(currentUser._id);
   const isSuperAdmin = currentUser?.role === 'superadmin';
-  const isAdmin = currentUser?.role === 'admin' || isSuperAdmin;
-  const canManage = isOwner || isAdmin;
+  const canManage = isOwner || isSuperAdmin;
 
   return (
     <>

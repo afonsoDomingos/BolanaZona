@@ -148,7 +148,7 @@ exports.update = async (req, res) => {
   try {
     const query = req.user.role === 'superadmin' ? { _id: req.params.id } : { _id: req.params.id, createdBy: req.user._id };
     const existing = await Tournament.findOne(query);
-    if (!existing) return res.status(404).json({ message: 'Torneio não encontrado.' });
+    if (!existing) return res.status(404).json({ message: 'Torneio não encontrado ou não tens permissão.' });
 
     const oldStatus = existing.status;
     const newStatus = req.body.status;
@@ -194,14 +194,15 @@ exports.remove = async (req, res) => {
     const t = await Tournament.findById(req.params.id);
     if (!t) return res.status(404).json({ message: 'Torneio não encontrado.' });
 
-    // Se o torneio terminou, apenas admins podem apagar
-    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
-    if (t.status === 'finished' && !isAdmin) {
-      return res.status(403).json({ message: 'Apenas o Administrador pode eliminar torneios finalizados (histórico).' });
+    // Se o torneio terminou, apenas o dono ou superadmin podem apagar
+    const isOwner = t.createdBy.toString() === req.user._id.toString();
+    const isSuperAdmin = req.user.role === 'superadmin';
+    if (t.status === 'finished' && !isOwner && !isSuperAdmin) {
+      return res.status(403).json({ message: 'Apenas o criador do torneio ou Superadmin podem eliminar torneios finalizados (histórico).' });
     }
 
-    // Garantir que quem apaga é o dono ou um admin
-    if (t.createdBy.toString() !== req.user._id.toString() && !isAdmin) {
+    // Garantir que quem apaga é o dono ou superadmin
+    if (t.createdBy.toString() !== req.user._id.toString() && req.user.role !== 'superadmin') {
       return res.status(403).json({ message: 'Não tens permissão para eliminar este torneio.' });
     }
 
@@ -224,8 +225,8 @@ exports.generateCalendar = async (req, res) => {
 
     // Verificar Permissão
     const isOwner = tournament.createdBy.toString() === req.user._id.toString();
-    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
-    if (!isOwner && !isAdmin) {
+    const isSuperAdmin = req.user.role === 'superadmin';
+    if (!isOwner && !isSuperAdmin) {
       return res.status(403).json({ message: 'Não tens permissão para gerar o calendário deste torneio.' });
     }
 
@@ -376,8 +377,8 @@ exports.createMatch = async (req, res) => {
 
     // Verificar Permissão
     const isOwner = tournament.createdBy.toString() === req.user._id.toString();
-    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
-    if (!isOwner && !isAdmin) {
+    const isSuperAdmin = req.user.role === 'superadmin';
+    if (!isOwner && !isSuperAdmin) {
       return res.status(403).json({ message: 'Não tens permissão para adicionar jogos a este torneio.' });
     }
 
@@ -393,8 +394,8 @@ exports.removeMatch = async (req, res) => {
 
     // Verificar Permissão
     const isOwner = tournament.createdBy.toString() === req.user._id.toString();
-    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
-    if (!isOwner && !isAdmin) {
+    const isSuperAdmin = req.user.role === 'superadmin';
+    if (!isOwner && !isSuperAdmin) {
       return res.status(403).json({ message: 'Não tens permissão para remover jogos deste torneio.' });
     }
 

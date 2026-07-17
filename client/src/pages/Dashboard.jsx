@@ -139,7 +139,8 @@ export default function Dashboard() {
             </h1>
             <p className="animate-slide-up splash-text" style={{ animationDelay: '0.1s' }}>
               Olá, {user?.name?.split(' ')[0]}! {
-                user?.role === 'superadmin' || user?.role === 'admin' ? 'Prepara os torneios, o jogo vai começar! 🏆' :
+                user?.role === 'superadmin' ? 'Prepara os torneios, o jogo vai começar! 🏆' :
+                user?.role === 'admin' ? 'Gerencia os teus torneios, és o organizador! 🏆' :
                 user?.role === 'player' ? 'Prepara as chuteiras, és o craque de hoje! ⚽' :
                 'Acompanha tudo, a emoção está aqui! 📣'
               }

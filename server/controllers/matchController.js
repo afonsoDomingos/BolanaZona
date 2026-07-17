@@ -28,9 +28,9 @@ exports.updateResult = async (req, res) => {
 
     // 1. Verificar Permissão
     const isOwner = match.tournament.createdBy.toString() === req.user._id.toString();
-    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
-    if (!isOwner && !isAdmin) {
-      return res.status(403).json({ message: 'Apenas o organizador do torneio pode inserir resultados.' });
+    const isSuperAdmin = req.user.role === 'superadmin';
+    if (!isOwner && !isSuperAdmin) {
+      return res.status(403).json({ message: 'Apenas o organizador do torneio ou Superadmin podem inserir resultados.' });
     }
 
     // 2. Bloquear se as equipas ainda não foram apuradas (slots null) em jogos de knockout
@@ -166,9 +166,9 @@ exports.update = async (req, res) => {
     if (!match) return res.status(404).json({ message: 'Jogo não encontrado.' });
 
     const isOwner = match.tournament.createdBy.toString() === req.user._id.toString();
-    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
-    if (!isOwner && !isAdmin) {
-      return res.status(403).json({ message: 'Sem permissão para editar este jogo.' });
+    const isSuperAdmin = req.user.role === 'superadmin';
+    if (!isOwner && !isSuperAdmin) {
+      return res.status(403).json({ message: 'Sem permissão para editar este jogo. Apenas o criador do torneio ou Superadmin.' });
     }
 
     const updated = await Match.findByIdAndUpdate(req.params.id, req.body, { new: true })
