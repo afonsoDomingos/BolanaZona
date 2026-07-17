@@ -48,6 +48,17 @@ button { cursor: pointer; font-family: inherit; border: none; outline: none; }
 input, textarea, select { font-family: inherit; outline: none; }
 img { max-width: 100%; }
 
+/* ===== MOBILE RESPONSIVENESS ===== */
+@media (max-width: 768px) {
+  .hide-mobile { display: none !important; }
+  .show-mobile { display: block !important; }
+}
+
+@media (min-width: 769px) {
+  .hide-mobile { display: block !important; }
+  .show-mobile { display: none !important; }
+}
+
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }

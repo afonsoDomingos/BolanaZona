@@ -445,108 +445,201 @@ export default function AdminStore() {
 
                 {/* Products Table */}
                 <div className="table-wrapper card-glass" style={{ padding: 0, borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <table className="table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Produto</th>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Categoria</th>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Preço</th>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Stock</th>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Checkout</th>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', textAlign: 'right' }}>Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredProducts.map(p => (
-                        <tr key={p._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                          <td style={{ padding: '12px 16px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                              <div style={{ 
-                                width: 40, height: 40, borderRadius: 8, 
-                                background: 'rgba(255,255,255,0.03)', overflow: 'hidden',
-                                border: '1px solid rgba(255,255,255,0.06)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
-                              }}>
-                                {p.image ? <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Shield size={16} color="var(--text-muted)" />}
+                  {/* Desktop Table */}
+                  <div className="hide-mobile">
+                    <table className="table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Produto</th>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Categoria</th>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Preço</th>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Stock</th>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Checkout</th>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', textAlign: 'right' }}>Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredProducts.map(p => (
+                          <tr key={p._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                            <td style={{ padding: '12px 16px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <div style={{ 
+                                  width: 40, height: 40, borderRadius: 8, 
+                                  background: 'rgba(255,255,255,0.03)', overflow: 'hidden',
+                                  border: '1px solid rgba(255,255,255,0.06)',
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                                }}>
+                                  {p.image ? <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Shield size={16} color="var(--text-muted)" />}
+                                </div>
+                                <div style={{ minWidth: 0 }}>
+                                  <div style={{ fontWeight: 700, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>ID: {p._id.slice(-6)}</div>
+                                </div>
                               </div>
-                              <div style={{ minWidth: 0 }}>
-                                <div style={{ fontWeight: 700, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>ID: {p._id.slice(-6)}</div>
+                            </td>
+                            <td style={{ padding: '12px 16px' }}>
+                              <span style={{ fontSize: 9, padding: '3px 8px', borderRadius: 100, background: 'rgba(255,255,255,0.04)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: 0.5 }}>
+                                {p.category}
+                              </span>
+                            </td>
+                            <td style={{ padding: '12px 16px', fontWeight: 800, color: 'var(--green)', fontSize: 13 }}>
+                              {p.price.toLocaleString()} MT
+                            </td>
+                            <td style={{ padding: '12px 16px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <span style={{ 
+                                  fontSize: 11, 
+                                  fontWeight: 700, 
+                                  color: (p.stock || 0) === 0 ? 'var(--red)' : (p.stock || 0) < 5 ? 'var(--yellow)' : '#fff'
+                                }}>
+                                  {p.stock || 0}
+                                </span>
+                                {(p.stock || 0) === 0 && (
+                                  <AlertTriangle size={10} color="var(--red)" title="Esgotado" />
+                                )}
+                                {(p.stock || 0) > 0 && (p.stock || 0) < 5 && (
+                                  <AlertTriangle size={10} color="var(--yellow)" title="Stock Baixo" />
+                                )}
                               </div>
-                            </div>
-                          </td>
-                          <td style={{ padding: '12px 16px' }}>
-                            <span style={{ fontSize: 9, padding: '3px 8px', borderRadius: 100, background: 'rgba(255,255,255,0.04)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: 0.5 }}>
-                              {p.category}
-                            </span>
-                          </td>
-                          <td style={{ padding: '12px 16px', fontWeight: 800, color: 'var(--green)', fontSize: 13 }}>
-                            {p.price.toLocaleString()} MT
-                          </td>
-                          <td style={{ padding: '12px 16px' }}>
+                            </td>
+                            <td style={{ padding: '12px 16px', fontSize: 11, color: 'var(--text-secondary)' }}>
+                              {p.checkoutUrl ? (
+                                <a href={p.checkoutUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
+                                  Configurado ↗
+                                </a>
+                              ) : (
+                                <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>WhatsApp</span>
+                              )}
+                            </td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                              <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', flexDirection: 'column' }}>
+                                <button 
+                                  onClick={() => setShowEditModal(p)}
+                                  className="btn btn-secondary btn-sm"
+                                  style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: 11 }}
+                                >
+                                  <Edit size={12} />
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteProduct(p._id)}
+                                  className="btn btn-secondary btn-sm"
+                                  style={{ padding: '4px 8px', color: 'var(--red)', borderColor: 'rgba(255,68,68,0.2)', fontSize: 11 }}
+                                >
+                                  <Trash2 size={12} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredProducts.length === 0 && (
+                          <tr>
+                            <td colSpan="6" style={{ padding: '40px 16px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
+                                <div style={{ fontSize: 32 }}>📦</div>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Nenhum produto cadastrado</div>
+                                <div style={{ fontSize: 12, color: 'var(--text-muted)', maxWidth: 280, lineHeight: 1.5, marginBottom: 8 }}>
+                                  Ainda não adicionou nenhum artigo à loja oficial. Comece por criar um novo produto!
+                                </div>
+                                <button onClick={() => setShowEditModal({})} className="btn btn-primary btn-sm" style={{ background: 'var(--green)', borderColor: 'var(--green)', color: '#000', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6, margin: '0 auto', fontSize: 12 }}>
+                                  <Plus size={14} /> Criar Primeiro Produto
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* Mobile Cards */}
+                  <div className="show-mobile" style={{ padding: 16 }}>
+                    {filteredProducts.map(p => (
+                      <div key={p._id} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16, marginBottom: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                          <div style={{ 
+                            width: 50, height: 50, borderRadius: 8, 
+                            background: 'rgba(255,255,255,0.03)', overflow: 'hidden',
+                            border: '1px solid rgba(255,255,255,0.06)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                          }}>
+                            {p.image ? <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Shield size={20} color="var(--text-muted)" />}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2 }}>{p.name}</div>
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>ID: {p._id.slice(-6)}</div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
+                          <div>
+                            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 2 }}>Categoria</div>
+                            <div style={{ fontSize: 12, fontWeight: 600 }}>{p.category}</div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 2 }}>Preço</div>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--green)' }}>{p.price.toLocaleString()} MT</div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 2 }}>Stock</div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                               <span style={{ 
-                                fontSize: 11, 
+                                fontSize: 12, 
                                 fontWeight: 700, 
                                 color: (p.stock || 0) === 0 ? 'var(--red)' : (p.stock || 0) < 5 ? 'var(--yellow)' : '#fff'
                               }}>
                                 {p.stock || 0}
                               </span>
                               {(p.stock || 0) === 0 && (
-                                <AlertTriangle size={10} color="var(--red)" title="Esgotado" />
+                                <AlertTriangle size={12} color="var(--red)" title="Esgotado" />
                               )}
                               {(p.stock || 0) > 0 && (p.stock || 0) < 5 && (
-                                <AlertTriangle size={10} color="var(--yellow)" title="Stock Baixo" />
+                                <AlertTriangle size={12} color="var(--yellow)" title="Stock Baixo" />
                               )}
                             </div>
-                          </td>
-                          <td style={{ padding: '12px 16px', fontSize: 11, color: 'var(--text-secondary)' }}>
-                            {p.checkoutUrl ? (
-                              <a href={p.checkoutUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
-                                Configurado ↗
-                              </a>
-                            ) : (
-                              <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>WhatsApp</span>
-                            )}
-                          </td>
-                          <td style={{ padding: '12px 16px', textAlign: 'right' }}>
-                            <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', flexDirection: 'column' }}>
-                              <button 
-                                onClick={() => setShowEditModal(p)}
-                                className="btn btn-secondary btn-sm"
-                                style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: 11 }}
-                              >
-                                <Edit size={12} />
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteProduct(p._id)}
-                                className="btn btn-secondary btn-sm"
-                                style={{ padding: '4px 8px', color: 'var(--red)', borderColor: 'rgba(255,68,68,0.2)', fontSize: 11 }}
-                              >
-                                <Trash2 size={12} />
-                              </button>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 2 }}>Checkout</div>
+                            <div style={{ fontSize: 11 }}>
+                              {p.checkoutUrl ? (
+                                <a href={p.checkoutUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                  Configurado ↗
+                                </a>
+                              ) : (
+                                <span style={{ color: 'var(--text-muted)' }}>WhatsApp</span>
+                              )}
                             </div>
-                          </td>
-                        </tr>
-                      ))}
-                      {filteredProducts.length === 0 && (
-                        <tr>
-                          <td colSpan="6" style={{ padding: '40px 16px' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                              <div style={{ fontSize: 32 }}>📦</div>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Nenhum produto cadastrado</div>
-                              <div style={{ fontSize: 12, color: 'var(--text-muted)', maxWidth: 280, lineHeight: 1.5, marginBottom: 8 }}>
-                                Ainda não adicionou nenhum artigo à loja oficial. Comece por criar um novo produto!
-                              </div>
-                              <button onClick={() => setShowEditModal({})} className="btn btn-primary btn-sm" style={{ background: 'var(--green)', borderColor: 'var(--green)', color: '#000', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6, margin: '0 auto', fontSize: 12 }}>
-                                <Plus size={14} /> Criar Primeiro Produto
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button 
+                            onClick={() => setShowEditModal(p)}
+                            className="btn btn-secondary btn-sm"
+                            style={{ flex: 1, padding: '8px 12px', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: 12 }}
+                          >
+                            <Edit size={14} /> Editar
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteProduct(p._id)}
+                            className="btn btn-secondary btn-sm"
+                            style={{ flex: 1, padding: '8px 12px', color: 'var(--red)', borderColor: 'rgba(255,68,68,0.2)', fontSize: 12 }}
+                          >
+                            <Trash2 size={14} /> Apagar
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {filteredProducts.length === 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center', padding: '40px 16px' }}>
+                        <div style={{ fontSize: 32 }}>📦</div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Nenhum produto cadastrado</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)', maxWidth: 280, lineHeight: 1.5, marginBottom: 8 }}>
+                          Ainda não adicionou nenhum artigo à loja oficial. Comece por criar um novo produto!
+                        </div>
+                        <button onClick={() => setShowEditModal({})} className="btn btn-primary btn-sm" style={{ background: 'var(--green)', borderColor: 'var(--green)', color: '#000', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6, margin: '0 auto', fontSize: 12 }}>
+                          <Plus size={14} /> Criar Primeiro Produto
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -608,106 +701,202 @@ export default function AdminStore() {
 
                 {/* Sales Table */}
                 <div className="table-wrapper card-glass" style={{ padding: 0, borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <table className="table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Cliente</th>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Produto</th>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Detalhes</th>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Pagamento</th>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Estado</th>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Data</th>
-                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', textAlign: 'right' }}>Ação</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredLeads.map(l => (
-                        <tr key={l._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                          <td style={{ padding: '12px 16px' }}>
-                            <div style={{ fontWeight: 700, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
-                            <div style={{ fontSize: 11, color: 'var(--green)', marginTop: 1 }}>{l.contact}</div>
-                            <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{l.province || 'Sem Província'}</div>
-                          </td>
-                          <td style={{ padding: '12px 16px' }}>
-                            <div style={{ fontWeight: 700, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.product?.name || 'Produto Não Encontrado'}</div>
-                            <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 1 }}>
-                              Qtd: <strong>{l.quantity || 1}x</strong> — {((l.product?.price || 0) * (l.quantity || 1)).toLocaleString()} MT
-                            </div>
-                          </td>
-                          <td style={{ padding: '12px 16px', fontSize: 11 }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                              {l.size && <span style={{ fontSize: 10 }}>Tamanho: <strong>{l.size}</strong></span>}
-                              {l.color && <span style={{ fontSize: 10 }}>Cor: <strong>{l.color}</strong></span>}
-                            </div>
-                          </td>
-                          <td style={{ padding: '12px 16px' }}>
+                  {/* Desktop Table */}
+                  <div className="hide-mobile">
+                    <table className="table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Cliente</th>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Produto</th>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Detalhes</th>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Pagamento</th>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Estado</th>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Data</th>
+                          <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', textAlign: 'right' }}>Ação</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredLeads.map(l => (
+                          <tr key={l._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                            <td style={{ padding: '12px 16px' }}>
+                              <div style={{ fontWeight: 700, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
+                              <div style={{ fontSize: 11, color: 'var(--green)', marginTop: 1 }}>{l.contact}</div>
+                              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{l.province || 'Sem Província'}</div>
+                            </td>
+                            <td style={{ padding: '12px 16px' }}>
+                              <div style={{ fontWeight: 700, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.product?.name || 'Produto Não Encontrado'}</div>
+                              <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 1 }}>
+                                Qtd: <strong>{l.quantity || 1}x</strong> — {((l.product?.price || 0) * (l.quantity || 1)).toLocaleString()} MT
+                              </div>
+                            </td>
+                            <td style={{ padding: '12px 16px', fontSize: 11 }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {l.size && <span style={{ fontSize: 10 }}>Tamanho: <strong>{l.size}</strong></span>}
+                                {l.color && <span style={{ fontSize: 10 }}>Cor: <strong>{l.color}</strong></span>}
+                              </div>
+                            </td>
+                            <td style={{ padding: '12px 16px' }}>
+                              <div style={{ fontSize: 11 }}>
+                                <span style={{ 
+                                  fontWeight: 700, 
+                                  textTransform: 'uppercase', 
+                                  color: l.paymentMethod === 'mpesa' ? '#e51a24' : l.paymentMethod === 'emola' ? '#ff6600' : l.paymentMethod === 'whatsapp' ? '#25D366' : 'var(--blue)' 
+                                }}>
+                                  {l.paymentMethod || 'WhatsApp'}
+                                </span>
+                                {l.paymentPhone && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{l.paymentPhone}</div>}
+                                {l.paymentDetails && <div style={{ fontSize: 10, color: 'var(--text-muted)', fontStyle: 'italic', marginTop: 2 }}>{l.paymentDetails}</div>}
+                              </div>
+                            </td>
+                            <td style={{ padding: '12px 16px' }}>
+                              <select
+                                value={l.status || 'new'}
+                                onChange={(e) => handleUpdateLeadStatus(l._id, e.target.value)}
+                                className={`badge ${
+                                  l.status === 'converted' 
+                                    ? 'badge-green' 
+                                    : l.status === 'lost' 
+                                      ? 'badge-red' 
+                                      : l.status === 'contacted'
+                                        ? 'badge-blue'
+                                        : 'badge-yellow'
+                                }`}
+                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 10, padding: '3px 6px' }}
+                              >
+                                <option value="new" style={{ background: '#0a0f14', color: '#fff' }}>Pendente</option>
+                                <option value="contacted" style={{ background: '#0a0f14', color: '#fff' }}>Contactado</option>
+                                <option value="converted" style={{ background: '#0a0f14', color: '#fff' }}>Pago</option>
+                                <option value="lost" style={{ background: '#0a0f14', color: '#fff' }}>Cancelado</option>
+                              </select>
+                            </td>
+                            <td style={{ padding: '12px 16px', fontSize: 11, color: 'var(--text-muted)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <Calendar size={10} />
+                                {new Date(l.createdAt).toLocaleDateString()}
+                              </div>
+                            </td>
+                            <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                              <a 
+                                href={`https://wa.me/${(l.contact || '').replace(/\D/g, '')}`} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                className="btn btn-primary btn-sm"
+                                style={{ padding: '4px 8px', fontSize: 10, background: '#25D366', borderColor: '#25D366', color: '#fff', fontWeight: 700 }}
+                              >
+                                WhatsApp
+                              </a>
+                            </td>
+                          </tr>
+                        ))}
+                        {filteredLeads.length === 0 && (
+                          <tr>
+                            <td colSpan="7" style={{ padding: '40px 16px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
+                                <div style={{ fontSize: 40 }}>🛒</div>
+                                <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Nenhuma encomenda registada</div>
+                                <div style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 360, lineHeight: 1.5 }}>
+                                  {searchLead ? 'Não encontrámos nenhuma encomenda que coincida com a sua pesquisa.' : 'As intenções de compra e pedidos de checkout feitos pelos utilizadores serão listados aqui.'}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* Mobile Cards */}
+                  <div className="show-mobile" style={{ padding: 16 }}>
+                    {filteredLeads.map(l => (
+                      <div key={l._id} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16, marginBottom: 12 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{l.name}</div>
+                            <div style={{ fontSize: 12, color: 'var(--green)', marginBottom: 2 }}>{l.contact}</div>
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{l.province || 'Sem Província'}</div>
+                          </div>
+                          <select
+                            value={l.status || 'new'}
+                            onChange={(e) => handleUpdateLeadStatus(l._id, e.target.value)}
+                            className={`badge ${
+                              l.status === 'converted' 
+                                ? 'badge-green' 
+                                : l.status === 'lost' 
+                                  ? 'badge-red' 
+                                  : l.status === 'contacted'
+                                    ? 'badge-blue'
+                                    : 'badge-yellow'
+                            }`}
+                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 11, padding: '4px 8px', flexShrink: 0 }}
+                          >
+                            <option value="new" style={{ background: '#0a0f14', color: '#fff' }}>Pendente</option>
+                            <option value="contacted" style={{ background: '#0a0f14', color: '#fff' }}>Contactado</option>
+                            <option value="converted" style={{ background: '#0a0f14', color: '#fff' }}>Pago</option>
+                            <option value="lost" style={{ background: '#0a0f14', color: '#fff' }}>Cancelado</option>
+                          </select>
+                        </div>
+                        
+                        <div style={{ marginBottom: 12 }}>
+                          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 2 }}>Produto</div>
+                          <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 2 }}>{l.product?.name || 'Produto Não Encontrado'}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+                            Qtd: <strong>{l.quantity || 1}x</strong> — {((l.product?.price || 0) * (l.quantity || 1)).toLocaleString()} MT
+                          </div>
+                        </div>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
+                          <div>
+                            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 2 }}>Detalhes</div>
                             <div style={{ fontSize: 11 }}>
+                              {l.size && <div>Tamanho: <strong>{l.size}</strong></div>}
+                              {l.color && <div>Cor: <strong>{l.color}</strong></div>}
+                              {!l.size && !l.color && <span style={{ color: 'var(--text-muted)' }}>N/A</span>}
+                            </div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 2 }}>Pagamento</div>
+                            <div>
                               <span style={{ 
                                 fontWeight: 700, 
                                 textTransform: 'uppercase', 
-                                color: l.paymentMethod === 'mpesa' ? '#e51a24' : l.paymentMethod === 'emola' ? '#ff6600' : l.paymentMethod === 'whatsapp' ? '#25D366' : 'var(--blue)' 
+                                color: l.paymentMethod === 'mpesa' ? '#e51a24' : l.paymentMethod === 'emola' ? '#ff6600' : l.paymentMethod === 'whatsapp' ? '#25D366' : 'var(--blue)',
+                                fontSize: 11
                               }}>
                                 {l.paymentMethod || 'WhatsApp'}
                               </span>
-                              {l.paymentPhone && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{l.paymentPhone}</div>}
-                              {l.paymentDetails && <div style={{ fontSize: 10, color: 'var(--text-muted)', fontStyle: 'italic', marginTop: 2 }}>{l.paymentDetails}</div>}
+                              {l.paymentPhone && <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 1 }}>{l.paymentPhone}</div>}
                             </div>
-                          </td>
-                          <td style={{ padding: '12px 16px' }}>
-                            <select
-                              value={l.status || 'new'}
-                              onChange={(e) => handleUpdateLeadStatus(l._id, e.target.value)}
-                              className={`badge ${
-                                l.status === 'converted' 
-                                  ? 'badge-green' 
-                                  : l.status === 'lost' 
-                                    ? 'badge-red' 
-                                    : l.status === 'contacted'
-                                      ? 'badge-blue'
-                                      : 'badge-yellow'
-                              }`}
-                              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 10, padding: '3px 6px' }}
-                            >
-                              <option value="new" style={{ background: '#0a0f14', color: '#fff' }}>Pendente</option>
-                              <option value="contacted" style={{ background: '#0a0f14', color: '#fff' }}>Contactado</option>
-                              <option value="converted" style={{ background: '#0a0f14', color: '#fff' }}>Pago</option>
-                              <option value="lost" style={{ background: '#0a0f14', color: '#fff' }}>Cancelado</option>
-                            </select>
-                          </td>
-                          <td style={{ padding: '12px 16px', fontSize: 11, color: 'var(--text-muted)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <Calendar size={10} />
-                              {new Date(l.createdAt).toLocaleDateString()}
-                            </div>
-                          </td>
-                          <td style={{ padding: '12px 16px', textAlign: 'right' }}>
-                            <a 
-                              href={`https://wa.me/${(l.contact || '').replace(/\D/g, '')}`} 
-                              target="_blank" 
-                              rel="noreferrer" 
-                              className="btn btn-primary btn-sm"
-                              style={{ padding: '4px 8px', fontSize: 10, background: '#25D366', borderColor: '#25D366', color: '#fff', fontWeight: 700 }}
-                            >
-                              WhatsApp
-                            </a>
-                          </td>
-                        </tr>
-                      ))}
-                      {filteredLeads.length === 0 && (
-                        <tr>
-                          <td colSpan="7" style={{ padding: '40px 16px' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                              <div style={{ fontSize: 40 }}>🛒</div>
-                              <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Nenhuma encomenda registada</div>
-                              <div style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 360, lineHeight: 1.5 }}>
-                                {searchLead ? 'Não encontrámos nenhuma encomenda que coincida com a sua pesquisa.' : 'As intenções de compra e pedidos de checkout feitos pelos utilizadores serão listados aqui.'}
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                          </div>
+                        </div>
+                        
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--text-muted)' }}>
+                            <Calendar size={12} />
+                            {new Date(l.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                        
+                        <a 
+                          href={`https://wa.me/${(l.contact || '').replace(/\D/g, '')}`} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="btn btn-primary btn-sm"
+                          style={{ width: '100%', padding: '10px 12px', fontSize: 12, background: '#25D366', borderColor: '#25D366', color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                        >
+                          <span style={{ fontSize: 14 }}>💬</span> Contactar no WhatsApp
+                        </a>
+                      </div>
+                    ))}
+                    {filteredLeads.length === 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center', padding: '40px 16px' }}>
+                        <div style={{ fontSize: 40 }}>🛒</div>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Nenhuma encomenda registada</div>
+                        <div style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 280, lineHeight: 1.5 }}>
+                          {searchLead ? 'Não encontrámos nenhuma encomenda que coincida com a sua pesquisa.' : 'As intenções de compra e pedidos de checkout feitos pelos utilizadores serão listados aqui.'}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
