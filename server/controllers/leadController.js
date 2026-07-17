@@ -113,6 +113,8 @@ exports.updateStatus = async (req, res) => {
           link: `/admin/store?tab=sales`
         });
         
+        console.log('🔔 [Lead] Enviando push notification para superadmin:', req.user._id);
+        
         // Push notification
         await sendPushNotification(
           req.user._id,
