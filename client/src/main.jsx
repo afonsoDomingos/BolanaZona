@@ -4,6 +4,19 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import './index.css'
 import App from './App.jsx'
 
+// Service Worker Registration para PWA
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('✅ [PWA] Service Worker registrado:', registration.scope);
+      })
+      .catch(err => {
+        console.log('❌ [PWA] Service Worker falhou:', err);
+      });
+  });
+}
+
 // IMPORTANTE: Adiciona VITE_GOOGLE_CLIENT_ID no teu ficheiro .env na pasta client
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "COLA_AQUI_O_TEU_CLIENT_ID";
 
