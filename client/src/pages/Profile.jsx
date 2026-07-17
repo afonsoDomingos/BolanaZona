@@ -221,11 +221,11 @@ export default function Profile() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
-              <button type="button" onClick={() => { logout(); navigate('/'); }} className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', color: 'var(--red)', borderColor: 'var(--red)' }}>
+            <div style={{ display: 'flex', gap: 12, marginTop: 12, flexDirection: 'column' }}>
+              <button type="button" onClick={() => { logout(); navigate('/'); }} className="btn btn-secondary" style={{ justifyContent: 'center', color: 'var(--red)', borderColor: 'var(--red)', width: '100%' }}>
                 <LogOut size={18} /> Sair da Conta
               </button>
-              <button type="submit" className="btn btn-primary" disabled={loading} style={{ flex: 2, justifyContent: 'center' }}>
+              <button type="submit" className="btn btn-primary" disabled={loading} style={{ justifyContent: 'center', width: '100%' }}>
                 {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><Save size={18} /> Guardar Alterações</>}
               </button>
             </div>
@@ -253,7 +253,7 @@ export default function Profile() {
             padding: 16, background: 'rgba(0,200,83,0.05)', borderRadius: 12,
             border: '1px solid rgba(0,200,83,0.2)', marginBottom: 20
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <Smartphone size={20} color="var(--green)" />
                 <div>
@@ -271,12 +271,14 @@ export default function Profile() {
                     background: 'var(--green)',
                     border: 'none',
                     borderRadius: 24,
-                    padding: '8px 16px',
+                    padding: '10px 16px',
                     cursor: savingPrefs ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: 8,
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    width: '100%'
                   }}
                 >
                   <ToggleRight size={18} color="#000" /> Ativado
@@ -289,12 +291,14 @@ export default function Profile() {
                     background: enablingPush ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.1)',
                     border: '1px solid rgba(255,255,255,0.2)',
                     borderRadius: 24,
-                    padding: '8px 16px',
+                    padding: '10px 16px',
                     cursor: enablingPush || !pushSupported ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: 8,
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    width: '100%'
                   }}
                 >
                   {enablingPush ? (
@@ -306,7 +310,7 @@ export default function Profile() {
               )}
             </div>
             {!pushSupported && (
-              <div style={{ marginTop: 12, fontSize: 11, color: 'var(--text-muted)' }}>
+              <div style={{ marginTop: 8, fontSize: 11, color: 'var(--text-muted)' }}>
                 ⚠️ Este navegador não suporta notificações push. Tenta usar Chrome ou Safari.
               </div>
             )}
@@ -321,7 +325,7 @@ export default function Profile() {
               { key: 'system', label: '🔔 Sistema', desc: 'Notificações importantes da plataforma' }
             ].map(pref => (
               <div key={pref.key} style={{ 
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                display: 'flex', flexDirection: 'column', gap: 12,
                 padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 12,
                 border: '1px solid rgba(255,255,255,0.06)'
               }}>
@@ -336,12 +340,14 @@ export default function Profile() {
                     background: notificationPrefs[pref.key] ? 'var(--green)' : 'rgba(255,255,255,0.1)',
                     border: 'none',
                     borderRadius: 24,
-                    padding: '8px 16px',
+                    padding: '10px 16px',
                     cursor: savingPrefs ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: 8,
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    width: '100%'
                   }}
                 >
                   {notificationPrefs[pref.key] ? (
