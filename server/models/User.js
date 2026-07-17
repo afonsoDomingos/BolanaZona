@@ -14,6 +14,15 @@ const userSchema = new mongoose.Schema({
   lastSeen: { type: Date, default: Date.now },
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+  notificationPreferences: {
+    match: { type: Boolean, default: true },
+    tournament: { type: Boolean, default: true },
+    squad: { type: Boolean, default: true },
+    store: { type: Boolean, default: true },
+    system: { type: Boolean, default: true },
+    pushEnabled: { type: Boolean, default: false },
+    emailEnabled: { type: Boolean, default: false }
+  }
 }, { timestamps: true });
 
 userSchema.pre('save', async function () {

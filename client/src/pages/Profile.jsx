@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { User, Mail, Phone, Shield, Camera, Save, LogOut, MapPin } from 'lucide-react';
+import { User, Mail, Phone, Shield, Camera, Save, LogOut, MapPin, Bell, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
@@ -11,6 +11,16 @@ export default function Profile() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', avatar: '', province: '' });
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    match: true,
+    tournament: true,
+    squad: true,
+    store: true,
+    system: true,
+    pushEnabled: false,
+    emailEnabled: false
+  });
+  const [savingPrefs, setSavingPrefs] = useState(false);
 
   const provinces = [
     'Maputo Cidade', 'Maputo Província', 'Gaza', 'Inhambane', 'Sofala', 
@@ -26,8 +36,24 @@ export default function Profile() {
         avatar: user.avatar || '',
         province: user.province || ''
       });
+      if (user.notificationPreferences) {
+        setNotificationPrefs(user.notificationPreferences);
+      }
     }
   }, [user]);
+
+  const fetchNotificationPrefs = async () => {
+    try {
+      const res = await api.get('/notifications/preferences');
+      setNotificationPrefs(res.data);
+    } catch (err) {
+      console.error('Erro ao carregar preferências:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotificationPrefs();
+  }, []);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -59,6 +85,21 @@ export default function Profile() {
       toast.error(err.response?.data?.message || 'Erro ao atualizar perfil.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleNotificationPrefChange = async (key, value) => {
+    const newPrefs = { ...notificationPrefs, [key]: value };
+    setNotificationPrefs(newPrefs);
+    setSavingPrefs(true);
+    try {
+      await api.put('/notifications/preferences', { notificationPreferences: newPrefs });
+      toast.success('Preferências atualizadas');
+    } catch (err) {
+      toast.error('Erro ao atualizar preferências');
+      setNotificationPrefs(notificationPrefs);
+    } finally {
+      setSavingPrefs(false);
     }
   };
 
@@ -152,6 +193,74 @@ export default function Profile() {
               </button>
             </div>
           </form>
+        </div>
+
+        {/* Notification Preferences */}
+        <div className="card-glass" style={{ padding: 32, borderRadius: 24, marginTop: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+            <div style={{ 
+              width: 48, height: 48, borderRadius: '50%', 
+              background: 'rgba(0,200,83,0.1)', border: '1px solid rgba(0,200,83,0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+              <Bell size={24} color="var(--green)" />
+            </div>
+            <div>
+              <h2 className="font-syne" style={{ fontSize: 18, fontWeight: 800, marginBottom: 4 }}>Preferências de Notificação</h2>
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Escolhe que tipos de notificações queres receber</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {[
+              { key: 'match', label: '⚽ Jogos e Partidas', desc: 'Notificações sobre jogos dos teus squads' },
+              { key: 'tournament', label: '🏆 Torneios', desc: 'Atualizações sobre torneios em que participas' },
+              { key: 'squad', label: '👥 Squads', desc: 'Atividades das tuas equipas' },
+              { key: 'store', label: '🛒 Loja', desc: 'Promoções e atualizações da loja' },
+              { key: 'system', label: '🔔 Sistema', desc: 'Notificações importantes da plataforma' }
+            ].map(pref => (
+              <div key={pref.key} style={{ 
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 12,
+                border: '1px solid rgba(255,255,255,0.06)'
+              }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{pref.label}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{pref.desc}</div>
+                </div>
+                <button
+                  onClick={() => handleNotificationPrefChange(pref.key, !notificationPrefs[pref.key])}
+                  disabled={savingPrefs}
+                  style={{
+                    background: notificationPrefs[pref.key] ? 'var(--green)' : 'rgba(255,255,255,0.1)',
+                    border: 'none',
+                    borderRadius: 24,
+                    padding: '8px 16px',
+                    cursor: savingPrefs ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {notificationPrefs[pref.key] ? (
+                    <><ToggleRight size={18} color="#000" /> Ativado</>
+                  ) : (
+                    <><ToggleLeft size={18} color="var(--text-muted)" /> Desativado</>
+                  )}
+                </button>
+              </div>
+            ))}
+
+            <div style={{ 
+              marginTop: 8, padding: 16, background: 'rgba(0,200,83,0.05)', 
+              borderRadius: 12, border: '1px solid rgba(0,200,83,0.2)'
+            }}>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                💡 <strong>Dica:</strong> Podes desativar notificações específicas se não queres receber atualizações sobre certos tipos de conteúdo.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

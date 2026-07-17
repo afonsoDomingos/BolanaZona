@@ -8,5 +8,7 @@ router.get('/', ctrl.getAll);
 router.put('/:id/read', ctrl.markAsRead);
 router.put('/read-all', ctrl.markAllAsRead);
 router.delete('/clear', ctrl.clearAll);
+router.get('/preferences', ctrl.getPreferences);
+router.put('/preferences', ctrl.updatePreferences);
 
 module.exports = router;

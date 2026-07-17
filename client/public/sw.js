@@ -1,52 +1,100 @@
-const CACHE_NAME = 'bnz-cache-v2'; // Atualizado para invalidar a cache v1 quebrada
-const urlsToCache = [
+const CACHE_NAME = 'bnz-cache-v3';
+const STATIC_CACHE = 'bnz-static-v3';
+const DYNAMIC_CACHE = 'bnz-dynamic-v3';
+
+// Recursos estáticos para cache imediato
+const STATIC_URLS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/favicon.svg'
 ];
 
+// Recursos dinâmicos para cache estratégico
+const DYNAMIC_PATTERNS = [
+  '/api/notifications',
+  '/api/tournaments',
+  '/api/squads'
+];
+
 self.addEventListener('install', event => {
-  self.skipWaiting(); // Força a instalação imediata do novo worker
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+    Promise.all([
+      caches.open(STATIC_CACHE).then(cache => cache.addAll(STATIC_URLS)),
+      caches.open(DYNAMIC_CACHE)
+    ])
   );
 });
 
-// Limpa caches antigos quando o novo service worker toma o controlo
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
+          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
             return caches.delete(cacheName);
           }
         })
       );
     })
   );
-  self.clients.claim(); // Assume controlo imediato de todas as janelas abertas
+  self.clients.claim();
 });
 
-// Estratégia "Network First, falling back to cache"
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return; // Apenas fazer cache de GET requests
+  if (event.request.method !== 'GET') return;
 
+  const url = new URL(event.request.url);
+
+  // Estratégia para recursos estáticos: Cache First
+  if (STATIC_URLS.some(staticUrl => url.pathname === staticUrl)) {
+    event.respondWith(
+      caches.match(event.request)
+        .then(response => {
+          if (response) return response;
+          return fetch(event.request).then(response => {
+            const responseToCache = response.clone();
+            caches.open(STATIC_CACHE)
+              .then(cache => cache.put(event.request, responseToCache));
+            return response;
+          });
+        })
+    );
+    return;
+  }
+
+  // Estratégia para API: Network First com fallback para cache
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(DYNAMIC_CACHE)
+              .then(cache => cache.put(event.request, responseToCache));
+          }
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+
+  // Estratégia padrão: Network First com fallback para cache
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Se a resposta for válida, atualizar na cache
         if (response && response.status === 200 && response.type === 'basic') {
           const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
+          caches.open(DYNAMIC_CACHE)
             .then(cache => cache.put(event.request, responseToCache));
         }
         return response;
       })
       .catch(() => {
-        // Se a rede falhar (offline), tenta ir buscar à cache
         return caches.match(event.request);
       })
   );

@@ -6,22 +6,64 @@
   "display": "standalone",
   "background_color": "#080d1a",
   "theme_color": "#00c853",
+  "orientation": "portrait",
+  "scope": "/",
+  "categories": ["sports", "entertainment"],
   "icons": [
     {
       "src": "favicon.svg",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
       "src": "favicon.svg",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
       "src": "favicon.svg",
-      "sizes": "any",
+      "sizes": "512x512",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile-1.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshots/desktop-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Criar Torneio",
+      "short_name": "Novo Torneio",
+      "description": "Criar um novo torneio",
+      "url": "/dashboard/tournaments/new",
+      "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Meus Squads",
+      "short_name": "Squads",
+      "description": "Ver as minhas equipas",
+      "url": "/dashboard/squads",
+      "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Loja",
+      "short_name": "Loja",
+      "description": "Ver a loja oficial",
+      "url": "/shop",
+      "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
     }
   ]
 }

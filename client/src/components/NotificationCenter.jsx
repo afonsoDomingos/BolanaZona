@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bell, Check, ExternalLink, Trash2 } from 'lucide-react';
+import { Bell, Check, ExternalLink, Trash2, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -7,12 +7,17 @@ import toast from 'react-hot-toast';
 export default function NotificationCenter() {
   const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
+  const [filterType, setFilterType] = useState('all');
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
   const dropdownRef = useRef(null);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = async (pageNum = 1) => {
     try {
-      const res = await api.get('/notifications');
-      setNotifications(res.data);
+      const res = await api.get(`/notifications?page=${pageNum}&limit=20`);
+      setNotifications(res.data.notifications);
+      setPagination(res.data.pagination);
+      setPage(pageNum);
     } catch (err) { console.error(err); }
   };
 
@@ -31,6 +36,10 @@ export default function NotificationCenter() {
   }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
+
+  const filteredNotifications = filterType === 'all' 
+    ? notifications 
+    : notifications.filter(n => n.type === filterType);
 
   const markAllRead = async () => {
     try {
@@ -61,6 +70,7 @@ export default function NotificationCenter() {
       match: '⚽',
       tournament: '🏆',
       squad: '👥',
+      store: '🛒',
       system: '🔔',
     };
     return icons[type] || '🔔';
@@ -170,8 +180,51 @@ export default function NotificationCenter() {
             </div>
           </div>
 
+          {/* Filter Tabs */}
+          {notifications.length > 0 && (
+            <div style={{
+              padding: '12px 20px',
+              borderBottom: '1px solid #f5f5f7',
+              display: 'flex',
+              gap: 8,
+              overflowX: 'auto',
+              position: 'sticky',
+              top: 73,
+              background: '#ffffff',
+              zIndex: 1
+            }}>
+              {[
+                { id: 'all', label: 'Todas' },
+                { id: 'match', label: '⚽ Jogos' },
+                { id: 'tournament', label: '🏆 Torneios' },
+                { id: 'squad', label: '👥 Squads' },
+                { id: 'store', label: '🛒 Loja' },
+                { id: 'system', label: '🔔 Sistema' }
+              ].map(filter => (
+                <button
+                  key={filter.id}
+                  onClick={() => setFilterType(filter.id)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 100,
+                    border: filterType === filter.id ? '1px solid #000' : '1px solid #e2e8f0',
+                    background: filterType === filter.id ? '#000' : '#fff',
+                    color: filterType === filter.id ? '#fff' : '#000',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Body */}
-          {notifications.length === 0 ? (
+          {filteredNotifications.length === 0 ? (
             <div style={{ padding: '48px 24px', textAlign: 'center' }}>
               <div style={{
                 width: 52, height: 52, borderRadius: '50%',
@@ -181,18 +234,22 @@ export default function NotificationCenter() {
               }}>
                 <Bell size={22} color="#88888b" strokeWidth={1.5} />
               </div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#000000', marginBottom: 4 }}>Tudo em dia!</div>
-              <div style={{ fontSize: 12, color: '#88888b' }}>Não tens notificações novas.</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#000000', marginBottom: 4 }}>
+                {filterType === 'all' ? 'Tudo em dia!' : 'Sem notificações desta categoria'}
+              </div>
+              <div style={{ fontSize: 12, color: '#88888b' }}>
+                {filterType === 'all' ? 'Não tens notificações novas.' : 'Muda o filtro para ver outras notificações.'}
+              </div>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {notifications.map((n, idx) => (
+              {filteredNotifications.map((n, idx) => (
                 <div
                   key={n._id}
                   onClick={() => markRead(n._id)}
                   style={{
                     padding: '14px 20px',
-                    borderBottom: idx < notifications.length - 1 ? '1px solid #f5f5f7' : 'none',
+                    borderBottom: idx < filteredNotifications.length - 1 ? '1px solid #f5f5f7' : 'none',
                     background: n.read ? '#ffffff' : '#f8fffe',
                     transition: 'background 0.2s ease',
                     cursor: 'pointer',
@@ -254,6 +311,56 @@ export default function NotificationCenter() {
                   )}
                 </div>
               ))}
+              
+              {/* Pagination */}
+              {pagination && pagination.pages > 1 && (
+                <div style={{
+                  padding: '16px 20px',
+                  borderTop: '1px solid #f5f5f7',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: 8,
+                  alignItems: 'center'
+                }}>
+                  <button
+                    onClick={() => fetchNotifications(page - 1)}
+                    disabled={page === 1}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: 8,
+                      border: '1px solid #e2e8f0',
+                      background: page === 1 ? '#f5f5f7' : '#fff',
+                      color: page === 1 ? '#888' : '#000',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      cursor: page === 1 ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Anterior
+                  </button>
+                  <span style={{ fontSize: 11, color: '#888', fontWeight: 600 }}>
+                    Página {page} de {pagination.pages}
+                  </span>
+                  <button
+                    onClick={() => fetchNotifications(page + 1)}
+                    disabled={page === pagination.pages}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: 8,
+                      border: '1px solid #e2e8f0',
+                      background: page === pagination.pages ? '#f5f5f7' : '#fff',
+                      color: page === pagination.pages ? '#888' : '#000',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      cursor: page === pagination.pages ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Próxima
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
