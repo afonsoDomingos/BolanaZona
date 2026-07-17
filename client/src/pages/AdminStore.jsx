@@ -48,8 +48,12 @@ export default function AdminStore() {
       
       console.log('✅ [AdminStore] Dados carregados:', { 
         products: productsData.length, 
-        leads: filteredLeads.length 
+        leads: filteredLeads.length,
+        isMobile: window.innerWidth <= 768
       });
+      
+      // Force re-render by updating a timestamp
+      window.lastDataUpdate = Date.now();
     } catch (err) {
       console.error('❌ [AdminStore] Erro ao carregar dados:', err);
       toast.error('Erro ao carregar dados do painel.');
@@ -119,6 +123,16 @@ export default function AdminStore() {
       if (sortProducts === 'stock') return (a.stock || 0) - (b.stock || 0);
       return 0;
     });
+
+  // Debug logs for filters
+  console.log('🔍 [AdminStore] Filtros aplicados:', {
+    totalProducts: products.length,
+    filteredProducts: filteredProducts.length,
+    searchProduct,
+    filterCategory,
+    filterStock,
+    sortProducts
+  });
 
   const filteredLeads = leads
     .filter(l => 

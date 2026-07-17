@@ -59,6 +59,10 @@ img { max-width: 100%; }
   .show-mobile { display: none !important; }
 }
 
+/* Ensure flex containers work correctly with hide/show classes */
+.hide-mobile.flex-container { display: none !important; }
+.show-mobile.flex-container { display: flex !important; }
+
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
