@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search, Trophy, Users, LogIn, Shield, Sun, Moon } from 'lucide-react';
+import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search, Trophy, Users, LogIn, Shield, Sun, Moon, Download } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 
 export default function Navbar() {
@@ -11,10 +11,43 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLightMode, setIsLightMode] = useState(document.body.classList.contains('light-mode'));
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstallButton, setShowInstallButton] = useState(false);
 
   useEffect(() => {
     setIsLightMode(document.body.classList.contains('light-mode'));
   }, []);
+
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallButton(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+
+    // Verificar se já está instalado
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (isStandalone) {
+      setShowInstallButton(false);
+    }
+
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return;
+    
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      setShowInstallButton(false);
+    }
+    
+    setDeferredPrompt(null);
+  };
 
   const toggleTheme = () => {
     const isLight = document.body.classList.contains('light-mode');
@@ -115,6 +148,31 @@ export default function Navbar() {
               </div>
               <span className="hide-desktop">Loja</span>
             </Link>
+
+            {showInstallButton && (
+              <button 
+                onClick={handleInstall}
+                className="nav-link"
+                style={{ 
+                  background: 'var(--green)', 
+                  border: 'none', 
+                  color: '#000', 
+                  cursor: 'pointer', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 8,
+                  padding: '6px 12px', 
+                  borderRadius: '8px',
+                  transition: 'var(--transition)',
+                  fontWeight: 700,
+                  fontSize: 13
+                }}
+                title="Instalar App"
+              >
+                <Download size={18} />
+                <span className="hide-desktop">Instalar</span>
+              </button>
+            )}
 
             <button 
               onClick={toggleTheme} 
