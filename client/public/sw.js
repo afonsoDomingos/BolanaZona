@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const STATIC_CACHE = `bnz-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `bnz-dynamic-${CACHE_VERSION}`;
 const IMAGE_CACHE = `bnz-images-${CACHE_VERSION}`;
@@ -8,7 +8,6 @@ const STATIC_URLS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/favicon.svg',
   '/icon-192.png',
   '/icon-512.png',
   '/icon-96.png'
