@@ -107,7 +107,7 @@ function AppRoutes() {
             <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['superadmin']}><UserManagement /></ProtectedRoute>} />
             <Route path="/admin/teams" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminTeams /></ProtectedRoute>} />
             <Route path="/admin/partners" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminPartners /></ProtectedRoute>} />
-            <Route path="/admin/shorts" element={<ProtectedRoute allowedRoles={['superadmin', 'admin']}><AdminShorts /></ProtectedRoute>} />
+            <Route path="/admin/shorts" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminShorts /></ProtectedRoute>} />
             <Route path="/admin/store" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminStore /></ProtectedRoute>} />
             <Route path="/support" element={<Support />} />
             <Route path="/como-criar-torneio" element={<GuideTournament />} />

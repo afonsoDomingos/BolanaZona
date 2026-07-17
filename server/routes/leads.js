@@ -6,9 +6,9 @@ const { protect, authorize } = require('../middleware/auth');
 // Public capture
 router.post('/', leadCtrl.create);
 
-// Admin management
+// Superadmin only management (store sales)
 router.use(protect);
-router.use(authorize('superadmin', 'admin'));
+router.use(authorize('superadmin'));
 router.get('/', leadCtrl.getAll);
 router.put('/:id', leadCtrl.updateStatus);
 router.put('/:id/status', leadCtrl.updateStatus);

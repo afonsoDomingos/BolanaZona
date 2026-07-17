@@ -27,8 +27,8 @@ router.get('/:key', async (req, res) => {
   }
 });
 
-// Update or create a setting by key (admin and superadmin only)
-router.put('/:key', protect, authorize('superadmin', 'admin'), async (req, res) => {
+// Update or create a setting by key (superadmin only)
+router.put('/:key', protect, authorize('superadmin'), async (req, res) => {
   try {
     const { value } = req.body;
     let setting = await Setting.findOneAndUpdate(
