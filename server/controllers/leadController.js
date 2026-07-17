@@ -97,7 +97,29 @@ exports.getAll = async (req, res) => {
 
 exports.updateStatus = async (req, res) => {
   try {
-    const lead = await Lead.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+    const lead = await Lead.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true })
+      .populate('product')
+      .populate('tournament');
+    
+    // Notificar quando status for atualizado para 'confirmed'
+    if (req.body.status === 'confirmed' && lead.product) {
+      await Notification.create({
+        user: req.user._id,
+        type: 'store',
+        title: 'Venda Confirmada! ✅',
+        message: `Venda de ${lead.name} - ${lead.product.name} foi confirmada com sucesso`,
+        link: `/admin/store?tab=sales`
+      });
+      
+      // Push notification
+      await sendPushNotification(
+        req.user._id,
+        'Venda Confirmada! ✅',
+        `Venda de ${lead.name} - ${lead.product.name} confirmada`,
+        { url: `/admin/store?tab=sales` }
+      );
+    }
+    
     res.json(lead);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
