@@ -14,6 +14,7 @@ import SocialFAB from './components/SocialFAB';
 import ProtectedRoute from './components/ProtectedRoute';
 import CursorGlow from './components/CursorGlow';
 import ClickRipple from './components/ClickRipple';
+import OfflineIndicator from './components/OfflineIndicator';
 
 // Static import for Landing page to avoid initial flicker
 import Landing from './pages/Landing';
@@ -126,6 +127,7 @@ function AppRoutes() {
       <ScrollToTop />
       <SocialFAB />
       {!isCommunityPage && <InstallPrompt />}
+      <OfflineIndicator />
       <Toaster
         position="top-right"
         toastOptions={{
