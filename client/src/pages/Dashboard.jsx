@@ -185,8 +185,12 @@ export default function Dashboard() {
                 {user?.role === 'superadmin' && (
                   <Link to="/admin/partners" className="btn btn-secondary"><Handshake size={16} /> Parceiros</Link>
                 )}
-                <Link to="/admin/teams" className="btn btn-secondary"><Shield size={16} /> Central de Equipas</Link>
-                <Link to="/admin/shorts" className="btn btn-secondary"><Youtube size={16} /> Configurar Shorts</Link>
+                {user?.role === 'superadmin' && (
+                  <Link to="/admin/teams" className="btn btn-secondary"><Shield size={16} /> Central de Equipas</Link>
+                )}
+                {user?.role === 'superadmin' && (
+                  <Link to="/admin/shorts" className="btn btn-secondary"><Youtube size={16} /> Configurar Shorts</Link>
+                )}
               </div>
             )}
             <Link to="/dashboard/squads" className="btn btn-secondary"><Shield size={16} /> Meus Clubes</Link>
