@@ -31,22 +31,41 @@ export default function Navbar() {
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     if (isStandalone) {
       setShowInstallButton(false);
+    } else {
+      // Mostrar botão se for mobile e não estiver instalado
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        setShowInstallButton(true);
+      }
     }
 
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
-    
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      setShowInstallButton(false);
+    if (deferredPrompt) {
+      // Usar prompt nativo se disponível
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        setShowInstallButton(false);
+      }
+      
+      setDeferredPrompt(null);
+    } else {
+      // Mostrar instruções manuais
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isAndroid = /Android/.test(navigator.userAgent);
+      
+      if (isIOS) {
+        alert('Para instalar no iPhone:\n\n1. Toca no ícone de Partilhar (quadrado com seta)\n2. Escolhe "Adicionar ao Ecrã Principal"');
+      } else if (isAndroid) {
+        alert('Para instalar no Android:\n\n1. Toca nos três pontos do navegador\n2. Escolhe "Instalar Aplicação" ou "Adicionar ao Ecrã Principal"');
+      } else {
+        alert('Para instalar:\n\n1. Procura a opção de instalar no menu do navegador\n2. Geralmente nos três pontos ou menu de configurações');
+      }
     }
-    
-    setDeferredPrompt(null);
   };
 
   const toggleTheme = () => {
