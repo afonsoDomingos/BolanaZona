@@ -148,6 +148,17 @@ export default function AdminStore() {
       return 0;
     });
 
+  // Debug logs for leads
+  console.log('🔍 [AdminStore] Filtros de vendas aplicados:', {
+    totalLeads: leads.length,
+    filteredLeads: filteredLeads.length,
+    searchLead,
+    filterStatus,
+    filterPayment,
+    sortLeads,
+    sampleLead: leads[0] ? { name: leads[0].name, status: leads[0].status, paymentMethod: leads[0].paymentMethod } : null
+  });
+
   // Export to CSV
   const exportProductsCSV = () => {
     const headers = ['Nome', 'Categoria', 'Preço', 'Stock', 'Descrição', 'Checkout URL'];
@@ -861,6 +872,7 @@ export default function AdminStore() {
                   
                   {/* Mobile Cards */}
                   <div className="show-mobile" style={{ padding: 16 }}>
+                    {console.log('📱 [AdminStore] Renderizando cards mobile, filteredLeads:', filteredLeads.length)}
                     {filteredLeads.map(l => (
                       <div key={l._id} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16, marginBottom: 12 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
