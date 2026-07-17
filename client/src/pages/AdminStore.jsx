@@ -448,82 +448,82 @@ export default function AdminStore() {
                   <table className="table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Produto</th>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Categoria</th>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Preço</th>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Stock</th>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Checkout link</th>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', textAlign: 'right' }}>Ações</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Produto</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Categoria</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Preço</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Stock</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Checkout</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', textAlign: 'right' }}>Ações</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredProducts.map(p => (
                         <tr key={p._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                          <td style={{ padding: '16px 20px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <td style={{ padding: '12px 16px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                               <div style={{ 
-                                width: 44, height: 44, borderRadius: 8, 
+                                width: 40, height: 40, borderRadius: 8, 
                                 background: 'rgba(255,255,255,0.03)', overflow: 'hidden',
                                 border: '1px solid rgba(255,255,255,0.06)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
                               }}>
-                                {p.image ? <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Shield size={18} color="var(--text-muted)" />}
+                                {p.image ? <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Shield size={16} color="var(--text-muted)" />}
                               </div>
-                              <div>
-                                <div style={{ fontWeight: 700, fontSize: 14 }}>{p.name}</div>
-                                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>ID: {p._id.slice(-6)}</div>
+                              <div style={{ minWidth: 0 }}>
+                                <div style={{ fontWeight: 700, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>ID: {p._id.slice(-6)}</div>
                               </div>
                             </div>
                           </td>
-                          <td style={{ padding: '16px 20px' }}>
-                            <span style={{ fontSize: 10, padding: '4px 10px', borderRadius: 100, background: 'rgba(255,255,255,0.04)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: 0.5 }}>
+                          <td style={{ padding: '12px 16px' }}>
+                            <span style={{ fontSize: 9, padding: '3px 8px', borderRadius: 100, background: 'rgba(255,255,255,0.04)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: 0.5 }}>
                               {p.category}
                             </span>
                           </td>
-                          <td style={{ padding: '16px 20px', fontWeight: 800, color: 'var(--green)', fontSize: 14 }}>
+                          <td style={{ padding: '12px 16px', fontWeight: 800, color: 'var(--green)', fontSize: 13 }}>
                             {p.price.toLocaleString()} MT
                           </td>
-                          <td style={{ padding: '16px 20px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <td style={{ padding: '12px 16px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                               <span style={{ 
-                                fontSize: 12, 
+                                fontSize: 11, 
                                 fontWeight: 700, 
                                 color: (p.stock || 0) === 0 ? 'var(--red)' : (p.stock || 0) < 5 ? 'var(--yellow)' : '#fff'
                               }}>
                                 {p.stock || 0}
                               </span>
                               {(p.stock || 0) === 0 && (
-                                <AlertTriangle size={12} color="var(--red)" title="Esgotado" />
+                                <AlertTriangle size={10} color="var(--red)" title="Esgotado" />
                               )}
                               {(p.stock || 0) > 0 && (p.stock || 0) < 5 && (
-                                <AlertTriangle size={12} color="var(--yellow)" title="Stock Baixo" />
+                                <AlertTriangle size={10} color="var(--yellow)" title="Stock Baixo" />
                               )}
                             </div>
                           </td>
-                          <td style={{ padding: '16px 20px', fontSize: 12, color: 'var(--text-secondary)' }}>
+                          <td style={{ padding: '12px 16px', fontSize: 11, color: 'var(--text-secondary)' }}>
                             {p.checkoutUrl ? (
-                              <a href={p.checkoutUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                              <a href={p.checkoutUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--blue)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
                                 Configurado ↗
                               </a>
                             ) : (
-                              <span style={{ color: 'var(--text-muted)' }}>WhatsApp Padrão</span>
+                              <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>WhatsApp</span>
                             )}
                           </td>
-                          <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                          <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                            <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', flexDirection: 'column' }}>
                               <button 
                                 onClick={() => setShowEditModal(p)}
                                 className="btn btn-secondary btn-sm"
-                                style={{ padding: '6px 10px', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.06)', color: '#fff' }}
+                                style={{ padding: '4px 8px', background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.06)', color: '#fff', fontSize: 11 }}
                               >
-                                <Edit size={14} />
+                                <Edit size={12} />
                               </button>
                               <button 
                                 onClick={() => handleDeleteProduct(p._id)}
                                 className="btn btn-secondary btn-sm"
-                                style={{ padding: '6px 10px', color: 'var(--red)', borderColor: 'rgba(255,68,68,0.2)' }}
+                                style={{ padding: '4px 8px', color: 'var(--red)', borderColor: 'rgba(255,68,68,0.2)', fontSize: 11 }}
                               >
-                                <Trash2 size={14} />
+                                <Trash2 size={12} />
                               </button>
                             </div>
                           </td>
@@ -531,15 +531,15 @@ export default function AdminStore() {
                       ))}
                       {filteredProducts.length === 0 && (
                         <tr>
-                          <td colSpan="6" style={{ padding: '60px 20px' }}>
+                          <td colSpan="6" style={{ padding: '40px 16px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                              <div style={{ fontSize: 40 }}>📦</div>
-                              <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Nenhum produto cadastrado</div>
-                              <div style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 360, lineHeight: 1.5, marginBottom: 8 }}>
+                              <div style={{ fontSize: 32 }}>📦</div>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Nenhum produto cadastrado</div>
+                              <div style={{ fontSize: 12, color: 'var(--text-muted)', maxWidth: 280, lineHeight: 1.5, marginBottom: 8 }}>
                                 Ainda não adicionou nenhum artigo à loja oficial. Comece por criar um novo produto!
                               </div>
-                              <button onClick={() => setShowEditModal({})} className="btn btn-primary btn-sm" style={{ background: 'var(--green)', borderColor: 'var(--green)', color: '#000', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6, margin: '0 auto' }}>
-                                <Plus size={16} /> Criar Primeiro Produto
+                              <button onClick={() => setShowEditModal({})} className="btn btn-primary btn-sm" style={{ background: 'var(--green)', borderColor: 'var(--green)', color: '#000', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6, margin: '0 auto', fontSize: 12 }}>
+                                <Plus size={14} /> Criar Primeiro Produto
                               </button>
                             </div>
                           </td>
@@ -611,37 +611,37 @@ export default function AdminStore() {
                   <table className="table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Cliente</th>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Produto Encomendado</th>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Detalhes</th>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Pagamento</th>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Estado</th>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Data</th>
-                        <th style={{ padding: '16px 20px', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', textAlign: 'right' }}>Ação</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Cliente</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Produto</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Detalhes</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Pagamento</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Estado</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Data</th>
+                        <th style={{ padding: '12px 16px', fontSize: 10, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', textAlign: 'right' }}>Ação</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredLeads.map(l => (
                         <tr key={l._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                          <td style={{ padding: '16px 20px' }}>
-                            <div style={{ fontWeight: 700, fontSize: 14 }}>{l.name}</div>
-                            <div style={{ fontSize: 12, color: 'var(--green)', marginTop: 2 }}>{l.contact}</div>
-                            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{l.province || 'Sem Província'}</div>
+                          <td style={{ padding: '12px 16px' }}>
+                            <div style={{ fontWeight: 700, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
+                            <div style={{ fontSize: 11, color: 'var(--green)', marginTop: 1 }}>{l.contact}</div>
+                            <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{l.province || 'Sem Província'}</div>
                           </td>
-                          <td style={{ padding: '16px 20px' }}>
-                            <div style={{ fontWeight: 700, fontSize: 13 }}>{l.product?.name || 'Produto Não Encontrado'}</div>
-                            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
+                          <td style={{ padding: '12px 16px' }}>
+                            <div style={{ fontWeight: 700, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.product?.name || 'Produto Não Encontrado'}</div>
+                            <div style={{ fontSize: 10, color: 'var(--text-secondary)', marginTop: 1 }}>
                               Qtd: <strong>{l.quantity || 1}x</strong> — {((l.product?.price || 0) * (l.quantity || 1)).toLocaleString()} MT
                             </div>
                           </td>
-                          <td style={{ padding: '16px 20px', fontSize: 12 }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                              {l.size && <span>Tamanho: <strong>{l.size}</strong></span>}
-                              {l.color && <span>Cor: <strong>{l.color}</strong></span>}
+                          <td style={{ padding: '12px 16px', fontSize: 11 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                              {l.size && <span style={{ fontSize: 10 }}>Tamanho: <strong>{l.size}</strong></span>}
+                              {l.color && <span style={{ fontSize: 10 }}>Cor: <strong>{l.color}</strong></span>}
                             </div>
                           </td>
-                          <td style={{ padding: '16px 20px' }}>
-                            <div style={{ fontSize: 12 }}>
+                          <td style={{ padding: '12px 16px' }}>
+                            <div style={{ fontSize: 11 }}>
                               <span style={{ 
                                 fontWeight: 700, 
                                 textTransform: 'uppercase', 
@@ -653,7 +653,7 @@ export default function AdminStore() {
                               {l.paymentDetails && <div style={{ fontSize: 10, color: 'var(--text-muted)', fontStyle: 'italic', marginTop: 2 }}>{l.paymentDetails}</div>}
                             </div>
                           </td>
-                          <td style={{ padding: '16px 20px' }}>
+                          <td style={{ padding: '12px 16px' }}>
                             <select
                               value={l.status || 'new'}
                               onChange={(e) => handleUpdateLeadStatus(l._id, e.target.value)}
@@ -666,27 +666,27 @@ export default function AdminStore() {
                                       ? 'badge-blue'
                                       : 'badge-yellow'
                               }`}
-                              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 11, padding: '4px 8px' }}
+                              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 10, padding: '3px 6px' }}
                             >
                               <option value="new" style={{ background: '#0a0f14', color: '#fff' }}>Pendente</option>
                               <option value="contacted" style={{ background: '#0a0f14', color: '#fff' }}>Contactado</option>
-                              <option value="converted" style={{ background: '#0a0f14', color: '#fff' }}>Pago / Entregue</option>
+                              <option value="converted" style={{ background: '#0a0f14', color: '#fff' }}>Pago</option>
                               <option value="lost" style={{ background: '#0a0f14', color: '#fff' }}>Cancelado</option>
                             </select>
                           </td>
-                          <td style={{ padding: '16px 20px', fontSize: 12, color: 'var(--text-muted)' }}>
+                          <td style={{ padding: '12px 16px', fontSize: 11, color: 'var(--text-muted)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <Calendar size={12} />
+                              <Calendar size={10} />
                               {new Date(l.createdAt).toLocaleDateString()}
                             </div>
                           </td>
-                          <td style={{ padding: '16px 20px', textAlign: 'right' }}>
+                          <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                             <a 
                               href={`https://wa.me/${(l.contact || '').replace(/\D/g, '')}`} 
                               target="_blank" 
                               rel="noreferrer" 
                               className="btn btn-primary btn-sm"
-                              style={{ padding: '6px 12px', fontSize: 12, background: '#25D366', borderColor: '#25D366', color: '#fff', fontWeight: 700 }}
+                              style={{ padding: '4px 8px', fontSize: 10, background: '#25D366', borderColor: '#25D366', color: '#fff', fontWeight: 700 }}
                             >
                               WhatsApp
                             </a>
@@ -695,7 +695,7 @@ export default function AdminStore() {
                       ))}
                       {filteredLeads.length === 0 && (
                         <tr>
-                          <td colSpan="7" style={{ padding: '60px 20px' }}>
+                          <td colSpan="7" style={{ padding: '40px 16px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
                               <div style={{ fontSize: 40 }}>🛒</div>
                               <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Nenhuma encomenda registada</div>
