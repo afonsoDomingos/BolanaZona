@@ -35,12 +35,23 @@ export const requestNotificationPermission = async () => {
 // Subscrever para push notifications
 export const subscribeToPush = async (registration) => {
   try {
-    const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || 'BPWp_uT5HEVMpAZC1eneQ9KLifOViz5_CpyYsKfAT9o0KUei2VN2or-O-XehxQn6XrBfXdKhY4SkdeimLrb2LlA';
+    // Buscar a VAPID public key do servidor para garantir sincronização
+    const response = await fetch('/api/push/vapid-public-key');
+    const { publicKey } = await response.json();
+    
+    if (!publicKey) {
+      console.error('VAPID public key não disponível no servidor');
+      return null;
+    }
+    
+    console.log('🔑 [Push] VAPID public key obtida do servidor:', publicKey.substring(0, 20) + '...');
     
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(vapidKey)
+      applicationServerKey: urlBase64ToUint8Array(publicKey)
     });
+    
+    console.log('✅ [Push] Subscription criada com sucesso');
     
     // Enviar subscription para o servidor
     await fetch('/api/push/subscribe', {
@@ -52,9 +63,10 @@ export const subscribeToPush = async (registration) => {
       body: JSON.stringify(subscription)
     });
     
+    console.log('✅ [Push] Subscription enviada para o servidor');
     return subscription;
   } catch (err) {
-    console.error('Erro ao subscrever para push:', err);
+    console.error('❌ [Push] Erro ao subscrever para push:', err);
     return null;
   }
 };
