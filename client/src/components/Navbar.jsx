@@ -13,6 +13,7 @@ export default function Navbar() {
   const [isLightMode, setIsLightMode] = useState(document.body.classList.contains('light-mode'));
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
+  const [showInstallModal, setShowInstallModal] = useState(false);
 
   useEffect(() => {
     setIsLightMode(document.body.classList.contains('light-mode'));
@@ -54,17 +55,8 @@ export default function Navbar() {
       
       setDeferredPrompt(null);
     } else {
-      // Mostrar instruções manuais
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      const isAndroid = /Android/.test(navigator.userAgent);
-      
-      if (isIOS) {
-        alert('Para instalar no iPhone:\n\n1. Toca no ícone de Partilhar (quadrado com seta)\n2. Escolhe "Adicionar ao Ecrã Principal"');
-      } else if (isAndroid) {
-        alert('Para instalar no Android:\n\n1. Toca nos três pontos do navegador\n2. Escolhe "Instalar Aplicação" ou "Adicionar ao Ecrã Principal"');
-      } else {
-        alert('Para instalar:\n\n1. Procura a opção de instalar no menu do navegador\n2. Geralmente nos três pontos ou menu de configurações');
-      }
+      // Mostrar modal com instruções manuais
+      setShowInstallModal(true);
     }
   };
 
@@ -265,6 +257,133 @@ export default function Navbar() {
           </button>
         </div>
       </div>
+
+      {/* Modal de Instruções de Instalação */}
+      {showInstallModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: 20
+        }} onClick={() => setShowInstallModal(false)}>
+          <div 
+            className="card-glass"
+            style={{
+              maxWidth: 400,
+              width: '100%',
+              padding: 32,
+              borderRadius: 24,
+              background: 'rgba(18,18,18,0.95)',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+              <div style={{ 
+                width: 64, 
+                height: 64, 
+                borderRadius: '50%', 
+                background: 'linear-gradient(135deg, var(--green), #00e676)', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                margin: '0 auto 16px',
+                color: '#000',
+                fontSize: 32
+              }}>
+                ⚽
+              </div>
+              <h3 className="font-syne" style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>Instalar Bola na Zona</h3>
+              <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Instala a app no teu telemóvel</p>
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              {/iPad|iPhone|iPod/.test(navigator.userAgent) ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, background: 'rgba(255,255,255,0.05)', borderRadius: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: 'rgba(0,200,83,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 20 }}>1️⃣</span>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>Toca em Partilhar</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Ícone quadrado com seta para cima</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, background: 'rgba(255,255,255,0.05)', borderRadius: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: 'rgba(0,200,83,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 20 }}>2️⃣</span>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>Escolhe "Adicionar ao Ecrã Principal"</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Na lista de opções</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, background: 'rgba(255,255,255,0.05)', borderRadius: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: 'rgba(0,200,83,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 20 }}>3️⃣</span>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>Toca em "Adicionar"</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>No canto superior direito</div>
+                    </div>
+                  </div>
+                </div>
+              ) : /Android/.test(navigator.userAgent) ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, background: 'rgba(255,255,255,0.05)', borderRadius: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: 'rgba(0,200,83,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 20 }}>1️⃣</span>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>Toca nos três pontos</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>No canto superior direito</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, background: 'rgba(255,255,255,0.05)', borderRadius: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: 'rgba(0,200,83,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 20 }}>2️⃣</span>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>Escolhe "Instalar Aplicação"</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Ou "Adicionar ao Ecrã Principal"</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, background: 'rgba(255,255,255,0.05)', borderRadius: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: 'rgba(0,200,83,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 20 }}>3️⃣</span>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>Confirma a instalação</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Toca em "Instalar"</div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding: 16, background: 'rgba(255,255,255,0.05)', borderRadius: 12, textAlign: 'center' }}>
+                  <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                    Procura a opção de instalar no menu do navegador (geralmente nos três pontos ou menu de configurações).
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <button 
+              onClick={() => setShowInstallModal(false)}
+              className="btn btn-primary"
+              style={{ width: '100%', justifyContent: 'center' }}
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
