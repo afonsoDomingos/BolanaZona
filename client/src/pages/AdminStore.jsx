@@ -274,7 +274,7 @@ export default function AdminStore() {
                 </div>
 
                 {/* Sub-grid: Methods Performance & Recent Activities */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                   {/* Performance por Métodos */}
                   <div className="card-glass" style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: 24 }}>
                     <h3 className="font-syne" style={{ fontSize: 16, fontWeight: 800, marginBottom: 20 }}>Métodos de Pagamento</h3>
