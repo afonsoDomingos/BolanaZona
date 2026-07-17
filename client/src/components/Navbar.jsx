@@ -24,6 +24,7 @@ export default function Navbar() {
       e.preventDefault();
       setDeferredPrompt(e);
       setShowInstallButton(true);
+      console.log('✅ [PWA] beforeinstallprompt disparado');
     };
 
     window.addEventListener('beforeinstallprompt', handler);
@@ -37,6 +38,7 @@ export default function Navbar() {
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if (isMobile) {
         setShowInstallButton(true);
+        console.log('📱 [PWA] Mobile detectado, botão de instalação visível');
       }
     }
 
