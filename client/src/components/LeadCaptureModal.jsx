@@ -18,6 +18,12 @@ export default function LeadCaptureModal({ product, onClose, onCaptured }) {
 
   const totalPrice = product.price * quantity;
 
+  // Atualizar contador do carrinho
+  const updateCartCount = () => {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    window.dispatchEvent(new Event('cartUpdated'));
+  };
+
   const handleCheckoutSubmit = async (e, checkoutType) => {
     if (e) e.preventDefault();
     if (!form.name || !form.contact) return toast.error('Preenche pelo menos o Nome e Contacto.');
@@ -80,6 +86,12 @@ export default function LeadCaptureModal({ product, onClose, onCaptured }) {
 
       toast.success('Dados registados!');
       setIsSuccess(true);
+      
+      // Remover do carrinho após compra bem-sucedida
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const updatedCart = cart.filter(item => item._id !== product._id);
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+      window.dispatchEvent(new Event('cartUpdated'));
     } catch {
       toast.error('Erro ao registar interesse.');
     } finally { setLoading(false); }

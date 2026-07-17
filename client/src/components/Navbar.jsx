@@ -14,9 +14,37 @@ export default function Navbar() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
   const [showInstallModal, setShowInstallModal] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     setIsLightMode(document.body.classList.contains('light-mode'));
+  }, []);
+
+  // Carregar contador do carrinho do localStorage
+  useEffect(() => {
+    const loadCartCount = () => {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      setCartCount(cart.length);
+    };
+
+    loadCartCount();
+
+    // Escutar mudanças no carrinho
+    const handleCartChange = () => {
+      loadCartCount();
+    };
+
+    window.addEventListener('cartUpdated', handleCartChange);
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'cart') {
+        loadCartCount();
+      }
+    });
+
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartChange);
+      window.removeEventListener('storage', handleCartChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -141,23 +169,25 @@ export default function Navbar() {
             <Link to="/shop" className={`nav-link ${isActive('/shop') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                 <ShoppingCart size={20} />
-                <span style={{
-                  position: 'absolute',
-                  top: -8,
-                  right: -10,
-                  background: '#000',
-                  color: '#fff',
-                  fontSize: 10,
-                  fontWeight: 800,
-                  width: 16,
-                  height: 16,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '2px solid #fff',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                }}>0</span>
+                {cartCount > 0 && (
+                  <span style={{
+                    position: 'absolute',
+                    top: -8,
+                    right: -10,
+                    background: '#000',
+                    color: '#fff',
+                    fontSize: 10,
+                    fontWeight: 800,
+                    width: 16,
+                    height: 16,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px solid #fff',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}>{cartCount > 9 ? '9+' : cartCount}</span>
+                )}
               </div>
               <span className="hide-desktop">Loja</span>
             </Link>

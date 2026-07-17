@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Tag, Search, Edit, Plus } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 import ProductEditModal from '../components/ProductEditModal';
 import LeadCaptureModal from '../components/LeadCaptureModal';
 import ProductGalleryLightbox from '../components/ProductGalleryLightbox';
@@ -145,6 +146,20 @@ export default function Store() {
   const filtered = products.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
 
   const handleBuy = (product) => {
+    // Adicionar ao carrinho no localStorage
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const existingItem = cart.find(item => item._id === product._id);
+    
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      cart.push({ ...product, quantity: 1 });
+    }
+    
+    localStorage.setItem('cart', JSON.stringify(cart));
+    window.dispatchEvent(new Event('cartUpdated'));
+    
+    toast.success('Produto adicionado ao carrinho!');
     setShowLeadModal(product);
   };
 
