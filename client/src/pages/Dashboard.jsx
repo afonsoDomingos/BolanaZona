@@ -11,7 +11,7 @@ function RecentActivity() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/notifications').then(res => setActivities(res.data)).finally(() => setLoading(false));
+    api.get('/notifications').then(res => setActivities(Array.isArray(res.data) ? res.data : [])).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div style={{ padding: 20, textAlign: 'center' }}><div className="spinner" style={{ width: 24, height: 24 }} /></div>;
@@ -79,9 +79,9 @@ export default function Dashboard() {
       api.get('/teams/my-managed-teams')
     ])
       .then(([tournamentsRes, matchesRes, teamsRes]) => {
-        setTournaments(tournamentsRes.data);
-        setMatches(matchesRes.data);
-        setManagedTeams(teamsRes.data);
+        setTournaments(Array.isArray(tournamentsRes.data) ? tournamentsRes.data : []);
+        setMatches(Array.isArray(matchesRes.data) ? matchesRes.data : []);
+        setManagedTeams(Array.isArray(teamsRes.data) ? teamsRes.data : []);
       })
       .finally(() => setLoading(false));
   }, []);
