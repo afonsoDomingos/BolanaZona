@@ -35,9 +35,11 @@ export const requestNotificationPermission = async () => {
 // Subscrever para push notifications
 export const subscribeToPush = async (registration) => {
   try {
+    const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || 'BPWp_uT5HEVMpAZC1eneQ9KLifOViz5_CpyYsKfAT9o0KUei2VN2or-O-XehxQn6XrBfXdKhY4SkdeimLrb2LlA';
+    
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(process.env.VITE_VAPID_PUBLIC_KEY)
+      applicationServerKey: urlBase64ToUint8Array(vapidKey)
     });
     
     // Enviar subscription para o servidor

@@ -4,8 +4,8 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import './index.css'
 import App from './App.jsx'
 
-// Service Worker Registration para PWA (apenas em produção)
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
+// Service Worker Registration para PWA
+if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then(registration => {
