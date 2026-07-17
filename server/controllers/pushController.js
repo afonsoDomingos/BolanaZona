@@ -47,12 +47,17 @@ exports.unsubscribe = async (req, res) => {
 
 exports.sendPushNotification = async (userId, title, body, data = {}) => {
   try {
+    console.log('🔔 [Push] Tentando enviar notificação push para userId:', userId);
+    console.log('🔔 [Push] Título:', title, 'Body:', body);
+    
     const subscriptions = await PushSubscription.find({ user: userId });
     
     if (subscriptions.length === 0) {
-      console.log('Nenhuma subscription encontrada para o utilizador');
+      console.log('⚠️ [Push] Nenhuma subscription encontrada para o utilizador:', userId);
       return;
     }
+    
+    console.log('✅ [Push] Encontradas', subscriptions.length, 'subscriptions para o utilizador');
     
     const payload = JSON.stringify({
       notification: {
@@ -65,19 +70,28 @@ exports.sendPushNotification = async (userId, title, body, data = {}) => {
       }
     });
     
+    let successCount = 0;
+    let failCount = 0;
+    
     for (const sub of subscriptions) {
       try {
         await webpush.sendNotification(sub, payload);
+        successCount++;
+        console.log('✅ [Push] Notificação enviada com sucesso para subscription:', sub._id);
       } catch (err) {
+        failCount++;
         // Se a subscription expirou, remover
         if (err.statusCode === 410) {
+          console.log('🗑️ [Push] Subscription expirada, removendo:', sub._id);
           await PushSubscription.deleteOne({ _id: sub._id });
         }
-        console.error('Erro ao enviar push:', err);
+        console.error('❌ [Push] Erro ao enviar push para subscription:', sub._id, err);
       }
     }
+    
+    console.log('📊 [Push] Resumo:', { successCount, failCount, total: subscriptions.length });
   } catch (err) {
-    console.error('Erro ao enviar notificação push:', err);
+    console.error('❌ [Push] Erro ao enviar notificação push:', err);
   }
 };
 
