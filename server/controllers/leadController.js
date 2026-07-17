@@ -48,10 +48,10 @@ exports.create = async (req, res) => {
       }
     } else if (productId) {
       const product = await Product.findById(productId);
-      const admins = await User.find({ role: { $in: ['admin', 'superadmin'] } });
-      for (const admin of admins) {
+      const superadmins = await User.find({ role: 'superadmin' });
+      for (const superadmin of superadmins) {
         await Notification.create({
-          user: admin._id,
+          user: superadmin._id,
           type: 'store',
           title: 'Nova Venda! 🛍️',
           message: `${name} comprou ${quantity || 1}x "${product?.name}" - ${((product?.price || 0) * (quantity || 1)).toLocaleString()} MT`,
@@ -60,7 +60,7 @@ exports.create = async (req, res) => {
         
         // Push notification
         await sendPushNotification(
-          admin._id,
+          superadmin._id,
           'Nova Venda! 🛍️',
           `${name} comprou ${quantity || 1}x ${product?.name} - ${((product?.price || 0) * (quantity || 1)).toLocaleString()} MT`,
           { url: `/admin/store?tab=sales` }
@@ -103,21 +103,24 @@ exports.updateStatus = async (req, res) => {
     
     // Notificar quando status for atualizado para 'confirmed'
     if (req.body.status === 'confirmed' && lead.product) {
-      await Notification.create({
-        user: req.user._id,
-        type: 'store',
-        title: 'Venda Confirmada! ✅',
-        message: `Venda de ${lead.name} - ${lead.product.name} foi confirmada com sucesso`,
-        link: `/admin/store?tab=sales`
-      });
-      
-      // Push notification
-      await sendPushNotification(
-        req.user._id,
-        'Venda Confirmada! ✅',
-        `Venda de ${lead.name} - ${lead.product.name} confirmada`,
-        { url: `/admin/store?tab=sales` }
-      );
+      // Apenas superadmin recebe notificações de vendas
+      if (req.user.role === 'superadmin') {
+        await Notification.create({
+          user: req.user._id,
+          type: 'store',
+          title: 'Venda Confirmada! ✅',
+          message: `Venda de ${lead.name} - ${lead.product.name} foi confirmada com sucesso`,
+          link: `/admin/store?tab=sales`
+        });
+        
+        // Push notification
+        await sendPushNotification(
+          req.user._id,
+          'Venda Confirmada! ✅',
+          `Venda de ${lead.name} - ${lead.product.name} confirmada`,
+          { url: `/admin/store?tab=sales` }
+        );
+      }
     }
     
     res.json(lead);
