@@ -8,6 +8,17 @@ router.get('/:key', async (req, res) => {
   try {
     const setting = await Setting.findOne({ key: req.params.key });
     if (!setting) {
+      // Retornar valor padrão para keys específicas
+      const defaultValues = {
+        'youtube_shorts': { enabled: false, apiKey: '' },
+        'analytics': { enabled: true },
+        'maintenance': { enabled: false }
+      };
+      
+      if (defaultValues[req.params.key]) {
+        return res.json({ key: req.params.key, value: defaultValues[req.params.key] });
+      }
+      
       return res.status(404).json({ message: 'Definição não encontrada.' });
     }
     res.json(setting);
