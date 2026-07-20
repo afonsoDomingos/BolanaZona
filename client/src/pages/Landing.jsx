@@ -404,6 +404,8 @@ export default function Landing() {
     const message = `Olá! Meu nome é *${leadInfo.name}*. Tenho interesse em adquirir *${quantity}x* do produto "*${product.name}*" que vi na página inicial do Bola na Zona.${details}\n\nPor favor, confirmem a disponibilidade.`;
     window.open(`https://wa.me/258847877405?text=${encodeURIComponent(message)}`, '_blank');
     setShowLeadModal(null);
+  };
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
