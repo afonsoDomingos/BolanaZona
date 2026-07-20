@@ -15,6 +15,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import CursorGlow from './components/CursorGlow';
 import ClickRipple from './components/ClickRipple';
 import OfflineIndicator from './components/OfflineIndicator';
+import WelcomeMessage from './components/WelcomeMessage';
 
 // Static import for Landing page to avoid initial flicker
 import Landing from './pages/Landing';
@@ -81,12 +82,7 @@ function AppRoutes() {
       setTimeout(() => {
         import('react-hot-toast').then(({ toast }) => {
           toast(
-            (t) => (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <span style={{ fontWeight: 'bold', fontSize: '1.05rem' }}>Bem-vindo ao Bola na Zona!</span>
-                <span style={{ fontSize: '0.9rem', opacity: 0.9 }}>Prepara-te para o próximo fim de semana, vêm aí grandes jogos! 🔥</span>
-              </div>
-            ),
+            (t) => <WelcomeMessage />,
             {
               icon: '👋',
               duration: 6000,

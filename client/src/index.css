@@ -2199,3 +2199,7 @@ body.light-mode .auth-page-wrapper {
     background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.95)), url('/loginbg2.png') !important;
   }
 }
+ 
+ . c u r s o r - b l i n k   {   a n i m a t i o n :   b l i n k   1 s   s t e p - e n d   i n f i n i t e ;   }  
+ @ k e y f r a m e s   b l i n k   {   0 % ,   1 0 0 %   {   o p a c i t y :   1 ;   }   5 0 %   {   o p a c i t y :   0 ;   }   }  
+ 
