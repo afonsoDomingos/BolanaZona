@@ -87,7 +87,6 @@ function AppRoutes() {
           toast(
             (t) => <WelcomeMessage />,
             {
-              icon: '👋',
               duration: 6000,
               position: 'top-center',
               style: {
