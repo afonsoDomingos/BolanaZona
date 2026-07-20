@@ -97,9 +97,24 @@ exports.getAll = async (req, res) => {
 
 exports.updateStatus = async (req, res) => {
   try {
-    const lead = await Lead.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true })
+    const lead = await Lead.findById(req.params.id)
       .populate('product')
       .populate('tournament');
+      
+    if (!lead) return res.status(404).json({ message: 'Lead não encontrado.' });
+    
+    // Verificação de permissão: Apenas superadmin ou dono do torneio
+    if (req.user.role !== 'superadmin') {
+      if (!lead.tournament) return res.status(403).json({ message: 'Apenas admins podem gerir vendas diretas de loja.' });
+      
+      const tournament = await Tournament.findById(lead.tournament._id);
+      if (String(tournament.createdBy) !== String(req.user._id)) {
+        return res.status(403).json({ message: 'Não tens permissão para gerir os leads deste torneio.' });
+      }
+    }
+    
+    lead.status = req.body.status;
+    await lead.save();
     
     // Notificar quando status for atualizado para 'confirmed'
     if (req.body.status === 'confirmed' && lead.product) {
