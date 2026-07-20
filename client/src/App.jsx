@@ -76,36 +76,7 @@ function AppRoutes() {
     }
   }, []);
 
-  useEffect(() => {
-    const hasSeenGreeting = sessionStorage.getItem('hasSeenGreeting');
-    if (!hasSeenGreeting) {
-      // Set synchronously immediately to prevent React StrictMode from triggering twice
-      sessionStorage.setItem('hasSeenGreeting', 'true');
-      
-      setTimeout(() => {
-        import('react-hot-toast').then(({ toast }) => {
-          toast(
-            (t) => <WelcomeMessage />,
-            {
-              duration: 6000,
-              position: 'top-center',
-              style: {
-                background: 'rgba(255, 255, 255, 0.98)',
-                color: '#1e293b',
-                border: '1px solid rgba(0, 0, 0, 0.05)',
-                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
-                padding: '16px 20px',
-                backdropFilter: 'blur(10px)',
-                maxWidth: '400px',
-                borderRadius: '12px',
-                marginTop: '35vh'
-              },
-            }
-          );
-        });
-      }, 1000); // Small delay so it doesn't get lost in initial load
-    }
-  }, []);
+  // O WelcomeMessage agora gere o seu próprio sessionStorage interno e posição.
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -154,6 +125,7 @@ function AppRoutes() {
       </main>
       <Footer />
       {!isCommunityPage && <CommunityFAB />}
+      <WelcomeMessage />
       <FeedbackPopup />
       {!isCommunityPage && <ShareAppPrompt />}
       <ScrollToTop />
