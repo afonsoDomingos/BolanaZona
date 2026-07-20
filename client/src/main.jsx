@@ -4,16 +4,28 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import './index.css'
 import App from './App.jsx'
 
-// Service Worker Registration para PWA
+// Prevenção do erro da "Tela Branca" (ChunkLoadError) após novas publicações na Vercel
+window.addEventListener('error', (e) => {
+  if (
+    e.message && 
+    (e.message.includes('Failed to fetch dynamically imported module') || e.message.includes('Importing a module script failed'))
+  ) {
+    console.warn('Nova versão detetada ou erro ao carregar módulo. A recarregar a página...');
+    // Se ainda não recarregou recentemente, recarrega para ir buscar o novo código à Vercel
+    if (!sessionStorage.getItem('reloading_due_to_chunk_error')) {
+      sessionStorage.setItem('reloading_due_to_chunk_error', 'true');
+      window.location.reload();
+    }
+  }
+});
+
+// Remover o Service Worker antigo para impedir que o site fique encravado no cache
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(registration => {
-        console.log('✅ [PWA] Service Worker registrado:', registration.scope);
-      })
-      .catch(err => {
-        console.log('❌ [PWA] Service Worker falhou:', err);
-      });
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for(let registration of registrations) {
+      registration.unregister();
+      console.log('✅ [PWA] Service Worker antigo desinstalado para evitar bugs de cache.');
+    }
   });
 }
 
