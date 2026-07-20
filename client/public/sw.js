@@ -1,12 +1,10 @@
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 const STATIC_CACHE = `bnz-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `bnz-dynamic-${CACHE_VERSION}`;
 const IMAGE_CACHE = `bnz-images-${CACHE_VERSION}`;
 
-// Recursos estáticos para cache imediato
+// Recursos estáticos para cache imediato (não incluir index.html para evitar bugs de cache em deploys)
 const STATIC_URLS = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
