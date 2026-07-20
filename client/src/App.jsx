@@ -75,6 +75,38 @@ function AppRoutes() {
     }
   }, []);
 
+  useEffect(() => {
+    const hasSeenGreeting = sessionStorage.getItem('hasSeenGreeting');
+    if (!hasSeenGreeting) {
+      setTimeout(() => {
+        import('react-hot-toast').then(({ toast }) => {
+          toast(
+            (t) => (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontWeight: 'bold', fontSize: '1.05rem' }}>Bem-vindo ao Bola na Zona!</span>
+                <span style={{ fontSize: '0.9rem', opacity: 0.9 }}>Prepara-te para o próximo fim de semana, vêm aí grandes jogos! 🔥</span>
+              </div>
+            ),
+            {
+              icon: '👋',
+              duration: 6000,
+              style: {
+                background: 'rgba(13, 21, 41, 0.95)',
+                color: '#fff',
+                border: '1px solid rgba(0, 200, 83, 0.3)',
+                boxShadow: '0 4px 20px rgba(0, 200, 83, 0.15)',
+                padding: '16px 20px',
+                backdropFilter: 'blur(10px)',
+                maxWidth: '400px'
+              },
+            }
+          );
+          sessionStorage.setItem('hasSeenGreeting', 'true');
+        });
+      }, 1000); // Small delay so it doesn't get lost in initial load
+    }
+  }, []);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
