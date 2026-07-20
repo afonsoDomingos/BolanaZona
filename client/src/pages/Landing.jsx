@@ -385,7 +385,6 @@ function YouTubeShortsSection() {
 export default function Landing() {
   const { user } = useAuth();
   const [scrollOpacity, setScrollOpacity] = useState(1);
-  const [pageLoading, setPageLoading] = useState(true);
   const [storeProducts, setStoreProducts] = useState([]);
   const [storeLoading, setStoreLoading] = useState(true);
   const [showLeadModal, setShowLeadModal] = useState(null);
@@ -405,14 +404,6 @@ export default function Landing() {
     const message = `Olá! Meu nome é *${leadInfo.name}*. Tenho interesse em adquirir *${quantity}x* do produto "*${product.name}*" que vi na página inicial do Bola na Zona.${details}\n\nPor favor, confirmem a disponibilidade.`;
     window.open(`https://wa.me/258847877405?text=${encodeURIComponent(message)}`, '_blank');
     setShowLeadModal(null);
-  };
-
-  useEffect(() => {
-    // Simular carregamento inicial
-    const timer = setTimeout(() => setPageLoading(false), 1200);
-    return () => clearTimeout(timer);
-  }, []);
-
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -435,8 +426,6 @@ export default function Landing() {
   }, []);
 
   useEffect(() => {
-    if (pageLoading) return;
-
     // Iniciar o radar de scroll
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -462,39 +451,9 @@ export default function Landing() {
       window.removeEventListener('scroll', handleScroll);
       observer.disconnect();
     };
-  }, [pageLoading, storeLoading]);
+  }, [storeLoading]);
 
-  if (pageLoading) {
-    return (
-      <div style={{ 
-        height: '100vh', width: '100vw', 
-        background: '#0a0f14', 
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexDirection: 'column', gap: 30,
-        position: 'fixed', inset: 0, zIndex: 9999
-      }}>
-        <div style={{ position: 'relative' }}>
-          {/* Aura pulsante */}
-          <div style={{ 
-            position: 'absolute', inset: -20, borderRadius: '50%', 
-            background: 'rgba(0, 200, 83, 0.2)', filter: 'blur(30px)',
-            animation: 'pulse-glow 1.5s ease-in-out infinite'
-          }} />
-          <div className="spin-ball" style={{ fontSize: 80, position: 'relative', zIndex: 1 }}>⚽</div>
-        </div>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-          <p className="font-syne" style={{ color: 'var(--green)', fontWeight: 900, letterSpacing: 4, fontSize: 10, textTransform: 'uppercase', opacity: 0.8 }}>
-            Bola na Zona
-          </p>
-          {/* Barra de progresso ultra-fina */}
-          <div style={{ width: 120, height: 2, background: 'rgba(255,255,255,0.05)', borderRadius: 10, overflow: 'hidden' }}>
-            <div style={{ width: '100%', height: '100%', background: 'var(--green)', animation: 'loading-bar 1.2s ease-in-out forwards' }} />
-          </div>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div style={{ minHeight: '100vh' }}>
