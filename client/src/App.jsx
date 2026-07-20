@@ -97,7 +97,8 @@ function AppRoutes() {
                 padding: '16px 20px',
                 backdropFilter: 'blur(10px)',
                 maxWidth: '400px',
-                borderRadius: '12px'
+                borderRadius: '12px',
+                marginTop: '35vh'
               },
             }
           );
