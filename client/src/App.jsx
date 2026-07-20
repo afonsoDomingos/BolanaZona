@@ -90,6 +90,7 @@ function AppRoutes() {
             {
               icon: '👋',
               duration: 6000,
+              position: 'top-center',
               style: {
                 background: 'rgba(13, 21, 41, 0.95)',
                 color: '#fff',
