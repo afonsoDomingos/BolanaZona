@@ -88,13 +88,14 @@ function AppRoutes() {
               duration: 6000,
               position: 'top-center',
               style: {
-                background: 'rgba(13, 21, 41, 0.95)',
-                color: '#fff',
-                border: '1px solid rgba(0, 200, 83, 0.3)',
-                boxShadow: '0 4px 20px rgba(0, 200, 83, 0.15)',
+                background: 'rgba(255, 255, 255, 0.98)',
+                color: '#1e293b',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
+                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
                 padding: '16px 20px',
                 backdropFilter: 'blur(10px)',
-                maxWidth: '400px'
+                maxWidth: '400px',
+                borderRadius: '12px'
               },
             }
           );
