@@ -79,6 +79,9 @@ function AppRoutes() {
   useEffect(() => {
     const hasSeenGreeting = sessionStorage.getItem('hasSeenGreeting');
     if (!hasSeenGreeting) {
+      // Set synchronously immediately to prevent React StrictMode from triggering twice
+      sessionStorage.setItem('hasSeenGreeting', 'true');
+      
       setTimeout(() => {
         import('react-hot-toast').then(({ toast }) => {
           toast(
@@ -99,7 +102,6 @@ function AppRoutes() {
               },
             }
           );
-          sessionStorage.setItem('hasSeenGreeting', 'true');
         });
       }, 1000); // Small delay so it doesn't get lost in initial load
     }
