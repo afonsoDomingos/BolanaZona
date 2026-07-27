@@ -137,3 +137,75 @@ exports.recalculateAllStats = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.sendTwilioSummons = async (req, res) => {
+  try {
+    const { recipients, templateText, matchInfo } = req.body;
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const fromPhone = process.env.TWILIO_WHATSAPP_NUMBER || 'whatsapp:+14155238886';
+
+    if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+      return res.status(400).json({ message: 'Nenhum destinatário fornecido.' });
+    }
+
+    if (!accountSid || !authToken) {
+      return res.status(400).json({ 
+        configured: false,
+        message: 'A API do Twilio não está configurada no servidor (TWILIO_ACCOUNT_SID e TWILIO_AUTH_TOKEN ausentes no .env). Por favor, use o Envio Coletivo Assistido.'
+      });
+    }
+
+    const axios = require('axios');
+    const results = [];
+    const authHeader = 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64');
+
+    for (const player of recipients) {
+      if (!player.contact) {
+        results.push({ name: player.name, success: false, error: 'Sem número' });
+        continue;
+      }
+
+      let cleanPhone = player.contact.replace(/\D/g, '');
+      if (cleanPhone.length === 9 && (cleanPhone.startsWith('82') || cleanPhone.startsWith('83') || cleanPhone.startsWith('84') || cleanPhone.startsWith('85') || cleanPhone.startsWith('86') || cleanPhone.startsWith('87'))) {
+        cleanPhone = '258' + cleanPhone;
+      }
+      const toWhatsApp = `whatsapp:+${cleanPhone}`;
+
+      let personalizedMsg = templateText || '';
+      personalizedMsg = personalizedMsg.split('{Nome do Jogador}').join(player.name || 'Jogador');
+      personalizedMsg = personalizedMsg.split('{Equipa Casa}').join(matchInfo?.homeTeam || 'Equipa A');
+      personalizedMsg = personalizedMsg.split('{Equipa Visitante}').join(matchInfo?.awayTeam || 'Equipa B');
+      personalizedMsg = personalizedMsg.split('{Data}').join(matchInfo?.date || 'A definir');
+      personalizedMsg = personalizedMsg.split('{Hora}').join(matchInfo?.time || 'A definir');
+      personalizedMsg = personalizedMsg.split('{Local}').join(matchInfo?.location || 'Campo');
+
+      try {
+        const params = new URLSearchParams();
+        params.append('From', fromPhone.startsWith('whatsapp:') ? fromPhone : `whatsapp:${fromPhone}`);
+        params.append('To', toWhatsApp);
+        params.append('Body', personalizedMsg);
+
+        const twilioRes = await axios.post(
+          `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+          params.toString(),
+          {
+            headers: {
+              'Authorization': authHeader,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+        );
+        results.push({ name: player.name, phone: cleanPhone, success: true, sid: twilioRes.data.sid });
+      } catch (err) {
+        const errMsg = err.response?.data?.message || err.message;
+        results.push({ name: player.name, phone: cleanPhone, success: false, error: errMsg });
+      }
+    }
+
+    res.json({ configured: true, results });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+

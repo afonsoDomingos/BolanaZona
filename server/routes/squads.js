@@ -11,5 +11,7 @@ router.delete('/:id', protect, squadController.remove);
 router.get('/public-all', squadController.getAllPublicSquads);
 router.get('/recalculate-all-stats', squadController.recalculateAllStats);
 router.get('/public/:id', squadController.getPublicSquad);
+router.post('/send-twilio-summons', protect, squadController.sendTwilioSummons);
+
 
 module.exports = router;
