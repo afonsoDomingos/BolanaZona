@@ -25,9 +25,12 @@ export default function SquadDetail() {
       const res = await api.post('/upload', formData);
       if (type === 'logo') {
         setSquad({ ...squad, logo: res.data.url });
+      } else if (type === 'banner') {
+        setSquad({ ...squad, banner: res.data.url });
       } else {
         setNewPlayer({ ...newPlayer, photo: res.data.url });
       }
+
       toast.success('Imagem carregada! 📸');
     } catch {
       toast.error('Erro no upload.');
@@ -131,27 +134,39 @@ export default function SquadDetail() {
       <div className="container" style={{ maxWidth: 800 }}>
         
         {/* HEADER */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 32 }}>
-          <Link to="/dashboard/squads" className="btn btn-secondary" style={{ width: 40, height: 40, padding: 0, justifyContent: 'center', borderRadius: 12 }}>
-            <ArrowLeft size={20} />
-          </Link>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{ width: 64, height: 64, borderRadius: 16, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `2px solid ${squad.color || 'var(--green)'}` }}>
-              {squad.logo ? <img src={squad.logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 14 }} /> : <Shield size={32} color={squad.color || 'var(--green)'} />}
+        <div style={{ 
+          position: 'relative', 
+          borderRadius: 20, 
+          overflow: 'hidden', 
+          marginBottom: 32, 
+          background: squad.banner 
+            ? `linear-gradient(to right, rgba(10,15,20,0.85) 30%, rgba(10,15,20,0.5)), url(${squad.banner}) center/cover no-repeat` 
+            : 'rgba(255,255,255,0.02)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          padding: '24px 20px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <Link to="/dashboard/squads" className="btn btn-secondary" style={{ width: 40, height: 40, padding: 0, justifyContent: 'center', borderRadius: 12, background: 'rgba(0,0,0,0.4)' }}>
+              <ArrowLeft size={20} />
+            </Link>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 16, minWidth: 200 }}>
+              <div style={{ width: 64, height: 64, borderRadius: 16, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `2px solid ${squad.color || 'var(--green)'}`, overflow: 'hidden', flexShrink: 0 }}>
+                {squad.logo ? <img src={squad.logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Shield size={32} color={squad.color || 'var(--green)'} />}
+              </div>
+              <div>
+                <h1 className="font-syne" style={{ fontSize: 28, fontWeight: 900, marginBottom: 4, color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}>{squad.name}</h1>
+                <p style={{ color: 'rgba(255,255,255,0.8)', margin: 0, textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>Gestão do Plantel</p>
+              </div>
             </div>
-            <div>
-              <h1 className="font-syne" style={{ fontSize: 28, fontWeight: 900, marginBottom: 4 }}>{squad.name}</h1>
-              <p style={{ color: 'var(--text-secondary)' }}>Gestão do Plantel</p>
+            
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button onClick={handleDelete} className="btn btn-secondary" style={{ color: 'var(--red)', borderColor: 'rgba(255,68,68,0.2)', background: 'rgba(0,0,0,0.4)' }}>
+                <Trash2 size={16} /> Eliminar
+              </button>
+              <button onClick={handleUpdate} className="btn btn-primary" disabled={saving} style={{ minWidth: 140, justifyContent: 'center' }}>
+                {saving ? <span className="spinner-xs" /> : <><Save size={18} /> Guardar</>}
+              </button>
             </div>
-          </div>
-          
-          <div style={{ display: 'flex', gap: 12 }}>
-            <button onClick={handleDelete} className="btn btn-secondary" style={{ color: 'var(--red)', borderColor: 'rgba(255,68,68,0.2)' }}>
-              <Trash2 size={16} /> Eliminar
-            </button>
-            <button onClick={handleUpdate} className="btn btn-primary" disabled={saving} style={{ minWidth: 140, justifyContent: 'center' }}>
-              {saving ? <span className="spinner-xs" /> : <><Save size={18} /> Guardar</>}
-            </button>
           </div>
         </div>
 
@@ -212,7 +227,7 @@ export default function SquadDetail() {
                   </div>
                 </div>
                 <div style={{ flex: 2 }}>
-                  <label className="form-label">Símbolo do Clube</label>
+                  <label className="form-label">Símbolo do Clube (Logo)</label>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input className="form-input" placeholder="Link da imagem..." value={squad.logo || ''} onChange={e => setSquad({...squad, logo: e.target.value})} style={{ flex: 1 }} />
                     <label className="btn btn-secondary" style={{ width: 44, height: 44, padding: 0, justifyContent: 'center', cursor: 'pointer', borderRadius: 12 }}>
@@ -222,6 +237,23 @@ export default function SquadDetail() {
                   </div>
                 </div>
               </div>
+
+              <div>
+                <label className="form-label">Foto de Capa / Banner da Equipa</label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input className="form-input" placeholder="Link da imagem do banner/capa..." value={squad.banner || ''} onChange={e => setSquad({...squad, banner: e.target.value})} style={{ flex: 1 }} />
+                  <label className="btn btn-secondary" style={{ width: 44, height: 44, padding: 0, justifyContent: 'center', cursor: 'pointer', borderRadius: 12 }}>
+                    <Upload size={18} />
+                    <input type="file" hidden accept="image/*" onChange={e => uploadImage(e.target.files[0], 'banner')} />
+                  </label>
+                </div>
+                {squad.banner && (
+                  <div style={{ marginTop: 8, height: 60, borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <img src={squad.banner} alt="Banner Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                )}
+              </div>
+
 
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16, alignItems: 'center' }}>
                 <button type="button" onClick={handleDelete} className="btn btn-secondary btn-sm" style={{ color: 'var(--red)', borderColor: 'rgba(255,0,0,0.2)' }}>

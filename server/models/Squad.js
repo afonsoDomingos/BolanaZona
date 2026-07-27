@@ -20,6 +20,8 @@ const squadSchema = new mongoose.Schema({
   players: [playerSchema],
   color: { type: String, default: '#00C853' },
   logo: { type: String, default: '' },
+  banner: { type: String, default: '' },
+
   stats: {
     matchesPlayed: { type: Number, default: 0 },
     wins: { type: Number, default: 0 },
