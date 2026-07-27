@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { Trophy, Users, MapPin, Calendar, ArrowRight, Search, X, Share2, ShoppingBag } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 import MatchLikeButton from '../components/MatchLikeButton';
 import ScheduledBadge from '../components/ScheduledBadge';
 import ShareModal from '../components/ShareModal';
@@ -15,6 +17,8 @@ const WhatsAppIcon = ({ size = 11 }) => (
 );
 
 export default function Explore() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -203,9 +207,38 @@ export default function Explore() {
             {/* Live Matches Section */}
             {matches.length > 0 && (
               <div style={{ marginBottom: 60 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
-                  <h2 className="font-syne" style={{ fontSize: 24, fontWeight: 800 }}>Jogos em Destaque 🔴</h2>
-                  <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, var(--red), transparent)', opacity: 0.3 }} />
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 200 }}>
+                    <h2 className="font-syne" style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>Jogos em Destaque 🔴</h2>
+                    <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, var(--red), transparent)', opacity: 0.3 }} />
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (user) {
+                        navigate('/dashboard?action=new-match');
+                      } else {
+                        toast('Inicia sessão para agendar o teu jogo! ⚽', { icon: '🔑' });
+                        navigate('/login?redirect=/dashboard?action=new-match');
+                      }
+                    }}
+                    className="btn hover-scale"
+                    style={{
+                      background: 'linear-gradient(135deg, var(--green), #00c853)',
+                      color: '#000000',
+                      fontWeight: 800,
+                      fontSize: 12,
+                      padding: '8px 16px',
+                      borderRadius: 100,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      boxShadow: '0 4px 14px rgba(0, 200, 83, 0.25)',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Calendar size={14} /> Agendar Jogo
+                  </button>
                 </div>
                 
                 <div style={{ 
@@ -355,57 +388,79 @@ export default function Explore() {
                         activeProduct ? (
                           <Link key="store-promo" to="/shop" className="match-card hover-scale" style={{ 
                             textDecoration: 'none', 
-                            width: 160,
-                            minWidth: 160, 
-                            maxWidth: 160,
-                            height: 160,
-                            minHeight: 160,
-                            maxHeight: 160,
+                            width: 230,
+                            minWidth: 230, 
+                            maxWidth: 230,
                             flexShrink: 0, 
                             scrollSnapAlign: 'start', 
                             position: 'relative', 
                             background: '#ffffff', 
-                            border: '1px solid rgba(0, 0, 0, 0.06)', 
+                            border: '1px solid rgba(255, 255, 255, 0.1)', 
                             borderRadius: 16, 
-                            padding: '10px',
+                            padding: '14px',
                             display: 'flex',
                             flexDirection: 'column',
                             justifyContent: 'space-between',
                             alignItems: 'stretch',
                             overflow: 'hidden',
-                            boxShadow: '0 8px 24px rgba(0,0,0,0.04)'
+                            boxShadow: '0 12px 32px rgba(0,0,0,0.12)'
                           }}>
                             {/* Top row: Category & Price */}
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                                <ShoppingBag size={9} color="#64748b" />
-                                <span style={{ fontSize: 8, color: '#64748b', fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <ShoppingBag size={11} color="#64748b" />
+                                <span style={{ fontSize: 9, color: '#64748b', fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>
                                   {activeProduct.category}
                                 </span>
                               </div>
                               <span style={{ 
-                                fontSize: 9, 
+                                fontSize: 10, 
                                 color: '#008b47', 
                                 fontWeight: 800, 
                                 background: 'rgba(0, 139, 71, 0.08)', 
-                                padding: '2px 6px', 
+                                padding: '3px 8px', 
                                 borderRadius: 100 
                               }}>
                                 {activeProduct.price.toLocaleString()} MT
                               </span>
                             </div>
                             
-                            {/* Middle: Centered Product Image */}
+                            {/* Middle: Generous Product Image */}
                             {activeProduct.image && (
-                              <div style={{ display: 'flex', justifyContent: 'center', margin: '4px 0' }}>
-                                <div style={{ width: 56, height: 56, borderRadius: 8, background: '#f8fafc', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.04)' }}>
-                                  <img src={activeProduct.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                </div>
+                              <div style={{ 
+                                width: '100%', 
+                                height: 115, 
+                                borderRadius: 12, 
+                                background: '#f8fafc', 
+                                overflow: 'hidden', 
+                                border: '1px solid rgba(0,0,0,0.04)',
+                                margin: '10px 0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}>
+                                <img 
+                                  src={activeProduct.image} 
+                                  alt={activeProduct.name} 
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }} 
+                                />
                               </div>
                             )}
 
                             {/* Product Name (Centered) */}
-                            <h3 className="font-syne" style={{ fontSize: 10, fontWeight: 700, color: '#0f172a', textAlign: 'center', margin: '0 0 2px', lineHeight: 1.1, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', width: '100%' }}>
+                            <h3 className="font-syne" style={{ 
+                              fontSize: 12, 
+                              fontWeight: 700, 
+                              color: '#0f172a', 
+                              textAlign: 'center', 
+                              margin: '0 0 10px', 
+                              lineHeight: 1.2, 
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                              width: '100%'
+                            }}>
                               {activeProduct.name}
                             </h3>
                             
@@ -414,53 +469,51 @@ export default function Explore() {
                               display: 'flex', 
                               alignItems: 'center', 
                               justifyContent: 'center', 
-                              gap: 4, 
+                              gap: 6, 
                               color: '#ffffff', 
                               background: '#0f172a',
                               borderRadius: 100,
-                              padding: '5px 0',
-                              fontSize: 9, 
+                              padding: '8px 0',
+                              fontSize: 11, 
                               fontWeight: 700,
-                              width: '100%'
+                              width: '100%',
+                              boxShadow: '0 4px 12px rgba(15,23,42,0.15)'
                             }}>
                               <span>Apreciar</span>
-                              <span style={{ fontSize: 10 }}>🛒</span>
+                              <span style={{ fontSize: 11 }}>🛒</span>
                             </div>
                           </Link>
                         ) : (
                           <Link key="store-promo" to="/shop" className="match-card hover-scale" style={{ 
                             textDecoration: 'none', 
-                            width: 160,
-                            minWidth: 160, 
-                            maxWidth: 160,
-                            height: 160,
-                            minHeight: 160,
-                            maxHeight: 160,
+                            width: 230,
+                            minWidth: 230, 
+                            maxWidth: 230,
                             flexShrink: 0, 
                             scrollSnapAlign: 'start', 
                             position: 'relative', 
                             background: '#ffffff', 
-                            border: '1px solid rgba(0, 0, 0, 0.06)', 
+                            border: '1px solid rgba(255, 255, 255, 0.1)', 
                             borderRadius: 16, 
-                            padding: '12px 10px',
+                            padding: '14px',
                             display: 'flex',
                             flexDirection: 'column',
                             justifyContent: 'space-between',
                             alignItems: 'stretch',
                             overflow: 'hidden',
-                            boxShadow: '0 8px 24px rgba(0,0,0,0.04)'
+                            boxShadow: '0 12px 32px rgba(0,0,0,0.12)'
                           }}>
                             <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
-                                <ShoppingBag size={9} color="#64748b" />
-                                <span style={{ fontSize: 8, color: '#64748b', fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>LOJA OFICIAL</span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 8 }}>
+                                <ShoppingBag size={11} color="#64748b" />
+                                <span style={{ fontSize: 9, color: '#64748b', fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase' }}>LOJA OFICIAL</span>
                               </div>
                               
-                              <h3 className="font-syne" style={{ fontSize: 11, fontWeight: 700, color: '#0f172a', marginBottom: 2, lineHeight: 1.2 }}>
+                              <h3 className="font-syne" style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', marginBottom: 4, lineHeight: 1.2 }}>
                                 Equipa o teu Clube! 👕
                               </h3>
-                              <p style={{ fontSize: 9, color: '#64748b', lineHeight: 1.2, margin: 0 }}>
-                                Equipamentos e acessórios oficiais.
+                              <p style={{ fontSize: 10, color: '#64748b', lineHeight: 1.3, margin: '0 0 12px' }}>
+                                Equipamentos e acessórios oficiais Bola na Zona.
                               </p>
                             </div>
                             
@@ -468,17 +521,18 @@ export default function Explore() {
                               display: 'flex', 
                               alignItems: 'center', 
                               justifyContent: 'center', 
-                              gap: 4, 
+                              gap: 6, 
                               color: '#ffffff', 
                               background: '#0f172a',
                               borderRadius: 100,
-                              padding: '5px 0',
-                              fontSize: 9, 
+                              padding: '8px 0',
+                              fontSize: 11, 
                               fontWeight: 700,
-                              width: '100%'
+                              width: '100%',
+                              boxShadow: '0 4px 12px rgba(15,23,42,0.15)'
                             }}>
                               <span>Apreciar</span>
-                              <span style={{ fontSize: 10 }}>🛒</span>
+                              <span style={{ fontSize: 11 }}>🛒</span>
                             </div>
                           </Link>
                         )

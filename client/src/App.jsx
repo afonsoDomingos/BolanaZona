@@ -57,10 +57,25 @@ import './index.css';
 
 // Bola na Zona - Plataforma Oficial ⚽
 
+const PageLoader = () => (
+  <div style={{
+    position: 'fixed',
+    inset: 0,
+    background: '#ffffff',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 999999
+  }}>
+    <div className="spin-ball" style={{ fontSize: 64, marginBottom: 12 }}>⚽</div>
+  </div>
+);
+
 // Helper route for guests only
 const GuestRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) return <div className="loading-center"><div className="spinner" /></div>;
+  if (loading) return <PageLoader />;
   return user ? <Navigate to="/dashboard" /> : children;
 };
 
@@ -77,8 +92,6 @@ function AppRoutes() {
     }
   }, []);
 
-  // O WelcomeMessage agora gere o seu próprio sessionStorage interno e posição.
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
@@ -86,7 +99,7 @@ function AppRoutes() {
       <CursorGlow />
       <ClickRipple />
       <main style={{ flex: 1, position: 'relative', zIndex: 2 }}>
-        <Suspense fallback={<div className="loading-center"><div className="spinner" /></div>}>
+        <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/explore" element={<Explore />} />

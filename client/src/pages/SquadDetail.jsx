@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shield, Users, Save, Trash2, Plus, X, Pencil, Upload, Image, Camera, PieChart } from 'lucide-react';
+import { ArrowLeft, Shield, Users, Save, Trash2, Plus, X, Pencil, Upload, Image, Camera, PieChart, MessageSquare, Phone } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import SummonsWhatsAppModal from '../components/SummonsWhatsAppModal';
 
 export default function SquadDetail() {
   const { id } = useParams();
@@ -10,9 +11,10 @@ export default function SquadDetail() {
   const [squad, setSquad] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [newPlayer, setNewPlayer] = useState({ name: '', position: '', number: '', photo: '' });
+  const [newPlayer, setNewPlayer] = useState({ name: '', position: '', number: '', photo: '', contact: '', notes: '' });
   const [editingPlayerIndex, setEditingPlayerIndex] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [showSummonsModal, setShowSummonsModal] = useState(false);
   const playerFormRef = useRef(null);
 
   const uploadImage = async (file, type) => {
@@ -234,61 +236,97 @@ export default function SquadDetail() {
 
           {/* JOGADORES */}
           <div className="card-glass" style={{ padding: 24, display: 'flex', flexDirection: 'column' }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 18, fontWeight: 800 }}>
-              <Users size={20} color="var(--green)" /> Plantel Oficial
-            </h3>
-            <p style={{ fontSize: 12, color: 'var(--yellow)', marginBottom: 16, fontWeight: 600 }}>
-              💡 Preenche os dados e clica no ícone amarelo (disquete) para guardar cada jogador.
-            </p>
-            
-            <form ref={playerFormRef} onSubmit={handleAddPlayer} style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-              <input className="form-input" placeholder="Nome do Jogador" value={newPlayer.name} onChange={e => setNewPlayer({...newPlayer, name: e.target.value})} style={{ flex: 2, height: 40 }} />
-              <select className="form-select" value={newPlayer.position} onChange={e => setNewPlayer({...newPlayer, position: e.target.value})} style={{ flex: 1, height: 40 }}>
-                <option value="">Posição (Opc.)</option>
-                <option value="Guarda-Redes">Guarda-Redes</option>
-                <option value="Defesa Central">Defesa Central</option>
-                <option value="Lateral">Lateral</option>
-                <option value="Trinco">Trinco / Defensivo</option>
-                <option value="Médio Centro">Médio Centro</option>
-                <option value="Extremo">Extremo / Ala</option>
-                <option value="Ponta de Lança">Ponta de Lança</option>
-              </select>
-              <input type="number" className="form-input" placeholder="Nº" value={newPlayer.number} onChange={e => setNewPlayer({...newPlayer, number: e.target.value})} style={{ width: 60, height: 40 }} />
-              <label className="btn btn-secondary" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center', cursor: 'pointer', borderRadius: 10, background: newPlayer.photo ? 'rgba(0,200,83,0.1)' : 'transparent', border: newPlayer.photo ? '1px solid var(--green)' : '1px solid rgba(255,255,255,0.1)' }}>
-                {uploading ? <span className="spinner-xs" /> : newPlayer.photo ? <Image size={18} color="var(--green)" /> : <Camera size={18} />}
-                <input type="file" hidden accept="image/*" onChange={e => uploadImage(e.target.files[0], 'player')} />
-              </label>
-              <button type="submit" className="btn btn-primary" title="Adicionar / Guardar Jogador" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center', background: editingPlayerIndex !== null ? 'var(--yellow)' : 'var(--green)', color: '#000', border: 'none' }}>
-                {editingPlayerIndex !== null ? <Save size={18} /> : <Plus size={18} />}
-              </button>
-              {editingPlayerIndex !== null && (
-                <button type="button" onClick={cancelEdit} className="btn btn-secondary" style={{ height: 40, width: 40, padding: 0, justifyContent: 'center', borderRadius: 10 }}>
-                  <X size={18} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 8 }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 18, fontWeight: 800, margin: 0 }}>
+                <Users size={20} color="var(--green)" /> Plantel Oficial ({squad?.players?.length || 0})
+              </h3>
+              {squad?.players?.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowSummonsModal(true)}
+                  className="btn"
+                  style={{ background: '#25D366', color: '#000', fontWeight: 800, fontSize: 12, padding: '6px 14px', borderRadius: 100, display: 'flex', alignItems: 'center', gap: 6 }}
+                >
+                  <MessageSquare size={14} /> Convocar via WhatsApp
                 </button>
               )}
+            </div>
+
+            <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 16 }}>
+              Regista os jogadores da equipa com o número de WhatsApp para poderes enviar convocatórias com 1 clique!
+            </p>
+            
+            <form ref={playerFormRef} onSubmit={handleAddPlayer} style={{ display: 'flex', flexDirection: 'column', gap: 10, background: 'rgba(255,255,255,0.02)', padding: 14, borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)', marginBottom: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 8 }}>
+                <input className="form-input" placeholder="Nome Completo *" value={newPlayer.name || ''} onChange={e => setNewPlayer({...newPlayer, name: e.target.value})} style={{ height: 38, fontSize: 13 }} required />
+                <input className="form-input" placeholder="WhatsApp (ex: 841234567)" value={newPlayer.contact || ''} onChange={e => setNewPlayer({...newPlayer, contact: e.target.value})} style={{ height: 38, fontSize: 13 }} />
+                <select className="form-select" value={newPlayer.position || ''} onChange={e => setNewPlayer({...newPlayer, position: e.target.value})} style={{ height: 38, fontSize: 13 }}>
+                  <option value="">Posição (Opc.)</option>
+                  <option value="Guarda-Redes">Guarda-Redes</option>
+                  <option value="Defesa Central">Defesa Central</option>
+                  <option value="Lateral">Lateral</option>
+                  <option value="Trinco">Trinco / Defensivo</option>
+                  <option value="Médio Centro">Médio Centro</option>
+                  <option value="Extremo">Extremo / Ala</option>
+                  <option value="Ponta de Lança">Ponta de Lança</option>
+                </select>
+                <input type="number" className="form-input" placeholder="Nº Camisola" value={newPlayer.number || ''} onChange={e => setNewPlayer({...newPlayer, number: e.target.value})} style={{ height: 38, fontSize: 13 }} />
+              </div>
+
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input className="form-input" placeholder="Observações / Outras informações relevantes (Opcional)" value={newPlayer.notes || ''} onChange={e => setNewPlayer({...newPlayer, notes: e.target.value})} style={{ flex: 1, height: 38, fontSize: 12 }} />
+                
+                <label className="btn btn-secondary" style={{ height: 38, width: 38, padding: 0, justifyContent: 'center', cursor: 'pointer', borderRadius: 8, background: newPlayer.photo ? 'rgba(0,200,83,0.1)' : 'transparent', border: newPlayer.photo ? '1px solid var(--green)' : '1px solid rgba(255,255,255,0.1)' }} title="Carregar Foto">
+                  {uploading ? <span className="spinner-xs" /> : newPlayer.photo ? <Image size={16} color="var(--green)" /> : <Camera size={16} />}
+                  <input type="file" hidden accept="image/*" onChange={e => uploadImage(e.target.files[0], 'player')} />
+                </label>
+
+                <button type="submit" className="btn btn-primary" title="Adicionar / Guardar Jogador" style={{ height: 38, padding: '0 16px', justifyContent: 'center', background: editingPlayerIndex !== null ? 'var(--yellow)' : 'var(--green)', color: '#000', fontWeight: 800, border: 'none', fontSize: 12 }}>
+                  {editingPlayerIndex !== null ? <><Save size={14} /> Guardar</> : <><Plus size={14} /> Adicionar</>}
+                </button>
+                {editingPlayerIndex !== null && (
+                  <button type="button" onClick={cancelEdit} className="btn btn-secondary" style={{ height: 38, width: 38, padding: 0, justifyContent: 'center', borderRadius: 8 }}>
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
             </form>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', maxHeight: 300, paddingRight: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflowY: 'auto', maxHeight: 320, paddingRight: 4 }}>
               {(!squad.players || squad.players.length === 0) ? (
                 <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)' }}>
-                  Sem jogadores no plantel.
+                  Ainda não adicionaste nenhum jogador a este plantel.
                 </div>
               ) : (
                 squad.players.map((p, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.05)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.05)', gap: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+                      <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(255,255,255,0.05)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         {p.photo ? <img src={p.photo} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Users size={16} color="var(--text-muted)" />}
                       </div>
-                      {p.number && <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--green)', background: 'rgba(0,200,83,0.1)', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4 }}>{p.number}</span>}
-                      <span style={{ fontWeight: 700, fontSize: 14 }}>{p.name}</span>
-                      {p.position && <span style={{ fontSize: 10, color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '2px 6px', borderRadius: 4 }}>{p.position}</span>}
+                      {p.number && <span style={{ fontSize: 11, fontWeight: 900, color: 'var(--green)', background: 'rgba(0,200,83,0.1)', padding: '2px 6px', borderRadius: 4, flexShrink: 0 }}>#{p.number}</span>}
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span>{p.name}</span>
+                          {p.position && <span style={{ fontSize: 10, color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '1px 5px', borderRadius: 4, fontWeight: 400 }}>{p.position}</span>}
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
+                          {p.contact ? (
+                            <span style={{ color: '#25D366', display: 'flex', alignItems: 'center', gap: 3 }}>
+                              <Phone size={10} /> {p.contact}
+                            </span>
+                          ) : (
+                            <span style={{ color: 'var(--text-muted)' }}>Sem WhatsApp</span>
+                          )}
+                          {p.notes && <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>· {p.notes}</span>}
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', gap: 4 }}>
-                      <button type="button" onClick={() => handleEditPlayer(idx)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
+                    <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                      <button type="button" onClick={() => handleEditPlayer(idx)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 6 }} title="Editar">
                         <Pencil size={14} />
                       </button>
-                      <button type="button" onClick={() => handleRemovePlayer(idx)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}>
+                      <button type="button" onClick={() => handleRemovePlayer(idx)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 6 }} title="Remover">
                         <X size={16} />
                       </button>
                     </div>
@@ -301,9 +339,9 @@ export default function SquadDetail() {
               onClick={handleUpdate} 
               className="btn btn-primary" 
               disabled={saving} 
-              style={{ marginTop: 24, width: '100%', justifyContent: 'center', height: 48, background: 'var(--green)', color: '#000', border: 'none' }}
+              style={{ marginTop: 20, width: '100%', justifyContent: 'center', height: 44, background: 'var(--green)', color: '#000', fontWeight: 800, border: 'none' }}
             >
-              {saving ? <span className="spinner-xs"/> : <><Save size={18}/> Guardar Plantel Oficial</>}
+              {saving ? <span className="spinner-xs"/> : <><Save size={16}/> Guardar Alterações no Plantel</>}
             </button>
           </div>
         </div>
@@ -336,6 +374,14 @@ export default function SquadDetail() {
         </div>
 
       </div>
+
+      {showSummonsModal && (
+        <SummonsWhatsAppModal
+          squadName={squad?.name}
+          players={squad?.players || []}
+          onClose={() => setShowSummonsModal(false)}
+        />
+      )}
     </div>
   );
 }

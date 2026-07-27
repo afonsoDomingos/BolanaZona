@@ -10,6 +10,7 @@ import ShareModal from '../components/ShareModal';
 import LinkManagerModal from '../components/LinkManagerModal';
 import MatchLikeButton from '../components/MatchLikeButton';
 import ScheduledBadge from '../components/ScheduledBadge';
+import SummonsWhatsAppModal from '../components/SummonsWhatsAppModal';
 import { buildTournamentShareText, buildMatchShareText, copyToClipboard } from '../utils/shareUtils';
 
 
@@ -23,6 +24,7 @@ export default function TournamentDetail() {
   const [tournament, setTournament] = useState(null);
   const [teams, setTeams] = useState([]);
   const [matches, setMatches] = useState([]);
+  const [summonsMatchModal, setSummonsMatchModal] = useState(null);
   const [standings, setStandings] = useState([]);
   const [proposals, setProposals] = useState([]);
   const [leads, setLeads] = useState([]);
@@ -2314,6 +2316,15 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
         </div>
 
       </div>
+
+      {summonsMatchModal && (
+        <SummonsWhatsAppModal
+          match={summonsMatchModal}
+          squadName={summonsMatchModal.homeTeam?.name || 'Equipa'}
+          players={teams.find(t => t._id === (summonsMatchModal.homeTeam?._id || summonsMatchModal.homeTeam))?.players || []}
+          onClose={() => setSummonsMatchModal(null)}
+        />
+      )}
     </div>
   );
 }

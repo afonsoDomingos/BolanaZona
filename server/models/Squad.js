@@ -5,7 +5,8 @@ const playerSchema = new mongoose.Schema({
   number: { type: Number },
   position: { type: String, default: '' },
   isCaptain: { type: Boolean, default: false },
-  contact: { type: String, trim: true, default: '' },
+  contact: { type: String, trim: true, default: '' }, // WhatsApp do jogador
+  notes: { type: String, trim: true, default: '' }, // Observações / Outras informações
   photo: { type: String, default: '' }
 });
 

@@ -382,8 +382,37 @@ exports.createMatch = async (req, res) => {
       return res.status(403).json({ message: 'Não tens permissão para adicionar jogos a este torneio.' });
     }
 
-    const match = await Match.create({ ...req.body, tournament: tournament._id, status: 'scheduled' });
-    res.status(201).json(match);
+    let { homeTeam, awayTeam, homeTeamName, awayTeamName, round, roundName, date, location, status } = req.body;
+
+    // Se forem passados nomes em texto para equipas, procurar ou criar equipa no torneio
+    if (!homeTeam && homeTeamName) {
+      let team = await Team.findOne({ tournament: tournament._id, name: { $regex: new RegExp(`^${homeTeamName.trim()}$`, 'i') } });
+      if (!team) {
+        team = await Team.create({ name: homeTeamName.trim(), tournament: tournament._id, createdBy: req.user._id, status: 'approved' });
+      }
+      homeTeam = team._id;
+    }
+    if (!awayTeam && awayTeamName) {
+      let team = await Team.findOne({ tournament: tournament._id, name: { $regex: new RegExp(`^${awayTeamName.trim()}$`, 'i') } });
+      if (!team) {
+        team = await Team.create({ name: awayTeamName.trim(), tournament: tournament._id, createdBy: req.user._id, status: 'approved' });
+      }
+      awayTeam = team._id;
+    }
+
+    const match = await Match.create({
+      tournament: tournament._id,
+      homeTeam: homeTeam || null,
+      awayTeam: awayTeam || null,
+      round: round || 1,
+      roundName: roundName || 'Jornada 1',
+      date: date || new Date(),
+      location: location || '',
+      status: status || 'scheduled'
+    });
+
+    const populatedMatch = await Match.findById(match._id).populate('homeTeam awayTeam tournament');
+    res.status(201).json(populatedMatch);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 

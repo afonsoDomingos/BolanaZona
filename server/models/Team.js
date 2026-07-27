@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const playerSchema = new mongoose.Schema({
   name: { type: String, required: true },
   number: { type: Number },
-  position: { type: String, enum: ['GK', 'DEF', 'MID', 'FWD', ''], default: '' },
+  position: { type: String, default: '' },
+  contact: { type: String, trim: true, default: '' }, // WhatsApp do jogador
+  notes: { type: String, trim: true, default: '' }, // Observações / Outras informações
   photo: { type: String, default: '' },
 });
 

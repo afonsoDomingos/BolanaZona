@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell, Shield, Phone, ChevronLeft, ChevronRight, Handshake, Youtube, ArrowLeft as BackIcon } from 'lucide-react';
+import { Trophy, Users, Calendar, Plus, ArrowRight, TrendingUp, Bell, Shield, Phone, ChevronLeft, ChevronRight, Handshake, Youtube, ArrowLeft as BackIcon, X } from 'lucide-react';
 import MatchLikeButton from '../components/MatchLikeButton';
 import toast from 'react-hot-toast';
 
@@ -45,6 +45,14 @@ export default function Dashboard() {
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [showMatchModal, setShowMatchModal] = useState(false);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    if (queryParams.get('action') === 'new-match') {
+      setShowMatchModal(true);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     const welcomeFlag = localStorage.getItem('bnz_welcome');
@@ -210,7 +218,22 @@ export default function Dashboard() {
               </div>
             )}
             <Link to="/dashboard/squads" className="btn btn-secondary"><Shield size={16} /> Meus Clubes</Link>
-            <Link to="/dashboard/tournaments/new" className="btn btn-primary"><Plus size={16} /> Novo Torneio</Link>
+            <button 
+              onClick={() => setShowMatchModal(true)} 
+              className="btn"
+              style={{
+                background: 'linear-gradient(135deg, var(--green), #00c853)',
+                color: '#000000',
+                fontWeight: 800,
+                boxShadow: '0 4px 14px rgba(0, 200, 83, 0.25)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6
+              }}
+            >
+              <Calendar size={16} /> Agendar Jogo
+            </button>
+            <Link to="/dashboard/tournaments/new" className="btn btn-secondary"><Plus size={16} /> Novo Torneio</Link>
           </div>
         </div>
 
@@ -505,6 +528,188 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+      </div>
+
+      {showMatchModal && (
+        <AddMatchModal 
+          tournaments={tournaments} 
+          onClose={() => setShowMatchModal(false)} 
+          onMatchAdded={() => {
+            api.get('/tournaments/public/matches/live').then(res => setMatches(Array.isArray(res.data) ? res.data : []));
+            api.get('/tournaments').then(res => setTournaments(Array.isArray(res.data) ? res.data : []));
+          }} 
+        />
+      )}
+    </div>
+  );
+}
+
+function AddMatchModal({ tournaments, onClose, onMatchAdded }) {
+  const [selectedTournament, setSelectedTournament] = useState(tournaments[0]?._id || 'new');
+  const [newTournamentName, setNewTournamentName] = useState('Jogos Rápidos & Amigáveis');
+  const [homeTeamName, setHomeTeamName] = useState('');
+  const [awayTeamName, setAwayTeamName] = useState('');
+  const [date, setDate] = useState('');
+  const [location, setLocation] = useState('');
+  const [roundName, setRoundName] = useState('Jogo Amigável');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!homeTeamName.trim() || !awayTeamName.trim()) {
+      toast.error('Por favor, indica o nome da Equipa Casa e Equipa Fora.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      let targetTournamentId = selectedTournament;
+
+      // Criar novo torneio se selecionado "novo"
+      if (targetTournamentId === 'new' || !targetTournamentId) {
+        const tRes = await api.post('/tournaments', {
+          name: newTournamentName.trim() || 'Jogos Rápidos & Amigáveis',
+          description: 'Torneio de jogos amigáveis e rápidos agendados.',
+          format: 'league',
+          status: 'active'
+        });
+        targetTournamentId = tRes.data._id;
+      }
+
+      // Adicionar o jogo
+      await api.post(`/tournaments/${targetTournamentId}/matches`, {
+        homeTeamName: homeTeamName.trim(),
+        awayTeamName: awayTeamName.trim(),
+        date: date ? new Date(date) : new Date(),
+        location: location.trim(),
+        round: 1,
+        roundName: roundName.trim() || 'Jogo Amigável',
+        status: 'scheduled'
+      });
+
+      toast.success('Jogo agendado com sucesso! ⚽');
+      onMatchAdded();
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Erro ao agendar jogo.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" style={{ maxWidth: 480 }}>
+        <div className="modal-header">
+          <h2 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            ⚽ Agendar Jogo
+          </h2>
+          <button className="modal-close" onClick={onClose}><X size={18} /></button>
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 12 }}>
+          {/* Seletor de Torneio */}
+          <div className="form-group">
+            <label className="form-label">Torneio / Competição</label>
+            <select 
+              className="form-select" 
+              value={selectedTournament} 
+              onChange={e => setSelectedTournament(e.target.value)}
+            >
+              <option value="new">⚡ Jogo Amigável / Criar Novo Torneio</option>
+              {tournaments.map(t => (
+                <option key={t._id} value={t._id}>🏆 {t.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {selectedTournament === 'new' && (
+            <div className="form-group">
+              <label className="form-label">Nome da Competição / Torneio</label>
+              <input 
+                className="form-input" 
+                placeholder="Ex: Liga Amadora / Jogos Rápidos" 
+                value={newTournamentName} 
+                onChange={e => setNewTournamentName(e.target.value)} 
+              />
+            </div>
+          )}
+
+          {/* Equipas */}
+          <div className="form-grid form-grid-2">
+            <div className="form-group">
+              <label className="form-label">Equipa Casa (Mandante)</label>
+              <input 
+                className="form-input" 
+                placeholder="Ex: AC Juvenil" 
+                value={homeTeamName} 
+                onChange={e => setHomeTeamName(e.target.value)}
+                required 
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Equipa Fora (Visitante)</label>
+              <input 
+                className="form-input" 
+                placeholder="Ex: Mandevo FC" 
+                value={awayTeamName} 
+                onChange={e => setAwayTeamName(e.target.value)}
+                required 
+              />
+            </div>
+          </div>
+
+          {/* Data & Hora e Local */}
+          <div className="form-grid form-grid-2">
+            <div className="form-group">
+              <label className="form-label">Data e Hora</label>
+              <input 
+                type="datetime-local" 
+                className="form-input" 
+                value={date} 
+                onChange={e => setDate(e.target.value)} 
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Local do Jogo</label>
+              <input 
+                className="form-input" 
+                placeholder="Ex: Campo de Maxaquene" 
+                value={location} 
+                onChange={e => setLocation(e.target.value)} 
+              />
+            </div>
+          </div>
+
+          {/* Ronda / Tipo */}
+          <div className="form-group">
+            <label className="form-label">Fase ou Ronda (Opcional)</label>
+            <input 
+              className="form-input" 
+              placeholder="Ex: Jornada 1 / Amigável / Quartos de Final" 
+              value={roundName} 
+              onChange={e => setRoundName(e.target.value)} 
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            className="btn btn-primary" 
+            disabled={loading} 
+            style={{ 
+              width: '100%', 
+              justifyContent: 'center', 
+              height: 48, 
+              marginTop: 8, 
+              background: 'linear-gradient(135deg, var(--green), #00c853)', 
+              color: '#000', 
+              fontWeight: 800,
+              fontSize: 14
+            }}
+          >
+            {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><Plus size={16} /> Publicar Jogo no Calendário</>}
+          </button>
+        </form>
       </div>
     </div>
   );

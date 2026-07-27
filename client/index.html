@@ -45,7 +45,11 @@
     <title>Bola na Zona · Torneios de Futebol</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="app-initial-splash" style="position: fixed; inset: 0; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999999;">
+        <div style="font-size: 64px; animation: spin 1s linear infinite; display: inline-block;">⚽</div>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

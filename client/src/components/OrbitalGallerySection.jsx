@@ -366,26 +366,25 @@ export default function OrbitalGallerySection() {
           </div>
         </div>
 
-        {/* 2. ORIGINAL MOBILE ORBITAL LAYOUT (<= 768px) */}
+        {/* 2. MOBILE GALLERY VIEW (<= 768px - Cartões Retos) */}
         <div className="gallery-mobile-view" style={{ display: 'none' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 14 }}>
             {filteredPhotos.map((photo, index) => {
-              const slot = ORBIT_SLOTS[index % ORBIT_SLOTS.length];
               return (
                 <div
                   key={photo._id || index}
                   onClick={() => openLightbox(index)}
                   style={{
-                    height: 195,
-                    borderRadius: slot.radius,
+                    height: 190,
+                    borderRadius: '16px',
                     overflow: 'hidden',
                     position: 'relative',
                     background: '#ffffff',
-                    boxShadow: '0 10px 24px rgba(0,0,0,0.08)',
-                    border: '4px solid #ffffff',
-                    transform: `rotate(${slot.rotate})`,
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                    border: '1px solid #e2e8f0',
+                    transform: 'none',
                     cursor: 'pointer',
-                    transition: 'transform 0.3s ease'
+                    transition: 'transform 0.2s ease'
                   }}
                 >
                   <img src={photo.image} alt={photo.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
