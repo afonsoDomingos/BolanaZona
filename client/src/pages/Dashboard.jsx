@@ -218,7 +218,9 @@ export default function Dashboard() {
               </div>
             )}
             <Link to="/dashboard/squads" className="btn btn-secondary"><Shield size={16} /> Meus Clubes</Link>
+            <Link to="/dashboard/squads?new=true" className="btn btn-secondary"><Plus size={16} /> Criar Clube</Link>
             <button 
+
               onClick={() => setShowMatchModal(true)} 
               className="btn"
               style={{

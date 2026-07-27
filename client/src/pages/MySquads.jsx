@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Shield, Plus, ArrowRight, User, Swords, Check, X, Calendar, MapPin, Trophy, LogOut, Edit2, Save, Upload } from 'lucide-react';
+
 
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -28,8 +29,7 @@ export default function MySquads() {
   const [managedTeams, setManagedTeams] = useState([]);
   const [selectedEditTeam, setSelectedEditTeam] = useState(null);
   const navigate = useNavigate();
-
-
+  const location = useLocation();
 
   const fetchSquads = async () => {
     try {
@@ -50,7 +50,12 @@ export default function MySquads() {
 
   useEffect(() => {
     fetchSquads();
-  }, []);
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('new') === 'true' || searchParams.get('create') === 'true') {
+      setShowModal(true);
+    }
+  }, [location.search]);
+
 
   const handleCreate = async (e) => {
     e.preventDefault();
