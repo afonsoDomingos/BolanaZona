@@ -1,82 +1,71 @@
 import { useState, useEffect } from 'react';
-import { Camera, Eye, X, ChevronLeft, ChevronRight, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Camera, Eye, X, ChevronLeft, ChevronRight, Sparkles, ArrowRight, Download, Maximize2, Filter } from 'lucide-react';
 import api from '../services/api';
 
 const DEFAULT_PHOTOS = [
   {
     _id: '1',
     title: 'Grande Final de Bairro',
-    caption: 'A festa do futebol comunitário na atribuição do troféu principal.',
+    caption: 'A festa do futebol comunitário na atribuição do troféu principal aos novos campeões.',
     image: '/banner1.png',
     category: 'Torneios',
   },
   {
     _id: '2',
     title: 'Mambinhas no CAN Sub-17',
-    caption: 'Momento histórico da qualificação inédita ao Mundial Qatar 2026.',
+    caption: 'Momento histórico da qualificação inédita ao Campeonato do Mundo Qatar 2026.',
     image: '/banner4mabinhas.jpg',
     category: 'Comunidade',
   },
   {
     _id: '3',
-    title: 'Ação em Campo',
-    caption: 'Garra, talento e determinação a cada lance disputado.',
+    title: 'Ação & Garra em Campo',
+    caption: 'Talento, velocidade e determinação a cada lance disputado na nossa liga.',
     image: '/banner2.png',
     category: 'Jogos',
   },
   {
     _id: '4',
-    title: 'Emblema da Comunidade',
-    caption: 'Paixão pelo desporto em todas as zonas e bairros.',
+    title: 'Troféu Oficial Bola na Zona',
+    caption: 'A máxima glória disputada com paixão em todas as zonas e bairros.',
     image: '/bolanazonalgo.png',
     category: 'Troféus',
   },
   {
     _id: '5',
-    title: 'Comunidade Bola na Zona',
-    caption: 'Jovens talentos prontos para dar o salto.',
+    title: 'Comunidade & Atletas',
+    caption: 'Jovens promessas do futebol preparadas para o próximo grande salto profissional.',
     image: '/vibe-avatar.png',
     category: 'Comunidade',
   },
   {
     _id: '6',
-    title: 'Duelo Decisivo nas Penalidades',
-    caption: 'Frieza e concentração nos momentos de máxima pressão.',
+    title: 'Duelo nas Penalidades',
+    caption: 'Frieza, técnica e máxima concentração no apuramento do vencedor.',
     image: '/banner1.png',
     category: 'Jogos',
   },
   {
     _id: '7',
     title: 'Cerimónia de Premiação',
-    caption: 'Reconhecimento aos melhores marcadores e guarda-redes.',
+    caption: 'Homenagem aos melhores marcadores, guarda-redes e equipas fair-play.',
     image: '/banner2.png',
     category: 'Troféus',
   },
   {
     _id: '8',
     title: 'Espírito Desportivo',
-    caption: 'Respeito e fair-play entre todas as equipas participantes.',
+    caption: 'União, respeito e companheirismo entre todas as comitivas participantes.',
     image: '/banner4mabinhas.jpg',
     category: 'Torneios',
   }
 ];
 
-// Tilt & position parameters for the orbital layout (inspired by the design inspiration image)
-const ORBIT_SLOTS = [
-  { top: '2%', left: '42%', rotate: '-6deg', radius: '36px 16px 36px 16px' },
-  { top: '10%', left: '72%', rotate: '12deg', radius: '20px 36px 20px 36px' },
-  { top: '42%', left: '82%', rotate: '-10deg', radius: '36px 20px 36px 20px' },
-  { top: '74%', left: '68%', rotate: '8deg', radius: '20px 36px 20px 36px' },
-  { top: '78%', left: '34%', rotate: '-14deg', radius: '36px 20px 36px 20px' },
-  { top: '64%', left: '6%', rotate: '10deg', radius: '20px 36px 20px 36px' },
-  { top: '30%', left: '2%', rotate: '-8deg', radius: '36px 20px 36px 20px' },
-  { top: '8%', left: '16%', rotate: '14deg', radius: '20px 36px 20px 36px' },
-];
-
 export default function OrbitalGallerySection() {
   const [photos, setPhotos] = useState(DEFAULT_PHOTOS);
   const [activeCategory, setActiveCategory] = useState('Todas');
-  const [activePhotoIndex, setActivePhotoIndex] = useState(null);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -98,264 +87,392 @@ export default function OrbitalGallerySection() {
     ? photos
     : photos.filter(p => p.category === activeCategory);
 
-  const displayPhotos = filteredPhotos.slice(0, 8);
+  const spotlightPhoto = filteredPhotos[selectedPhotoIndex] || filteredPhotos[0] || DEFAULT_PHOTOS[0];
 
-  const openLightbox = (index) => {
-    setActivePhotoIndex(index);
+  const handleCardClick = (index) => {
+    setSelectedPhotoIndex(index);
+  };
+
+  const openLightbox = (index, e) => {
+    if (e) e.stopPropagation();
+    setLightboxIndex(index);
   };
 
   const closeLightbox = () => {
-    setActivePhotoIndex(null);
+    setLightboxIndex(null);
   };
 
-  const nextPhoto = () => {
-    if (activePhotoIndex === null) return;
-    setActivePhotoIndex((activePhotoIndex + 1) % displayPhotos.length);
+  const nextLightbox = () => {
+    if (lightboxIndex === null) return;
+    setLightboxIndex((lightboxIndex + 1) % filteredPhotos.length);
   };
 
-  const prevPhoto = () => {
-    if (activePhotoIndex === null) return;
-    setActivePhotoIndex((activePhotoIndex - 1 + displayPhotos.length) % displayPhotos.length);
+  const prevLightbox = () => {
+    if (lightboxIndex === null) return;
+    setLightboxIndex((lightboxIndex - 1 + filteredPhotos.length) % filteredPhotos.length);
   };
 
-  const currentPhoto = activePhotoIndex !== null ? displayPhotos[activePhotoIndex] : null;
+  const lightboxPhoto = lightboxIndex !== null ? filteredPhotos[lightboxIndex] : null;
 
   return (
     <section style={{
-      padding: '100px 0',
-      background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 50%, #f1f5f9 100%)',
+      padding: '90px 0',
+      background: '#f8fafc',
       color: '#0f172a',
       position: 'relative',
       overflow: 'hidden',
       borderTop: '1px solid #e2e8f0',
       borderBottom: '1px solid #e2e8f0'
     }}>
-      {/* Background glow & subtle ambient shapes */}
+      {/* Background ambient pattern */}
       <div style={{
         position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '600px',
-        height: '600px',
-        background: 'radial-gradient(circle, rgba(0, 200, 83, 0.06) 0%, rgba(255, 255, 255, 0) 70%)',
-        pointerEvents: 'none',
-        zIndex: 0
+        inset: 0,
+        backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)',
+        backgroundSize: '24px 24px',
+        opacity: 0.35,
+        pointerEvents: 'none'
       }} />
 
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-        {/* Section Header */}
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+        {/* Header Title */}
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: 8,
             background: '#ffffff',
             border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
             borderRadius: 100,
             padding: '6px 18px',
-            marginBottom: 16
+            marginBottom: 14
           }}>
             <Camera size={15} color="#00C853" />
-            <span style={{ fontSize: 13, color: '#0f172a', fontWeight: 700, letterSpacing: 0.3 }}>
-              Galeria Oficial Bola na Zona
+            <span style={{ fontSize: 13, color: '#0f172a', fontWeight: 700, letterSpacing: 0.4 }}>
+              Galeria da Comunidade
             </span>
           </div>
 
           <h2 className="font-syne scroll-reveal" style={{
-            fontSize: 'clamp(28px, 5vw, 44px)',
+            fontSize: 'clamp(26px, 4.5vw, 42px)',
             fontWeight: 800,
             color: '#0f172a',
-            marginBottom: 16,
+            marginBottom: 12,
             lineHeight: 1.15
           }}>
-            Momentos que marcam a <span style={{
+            Momentos em <span style={{
               background: 'linear-gradient(135deg, #00C853 0%, #008a38 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
-            }}>Nossa História</span>
+            }}>Destaque</span>
           </h2>
 
-          <p style={{ color: '#64748b', fontSize: 17, maxWidth: 520, margin: '0 auto 32px', lineHeight: 1.6 }}>
-            Explora os lances, comemorações e troféus registados pela nossa comunidade.
+          <p style={{ color: '#64748b', fontSize: 16, maxWidth: 520, margin: '0 auto', lineHeight: 1.6 }}>
+            Selecione qualquer fotografia no estúdio para colocar em foco ou expandir em alta resolução.
           </p>
-
-          {/* Category Filter Pills */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 40 }}>
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                style={{
-                  padding: '8px 20px',
-                  borderRadius: 100,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  border: activeCategory === cat ? 'none' : '1px solid #e2e8f0',
-                  background: activeCategory === cat ? '#0f172a' : '#ffffff',
-                  color: activeCategory === cat ? '#ffffff' : '#475569',
-                  cursor: 'pointer',
-                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: activeCategory === cat ? '0 8px 20px rgba(15,23,42,0.15)' : 'none',
-                  transform: activeCategory === cat ? 'translateY(-2px)' : 'none'
-                }}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
         </div>
 
-        {/* ORBITAL LAYOUT CONTAINER (Desktop & Tablet) */}
-        <div className="orbital-desktop-wrapper" style={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: '820px',
-          height: '620px',
-          margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
+        {/* MAIN STUDIO LAYOUT GRID (Inspired by Reference Image) */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(280px, 340px) 1fr',
+          gap: 28,
+          alignItems: 'start',
+          maxWidth: '1240px',
+          margin: '0 auto'
+        }} className="studio-layout-grid">
 
-          {/* Center Hub Core (Inspired by "Upload or drop your assets" hub) */}
+          {/* LEFT COLUMN: HERO SPOTLIGHT CARD */}
           <div style={{
-            width: '180px',
-            height: '180px',
             background: '#ffffff',
-            borderRadius: '32px',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.05)',
+            borderRadius: '28px',
+            padding: '16px',
             border: '1px solid #e2e8f0',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.03)',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 20,
-            textAlign: 'center',
-            zIndex: 10,
-            transition: 'all 0.3s ease',
-            cursor: 'default'
+            position: 'sticky',
+            top: '84px',
+            zIndex: 5
           }}>
+            {/* Spotlight Image Container */}
             <div style={{
-              width: 52,
-              height: 52,
-              borderRadius: 18,
-              background: 'rgba(0, 200, 83, 0.08)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#00C853',
-              marginBottom: 12
+              position: 'relative',
+              width: '100%',
+              aspectRatio: '3/4',
+              borderRadius: '22px',
+              overflow: 'hidden',
+              background: '#f1f5f9',
+              border: '1px solid #e2e8f0'
             }}>
-              <Sparkles size={26} />
+              <img
+                src={spotlightPhoto.image}
+                alt={spotlightPhoto.title}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  transition: 'transform 0.4s ease'
+                }}
+              />
+
+              {/* Category Badge */}
+              <div style={{
+                position: 'absolute',
+                top: 14,
+                left: 14,
+                background: 'rgba(0, 0, 0, 0.75)',
+                backdropFilter: 'blur(8px)',
+                color: '#00C853',
+                fontSize: 11,
+                fontWeight: 800,
+                padding: '5px 12px',
+                borderRadius: 100,
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+                border: '1px solid rgba(255,255,255,0.15)'
+              }}>
+                {spotlightPhoto.category}
+              </div>
+
+              {/* Expand Lightbox Button */}
+              <button
+                onClick={(e) => openLightbox(selectedPhotoIndex, e)}
+                title="Ver em ecrã inteiro"
+                style={{
+                  position: 'absolute',
+                  top: 14,
+                  right: 14,
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  background: 'rgba(0,0,0,0.65)',
+                  backdropFilter: 'blur(8px)',
+                  color: '#ffffff',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s ease'
+                }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
+                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <Maximize2 size={16} />
+              </button>
             </div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>
-              Bola na Zona
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', marginTop: 4 }}>
-              {displayPhotos.length} Momentos
+
+            {/* Spotlight Info */}
+            <div style={{ padding: '18px 8px 6px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', lineHeight: 1.3 }}>
+                  {spotlightPhoto.title}
+                </h3>
+                <div style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: '#f1f5f9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#64748b',
+                  flexShrink: 0
+                }}>
+                  <ArrowRight size={16} />
+                </div>
+              </div>
+
+              {spotlightPhoto.caption && (
+                <p style={{ color: '#64748b', fontSize: 13, lineHeight: 1.5 }}>
+                  {spotlightPhoto.caption}
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Surrounding Orbital Photo Cards */}
-          {displayPhotos.map((photo, index) => {
-            const slot = ORBIT_SLOTS[index % ORBIT_SLOTS.length];
-            return (
-              <div
-                key={photo._id || index}
-                onClick={() => openLightbox(index)}
-                className="orbital-card"
-                style={{
-                  position: 'absolute',
-                  top: slot.top,
-                  left: slot.left,
-                  width: '135px',
-                  height: '170px',
-                  borderRadius: slot.radius,
-                  overflow: 'hidden',
-                  background: '#ffffff',
-                  boxShadow: '0 12px 30px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04)',
-                  border: '4px solid #ffffff',
-                  transform: `rotate(${slot.rotate}) scale(1)`,
-                  transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  cursor: 'pointer',
-                  zIndex: 5
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = `rotate(0deg) scale(1.18)`;
-                  e.currentTarget.style.zIndex = '20';
-                  e.currentTarget.style.boxShadow = '0 24px 50px rgba(0,200,83,0.25), 0 8px 20px rgba(0,0,0,0.12)';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = `rotate(${slot.rotate}) scale(1)`;
-                  e.currentTarget.style.zIndex = '5';
-                  e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04)';
-                }}
-              >
-                <img
-                  src={photo.image}
-                  alt={photo.title}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover'
-                  }}
-                />
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)',
-                  opacity: 0.85,
-                  display: 'flex',
-                  alignItems: 'flex-end',
-                  padding: '10px'
-                }}>
-                  <span style={{ color: '#ffffff', fontSize: 10, fontWeight: 700, lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {photo.title}
-                  </span>
-                </div>
+          {/* RIGHT COLUMN: STUDIO CANVAS BOARD */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '28px',
+            padding: '24px',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.04)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 20
+          }}>
+            {/* Board Header Bar (Inspired by "Dashboard / 4MLA Project") */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingBottom: 16,
+              borderBottom: '1px solid #f1f5f9',
+              flexWrap: 'wrap',
+              gap: 12
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#64748b', fontWeight: 600 }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#00C853' }} />
+                <span>Bola na Zona</span>
+                <span style={{ color: '#cbd5e1' }}>/</span>
+                <span style={{ color: '#0f172a', fontWeight: 800 }}>Galeria Oficial</span>
               </div>
-            );
-          })}
-        </div>
 
-        {/* MOBILE GRID VIEW (Clean Responsive Alternative) */}
-        <div className="orbital-mobile-wrapper" style={{ display: 'none', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
-          {displayPhotos.map((photo, index) => (
-            <div
-              key={photo._id || index}
-              onClick={() => openLightbox(index)}
-              style={{
-                height: 180,
-                borderRadius: '24px 12px 24px 12px',
-                overflow: 'hidden',
-                position: 'relative',
-                background: '#ffffff',
-                boxShadow: '0 8px 20px rgba(0,0,0,0.06)',
-                border: '3px solid #ffffff',
-                cursor: 'pointer'
-              }}
-            >
-              <img src={photo.image} alt={photo.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 50%)', padding: 10, display: 'flex', alignItems: 'flex-end' }}>
-                <span style={{ color: '#fff', fontSize: 11, fontWeight: 700, lineHeight: 1.2 }}>{photo.title}</span>
+              {/* Category Filter Pills */}
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => { setActiveCategory(cat); setSelectedPhotoIndex(0); }}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: 100,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      border: activeCategory === cat ? 'none' : '1px solid #e2e8f0',
+                      background: activeCategory === cat ? '#0f172a' : '#f8fafc',
+                      color: activeCategory === cat ? '#ffffff' : '#64748b',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {cat}
+                  </button>
+                ))}
               </div>
             </div>
-          ))}
+
+            {/* Photo Grid (Studio Cards) */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))',
+              gap: 16
+            }}>
+              {filteredPhotos.map((photo, index) => {
+                const isSelected = index === selectedPhotoIndex;
+                return (
+                  <div
+                    key={photo._id || index}
+                    onClick={() => handleCardClick(index)}
+                    style={{
+                      position: 'relative',
+                      borderRadius: '20px',
+                      overflow: 'hidden',
+                      background: '#f8fafc',
+                      border: isSelected ? '3px solid #00C853' : '1px solid #e2e8f0',
+                      boxShadow: isSelected ? '0 8px 24px rgba(0,200,83,0.2)' : '0 4px 12px rgba(0,0,0,0.02)',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      transform: isSelected ? 'scale(1.02)' : 'scale(1)'
+                    }}
+                    onMouseEnter={e => {
+                      if (!isSelected) {
+                        e.currentTarget.style.transform = 'translateY(-4px)';
+                        e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.08)';
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!isSelected) {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.02)';
+                      }
+                    }}
+                  >
+                    {/* Card Image Wrapper */}
+                    <div style={{ width: '100%', height: 210, overflow: 'hidden', position: 'relative', background: '#000' }}>
+                      <img
+                        src={photo.image}
+                        alt={photo.title}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover'
+                        }}
+                      />
+
+                      {/* Top Action Icons (Inspired by trash/download circle buttons in reference) */}
+                      <div style={{
+                        position: 'absolute',
+                        top: 8,
+                        right: 8,
+                        display: 'flex',
+                        gap: 6
+                      }}>
+                        <button
+                          onClick={(e) => openLightbox(index, e)}
+                          title="Expandir foto"
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: '50%',
+                            background: 'rgba(0,0,0,0.6)',
+                            backdropFilter: 'blur(4px)',
+                            color: '#ffffff',
+                            border: 'none',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <Eye size={13} />
+                        </button>
+                      </div>
+
+                      {/* Bottom Category Pill inside image */}
+                      <div style={{
+                        position: 'absolute',
+                        bottom: 8,
+                        left: 8,
+                        background: 'rgba(15, 23, 42, 0.75)',
+                        backdropFilter: 'blur(4px)',
+                        color: '#ffffff',
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(255,255,255,0.1)'
+                      }}>
+                        {photo.category}
+                      </div>
+                    </div>
+
+                    {/* Card Footer Title */}
+                    <div style={{ padding: '10px 12px', background: '#ffffff' }}>
+                      <div style={{
+                        fontSize: 12,
+                        fontWeight: 800,
+                        color: '#0f172a',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
+                        {photo.title}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* LIGHTBOX MODAL */}
-      {currentPhoto && (
+      {lightboxPhoto && (
         <div
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(5, 8, 15, 0.92)',
+            background: 'rgba(5, 8, 15, 0.94)',
             backdropFilter: 'blur(16px)',
-            zIndex: 9999,
+            zIndex: 99999,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -388,7 +505,7 @@ export default function OrbitalGallerySection() {
 
           {/* Navigation Prev */}
           <button
-            onClick={prevPhoto}
+            onClick={prevLightbox}
             style={{
               position: 'absolute',
               left: 24,
@@ -410,9 +527,9 @@ export default function OrbitalGallerySection() {
             <ChevronLeft size={24} />
           </button>
 
-          {/* Main Content Box */}
+          {/* Content Box */}
           <div style={{
-            maxWidth: '800px',
+            maxWidth: '820px',
             width: '100%',
             background: '#0d1527',
             borderRadius: '28px',
@@ -420,10 +537,10 @@ export default function OrbitalGallerySection() {
             border: '1px solid rgba(255,255,255,0.12)',
             boxShadow: '0 30px 60px rgba(0,0,0,0.6)'
           }}>
-            <div style={{ height: '420px', background: '#000', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ height: '440px', background: '#000', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <img
-                src={currentPhoto.image}
-                alt={currentPhoto.title}
+                src={lightboxPhoto.image}
+                alt={lightboxPhoto.title}
                 style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
               />
               <div style={{
@@ -438,17 +555,17 @@ export default function OrbitalGallerySection() {
                 fontWeight: 800,
                 textTransform: 'uppercase'
               }}>
-                {currentPhoto.category}
+                {lightboxPhoto.category}
               </div>
             </div>
 
             <div style={{ padding: '24px 32px' }}>
               <h3 style={{ fontSize: 22, fontWeight: 800, color: '#ffffff', marginBottom: 8 }}>
-                {currentPhoto.title}
+                {lightboxPhoto.title}
               </h3>
-              {currentPhoto.caption && (
+              {lightboxPhoto.caption && (
                 <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 15, lineHeight: 1.6 }}>
-                  {currentPhoto.caption}
+                  {lightboxPhoto.caption}
                 </p>
               )}
             </div>
@@ -456,7 +573,7 @@ export default function OrbitalGallerySection() {
 
           {/* Navigation Next */}
           <button
-            onClick={nextPhoto}
+            onClick={nextLightbox}
             style={{
               position: 'absolute',
               right: 24,
@@ -482,12 +599,13 @@ export default function OrbitalGallerySection() {
 
       {/* Responsive Styles Injection */}
       <style>{`
-        @media (max-width: 768px) {
-          .orbital-desktop-wrapper {
-            display: none !important;
+        @media (max-width: 900px) {
+          .studio-layout-grid {
+            grid-template-columns: 1fr !important;
           }
-          .orbital-mobile-wrapper {
-            display: grid !important;
+          .studio-layout-grid > div:first-child {
+            position: relative !important;
+            top: 0 !important;
           }
         }
       `}</style>
