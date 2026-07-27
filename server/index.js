@@ -65,6 +65,7 @@ app.use('/api/squads', require('./routes/squads'));
 app.use('/api/challenges', require('./routes/challenges'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/settings', require('./routes/settings'));
+app.use('/api/gallery', require('./routes/gallery'));
 
 // Start DB connection for local development
 if (process.env.NODE_ENV !== 'production') {

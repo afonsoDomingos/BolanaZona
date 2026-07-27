@@ -4,6 +4,7 @@ import { Trophy, Users, Calendar, BarChart2, Share2, ArrowRight, CheckCircle, Cl
 import LandingBracketPreview from '../components/LandingBracketPreview';
 import LeadCaptureModal from '../components/LeadCaptureModal';
 import PartnersSection from '../components/PartnersSection';
+import OrbitalGallerySection from '../components/OrbitalGallerySection';
 import api from '../services/api';
 import VisitorCounter from '../components/VisitorCounter';
 import { useAuth } from '../contexts/AuthContext';
@@ -647,6 +648,8 @@ export default function Landing() {
           )}
         </div>
       </section>
+
+      <OrbitalGallerySection />
 
       <YouTubeShortsSection />
 

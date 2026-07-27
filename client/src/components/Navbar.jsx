@@ -320,6 +320,21 @@ export default function Navbar() {
                           <Settings size={16} /> Gestão
                         </Link>
                         <Link 
+                          to="/admin/gallery" 
+                          className="nav-link" 
+                          onClick={() => { setIsMenuOpen(false); setShowAdminDropdown(false); }}
+                          style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 8,
+                            padding: '8px 12px',
+                            borderRadius: 8,
+                            fontSize: 14
+                          }}
+                        >
+                          <Camera size={16} /> Galeria de Fotos
+                        </Link>
+                        <Link 
                           to="/dashboard/analytics" 
                           className="nav-link" 
                           onClick={() => { setIsMenuOpen(false); setShowAdminDropdown(false); }}

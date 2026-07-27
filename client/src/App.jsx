@@ -44,6 +44,7 @@ const UserManagement = lazy(() => import('./pages/UserManagement'));
 const AdminTeams = lazy(() => import('./pages/AdminTeams'));
 const AdminPartners = lazy(() => import('./pages/AdminPartners'));
 const AdminShorts = lazy(() => import('./pages/AdminShorts'));
+const AdminGallery = lazy(() => import('./pages/AdminGallery'));
 const Community = lazy(() => import('./pages/Community'));
 const AdminStore = lazy(() => import('./pages/AdminStore'));
 const Privacy = lazy(() => import('./pages/legal/Privacy'));
@@ -111,6 +112,7 @@ function AppRoutes() {
             <Route path="/admin/teams" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminTeams /></ProtectedRoute>} />
             <Route path="/admin/partners" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminPartners /></ProtectedRoute>} />
             <Route path="/admin/shorts" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminShorts /></ProtectedRoute>} />
+            <Route path="/admin/gallery" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminGallery /></ProtectedRoute>} />
             <Route path="/admin/store" element={<ProtectedRoute allowedRoles={['superadmin']}><AdminStore /></ProtectedRoute>} />
             <Route path="/support" element={<Support />} />
             <Route path="/como-criar-torneio" element={<GuideTournament />} />
