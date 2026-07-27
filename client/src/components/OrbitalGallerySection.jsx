@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Camera, Eye, X, ChevronLeft, ChevronRight, Sparkles, ArrowRight, Download, Maximize2, Filter } from 'lucide-react';
+import { Camera, Eye, X, ChevronLeft, ChevronRight, Sparkles, ArrowRight, Maximize2 } from 'lucide-react';
 import api from '../services/api';
 
 const DEFAULT_PHOTOS = [
@@ -61,12 +61,23 @@ const DEFAULT_PHOTOS = [
   }
 ];
 
+// Tilt & position parameters for the original Mobile Orbital Layout
+const ORBIT_SLOTS = [
+  { rotate: '-6deg', radius: '36px 16px 36px 16px' },
+  { rotate: '12deg', radius: '20px 36px 20px 36px' },
+  { rotate: '-10deg', radius: '36px 20px 36px 20px' },
+  { rotate: '8deg', radius: '20px 36px 20px 36px' },
+  { rotate: '-14deg', radius: '36px 20px 36px 20px' },
+  { rotate: '10deg', radius: '20px 36px 20px 36px' },
+  { rotate: '-8deg', radius: '36px 20px 36px 20px' },
+  { rotate: '14deg', radius: '20px 36px 20px 36px' },
+];
+
 export default function OrbitalGallerySection() {
   const [photos, setPhotos] = useState(DEFAULT_PHOTOS);
   const [activeCategory, setActiveCategory] = useState('Todas');
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api.get('/gallery')
@@ -77,8 +88,7 @@ export default function OrbitalGallerySection() {
       })
       .catch(err => {
         console.error('Erro ao carregar galeria:', err);
-      })
-      .finally(() => setLoading(false));
+      });
   }, []);
 
   const categories = ['Todas', 'Torneios', 'Jogos', 'Comunidade', 'Troféus'];
@@ -88,10 +98,6 @@ export default function OrbitalGallerySection() {
     : photos.filter(p => p.category === activeCategory);
 
   const spotlightPhoto = filteredPhotos[selectedPhotoIndex] || filteredPhotos[0] || DEFAULT_PHOTOS[0];
-
-  const handleCardClick = (index) => {
-    setSelectedPhotoIndex(index);
-  };
 
   const openLightbox = (index, e) => {
     if (e) e.stopPropagation();
@@ -136,7 +142,7 @@ export default function OrbitalGallerySection() {
 
       <div className="container" style={{ position: 'relative', zIndex: 1 }}>
         {/* Header Title */}
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -161,30 +167,53 @@ export default function OrbitalGallerySection() {
             marginBottom: 12,
             lineHeight: 1.15
           }}>
-            Momentos em <span style={{
+            Momentos que Marcam a <span style={{
               background: 'linear-gradient(135deg, #00C853 0%, #008a38 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
-            }}>Destaque</span>
+            }}>Nossa História</span>
           </h2>
 
-          <p style={{ color: '#64748b', fontSize: 16, maxWidth: 520, margin: '0 auto', lineHeight: 1.6 }}>
-            Selecione qualquer fotografia no estúdio para colocar em foco ou expandir em alta resolução.
+          <p style={{ color: '#64748b', fontSize: 16, maxWidth: 520, margin: '0 auto 24px', lineHeight: 1.6 }}>
+            Explora os lances, comemorações e troféus registados pela nossa comunidade.
           </p>
+
+          {/* Category Filters Bar */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => { setActiveCategory(cat); setSelectedPhotoIndex(0); }}
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: 100,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  border: activeCategory === cat ? 'none' : '1px solid #e2e8f0',
+                  background: activeCategory === cat ? '#0f172a' : '#ffffff',
+                  color: activeCategory === cat ? '#ffffff' : '#64748b',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: activeCategory === cat ? '0 6px 16px rgba(15,23,42,0.12)' : 'none'
+                }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* MAIN STUDIO LAYOUT GRID (Inspired by Reference Image) */}
-        <div style={{
+        {/* 1. DESKTOP STUDIO LAYOUT (> 768px) */}
+        <div className="gallery-desktop-view" style={{
           display: 'grid',
           gridTemplateColumns: 'minmax(280px, 340px) 1fr',
           gap: 28,
           alignItems: 'start',
           maxWidth: '1240px',
           margin: '0 auto'
-        }} className="studio-layout-grid">
-
-          {/* LEFT COLUMN: HERO SPOTLIGHT CARD */}
+        }}>
+          {/* LEFT SPOTLIGHT CARD */}
           <div style={{
             background: '#ffffff',
             borderRadius: '28px',
@@ -197,7 +226,6 @@ export default function OrbitalGallerySection() {
             top: '84px',
             zIndex: 5
           }}>
-            {/* Spotlight Image Container */}
             <div style={{
               position: 'relative',
               width: '100%',
@@ -210,15 +238,9 @@ export default function OrbitalGallerySection() {
               <img
                 src={spotlightPhoto.image}
                 alt={spotlightPhoto.title}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  transition: 'transform 0.4s ease'
-                }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
               />
 
-              {/* Category Badge */}
               <div style={{
                 position: 'absolute',
                 top: 14,
@@ -231,13 +253,11 @@ export default function OrbitalGallerySection() {
                 padding: '5px 12px',
                 borderRadius: 100,
                 textTransform: 'uppercase',
-                letterSpacing: 0.5,
                 border: '1px solid rgba(255,255,255,0.15)'
               }}>
                 {spotlightPhoto.category}
               </div>
 
-              {/* Expand Lightbox Button */}
               <button
                 onClick={(e) => openLightbox(selectedPhotoIndex, e)}
                 title="Ver em ecrã inteiro"
@@ -255,37 +275,22 @@ export default function OrbitalGallerySection() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s ease'
+                  cursor: 'pointer'
                 }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
-                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
               >
                 <Maximize2 size={16} />
               </button>
             </div>
 
-            {/* Spotlight Info */}
             <div style={{ padding: '18px 8px 6px', display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0f172a', lineHeight: 1.3 }}>
                   {spotlightPhoto.title}
                 </h3>
-                <div style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  background: '#f1f5f9',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#64748b',
-                  flexShrink: 0
-                }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
                   <ArrowRight size={16} />
                 </div>
               </div>
-
               {spotlightPhoto.caption && (
                 <p style={{ color: '#64748b', fontSize: 13, lineHeight: 1.5 }}>
                   {spotlightPhoto.caption}
@@ -294,7 +299,7 @@ export default function OrbitalGallerySection() {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: STUDIO CANVAS BOARD */}
+          {/* RIGHT CANVAS BOARD */}
           <div style={{
             background: '#ffffff',
             borderRadius: '28px',
@@ -305,59 +310,23 @@ export default function OrbitalGallerySection() {
             flexDirection: 'column',
             gap: 20
           }}>
-            {/* Board Header Bar (Inspired by "Dashboard / 4MLA Project") */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingBottom: 16,
-              borderBottom: '1px solid #f1f5f9',
-              flexWrap: 'wrap',
-              gap: 12
-            }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 14, borderBottom: '1px solid #f1f5f9' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#64748b', fontWeight: 600 }}>
                 <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#00C853' }} />
                 <span>Bola na Zona</span>
                 <span style={{ color: '#cbd5e1' }}>/</span>
                 <span style={{ color: '#0f172a', fontWeight: 800 }}>Galeria Oficial</span>
               </div>
-
-              {/* Category Filter Pills */}
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                {categories.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => { setActiveCategory(cat); setSelectedPhotoIndex(0); }}
-                    style={{
-                      padding: '6px 14px',
-                      borderRadius: 100,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      border: activeCategory === cat ? 'none' : '1px solid #e2e8f0',
-                      background: activeCategory === cat ? '#0f172a' : '#f8fafc',
-                      color: activeCategory === cat ? '#ffffff' : '#64748b',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+              <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600 }}>{filteredPhotos.length} Momentos</span>
             </div>
 
-            {/* Photo Grid (Studio Cards) */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))',
-              gap: 16
-            }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: 16 }}>
               {filteredPhotos.map((photo, index) => {
                 const isSelected = index === selectedPhotoIndex;
                 return (
                   <div
                     key={photo._id || index}
-                    onClick={() => handleCardClick(index)}
+                    onClick={() => setSelectedPhotoIndex(index)}
                     style={{
                       position: 'relative',
                       borderRadius: '20px',
@@ -366,93 +335,27 @@ export default function OrbitalGallerySection() {
                       border: isSelected ? '3px solid #00C853' : '1px solid #e2e8f0',
                       boxShadow: isSelected ? '0 8px 24px rgba(0,200,83,0.2)' : '0 4px 12px rgba(0,0,0,0.02)',
                       cursor: 'pointer',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      transition: 'all 0.3s ease',
                       display: 'flex',
-                      flexDirection: 'column',
-                      transform: isSelected ? 'scale(1.02)' : 'scale(1)'
-                    }}
-                    onMouseEnter={e => {
-                      if (!isSelected) {
-                        e.currentTarget.style.transform = 'translateY(-4px)';
-                        e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.08)';
-                      }
-                    }}
-                    onMouseLeave={e => {
-                      if (!isSelected) {
-                        e.currentTarget.style.transform = 'scale(1)';
-                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.02)';
-                      }
+                      flexDirection: 'column'
                     }}
                   >
-                    {/* Card Image Wrapper */}
                     <div style={{ width: '100%', height: 210, overflow: 'hidden', position: 'relative', background: '#000' }}>
-                      <img
-                        src={photo.image}
-                        alt={photo.title}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover'
-                        }}
-                      />
-
-                      {/* Top Action Icons (Inspired by trash/download circle buttons in reference) */}
-                      <div style={{
-                        position: 'absolute',
-                        top: 8,
-                        right: 8,
-                        display: 'flex',
-                        gap: 6
-                      }}>
+                      <img src={photo.image} alt={photo.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <div style={{ position: 'absolute', top: 8, right: 8 }}>
                         <button
                           onClick={(e) => openLightbox(index, e)}
-                          title="Expandir foto"
-                          style={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: '50%',
-                            background: 'rgba(0,0,0,0.6)',
-                            backdropFilter: 'blur(4px)',
-                            color: '#ffffff',
-                            border: 'none',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer'
-                          }}
+                          style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', color: '#ffffff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
                         >
                           <Eye size={13} />
                         </button>
                       </div>
-
-                      {/* Bottom Category Pill inside image */}
-                      <div style={{
-                        position: 'absolute',
-                        bottom: 8,
-                        left: 8,
-                        background: 'rgba(15, 23, 42, 0.75)',
-                        backdropFilter: 'blur(4px)',
-                        color: '#ffffff',
-                        fontSize: 10,
-                        fontWeight: 700,
-                        padding: '3px 8px',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(255,255,255,0.1)'
-                      }}>
+                      <div style={{ position: 'absolute', bottom: 8, left: 8, background: 'rgba(15, 23, 42, 0.75)', color: '#ffffff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: '6px' }}>
                         {photo.category}
                       </div>
                     </div>
-
-                    {/* Card Footer Title */}
                     <div style={{ padding: '10px 12px', background: '#ffffff' }}>
-                      <div style={{
-                        fontSize: 12,
-                        fontWeight: 800,
-                        color: '#0f172a',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis'
-                      }}>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {photo.title}
                       </div>
                     </div>
@@ -462,9 +365,54 @@ export default function OrbitalGallerySection() {
             </div>
           </div>
         </div>
+
+        {/* 2. ORIGINAL MOBILE ORBITAL LAYOUT (<= 768px) */}
+        <div className="gallery-mobile-view" style={{ display: 'none' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
+            {filteredPhotos.map((photo, index) => {
+              const slot = ORBIT_SLOTS[index % ORBIT_SLOTS.length];
+              return (
+                <div
+                  key={photo._id || index}
+                  onClick={() => openLightbox(index)}
+                  style={{
+                    height: 195,
+                    borderRadius: slot.radius,
+                    overflow: 'hidden',
+                    position: 'relative',
+                    background: '#ffffff',
+                    boxShadow: '0 10px 24px rgba(0,0,0,0.08)',
+                    border: '4px solid #ffffff',
+                    transform: `rotate(${slot.rotate})`,
+                    cursor: 'pointer',
+                    transition: 'transform 0.3s ease'
+                  }}
+                >
+                  <img src={photo.image} alt={photo.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)',
+                    padding: '10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end'
+                  }}>
+                    <span style={{ color: 'var(--green)', fontSize: 9, fontWeight: 800, textTransform: 'uppercase', marginBottom: 2 }}>
+                      {photo.category}
+                    </span>
+                    <span style={{ color: '#ffffff', fontSize: 11, fontWeight: 800, lineHeight: 1.25 }}>
+                      {photo.title}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
-      {/* LIGHTBOX MODAL */}
+      {/* LIGHTBOX MODAL (Universal) */}
       {lightboxPhoto && (
         <div
           style={{
@@ -480,132 +428,58 @@ export default function OrbitalGallerySection() {
           }}
           onClick={e => e.target === e.currentTarget && closeLightbox()}
         >
-          {/* Close button */}
           <button
             onClick={closeLightbox}
-            style={{
-              position: 'absolute',
-              top: 24,
-              right: 24,
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              color: '#ffffff',
-              borderRadius: '50%',
-              width: 44,
-              height: 44,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              zIndex: 10
-            }}
+            style={{ position: 'absolute', top: 24, right: 24, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#ffffff', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
           >
             <X size={20} />
           </button>
 
-          {/* Navigation Prev */}
           <button
             onClick={prevLightbox}
-            style={{
-              position: 'absolute',
-              left: 24,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              color: '#ffffff',
-              borderRadius: '50%',
-              width: 48,
-              height: 48,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              zIndex: 10
-            }}
+            style={{ position: 'absolute', left: 24, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#ffffff', borderRadius: '50%', width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
           >
             <ChevronLeft size={24} />
           </button>
 
-          {/* Content Box */}
-          <div style={{
-            maxWidth: '820px',
-            width: '100%',
-            background: '#0d1527',
-            borderRadius: '28px',
-            overflow: 'hidden',
-            border: '1px solid rgba(255,255,255,0.12)',
-            boxShadow: '0 30px 60px rgba(0,0,0,0.6)'
-          }}>
-            <div style={{ height: '440px', background: '#000', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <img
-                src={lightboxPhoto.image}
-                alt={lightboxPhoto.title}
-                style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
-              />
-              <div style={{
-                position: 'absolute',
-                top: 16,
-                left: 16,
-                background: 'rgba(0, 200, 83, 0.9)',
-                color: '#000000',
-                padding: '4px 14px',
-                borderRadius: 100,
-                fontSize: 11,
-                fontWeight: 800,
-                textTransform: 'uppercase'
-              }}>
+          <div style={{ maxWidth: '820px', width: '100%', background: '#0d1527', borderRadius: '28px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 30px 60px rgba(0,0,0,0.6)' }}>
+            <div style={{ height: '420px', background: '#000', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img src={lightboxPhoto.image} alt={lightboxPhoto.title} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }} />
+              <div style={{ position: 'absolute', top: 16, left: 16, background: 'rgba(0, 200, 83, 0.9)', color: '#000000', padding: '4px 14px', borderRadius: 100, fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>
                 {lightboxPhoto.category}
               </div>
             </div>
-
             <div style={{ padding: '24px 32px' }}>
-              <h3 style={{ fontSize: 22, fontWeight: 800, color: '#ffffff', marginBottom: 8 }}>
-                {lightboxPhoto.title}
-              </h3>
-              {lightboxPhoto.caption && (
-                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 15, lineHeight: 1.6 }}>
-                  {lightboxPhoto.caption}
-                </p>
-              )}
+              <h3 style={{ fontSize: 22, fontWeight: 800, color: '#ffffff', marginBottom: 8 }}>{lightboxPhoto.title}</h3>
+              {lightboxPhoto.caption && <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 15, lineHeight: 1.6 }}>{lightboxPhoto.caption}</p>}
             </div>
           </div>
 
-          {/* Navigation Next */}
           <button
             onClick={nextLightbox}
-            style={{
-              position: 'absolute',
-              right: 24,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              color: '#ffffff',
-              borderRadius: '50%',
-              width: 48,
-              height: 48,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              zIndex: 10
-            }}
+            style={{ position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#ffffff', borderRadius: '50%', width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
           >
             <ChevronRight size={24} />
           </button>
         </div>
       )}
 
-      {/* Responsive Styles Injection */}
+      {/* Media Queries toggle for Desktop vs Mobile */}
       <style>{`
-        @media (max-width: 900px) {
-          .studio-layout-grid {
-            grid-template-columns: 1fr !important;
+        @media (max-width: 768px) {
+          .gallery-desktop-view {
+            display: none !important;
           }
-          .studio-layout-grid > div:first-child {
-            position: relative !important;
-            top: 0 !important;
+          .gallery-mobile-view {
+            display: block !important;
+          }
+        }
+        @media (min-width: 769px) {
+          .gallery-desktop-view {
+            display: grid !important;
+          }
+          .gallery-mobile-view {
+            display: none !important;
           }
         }
       `}</style>
