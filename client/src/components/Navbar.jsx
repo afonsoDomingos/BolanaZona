@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search, Trophy, Users, LogIn, Shield, Sun, Moon, Download, ChevronDown, LayoutDashboard } from 'lucide-react';
+import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search, Trophy, Users, LogIn, Shield, Sun, Moon, Download, ChevronDown, LayoutDashboard, Camera, Handshake, Film } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 
 export default function Navbar() {
@@ -260,7 +260,8 @@ export default function Navbar() {
                 {user.role === 'superadmin' && (
                   <div className="admin-dropdown-container" style={{ position: 'relative' }}>
                     <button
-                      onClick={() => setShowAdminDropdown(!showAdminDropdown)}
+                      type="button"
+                      onClick={() => setShowAdminDropdown(prev => !prev)}
                       className={`nav-link ${isActive('/admin/') || isActive('/dashboard/analytics') ? 'active' : ''}`}
                       style={{ 
                         display: 'flex', 
@@ -275,80 +276,61 @@ export default function Navbar() {
                     >
                       <LayoutDashboard size={18} /> Admin <ChevronDown size={14} style={{ transition: 'transform 0.2s', transform: showAdminDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }} />
                     </button>
+
                     {showAdminDropdown && (
                       <div style={{
                         position: 'absolute',
-                        top: '100%',
+                        top: 'calc(100% + 8px)',
                         right: 0,
-                        marginTop: 8,
-                        background: 'var(--bg-card)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 12,
-                        padding: 8,
-                        minWidth: 200,
-                        boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
-                        zIndex: 1000
+                        background: isLightMode ? '#ffffff' : '#0d1527',
+                        border: isLightMode ? '1px solid #e2e8f0' : '1px solid rgba(255,255,255,0.15)',
+                        borderRadius: 16,
+                        padding: '8px',
+                        minWidth: 220,
+                        boxShadow: isLightMode ? '0 12px 36px rgba(0,0,0,0.12)' : '0 20px 50px rgba(0,0,0,0.7)',
+                        backdropFilter: 'blur(16px)',
+                        zIndex: 10000,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2
                       }}>
-                        <Link 
-                          to="/admin/store" 
-                          className="nav-link" 
-                          onClick={() => { setIsMenuOpen(false); setShowAdminDropdown(false); }}
-                          style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 8,
-                            padding: '8px 12px',
-                            borderRadius: 8,
-                            fontSize: 14
-                          }}
-                        >
-                          <ShoppingCart size={16} /> Painel Loja
-                        </Link>
-                        <Link 
-                          to="/admin/users" 
-                          className="nav-link" 
-                          onClick={() => { setIsMenuOpen(false); setShowAdminDropdown(false); }}
-                          style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 8,
-                            padding: '8px 12px',
-                            borderRadius: 8,
-                            fontSize: 14
-                          }}
-                        >
-                          <Settings size={16} /> Gestão
-                        </Link>
-                        <Link 
-                          to="/admin/gallery" 
-                          className="nav-link" 
-                          onClick={() => { setIsMenuOpen(false); setShowAdminDropdown(false); }}
-                          style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 8,
-                            padding: '8px 12px',
-                            borderRadius: 8,
-                            fontSize: 14
-                          }}
-                        >
-                          <Camera size={16} /> Galeria de Fotos
-                        </Link>
-                        <Link 
-                          to="/dashboard/analytics" 
-                          className="nav-link" 
-                          onClick={() => { setIsMenuOpen(false); setShowAdminDropdown(false); }}
-                          style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 8,
-                            padding: '8px 12px',
-                            borderRadius: 8,
-                            fontSize: 14
-                          }}
-                        >
-                          <Activity size={16} /> Analytics
-                        </Link>
+                        {[
+                          { to: '/admin/store', label: 'Painel Loja', icon: <ShoppingCart size={16} /> },
+                          { to: '/admin/gallery', label: 'Galeria de Fotos', icon: <Camera size={16} /> },
+                          { to: '/admin/partners', label: 'Parceiros', icon: <Handshake size={16} /> },
+                          { to: '/admin/shorts', label: 'Shorts & Reels', icon: <Film size={16} /> },
+                          { to: '/admin/teams', label: 'Equipas', icon: <Shield size={16} /> },
+                          { to: '/admin/users', label: 'Gestão Utilizadores', icon: <Settings size={16} /> },
+                          { to: '/dashboard/analytics', label: 'Analytics', icon: <Activity size={16} /> },
+                        ].map(item => (
+                          <Link 
+                            key={item.to}
+                            to={item.to} 
+                            onClick={() => { setIsMenuOpen(false); setShowAdminDropdown(false); }}
+                            style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: 10,
+                              padding: '10px 14px',
+                              borderRadius: 10,
+                              fontSize: 13,
+                              fontWeight: 600,
+                              color: isLightMode ? '#0f172a' : '#ffffff',
+                              background: isActive(item.to) ? (isLightMode ? 'rgba(0,200,83,0.12)' : 'rgba(0,200,83,0.18)') : 'transparent',
+                              transition: 'all 0.2s ease',
+                              textDecoration: 'none'
+                            }}
+                            onMouseEnter={e => {
+                              if (!isActive(item.to)) e.currentTarget.style.background = isLightMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.08)';
+                            }}
+                            onMouseLeave={e => {
+                              if (!isActive(item.to)) e.currentTarget.style.background = 'transparent';
+                            }}
+                          >
+                            {item.icon}
+                            <span>{item.label}</span>
+                          </Link>
+                        ))}
                       </div>
                     )}
                   </div>
