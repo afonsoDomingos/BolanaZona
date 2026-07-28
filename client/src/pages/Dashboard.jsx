@@ -559,12 +559,15 @@ export default function Dashboard() {
 
 function AddMatchModal({ tournaments = [], onClose, onMatchAdded }) {
   const [matchType, setMatchType] = useState('friendly');
-  const [selectedTournament, setSelectedTournament] = useState(tournaments[0]?._id || '');
+  const [tournamentSelectionMode, setTournamentSelectionMode] = useState(tournaments.length > 0 ? 'existing' : 'new');
+  const [selectedTournament, setSelectedTournament] = useState(tournaments[0]?._id || 'NEW_TOURNAMENT');
+  const [newTournamentName, setNewTournamentName] = useState('');
+  const [newTournamentFormat, setNewTournamentFormat] = useState('groups');
   const [homeTeamName, setHomeTeamName] = useState('');
   const [awayTeamName, setAwayTeamName] = useState('');
   const [date, setDate] = useState('');
   const [location, setLocation] = useState('');
-  const [roundName, setRoundName] = useState('Jogo Amigável');
+  const [roundName, setRoundName] = useState('');
   const [fieldMode, setFieldMode] = useState('Futebol de 11');
   const [loading, setLoading] = useState(false);
 
@@ -587,10 +590,25 @@ function AddMatchModal({ tournaments = [], onClose, onMatchAdded }) {
           status: 'active'
         });
         targetTournamentId = tRes.data._id;
-      } else if (!targetTournamentId) {
-        toast.error('Por favor selecione um torneio existente.');
-        setLoading(false);
-        return;
+      } else {
+        if (tournamentSelectionMode === 'new' || selectedTournament === 'NEW_TOURNAMENT') {
+          if (!newTournamentName.trim()) {
+            toast.error('Por favor, indica o nome do novo torneio.');
+            setLoading(false);
+            return;
+          }
+          const tRes = await api.post('/tournaments', {
+            name: newTournamentName.trim(),
+            description: `Torneio ${newTournamentName.trim()} criado via agendamento.`,
+            format: newTournamentFormat || 'groups',
+            status: 'active'
+          });
+          targetTournamentId = tRes.data._id;
+        } else if (!targetTournamentId || targetTournamentId === 'NEW_TOURNAMENT') {
+          toast.error('Por favor selecione um torneio existente ou crie um novo.');
+          setLoading(false);
+          return;
+        }
       }
 
       await api.post(`/tournaments/${targetTournamentId}/matches`, {
@@ -615,13 +633,14 @@ function AddMatchModal({ tournaments = [], onClose, onMatchAdded }) {
   };
 
   const isFriendly = matchType === 'friendly';
+  const isNewTournament = tournamentSelectionMode === 'new' || selectedTournament === 'NEW_TOURNAMENT';
 
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div 
         className="modal animate-fade-in" 
         style={{ 
-          maxWidth: 520, 
+          maxWidth: 540, 
           background: isFriendly ? '#ffffff' : 'var(--bg-secondary, #0d1529)',
           color: isFriendly ? '#0f172a' : '#ffffff',
           borderRadius: 24,
@@ -685,18 +704,132 @@ function AddMatchModal({ tournaments = [], onClose, onMatchAdded }) {
           </form>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div className="form-group">
-              <label className="form-label" style={{ fontSize: 12 }}>Selecione o Torneio</label>
-              <select className="form-select" value={selectedTournament} onChange={e => setSelectedTournament(e.target.value)} style={{ background: 'rgba(0,0,0,0.3)', color: '#fff' }}>
-                {tournaments.map(t => <option key={t._id} value={t._id}>🏆 {t.name}</option>)}
-              </select>
+            {/* Opção de selecionar ou criar novo torneio */}
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: 14, borderRadius: 14, border: '1px solid rgba(255,255,255,0.1)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <label className="form-label" style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', margin: 0 }}>
+                  🏆 Torneio Destino
+                </label>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTournamentSelectionMode('existing');
+                      if (tournaments.length > 0 && selectedTournament === 'NEW_TOURNAMENT') {
+                        setSelectedTournament(tournaments[0]._id);
+                      }
+                    }}
+                    disabled={tournaments.length === 0}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: 6,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      border: 'none',
+                      cursor: tournaments.length > 0 ? 'pointer' : 'not-allowed',
+                      opacity: tournaments.length > 0 ? 1 : 0.4,
+                      background: tournamentSelectionMode === 'existing' && selectedTournament !== 'NEW_TOURNAMENT' ? 'var(--green, #00C853)' : 'rgba(255,255,255,0.1)',
+                      color: tournamentSelectionMode === 'existing' && selectedTournament !== 'NEW_TOURNAMENT' ? '#000' : '#fff'
+                    }}
+                  >
+                    Existente
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTournamentSelectionMode('new');
+                      setSelectedTournament('NEW_TOURNAMENT');
+                    }}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: 6,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      border: 'none',
+                      cursor: 'pointer',
+                      background: isNewTournament ? 'var(--green, #00C853)' : 'rgba(255,255,255,0.1)',
+                      color: isNewTournament ? '#000' : '#fff'
+                    }}
+                  >
+                    ➕ Criar Novo
+                  </button>
+                </div>
+              </div>
+
+              {!isNewTournament && tournaments.length > 0 ? (
+                <select
+                  className="form-select"
+                  value={selectedTournament}
+                  onChange={e => {
+                    if (e.target.value === 'NEW_TOURNAMENT') {
+                      setTournamentSelectionMode('new');
+                      setSelectedTournament('NEW_TOURNAMENT');
+                    } else {
+                      setSelectedTournament(e.target.value);
+                    }
+                  }}
+                  style={{ background: 'rgba(0,0,0,0.4)', color: '#fff', border: '1px solid rgba(255,255,255,0.15)', width: '100%' }}
+                >
+                  <option value="NEW_TOURNAMENT">➕ Criar Novo Torneio...</option>
+                  {tournaments.map(t => <option key={t._id} value={t._id}>🏆 {t.name}</option>)}
+                </select>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Nome do Novo Torneio (ex: Copa Maputo 2026)"
+                    value={newTournamentName}
+                    onChange={e => setNewTournamentName(e.target.value)}
+                    required
+                    style={{ background: 'rgba(0,0,0,0.4)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                  />
+                  <select
+                    className="form-select"
+                    value={newTournamentFormat}
+                    onChange={e => setNewTournamentFormat(e.target.value)}
+                    style={{ background: 'rgba(0,0,0,0.4)', color: '#fff', border: '1px solid rgba(255,255,255,0.15)' }}
+                  >
+                    <option value="groups">📊 Fase de Grupos</option>
+                    <option value="knockout">⚔️ Mata-mata (Eliminatória)</option>
+                    <option value="groups_knockout">🏆 Grupos + Mata-mata</option>
+                  </select>
+                </div>
+              )}
             </div>
+
+            {/* Equipas Casa e Fora */}
             <div className="form-grid form-grid-2">
-              <div className="form-group"><label className="form-label">Casa</label><input className="form-input" value={homeTeamName} onChange={e => setHomeTeamName(e.target.value)} required /></div>
-              <div className="form-group"><label className="form-label">Fora</label><input className="form-input" value={awayTeamName} onChange={e => setAwayTeamName(e.target.value)} required /></div>
+              <div className="form-group">
+                <label className="form-label" style={{ fontSize: 12 }}>Equipa Casa</label>
+                <input className="form-input" placeholder="Ex: Maxaquene" value={homeTeamName} onChange={e => setHomeTeamName(e.target.value)} required style={{ background: 'rgba(0,0,0,0.3)', color: '#fff' }} />
+              </div>
+              <div className="form-group">
+                <label className="form-label" style={{ fontSize: 12 }}>Equipa Fora</label>
+                <input className="form-input" placeholder="Ex: Ferroviário" value={awayTeamName} onChange={e => setAwayTeamName(e.target.value)} required style={{ background: 'rgba(0,0,0,0.3)', color: '#fff' }} />
+              </div>
             </div>
-            <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', height: 48, background: 'var(--green)' }}>
-              {loading ? <span className="spinner" /> : 'Adicionar Jogo'}
+
+            {/* Data e Local */}
+            <div className="form-grid form-grid-2">
+              <div className="form-group">
+                <label className="form-label" style={{ fontSize: 12 }}>Data e Hora</label>
+                <input type="datetime-local" className="form-input" value={date} onChange={e => setDate(e.target.value)} style={{ background: 'rgba(0,0,0,0.3)', color: '#fff' }} />
+              </div>
+              <div className="form-group">
+                <label className="form-label" style={{ fontSize: 12 }}>Local</label>
+                <input type="text" className="form-input" placeholder="Ex: Campo de Costa do Sol" value={location} onChange={e => setLocation(e.target.value)} style={{ background: 'rgba(0,0,0,0.3)', color: '#fff' }} />
+              </div>
+            </div>
+
+            {/* Fase / Jornada */}
+            <div className="form-group">
+              <label className="form-label" style={{ fontSize: 12 }}>Fase / Jornada</label>
+              <input type="text" className="form-input" placeholder="Ex: Jornada 1, Quartos de Final" value={roundName} onChange={e => setRoundName(e.target.value)} style={{ background: 'rgba(0,0,0,0.3)', color: '#fff' }} />
+            </div>
+
+            <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', height: 48, background: 'var(--green)', color: '#000', fontWeight: 800, borderRadius: 12, marginTop: 4 }}>
+              {loading ? <span className="spinner" /> : (isNewTournament ? 'Criar Torneio e Agendar Jogo' : 'Adicionar Jogo ao Torneio')}
             </button>
           </form>
         )}
