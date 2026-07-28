@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { Shield, Search, Trash2, Users, Trophy, ExternalLink, MapPin } from 'lucide-react';
+import { Shield, Search, Trash2, Users, Trophy, ExternalLink, MapPin, Pencil } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import AdminSquadEditModal from '../components/AdminSquadEditModal';
 
 export default function AdminTeams() {
   const [data, setData] = useState({ squads: [], teams: [] });
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState('squads');
+  const [editingSquad, setEditingSquad] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -59,7 +61,7 @@ export default function AdminTeams() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, flexWrap: 'wrap', gap: 20 }}>
           <div>
             <h1 className="font-syne" style={{ fontSize: 32, fontWeight: 800, marginBottom: 8 }}>Central de Equipas 🛡️</h1>
-            <p style={{ color: 'var(--text-secondary)' }}>Visão global de todos os clubes e equipas da plataforma</p>
+            <p style={{ color: 'var(--text-secondary)' }}>Visão global de todos os clubes e equipas da plataforma (Gestão Admin Ativa)</p>
           </div>
         </div>
 
@@ -87,28 +89,50 @@ export default function AdminTeams() {
         {loading ? (
           <div className="loading-center"><div className="spinner" /></div>
         ) : tab === 'squads' ? (
-          <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+          <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
             {filteredSquads.map(s => (
-              <div key={s._id} className="card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-                  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 12, background: s.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                      {s.logo ? <img src={s.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
+              <div key={s._id} className="card-glass" style={{ borderRadius: 20, overflow: 'hidden', padding: 0, border: '1px solid rgba(255,255,255,0.08)' }}>
+                {/* Header Banner Preview */}
+                <div style={{ height: 80, background: s.banner ? `url(${s.banner}) center/cover no-repeat` : 'linear-gradient(135deg, rgba(0,200,83,0.15) 0%, rgba(10,15,30,0.9) 100%)', position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 6 }}>
+                    <button onClick={() => setEditingSquad(s)} className="btn btn-secondary btn-sm" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)', color: '#fff', padding: '6px 12px', fontSize: 12, borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)' }}>
+                      <Pencil size={12} /> Editar Equipa
+                    </button>
+                    <button onClick={() => handleDeleteSquad(s._id, s.name)} className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,68,68,0.2)', backdropFilter: 'blur(6px)', color: 'var(--red)', padding: 6, borderRadius: 8, border: '1px solid rgba(255,68,68,0.3)' }}>
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ padding: '0 16px 16px', marginTop: -24 }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 12 }}>
+                    <div style={{ width: 52, height: 52, borderRadius: 14, background: '#0a0f1e', border: `2px solid ${s.color || 'var(--green)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                      {s.logo ? <img src={s.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Shield size={24} color={s.color || 'var(--green)'} />}
                     </div>
                     <div>
-                      <div style={{ fontWeight: 800 }}>{s.name}</div>
-                      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>📍 {s.neighborhood || 'Bairro indefinido'}</div>
+                      <div style={{ fontWeight: 800, fontSize: 16, color: '#fff' }}>{s.name}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>📍 {s.city || 'Maputo'}{s.neighborhood ? ` • ${s.neighborhood}` : ''}</div>
                     </div>
                   </div>
-                  <button onClick={() => handleDeleteSquad(s._id, s.name)} className="btn btn-secondary btn-sm" style={{ color: 'var(--red)', padding: 8 }}><Trash2 size={14} /></button>
-                </div>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Users size={14} /> Gestor: {s.manager?.name || 'Sistema'}</div>
-                  {s.manager?.phone && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 20 }}>📞 {s.manager.phone}</div>}
-                </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <span className="badge badge-gray">{s.players?.length || 0} Atletas</span>
-                  <span className="badge badge-blue">{new Date(s.createdAt).toLocaleDateString()}</span>
+
+                  <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Users size={14} /> Gestor: {s.manager?.name || 'Sistema'}</div>
+                    {s.manager?.phone && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 20 }}>📞 {s.manager.phone}</div>}
+                  </div>
+
+                  {s.description && (
+                    <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 12, fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      "{s.description}"
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <span className="badge badge-gray">{s.players?.length || 0} Atletas</span>
+                    <span className="badge badge-green">⚽ {s.category || 'Senior'}</span>
+                    <button onClick={() => setEditingSquad(s)} style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: 'var(--green)', fontSize: 12, fontWeight: 800, cursor: 'pointer', textDecoration: 'underline' }}>
+                      Editar tudo →
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -162,6 +186,14 @@ export default function AdminTeams() {
               </tbody>
             </table>
           </div>
+        )}
+
+        {editingSquad && (
+          <AdminSquadEditModal 
+            squad={editingSquad} 
+            onClose={() => setEditingSquad(null)} 
+            onSaved={loadData} 
+          />
         )}
       </div>
     </div>
