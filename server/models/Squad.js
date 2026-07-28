@@ -17,6 +17,7 @@ const squadSchema = new mongoose.Schema({
   city: { type: String, trim: true, default: 'Maputo (Cidade)' },
   category: { type: String, default: 'Senior' }, // ex: Sub-17, Sub-20, Senior
   contact: { type: String, default: '' }, // WhatsApp do capitão/gestor da equipa
+  description: { type: String, trim: true, default: '' }, // História / Biografia da equipa
   players: [playerSchema],
   color: { type: String, default: '#00C853' },
   logo: { type: String, default: '' },

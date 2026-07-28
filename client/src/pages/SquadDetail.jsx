@@ -208,6 +208,10 @@ export default function SquadDetail() {
                 <input className="form-input" placeholder="Ex: 258842123456" value={squad.contact || ''} onChange={e => setSquad({...squad, contact: e.target.value})} />
               </div>
               <div>
+                <label className="form-label">História / Biografia do Clube</label>
+                <textarea className="form-input" rows={3} placeholder="Descreve a história, lema e ambições do teu clube..." value={squad.description || ''} onChange={e => setSquad({...squad, description: e.target.value})} style={{ resize: 'vertical' }} />
+              </div>
+              <div>
                 <label className="form-label">Escalão / Categoria</label>
                 <select className="form-select" value={squad.category || 'Senior'} onChange={e => setSquad({...squad, category: e.target.value})}>
                   <option value="Senior">Sénior (Livre) ⚽</option>

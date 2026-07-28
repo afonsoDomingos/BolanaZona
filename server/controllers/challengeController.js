@@ -358,8 +358,8 @@ exports.getSquadChallenges = async (req, res) => {
       ],
       status: 'completed'
     })
-    .populate('challengerSquad', 'name logo color')
-    .populate('challengedSquad', 'name logo color')
+    .populate('challengerSquad', 'name logo banner color neighborhood city')
+    .populate('challengedSquad', 'name logo banner color neighborhood city')
     .sort({ date: -1 });
 
     res.json(challenges);

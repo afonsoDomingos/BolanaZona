@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search, Trophy, Users, LogIn, Shield, Sun, Moon, Download, ChevronDown, LayoutDashboard, Camera, Handshake, Film } from 'lucide-react';
+import { ShoppingCart, Activity, Menu, X, User, Settings, Heart, Search, Trophy, Users, LogIn, Shield, Swords, Sun, Moon, Download, ChevronDown, LayoutDashboard, Camera, Handshake, Film } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 
 export default function Navbar() {
@@ -171,7 +171,7 @@ export default function Navbar() {
               <Trophy size={20} /> Torneios
             </Link>
             <Link to="/clubs" className={`nav-link ${isActive('/clubs') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>
-              <Shield size={20} /> Liga Nacional
+              <Swords size={20} /> Lançar Desafio
             </Link>
             <Link to="/talents" className={`nav-link ${isActive('/talents') ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>
               <Users size={20} /> Talentos
