@@ -179,6 +179,8 @@ exports.sendTwilioSummons = async (req, res) => {
       personalizedMsg = personalizedMsg.split('{Data}').join(matchInfo?.date || 'A definir');
       personalizedMsg = personalizedMsg.split('{Hora}').join(matchInfo?.time || 'A definir');
       personalizedMsg = personalizedMsg.split('{Local}').join(matchInfo?.location || 'Campo');
+      personalizedMsg = personalizedMsg.split('{Link do Jogo}').join(matchInfo?.link || 'https://bolanazona.com');
+
 
       try {
         const params = new URLSearchParams();
