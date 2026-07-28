@@ -315,4 +315,3 @@ export default function SquadDetailsModal({ squad, onClose, onChallenge }) {
     </div>
   );
 }
-}
