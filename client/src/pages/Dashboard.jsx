@@ -331,92 +331,106 @@ export default function Dashboard() {
                     scrollBehavior: 'smooth'
                   }} className="hide-scrollbar"
                 >
-                  {matches.map(m => (
-                    <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="card" style={{ 
-                      textDecoration: 'none', 
-                      minWidth: 280,
-                      padding: '12px 16px', 
-                      flexShrink: 0,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 8,
-                      background: 'rgba(255,255,255,0.02)',
-                      border: '1px solid rgba(255,255,255,0.05)'
-                    }}>
-                      <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        {m.tournament?.name}
+                  {matches.map(m => {
+                    const isFriendly = m.roundName === 'Jogo Amigável' || m.tournament?.name === 'Jogos Rápidos & Amigáveis';
+                    
+                    return (
+                  <Link key={m._id} to={`/t/${m.tournament?.shareCode}`} className="card" style={{ 
+                    textDecoration: 'none', 
+                    minWidth: 280,
+                    padding: '14px 16px', 
+                    flexShrink: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 10,
+                    borderRadius: 18,
+                    background: isFriendly ? '#ffffff' : 'rgba(255,255,255,0.02)',
+                    color: isFriendly ? '#0f172a' : '#ffffff',
+                    border: isFriendly ? '1px solid #e2e8f0' : '1px solid rgba(255,255,255,0.05)',
+                    boxShadow: isFriendly ? '0 6px 18px rgba(0,0,0,0.06)' : 'none',
+                    transition: 'all 0.25s ease'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ 
+                        fontSize: 9, 
+                        fontWeight: 800, 
+                        textTransform: 'uppercase', 
+                        letterSpacing: '0.5px',
+                        color: isFriendly ? '#008a38' : 'var(--text-muted)',
+                        background: isFriendly ? 'rgba(0,200,83,0.1)' : 'rgba(255,255,255,0.05)',
+                        padding: '3px 8px',
+                        borderRadius: 100,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4
+                      }}>
+                        {isFriendly ? '⚡ Desafio Amigável' : `🏆 ${m.tournament?.name || 'Torneio'}`}
                       </div>
-                      
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-                          <div style={{ width: 22, height: 22, borderRadius: 5, background: m.homeTeam?.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
-                          </div>
-                          <span style={{ 
-                            fontWeight: 700, 
-                            fontSize: 11, 
-                            whiteSpace: 'nowrap', 
-                            overflow: 'hidden', 
-                            textOverflow: 'ellipsis',
-                            color: 'var(--text-primary)'
-                          }}>{m.homeTeam?.name}</span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
+                        <div style={{ width: 24, height: 24, borderRadius: 6, background: m.homeTeam?.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          {m.homeTeam?.logo ? <img src={m.homeTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                         </div>
+                        <span style={{ 
+                          fontWeight: 800, 
+                          fontSize: 12, 
+                          whiteSpace: 'nowrap', 
+                          overflow: 'hidden', 
+                          textOverflow: 'ellipsis',
+                          color: isFriendly ? '#0f172a' : 'var(--text-primary)'
+                        }}>{m.homeTeam?.name}</span>
+                      </div>
 
-                        <div style={{ padding: '2px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: 6, minWidth: 46, textAlign: 'center', flexShrink: 0 }}>
-                          {m.status === 'live' ? (
-                            <span style={{ fontWeight: 900, fontSize: 13, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</span>
-                          ) : m.status === 'finished' ? (
-                            <span style={{ fontWeight: 900, fontSize: 13, color: 'var(--text-muted)' }}>{m.homeScore} - {m.awayScore}</span>
-                          ) : (
-                            <span style={{ fontWeight: 900, fontSize: 13, color: 'var(--text-secondary)' }}>VS</span>
-                          )}
-                        </div>
+                      <div style={{ padding: '3px 10px', background: isFriendly ? '#f1f5f9' : 'rgba(255,255,255,0.05)', borderRadius: 8, minWidth: 48, textAlign: 'center', flexShrink: 0 }}>
+                        {m.status === 'live' ? (
+                          <span style={{ fontWeight: 900, fontSize: 13, color: 'var(--green)' }}>{m.homeScore} - {m.awayScore}</span>
+                        ) : m.status === 'finished' ? (
+                          <span style={{ fontWeight: 900, fontSize: 13, color: isFriendly ? '#64748b' : 'var(--text-muted)' }}>{m.homeScore} - {m.awayScore}</span>
+                        ) : (
+                          <span style={{ fontWeight: 900, fontSize: 12, color: isFriendly ? '#00C853' : 'var(--text-secondary)' }}>VS</span>
+                        )}
+                      </div>
 
-
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'flex-end', minWidth: 0 }}>
-                          <span style={{ 
-                            fontWeight: 700, 
-                            fontSize: 11, 
-                            whiteSpace: 'nowrap', 
-                            overflow: 'hidden', 
-                            textOverflow: 'ellipsis',
-                            color: 'var(--text-primary)'
-                          }}>{m.awayTeam?.name}</span>
-                          <div style={{ width: 22, height: 22, borderRadius: 5, background: m.awayTeam?.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
-                          </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'flex-end', minWidth: 0 }}>
+                        <span style={{ 
+                          fontWeight: 800, 
+                          fontSize: 12, 
+                          whiteSpace: 'nowrap', 
+                          overflow: 'hidden', 
+                          textOverflow: 'ellipsis',
+                          color: isFriendly ? '#0f172a' : 'var(--text-primary)'
+                        }}>{m.awayTeam?.name}</span>
+                        <div style={{ width: 24, height: 24, borderRadius: 6, background: m.awayTeam?.color || 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          {m.awayTeam?.logo ? <img src={m.awayTeam.logo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👕'}
                         </div>
                       </div>
-                      {/* Date + Location + Likes row */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
-                        <div style={{ display: 'flex', gap: 6, fontSize: 9, color: 'var(--text-muted)' }}>
-                          {m.date && <span>📅 {new Date(m.date).toLocaleDateString('pt-PT')} · {new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</span>}
-                          {m.location && <span>🏟️ {m.location}</span>}
-                        </div>
-                        <MatchLikeButton 
-                          likes={m.likes || 0} 
-                          views={m.views || 0} 
-                          onLike={() => handleMatchLike(m)} 
-                          size="sm" 
-                        />
-                      </div>
-                    </Link>
+                    </div>
 
-                  ))}
-                  <div style={{ minWidth: 24, flexShrink: 0 }} />
-                </div>
-              </div>
-            )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', gap: 6, fontSize: 10, color: isFriendly ? '#64748b' : 'var(--text-muted)', fontWeight: 600 }}>
+                        {m.date && <span>📅 {new Date(m.date).toLocaleDateString('pt-PT')} · {new Date(m.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</span>}
+                        {m.location && <span>🏟️ {m.location}</span>}
+                      </div>
+                      <MatchLikeButton 
+                        likes={m.likes || 0} 
+                        views={m.views || 0} 
+                        onLike={() => handleMatchLike(m)} 
+                        size="sm" 
+                      />
+                    </div>
+                  </Link>
+                );
+              })}
+              <div style={{ minWidth: 24, flexShrink: 0 }} />
+            </div>
+          </div>
+        )}
+
         <div className="dashboard-grid">
-          {/* Main Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-            {/* Stats */}
-            {/* Global/Live Matches */}
-
-
-
-
-                        <style>{`
+            <style>{`
               .badge-red { background: rgba(255, 23, 68, 0.1); color: #ff1744; border: 1px solid rgba(255, 23, 68, 0.2); }
               ::-webkit-scrollbar { display: none; }
             `}</style>
@@ -442,7 +456,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-                        {/* Recent Tournaments */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <h2 style={{ fontSize: 20, fontWeight: 700 }}>Torneios Recentes</h2>
@@ -519,8 +532,6 @@ export default function Dashboard() {
             )}
           </div>
 
-
-          {/* Sidebar - Notifications */}
           <div className="dashboard-sidebar">
             <div className="card-glass" style={{ padding: 24 }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -546,14 +557,15 @@ export default function Dashboard() {
   );
 }
 
-function AddMatchModal({ tournaments, onClose, onMatchAdded }) {
-  const [selectedTournament, setSelectedTournament] = useState(tournaments[0]?._id || 'new');
-  const [newTournamentName, setNewTournamentName] = useState('Jogos Rápidos & Amigáveis');
+function AddMatchModal({ tournaments = [], onClose, onMatchAdded }) {
+  const [matchType, setMatchType] = useState('friendly');
+  const [selectedTournament, setSelectedTournament] = useState(tournaments[0]?._id || '');
   const [homeTeamName, setHomeTeamName] = useState('');
   const [awayTeamName, setAwayTeamName] = useState('');
   const [date, setDate] = useState('');
   const [location, setLocation] = useState('');
   const [roundName, setRoundName] = useState('Jogo Amigável');
+  const [fieldMode, setFieldMode] = useState('Futebol de 11');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -567,29 +579,32 @@ function AddMatchModal({ tournaments, onClose, onMatchAdded }) {
     try {
       let targetTournamentId = selectedTournament;
 
-      // Criar novo torneio se selecionado "novo"
-      if (targetTournamentId === 'new' || !targetTournamentId) {
+      if (matchType === 'friendly') {
         const tRes = await api.post('/tournaments', {
-          name: newTournamentName.trim() || 'Jogos Rápidos & Amigáveis',
-          description: 'Torneio de jogos amigáveis e rápidos agendados.',
+          name: 'Jogos Rápidos & Amigáveis',
+          description: 'Desafios amigáveis rápidos agendados entre 2 equipas.',
           format: 'league',
           status: 'active'
         });
         targetTournamentId = tRes.data._id;
+      } else if (!targetTournamentId) {
+        toast.error('Por favor selecione um torneio existente.');
+        setLoading(false);
+        return;
       }
 
-      // Adicionar o jogo
       await api.post(`/tournaments/${targetTournamentId}/matches`, {
         homeTeamName: homeTeamName.trim(),
         awayTeamName: awayTeamName.trim(),
         date: date ? new Date(date) : new Date(),
         location: location.trim(),
         round: 1,
-        roundName: roundName.trim() || 'Jogo Amigável',
-        status: 'scheduled'
+        roundName: matchType === 'friendly' ? 'Jogo Amigável' : (roundName.trim() || 'Fase de Grupos'),
+        status: 'scheduled',
+        fieldMode: matchType === 'friendly' ? fieldMode : undefined
       });
 
-      toast.success('Jogo agendado com sucesso! ⚽');
+      toast.success(matchType === 'friendly' ? 'Desafio Amigável agendado! ⚡' : 'Jogo de Torneio agendado! 🏆');
       onMatchAdded();
       onClose();
     } catch (err) {
@@ -599,119 +614,92 @@ function AddMatchModal({ tournaments, onClose, onMatchAdded }) {
     }
   };
 
+  const isFriendly = matchType === 'friendly';
+
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal" style={{ maxWidth: 480 }}>
-        <div className="modal-header">
-          <h2 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            ⚽ Agendar Jogo
-          </h2>
-          <button className="modal-close" onClick={onClose}><X size={18} /></button>
+      <div 
+        className="modal animate-fade-in" 
+        style={{ 
+          maxWidth: 520, 
+          background: isFriendly ? '#ffffff' : 'var(--bg-secondary, #0d1529)',
+          color: isFriendly ? '#0f172a' : '#ffffff',
+          borderRadius: 24,
+          border: isFriendly ? '1px solid #e2e8f0' : '1px solid rgba(255,255,255,0.1)',
+          boxShadow: isFriendly ? '0 24px 60px rgba(0,0,0,0.25)' : '0 24px 60px rgba(0,0,0,0.6)',
+          transition: 'all 0.3s ease',
+          padding: 24
+        }}
+      >
+        <div className="modal-header" style={{ borderBottom: isFriendly ? '1px solid #f1f5f9' : '1px solid rgba(255,255,255,0.1)', paddingBottom: 16 }}>
+          <div>
+            <h2 className="modal-title font-syne" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 20, color: isFriendly ? '#0f172a' : '#ffffff' }}>
+              {isFriendly ? '⚡ Agendar Jogo Amigável' : '🏆 Agendar Jogo de Torneio'}
+            </h2>
+          </div>
+          <button className="modal-close" onClick={onClose} style={{ color: isFriendly ? '#64748b' : '#ffffff' }}><X size={18} /></button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 12 }}>
-          {/* Seletor de Torneio */}
-          <div className="form-group">
-            <label className="form-label">Torneio / Competição</label>
-            <select 
-              className="form-select" 
-              value={selectedTournament} 
-              onChange={e => setSelectedTournament(e.target.value)}
-            >
-              <option value="new">⚡ Jogo Amigável / Criar Novo Torneio</option>
-              {tournaments.map(t => (
-                <option key={t._id} value={t._id}>🏆 {t.name}</option>
-              ))}
-            </select>
-          </div>
-
-          {selectedTournament === 'new' && (
-            <div className="form-group">
-              <label className="form-label">Nome da Competição / Torneio</label>
-              <input 
-                className="form-input" 
-                placeholder="Ex: Liga Amadora / Jogos Rápidos" 
-                value={newTournamentName} 
-                onChange={e => setNewTournamentName(e.target.value)} 
-              />
-            </div>
-          )}
-
-          {/* Equipas */}
-          <div className="form-grid form-grid-2">
-            <div className="form-group">
-              <label className="form-label">Equipa Casa (Mandante)</label>
-              <input 
-                className="form-input" 
-                placeholder="Ex: AC Juvenil" 
-                value={homeTeamName} 
-                onChange={e => setHomeTeamName(e.target.value)}
-                required 
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Equipa Fora (Visitante)</label>
-              <input 
-                className="form-input" 
-                placeholder="Ex: Mandevo FC" 
-                value={awayTeamName} 
-                onChange={e => setAwayTeamName(e.target.value)}
-                required 
-              />
-            </div>
-          </div>
-
-          {/* Data & Hora e Local */}
-          <div className="form-grid form-grid-2">
-            <div className="form-group">
-              <label className="form-label">Data e Hora</label>
-              <input 
-                type="datetime-local" 
-                className="form-input" 
-                value={date} 
-                onChange={e => setDate(e.target.value)} 
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Local do Jogo</label>
-              <input 
-                className="form-input" 
-                placeholder="Ex: Campo de Maxaquene" 
-                value={location} 
-                onChange={e => setLocation(e.target.value)} 
-              />
-            </div>
-          </div>
-
-          {/* Ronda / Tipo */}
-          <div className="form-group">
-            <label className="form-label">Fase ou Ronda (Opcional)</label>
-            <input 
-              className="form-input" 
-              placeholder="Ex: Jornada 1 / Amigável / Quartos de Final" 
-              value={roundName} 
-              onChange={e => setRoundName(e.target.value)} 
-            />
-          </div>
-
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            disabled={loading} 
-            style={{ 
-              width: '100%', 
-              justifyContent: 'center', 
-              height: 48, 
-              marginTop: 8, 
-              background: 'linear-gradient(135deg, var(--green), #00c853)', 
-              color: '#000', 
-              fontWeight: 800,
-              fontSize: 14
-            }}
-          >
-            {loading ? <span className="spinner" style={{ width: 18, height: 18 }} /> : <><Plus size={16} /> Publicar Jogo no Calendário</>}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 8,
+          background: isFriendly ? '#f1f5f9' : 'rgba(255,255,255,0.05)',
+          padding: 4,
+          borderRadius: 14,
+          margin: '18px 0 20px'
+        }}>
+          <button type="button" onClick={() => setMatchType('friendly')} style={{ padding: '10px 14px', borderRadius: 10, fontSize: 13, fontWeight: 800, border: 'none', cursor: 'pointer', background: isFriendly ? '#ffffff' : 'transparent', color: isFriendly ? '#0f172a' : 'rgba(255,255,255,0.6)', boxShadow: isFriendly ? '0 4px 12px rgba(0,0,0,0.08)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'all 0.2s ease' }}>
+            ⚡ Jogo Amigável
           </button>
-        </form>
+          <button type="button" onClick={() => setMatchType('tournament')} style={{ padding: '10px 14px', borderRadius: 10, fontSize: 13, fontWeight: 800, border: 'none', cursor: 'pointer', background: !isFriendly ? 'var(--green, #00C853)' : 'transparent', color: !isFriendly ? '#000000' : (isFriendly ? '#64748b' : '#ffffff'), boxShadow: !isFriendly ? '0 4px 12px rgba(0,200,83,0.3)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'all 0.2s ease' }}>
+            🏆 Torneio
+          </button>
+        </div>
+
+        {isFriendly ? (
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="form-group">
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 6, display: 'block' }}>Equipa Casa</label>
+                <input type="text" placeholder="Ex: AC Juvenil" value={homeTeamName} onChange={e => setHomeTeamName(e.target.value)} required style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: 13, fontWeight: 600 }} />
+              </div>
+              <div className="form-group">
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 6, display: 'block' }}>Equipa Fora</label>
+                <input type="text" placeholder="Ex: Mandevo FC" value={awayTeamName} onChange={e => setAwayTeamName(e.target.value)} required style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: 13, fontWeight: 600 }} />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="form-group">
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 6, display: 'block' }}>Data e Hora</label>
+                <input type="datetime-local" value={date} onChange={e => setDate(e.target.value)} style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: 13, fontWeight: 600 }} />
+              </div>
+              <div className="form-group">
+                <label style={{ fontSize: 12, fontWeight: 700, color: '#334155', marginBottom: 6, display: 'block' }}>Local</label>
+                <input type="text" placeholder="Ex: Campo de Maxaquene" value={location} onChange={e => setLocation(e.target.value)} style={{ width: '100%', padding: '11px 14px', borderRadius: 10, border: '1px solid #cbd5e1', background: '#f8fafc', color: '#0f172a', fontSize: 13, fontWeight: 600 }} />
+              </div>
+            </div>
+            <button type="submit" disabled={loading} style={{ width: '100%', height: 48, marginTop: 8, borderRadius: 12, background: 'linear-gradient(135deg, #00C853 0%, #00a843 100%)', color: '#ffffff', fontWeight: 800, fontSize: 15, border: 'none', cursor: 'pointer' }}>
+              {loading ? <span className="spinner" /> : 'Publicar Desafio Amigável'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="form-group">
+              <label className="form-label" style={{ fontSize: 12 }}>Selecione o Torneio</label>
+              <select className="form-select" value={selectedTournament} onChange={e => setSelectedTournament(e.target.value)} style={{ background: 'rgba(0,0,0,0.3)', color: '#fff' }}>
+                {tournaments.map(t => <option key={t._id} value={t._id}>🏆 {t.name}</option>)}
+              </select>
+            </div>
+            <div className="form-grid form-grid-2">
+              <div className="form-group"><label className="form-label">Casa</label><input className="form-input" value={homeTeamName} onChange={e => setHomeTeamName(e.target.value)} required /></div>
+              <div className="form-group"><label className="form-label">Fora</label><input className="form-input" value={awayTeamName} onChange={e => setAwayTeamName(e.target.value)} required /></div>
+            </div>
+            <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', height: 48, background: 'var(--green)' }}>
+              {loading ? <span className="spinner" /> : 'Adicionar Jogo'}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
