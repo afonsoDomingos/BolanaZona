@@ -3,6 +3,40 @@ import { Shield, X, Save, Upload, Plus, Trash2, Pencil, Users, Camera, Image, Ph
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
+// Comprime imagem via Canvas antes do upload (garante < 2MB)
+const compressImage = (file, maxWidth = 1200, quality = 0.82) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.src = e.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return reject(new Error('Falha na compressão da imagem.'));
+            const compressed = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+            console.log(`📦 Compressão: ${(file.size / 1024).toFixed(0)}KB → ${(compressed.size / 1024).toFixed(0)}KB`);
+            resolve(compressed);
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      img.onerror = reject;
+    };
+    reader.onerror = reject;
+  });
+
 export default function AdminSquadEditModal({ squad, onClose, onSaved }) {
   const [formData, setFormData] = useState({
     name: squad?.name || '',
@@ -29,14 +63,19 @@ export default function AdminSquadEditModal({ squad, onClose, onSaved }) {
   const playerFormRef = useRef(null);
 
   const uploadImage = async (file, target) => {
-    const fd = new FormData();
-    fd.append('image', file);
-    
     if (target === 'banner') setUploadingBanner(true);
     if (target === 'logo') setUploadingLogo(true);
     if (target === 'player') setUploadingPlayerPhoto(true);
 
     try {
+      // Comprime antes do upload: banner até 1920px, logo/foto até 800px
+      const maxWidth = target === 'banner' ? 1920 : 800;
+      const quality = target === 'banner' ? 0.80 : 0.85;
+      const compressed = await compressImage(file, maxWidth, quality);
+
+      const fd = new FormData();
+      fd.append('image', compressed);
+
       const res = await api.post('/upload', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
         timeout: 60000,
@@ -52,7 +91,7 @@ export default function AdminSquadEditModal({ squad, onClose, onSaved }) {
     } catch (err) {
       const msg = err?.response?.data?.message || err?.message || 'Erro no upload.';
       console.error('[UPLOAD ERROR]', err);
-      toast.error(`Falha no upload: ${msg}. Verifica as credenciais do Cloudinary.`);
+      toast.error(`Falha no upload: ${msg}`);
     } finally {
       setUploadingBanner(false);
       setUploadingLogo(false);

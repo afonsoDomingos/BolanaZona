@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { User, Mail, Phone, Shield, Camera, Save, LogOut, MapPin, Bell, ToggleLeft, ToggleRight, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { requestNotificationPermission, subscribeToPush, registerServiceWorker, isPushSupported } from '../services/pushNotifications';
+import compressImage from '../services/compressImage';
 
 export default function Profile() {
   const { user, logout, setUser } = useAuth();
@@ -63,11 +64,12 @@ export default function Profile() {
     const file = e.target.files[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append('image', file);
-
     setUploading(true);
     try {
+      const compressed = await compressImage(file, 800, 0.88);
+      const formData = new FormData();
+      formData.append('image', compressed);
+
       const res = await api.post('/upload', formData);
       setForm({ ...form, avatar: res.data.url });
       toast.success('Foto carregada! Salva para confirmar.');

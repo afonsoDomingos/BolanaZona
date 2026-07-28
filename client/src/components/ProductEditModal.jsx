@@ -2,6 +2,7 @@ import { useState } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { X, Save, Camera, Link as LinkIcon, Trash2, Package } from 'lucide-react';
+import compressImage from '../services/compressImage';
 
 export default function ProductEditModal({ product, onClose, onSaved }) {
   const [form, setForm] = useState(() => {
@@ -22,10 +23,11 @@ export default function ProductEditModal({ product, onClose, onSaved }) {
     if (!file) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append('image', file);
-
     try {
+      const compressed = await compressImage(file, 1200, 0.85);
+      const formData = new FormData();
+      formData.append('image', compressed);
+
       const res = await api.post('/upload', formData);
       setForm({ ...form, image: res.data.url });
       toast.success('Imagem carregada!');
@@ -38,10 +40,11 @@ export default function ProductEditModal({ product, onClose, onSaved }) {
     if (!file) return;
 
     setUploadingAdditional(true);
-    const formData = new FormData();
-    formData.append('image', file);
-
     try {
+      const compressed = await compressImage(file, 1200, 0.85);
+      const formData = new FormData();
+      formData.append('image', compressed);
+
       const res = await api.post('/upload', formData);
       setForm(prev => ({
         ...prev,
