@@ -37,7 +37,10 @@ export default function AdminSquadEditModal({ squad, onClose, onSaved }) {
     if (target === 'player') setUploadingPlayerPhoto(true);
 
     try {
-      const res = await api.post('/upload', fd);
+      const res = await api.post('/upload', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 60000,
+      });
       if (target === 'banner') {
         setFormData(prev => ({ ...prev, banner: res.data.url }));
       } else if (target === 'logo') {
@@ -46,8 +49,10 @@ export default function AdminSquadEditModal({ squad, onClose, onSaved }) {
         setNewPlayer(prev => ({ ...prev, photo: res.data.url }));
       }
       toast.success('Imagem carregada com sucesso! 📸');
-    } catch {
-      toast.error('Erro ao efetuar o upload da imagem.');
+    } catch (err) {
+      const msg = err?.response?.data?.message || err?.message || 'Erro no upload.';
+      console.error('[UPLOAD ERROR]', err);
+      toast.error(`Falha no upload: ${msg}. Verifica as credenciais do Cloudinary.`);
     } finally {
       setUploadingBanner(false);
       setUploadingLogo(false);
@@ -104,7 +109,7 @@ export default function AdminSquadEditModal({ squad, onClose, onSaved }) {
 
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()} style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(8px)', zIndex: 1200, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '76px 16px 36px', overflowY: 'auto' }}>
-      <div className="modal animate-slide-up" style={{ background: '#ffffff', color: '#0f172a', border: '1px solid #e2e8f0', borderRadius: 24, width: '100%', maxWidth: 680, padding: 0, boxShadow: '0 25px 60px rgba(0,0,0,0.3)', overflow: 'hidden' }}>
+      <div className="modal animate-slide-up" style={{ background: '#ffffff', color: '#0f172a', border: '1px solid #e2e8f0', borderRadius: 24, width: '100%', maxWidth: 680, padding: 0, boxShadow: '0 25px 60px rgba(0,0,0,0.3)', overflow: 'hidden', maxHeight: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column' }}>
         
         {/* Banner Preview & Header */}
         <div style={{
@@ -130,8 +135,8 @@ export default function AdminSquadEditModal({ squad, onClose, onSaved }) {
           </button>
         </div>
 
-        {/* Form Body */}
-        <div style={{ padding: '0 24px 24px', marginTop: -46 }}>
+        {/* Form Body - Scrollable */}
+        <div style={{ padding: '0 24px 24px', marginTop: -46, overflowY: 'auto', flex: 1 }}>
           
           {/* Logo Upload & Title */}
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginBottom: 20 }}>
