@@ -326,14 +326,15 @@ export default function OrbitalGallerySection() {
                 return (
                   <div
                     key={photo._id || index}
+                    className="gallery-card-item"
                     onClick={() => setSelectedPhotoIndex(index)}
                     style={{
                       position: 'relative',
                       borderRadius: '24px',
                       overflow: 'hidden',
                       background: '#090a0f',
-                      border: isSelected ? '3px solid #00C853' : '1px solid rgba(0,0,0,0.1)',
-                      boxShadow: isSelected ? '0 10px 28px rgba(0,200,83,0.25)' : '0 8px 20px rgba(0,0,0,0.08)',
+                      border: isSelected ? '3px solid #00C853' : '1.5px solid rgba(15, 23, 42, 0.12)',
+                      boxShadow: isSelected ? '0 10px 28px rgba(0,200,83,0.25)' : '0 8px 22px rgba(0,0,0,0.08)',
                       cursor: 'pointer',
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                       display: 'flex',
@@ -416,6 +417,7 @@ export default function OrbitalGallerySection() {
               return (
                 <div
                   key={photo._id || index}
+                  className="gallery-card-item"
                   onClick={() => openLightbox(index)}
                   style={{
                     aspectRatio: '3/4',
@@ -424,9 +426,9 @@ export default function OrbitalGallerySection() {
                     position: 'relative',
                     background: '#090a0f',
                     boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                    border: '1px solid rgba(0, 0, 0, 0.12)',
+                    border: '1.5px solid rgba(15, 23, 42, 0.14)',
                     cursor: 'pointer',
-                    transition: 'transform 0.2s ease, boxShadow 0.2s ease'
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                   }}
                 >
                   {/* Top MATCH watermark */}
@@ -548,8 +550,16 @@ export default function OrbitalGallerySection() {
         </div>
       )}
 
-      {/* Media Queries toggle for Desktop vs Mobile */}
+      {/* Media Queries & Hover effects toggle for Desktop vs Mobile */}
       <style>{`
+        .gallery-card-item {
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+        }
+        .gallery-card-item:hover {
+          transform: translateY(-4px) scale(1.02);
+          box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2) !important;
+          border-color: #00C853 !important;
+        }
         @media (max-width: 768px) {
           .gallery-desktop-view {
             display: none !important;
