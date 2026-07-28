@@ -329,33 +329,76 @@ export default function OrbitalGallerySection() {
                     onClick={() => setSelectedPhotoIndex(index)}
                     style={{
                       position: 'relative',
-                      borderRadius: '20px',
+                      borderRadius: '24px',
                       overflow: 'hidden',
-                      background: '#f8fafc',
-                      border: isSelected ? '3px solid #00C853' : '1px solid #e2e8f0',
-                      boxShadow: isSelected ? '0 8px 24px rgba(0,200,83,0.2)' : '0 4px 12px rgba(0,0,0,0.02)',
+                      background: '#090a0f',
+                      border: isSelected ? '3px solid #00C853' : '1px solid rgba(0,0,0,0.1)',
+                      boxShadow: isSelected ? '0 10px 28px rgba(0,200,83,0.25)' : '0 8px 20px rgba(0,0,0,0.08)',
                       cursor: 'pointer',
-                      transition: 'all 0.3s ease',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                       display: 'flex',
-                      flexDirection: 'column'
+                      flexDirection: 'column',
+                      aspectRatio: '3/4'
                     }}
                   >
-                    <div style={{ width: '100%', height: 210, overflow: 'hidden', position: 'relative', background: '#000' }}>
-                      <img src={photo.image} alt={photo.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      <div style={{ position: 'absolute', top: 8, right: 8 }}>
-                        <button
-                          onClick={(e) => openLightbox(index, e)}
-                          style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', color: '#ffffff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                        >
-                          <Eye size={13} />
-                        </button>
-                      </div>
-                      <div style={{ position: 'absolute', bottom: 8, left: 8, background: 'rgba(15, 23, 42, 0.75)', color: '#ffffff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: '6px' }}>
-                        {photo.category}
-                      </div>
+                    {/* Top MATCH watermark */}
+                    <div style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 12,
+                      zIndex: 3,
+                      fontSize: 9,
+                      fontWeight: 900,
+                      letterSpacing: '1px',
+                      color: 'rgba(255, 255, 255, 0.85)',
+                      fontFamily: "'Syne', sans-serif"
+                    }}>
+                      MATCH
                     </div>
-                    <div style={{ padding: '10px 12px', background: '#ffffff' }}>
-                      <div style={{ fontSize: 12, fontWeight: 800, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+
+                    {/* Top Left Category Badge */}
+                    <div style={{
+                      position: 'absolute',
+                      top: 10,
+                      left: 10,
+                      zIndex: 3,
+                      background: 'rgba(0, 0, 0, 0.65)',
+                      backdropFilter: 'blur(6px)',
+                      color: '#00C853',
+                      fontSize: 9,
+                      fontWeight: 800,
+                      padding: '3px 8px',
+                      borderRadius: '100px',
+                      textTransform: 'uppercase',
+                      border: '1px solid rgba(255, 255, 255, 0.15)'
+                    }}>
+                      {photo.category}
+                    </div>
+
+                    <img
+                      src={photo.image}
+                      alt={photo.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+
+                    {/* Bottom Dark Panel with Title & Date */}
+                    <div style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      insetHorizontal: 0,
+                      left: 0,
+                      right: 0,
+                      zIndex: 3,
+                      background: 'linear-gradient(to top, rgba(9, 10, 15, 0.95) 0%, rgba(9, 10, 15, 0.7) 60%, transparent 100%)',
+                      padding: '14px 12px 10px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-end'
+                    }}>
+                      <div style={{ fontSize: 7, fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 2 }}>
+                        FUTEBOL É VIDA
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: '#ffffff', fontFamily: "'Syne', sans-serif", textTransform: 'uppercase', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {photo.title}
                       </div>
                     </div>
@@ -366,41 +409,83 @@ export default function OrbitalGallerySection() {
           </div>
         </div>
 
-        {/* 2. MOBILE GALLERY VIEW (<= 768px - Cartões Retos) */}
+        {/* 2. MOBILE GALLERY VIEW (<= 768px - Cartões Retos com Bordas Arredondadas 24px) */}
         <div className="gallery-mobile-view" style={{ display: 'none' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 14 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
             {filteredPhotos.map((photo, index) => {
               return (
                 <div
                   key={photo._id || index}
                   onClick={() => openLightbox(index)}
                   style={{
-                    height: 190,
-                    borderRadius: '16px',
+                    aspectRatio: '3/4',
+                    borderRadius: '24px',
                     overflow: 'hidden',
                     position: 'relative',
-                    background: '#ffffff',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                    border: '1px solid #e2e8f0',
-                    transform: 'none',
+                    background: '#090a0f',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                    border: '1px solid rgba(0, 0, 0, 0.12)',
                     cursor: 'pointer',
-                    transition: 'transform 0.2s ease'
+                    transition: 'transform 0.2s ease, boxShadow 0.2s ease'
                   }}
                 >
-                  <img src={photo.image} alt={photo.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {/* Top MATCH watermark */}
                   <div style={{
                     position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)',
-                    padding: '10px',
+                    top: 10,
+                    right: 12,
+                    zIndex: 3,
+                    fontSize: 9,
+                    fontWeight: 900,
+                    letterSpacing: '1px',
+                    color: 'rgba(255, 255, 255, 0.85)',
+                    fontFamily: "'Syne', sans-serif"
+                  }}>
+                    MATCH
+                  </div>
+
+                  {/* Top Left Category Pill */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 10,
+                    left: 10,
+                    zIndex: 3,
+                    background: 'rgba(0, 0, 0, 0.65)',
+                    backdropFilter: 'blur(6px)',
+                    color: '#00C853',
+                    fontSize: 8,
+                    fontWeight: 800,
+                    padding: '2px 7px',
+                    borderRadius: '100px',
+                    textTransform: 'uppercase',
+                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                  }}>
+                    {photo.category}
+                  </div>
+
+                  <img
+                    src={photo.image}
+                    alt={photo.title}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+
+                  {/* Bottom Dark Panel Overlay */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 3,
+                    background: 'linear-gradient(to top, rgba(9, 10, 15, 0.96) 0%, rgba(9, 10, 15, 0.7) 65%, transparent 100%)',
+                    padding: '12px 10px 8px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'flex-end'
                   }}>
-                    <span style={{ color: 'var(--green)', fontSize: 9, fontWeight: 800, textTransform: 'uppercase', marginBottom: 2 }}>
-                      {photo.category}
+                    <span style={{ fontSize: 7, fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 2 }}>
+                      FUTEBOL É VIDA
                     </span>
-                    <span style={{ color: '#ffffff', fontSize: 11, fontWeight: 800, lineHeight: 1.25 }}>
+                    <span style={{ color: '#ffffff', fontSize: 12, fontWeight: 800, fontFamily: "'Syne', sans-serif", textTransform: 'uppercase', lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {photo.title}
                     </span>
                   </div>
