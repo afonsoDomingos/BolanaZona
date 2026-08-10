@@ -1,6 +1,39 @@
 import { useState, useEffect } from 'react';
 import { Eye, Youtube } from 'lucide-react';
 import api from '../services/api';
+import toast from 'react-hot-toast';
+
+const Confetti = () => {
+  return (
+    <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 99999, overflow: 'hidden' }}>
+      {[...Array(60)].map((_, i) => {
+        const left = Math.random() * 100;
+        const animDuration = 2 + Math.random() * 3;
+        const delay = Math.random() * 0.5;
+        const colors = ['#00C853', '#FFD600', '#FF3D00', '#2979FF', '#AA00FF', '#00f2ea', '#ff0050'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        return (
+          <div key={i} style={{
+            position: 'absolute',
+            top: '-20px',
+            left: `${left}%`,
+            width: '8px',
+            height: '8px',
+            background: color,
+            borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+            animation: `confetti-fall ${animDuration}s linear ${delay}s forwards`,
+          }} />
+        );
+      })}
+      <style>{`
+        @keyframes confetti-fall {
+          0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+};
 
 const TiktokIcon = ({ size = 14 }) => (
   <svg 
@@ -47,6 +80,7 @@ export default function VisitorCounter({ variant = 'fixed' }) {
   const [loading, setLoading] = useState(true);
   const [slide, setSlide] = useState('visits'); // 'visits' | 'youtube' | 'tiktok'
   const [isFading, setIsFading] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     // 1. Carregar contagem inicial de visitas
@@ -70,6 +104,38 @@ export default function VisitorCounter({ variant = 'fixed' }) {
         setCount(visitorNumber);
         setHighlight(true);
         setTimeout(() => setHighlight(false), 2000);
+
+        // Se for um múltiplo de 10, celebrar!
+        if (visitorNumber % 10 === 0) {
+          setShowConfetti(true);
+          setTimeout(() => setShowConfetti(false), 6000);
+          
+          toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-enter' : 'animate-leave'}`} style={{ 
+              background: 'rgba(15, 20, 25, 0.95)', 
+              border: '1px solid var(--green)', 
+              padding: '24px', 
+              borderRadius: '16px', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              textAlign: 'center', 
+              gap: '8px',
+              boxShadow: '0 10px 40px rgba(0, 200, 83, 0.25)',
+              backdropFilter: 'blur(10px)',
+              maxWidth: '320px'
+            }}>
+               <div style={{ fontSize: '40px', animation: 'pulse 1.5s infinite' }}>🎉</div>
+               <div style={{ fontWeight: '900', color: 'var(--green)', fontSize: '20px', textTransform: 'uppercase' }}>Parabéns!</div>
+               <div style={{ color: '#fff', fontSize: '15px' }}>
+                 És o <strong style={{ color: 'var(--green)', fontSize: '18px' }}>{visitorNumber}º</strong> visitante da plataforma!
+               </div>
+               <div style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '4px' }}>
+                 A nossa comunidade não para de crescer, obrigado por fazeres parte disto! 🚀⚽
+               </div>
+            </div>
+          ), { duration: 6000, position: 'top-center' });
+        }
       }
     };
 
@@ -177,9 +243,11 @@ export default function VisitorCounter({ variant = 'fixed' }) {
   if (loading && count === 0) return null;
 
   return (
-    <div 
-      className={`visitor-badge-container ${variant === 'inline' ? 'visitor-badge-container--inline' : 'visitor-badge-container--fixed'} ${highlight ? 'sparkle-highlight' : ''} ${slide === 'youtube' ? 'clickable-youtube' : ''} ${slide === 'tiktok' ? 'clickable-tiktok' : ''}`}
-      onClick={handleClick}
+    <>
+      {showConfetti && <Confetti />}
+      <div 
+        className={`visitor-badge-container ${variant === 'inline' ? 'visitor-badge-container--inline' : 'visitor-badge-container--fixed'} ${highlight ? 'sparkle-highlight' : ''} ${slide === 'youtube' ? 'clickable-youtube' : ''} ${slide === 'tiktok' ? 'clickable-tiktok' : ''}`}
+        onClick={handleClick}
       style={getContainerStyle()}
       title={
         slide === 'youtube' 
@@ -340,6 +408,7 @@ export default function VisitorCounter({ variant = 'fixed' }) {
           }
         }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 }
