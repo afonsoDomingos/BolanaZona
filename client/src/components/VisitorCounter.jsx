@@ -112,8 +112,8 @@ export default function VisitorCounter({ variant = 'fixed' }) {
           
           toast.custom((t) => (
             <div className={`${t.visible ? 'animate-enter' : 'animate-leave'}`} style={{ 
-              background: 'rgba(15, 20, 25, 0.95)', 
-              border: '1px solid var(--green)', 
+              background: '#ffffff', 
+              border: '2px solid var(--green)', 
               padding: '24px', 
               borderRadius: '16px', 
               display: 'flex', 
@@ -121,16 +121,19 @@ export default function VisitorCounter({ variant = 'fixed' }) {
               alignItems: 'center', 
               textAlign: 'center', 
               gap: '8px',
-              boxShadow: '0 10px 40px rgba(0, 200, 83, 0.25)',
-              backdropFilter: 'blur(10px)',
-              maxWidth: '320px'
+              boxShadow: '0 15px 50px rgba(0, 200, 83, 0.4), inset 0 0 20px rgba(0, 200, 83, 0.1)',
+              maxWidth: '320px',
+              position: 'relative',
+              overflow: 'hidden'
             }}>
-               <div style={{ fontSize: '40px', animation: 'pulse 1.5s infinite' }}>🎉</div>
-               <div style={{ fontWeight: '900', color: 'var(--green)', fontSize: '20px', textTransform: 'uppercase' }}>Parabéns!</div>
-               <div style={{ color: '#fff', fontSize: '15px' }}>
-                 És o <strong style={{ color: 'var(--green)', fontSize: '18px' }}>{visitorNumber}º</strong> visitante da plataforma!
+               <div style={{ position: 'absolute', top: '-10px', left: '-10px', width: '70px', height: '70px', background: 'var(--green)', opacity: '0.15', borderRadius: '50%', filter: 'blur(15px)' }}></div>
+               <div style={{ position: 'absolute', bottom: '-10px', right: '-10px', width: '70px', height: '70px', background: '#FFD600', opacity: '0.15', borderRadius: '50%', filter: 'blur(15px)' }}></div>
+               <div style={{ fontSize: '40px', animation: 'bounce 2s infinite', position: 'relative', zIndex: 2 }}>🎉</div>
+               <div style={{ fontWeight: '900', color: 'var(--green)', fontSize: '20px', textTransform: 'uppercase', position: 'relative', zIndex: 2 }}>Parabéns!</div>
+               <div style={{ color: '#1a1a1a', fontSize: '15px', position: 'relative', zIndex: 2, fontWeight: '600' }}>
+                 És o <strong style={{ color: 'var(--green)', fontSize: '18px', background: 'rgba(0,200,83,0.1)', padding: '2px 8px', borderRadius: '8px' }}>{visitorNumber}º</strong> visitante da plataforma!
                </div>
-               <div style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '4px' }}>
+               <div style={{ color: '#555555', fontSize: '13px', marginTop: '4px', position: 'relative', zIndex: 2, fontWeight: '500' }}>
                  A nossa comunidade não para de crescer, obrigado por fazeres parte disto! 🚀⚽
                </div>
             </div>
