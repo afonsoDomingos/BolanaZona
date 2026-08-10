@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Eye, Youtube } from 'lucide-react';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 
 const Confetti = () => {
   return (
@@ -81,6 +80,7 @@ export default function VisitorCounter({ variant = 'fixed' }) {
   const [slide, setSlide] = useState('visits'); // 'visits' | 'youtube' | 'tiktok'
   const [isFading, setIsFading] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [milestoneVisitor, setMilestoneVisitor] = useState(null);
 
   useEffect(() => {
     // 1. Carregar contagem inicial de visitas
@@ -107,37 +107,9 @@ export default function VisitorCounter({ variant = 'fixed' }) {
 
         // Se for um múltiplo de 10, celebrar!
         if (visitorNumber % 10 === 0) {
+          setMilestoneVisitor(visitorNumber);
           setShowConfetti(true);
           setTimeout(() => setShowConfetti(false), 6000);
-          
-          toast.custom((t) => (
-            <div className={`${t.visible ? 'animate-enter' : 'animate-leave'}`} style={{ 
-              background: '#ffffff', 
-              border: '2px solid var(--green)', 
-              padding: '24px', 
-              borderRadius: '16px', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center', 
-              textAlign: 'center', 
-              gap: '8px',
-              boxShadow: '0 15px 50px rgba(0, 200, 83, 0.4), inset 0 0 20px rgba(0, 200, 83, 0.1)',
-              maxWidth: '320px',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-               <div style={{ position: 'absolute', top: '-10px', left: '-10px', width: '70px', height: '70px', background: 'var(--green)', opacity: '0.15', borderRadius: '50%', filter: 'blur(15px)' }}></div>
-               <div style={{ position: 'absolute', bottom: '-10px', right: '-10px', width: '70px', height: '70px', background: '#FFD600', opacity: '0.15', borderRadius: '50%', filter: 'blur(15px)' }}></div>
-               <div style={{ fontSize: '40px', animation: 'bounce 2s infinite', position: 'relative', zIndex: 2 }}>🎉</div>
-               <div style={{ fontWeight: '900', color: 'var(--green)', fontSize: '20px', textTransform: 'uppercase', position: 'relative', zIndex: 2 }}>Parabéns!</div>
-               <div style={{ color: '#1a1a1a', fontSize: '15px', position: 'relative', zIndex: 2, fontWeight: '600' }}>
-                 És o <strong style={{ color: 'var(--green)', fontSize: '18px', background: 'rgba(0,200,83,0.1)', padding: '2px 8px', borderRadius: '8px' }}>{visitorNumber}º</strong> visitante da plataforma!
-               </div>
-               <div style={{ color: '#555555', fontSize: '13px', marginTop: '4px', position: 'relative', zIndex: 2, fontWeight: '500' }}>
-                 A nossa comunidade não para de crescer, obrigado por fazeres parte disto! 🚀⚽
-               </div>
-            </div>
-          ), { duration: 6000, position: 'top-center' });
         }
       }
     };
@@ -247,7 +219,41 @@ export default function VisitorCounter({ variant = 'fixed' }) {
 
   return (
     <>
-      {showConfetti && <Confetti />}
+      {showConfetti && (
+        <>
+          <Confetti />
+          <div style={{ position: 'fixed', inset: 0, zIndex: 99998, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)' }}>
+            <div className="wave-border-card" style={{
+              background: '#ffffff', 
+              padding: '40px 24px', 
+              borderRadius: '24px', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              textAlign: 'center', 
+              gap: '12px',
+              maxWidth: '340px',
+              position: 'relative',
+              zIndex: 1,
+              animation: 'slide-up-fade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+            }}>
+               <div style={{ position: 'absolute', top: '-20px', left: '-20px', width: '120px', height: '120px', background: 'var(--green)', opacity: '0.1', borderRadius: '50%', filter: 'blur(25px)', zIndex: -1 }}></div>
+               <div style={{ position: 'absolute', bottom: '-20px', right: '-20px', width: '120px', height: '120px', background: '#FFD600', opacity: '0.1', borderRadius: '50%', filter: 'blur(25px)', zIndex: -1 }}></div>
+               
+               <div style={{ fontSize: '56px', animation: 'bounce 2s infinite', marginBottom: '8px' }}>🎉</div>
+               <div style={{ fontWeight: '900', color: 'var(--green)', fontSize: '26px', textTransform: 'uppercase', letterSpacing: '-0.5px' }}>Parabéns!</div>
+               
+               <div style={{ color: '#1a1a1a', fontSize: '16px', fontWeight: '600', margin: '4px 0' }}>
+                 És o <strong style={{ color: 'var(--green)', fontSize: '22px', background: 'rgba(0,200,83,0.1)', padding: '4px 12px', borderRadius: '10px', display: 'inline-block', margin: '0 4px' }}>{milestoneVisitor}º</strong> visitante!
+               </div>
+               
+               <div style={{ color: '#666666', fontSize: '14px', marginTop: '4px', fontWeight: '500', lineHeight: '1.5' }}>
+                 A nossa comunidade não para de crescer.<br/>Obrigado por fazeres parte disto! 🚀⚽
+               </div>
+            </div>
+          </div>
+        </>
+      )}
       <div 
         className={`visitor-badge-container ${variant === 'inline' ? 'visitor-badge-container--inline' : 'visitor-badge-container--fixed'} ${highlight ? 'sparkle-highlight' : ''} ${slide === 'youtube' ? 'clickable-youtube' : ''} ${slide === 'tiktok' ? 'clickable-tiktok' : ''}`}
         onClick={handleClick}
@@ -389,6 +395,42 @@ export default function VisitorCounter({ variant = 'fixed' }) {
         .sparkle-highlight {
           transform: scale(1.05);
           border-color: rgba(0, 200, 83, 0.8) !important;
+        }
+
+        .wave-border-card {
+          border: 3px solid var(--green);
+        }
+
+        .wave-border-card::before {
+          content: "";
+          position: absolute;
+          inset: -6px;
+          border-radius: 28px;
+          border: 2px solid var(--green);
+          animation: wave-ripple 2s linear infinite;
+          z-index: -2;
+        }
+
+        .wave-border-card::after {
+          content: "";
+          position: absolute;
+          inset: -6px;
+          border-radius: 28px;
+          border: 2px solid var(--green);
+          animation: wave-ripple 2s linear infinite;
+          animation-delay: 1s;
+          z-index: -2;
+        }
+
+        @keyframes wave-ripple {
+          0% {
+            transform: scale(1);
+            opacity: 0.8;
+          }
+          100% {
+            transform: scale(1.15);
+            opacity: 0;
+          }
         }
 
         @keyframes slide-up-fade {
