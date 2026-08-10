@@ -1455,6 +1455,15 @@ export default function TournamentDetail() {
         />
       )}
 
+      {summonsMatchModal && (
+        <SummonsWhatsAppModal
+          match={summonsMatchModal}
+          squadName={summonsMatchModal.homeTeam?.name || 'Equipa'}
+          players={teams.find(t => t._id === (summonsMatchModal.homeTeam?._id || summonsMatchModal.homeTeam))?.players || []}
+          onClose={() => setSummonsMatchModal(null)}
+        />
+      )}
+
       {/* FINISH TOURNAMENT MODAL */}
       {showFinishModal && (
         <FinishTournamentModal 
@@ -2350,15 +2359,6 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
         </div>
 
       </div>
-
-      {summonsMatchModal && (
-        <SummonsWhatsAppModal
-          match={summonsMatchModal}
-          squadName={summonsMatchModal.homeTeam?.name || 'Equipa'}
-          players={teams.find(t => t._id === (summonsMatchModal.homeTeam?._id || summonsMatchModal.homeTeam))?.players || []}
-          onClose={() => setSummonsMatchModal(null)}
-        />
-      )}
     </div>
   );
 }
