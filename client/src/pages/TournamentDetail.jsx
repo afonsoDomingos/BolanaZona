@@ -221,6 +221,8 @@ export default function TournamentDetail() {
   if (loading) return <div className="loading-center" style={{ minHeight: '80vh' }}><div className="spinner" /></div>;
   if (!tournament) return <div className="page"><div className="container"><p>Torneio não encontrado.</p></div></div>;
 
+  const overdueMatches = canManage ? matches.filter(m => m.date && new Date(m.date) < new Date() && m.status !== 'finished' && m.status !== 'cancelled') : [];
+
   return (
     <div className="page">
       <div className="container">
@@ -607,6 +609,15 @@ export default function TournamentDetail() {
         {/* CALENDAR TAB */}
         {tab === 'calendar' && (
           <div>
+            {overdueMatches.length > 0 && (
+              <div className="alert alert-warning" style={{ marginBottom: 20, display: 'flex', alignItems: 'flex-start', gap: 12, background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: 12, padding: 16 }}>
+                <span style={{ fontSize: 20 }}>⏰</span>
+                <div>
+                  <h4 style={{ color: '#f59e0b', margin: '0 0 4px 0', fontSize: 14, fontWeight: 700 }}>Jogos Atrasados ({overdueMatches.length})</h4>
+                  <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>Existem jogos cuja data já passou e que ainda não têm o resultado lançado. Lança o resultado ou edita a data para manter a tabela atualizada.</p>
+                </div>
+              </div>
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
                 <h2 style={{ fontSize: 18, fontWeight: 700 }}>Calendário ({matches.length} jogos)</h2>
