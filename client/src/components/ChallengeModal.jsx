@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { showErrorToast, ErrorContactAdminBanner } from '../utils/toastUtils';
 
 export default function ChallengeModal({ targetSquad, mySquads, onClose, onSuccess, initialData = null }) {
   const [form, setForm] = useState(initialData || { 
@@ -15,10 +16,12 @@ export default function ChallengeModal({ targetSquad, mySquads, onClose, onSucce
   const [loading, setLoading] = useState(false);
   const [whatsappLink, setWhatsappLink] = useState(null);
   const [sent, setSent] = useState(false);
+  const [apiError, setApiError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setApiError(null);
     try {
       let res;
       if (initialData?._id) {
@@ -38,8 +41,10 @@ export default function ChallengeModal({ targetSquad, mySquads, onClose, onSucce
         }
         onSuccess && onSuccess();
       }
-    } catch {
-      toast.error('Erro ao processar o desafio.');
+    } catch (err) {
+      const errMsg = err.response?.data?.message || 'Erro ao processar o desafio.';
+      setApiError(errMsg);
+      showErrorToast(errMsg);
     } finally {
       setLoading(false);
     }
@@ -87,6 +92,8 @@ export default function ChallengeModal({ targetSquad, mySquads, onClose, onSucce
         <p style={{ color: 'var(--text-secondary)', marginBottom: 24, fontSize: 15, lineHeight: 1.5 }}>
           {initialData ? `Estás a editar o desafio enviado para a equipa ${initialData.challengedSquad?.name}.` : `Estás a enviar uma convocatória de amistoso para a equipa ${targetSquad.name}.`}
         </p>
+        
+        <ErrorContactAdminBanner error={apiError} />
         
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div className="form-group">

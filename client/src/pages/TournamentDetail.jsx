@@ -12,6 +12,7 @@ import MatchLikeButton from '../components/MatchLikeButton';
 import ScheduledBadge from '../components/ScheduledBadge';
 import SummonsWhatsAppModal from '../components/SummonsWhatsAppModal';
 import { buildTournamentShareText, buildMatchShareText, copyToClipboard } from '../utils/shareUtils';
+import { showErrorToast, ErrorContactAdminBanner } from '../utils/toastUtils';
 
 
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
@@ -2137,6 +2138,7 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
   const handleRemoveEvent = (id) => setEvents(events.filter(e => e.id !== id && e._id !== id));
 
   const [confirmGoalWarning, setConfirmGoalWarning] = useState(null);
+  const [apiError, setApiError] = useState(null);
 
   const handleSave = async (customStatus, skipWarning = false) => {
     if (home === '' || away === '') return toast.error('Insere os dois resultados.');
@@ -2150,6 +2152,7 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
     }
 
     setConfirmGoalWarning(null);
+    setApiError(null);
     setLoading(true);
 
     try {
@@ -2164,7 +2167,9 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
       onSaved();
       if (!customStatus || customStatus === 'finished') onClose();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Erro ao guardar resultado.');
+      const errMsg = err.response?.data?.message || 'Erro ao guardar resultado.';
+      setApiError(errMsg);
+      showErrorToast(errMsg);
     } finally { setLoading(false); }
   };
 
@@ -2293,6 +2298,9 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
             )}
           </div>
         </div>
+
+        {/* Error contact admin banner */}
+        <ErrorContactAdminBanner error={apiError} />
 
         {/* Warning banner when goals lack player events */}
         {confirmGoalWarning && (

@@ -11,6 +11,7 @@ import ShareModal from '../components/ShareModal';
 import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
 import { buildTournamentShareText } from '../utils/shareUtils';
+import { showErrorToast, ErrorContactAdminBanner } from '../utils/toastUtils';
 import { useAuth } from '../contexts/AuthContext';
 
 const formatLabel = { groups: 'Todos contra Todos', knockout: 'Mata-mata', groups_knockout: 'Grupos + Eliminatórias' };
@@ -981,6 +982,9 @@ function PublicResultModal({ match, tournamentId, teams, matches, onClose, onSav
   };
   const handleRemoveEvent = (id) => setEvents(events.filter(e => e.id !== id && e._id !== id));
 
+  const [confirmGoalWarning, setConfirmGoalWarning] = useState(null);
+  const [apiError, setApiError] = useState(null);
+
   const handleSave = async (customStatus, skipWarning = false) => {
     if (home === '' || away === '') return toast.error('Insere os dois resultados.');
 
@@ -993,6 +997,7 @@ function PublicResultModal({ match, tournamentId, teams, matches, onClose, onSav
     }
 
     setConfirmGoalWarning(null);
+    setApiError(null);
     setSaving(true);
 
     try {
@@ -1007,7 +1012,9 @@ function PublicResultModal({ match, tournamentId, teams, matches, onClose, onSav
       onSaved();
       if (!customStatus || customStatus === 'finished') onClose();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Erro ao guardar resultado.');
+      const errMsg = err.response?.data?.message || 'Erro ao guardar resultado.';
+      setApiError(errMsg);
+      showErrorToast(errMsg);
     } finally { setSaving(false); }
   };
 
@@ -1145,6 +1152,9 @@ function PublicResultModal({ match, tournamentId, teams, matches, onClose, onSav
             )}
           </div>
         </div>
+
+        {/* Error contact admin banner */}
+        <ErrorContactAdminBanner error={apiError} />
 
         {confirmGoalWarning && (
           <div style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.35)', borderRadius: 10, padding: '10px 12px', marginBottom: 12 }}>

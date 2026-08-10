@@ -4,6 +4,7 @@ import api from '../services/api';
 import toast from 'react-hot-toast';
 import { Plus, Search, Trash2, ArrowRight, Trophy, User, X, Save, ChevronDown, ChevronUp, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { showErrorToast, ErrorContactAdminBanner } from '../utils/toastUtils';
 
 
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
@@ -252,10 +253,12 @@ function QuickResultModal({ match, tournamentId, onClose, onSaved }) {
   const [home, setHome] = useState(match.homeScore ?? '');
   const [away, setAway] = useState(match.awayScore ?? '');
   const [saving, setSaving] = useState(false);
+  const [apiError, setApiError] = useState(null);
 
   const handleSave = async (customStatus) => {
     if (home === '' || away === '') return toast.error('Insere os dois resultados.');
     setSaving(true);
+    setApiError(null);
     try {
       await api.put(`/tournaments/${tournamentId}/matches/${match._id}/result`, {
         homeScore: Number(home),
@@ -265,7 +268,9 @@ function QuickResultModal({ match, tournamentId, onClose, onSaved }) {
       toast.success(customStatus === 'live' ? 'Live Atualizado! 📡' : 'Resultado guardado! ✅');
       onSaved();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Erro ao guardar resultado.');
+      const errMsg = err.response?.data?.message || 'Erro ao guardar resultado.';
+      setApiError(errMsg);
+      showErrorToast(errMsg);
     } finally { setSaving(false); }
   };
 
@@ -279,6 +284,8 @@ function QuickResultModal({ match, tournamentId, onClose, onSaved }) {
           <h2 className="modal-title">Lançar Resultado</h2>
           <button className="modal-close" onClick={onClose}><X size={18} /></button>
         </div>
+
+        <ErrorContactAdminBanner error={apiError} />
 
         <p style={{ color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center', marginBottom: 20 }}>
           {match.homeTeam?.name || '?'} <span style={{ color: 'var(--text-muted)' }}>vs</span> {match.awayTeam?.name || '?'}
