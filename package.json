@@ -7,7 +7,7 @@
     "server": "cd server && npm run dev",
     "client": "cd client && npm run dev",
     "install-all": "npm install && cd client && npm install && cd ../server && npm install",
-    "build": "npm --prefix client install && npm --prefix client run build"
+    "build": "npm --prefix client install && npm --prefix client run build && node -e \"const fs=require('fs'); fs.rmSync('public', { recursive: true, force: true }); fs.cpSync('client/dist', 'public', { recursive: true });\""
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
