@@ -1669,11 +1669,12 @@ function TournamentEditModal({ tournament, onClose, onSaved }) {
     { value: 'groups', label: '📊 Fase de Grupos' },
     { value: 'knockout', label: '⚔️ Mata-mata' },
     { value: 'groups_knockout', label: '🏆 Grupos + Mata-mata' },
+    { value: 'league', label: '⚡ Liga / Amigável' },
   ];
 
   const handleSave = async () => {
-    if (!form.name || !form.neighborhood || !form.location) {
-      return toast.error('Preenche os campos obrigatórios (Nome, Bairro, Local).');
+    if (!form.name) {
+      return toast.error('Preenche o nome do torneio.');
     }
     setLoading(true);
     try {
@@ -2156,7 +2157,8 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
     setLoading(true);
 
     try {
-      await api.put(`/tournaments/${tournamentId}/matches/${match._id}/result`, {
+      const tId = tournamentId || match.tournament?._id || match.tournament;
+      await api.put(`/tournaments/${tId}/matches/${match._id}/result`, {
         homeScore: Number(home), 
         awayScore: Number(away), 
         events, 

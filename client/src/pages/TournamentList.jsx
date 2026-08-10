@@ -9,7 +9,7 @@ import { showErrorToast, ErrorContactAdminBanner } from '../utils/toastUtils';
 
 const statusLabel = { draft: 'Rascunho', registration: 'Inscrições', active: 'A decorrer', finished: 'Concluído' };
 const statusBadge = { draft: 'badge-gray', registration: 'badge-blue', active: 'badge-green', finished: 'badge-yellow' };
-const formatLabel = { groups: 'Fase de Grupos', knockout: 'Mata-mata', groups_knockout: 'Grupos + Mata-mata' };
+const formatLabel = { groups: 'Fase de Grupos', knockout: 'Mata-mata', groups_knockout: 'Grupos + Mata-mata', league: 'Liga / Amigável' };
 
 export default function TournamentList() {
   const { user } = useAuth();
@@ -260,7 +260,8 @@ function QuickResultModal({ match, tournamentId, onClose, onSaved }) {
     setSaving(true);
     setApiError(null);
     try {
-      await api.put(`/tournaments/${tournamentId}/matches/${match._id}/result`, {
+      const tId = tournamentId || match.tournament?._id || match.tournament;
+      await api.put(`/tournaments/${tId}/matches/${match._id}/result`, {
         homeScore: Number(home),
         awayScore: Number(away),
         status: customStatus || 'finished'

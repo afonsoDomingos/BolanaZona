@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Match = require('../models/Match');
 const Team = require('../models/Team');
 const Tournament = require('../models/Tournament');
@@ -27,10 +28,21 @@ exports.updateResult = async (req, res) => {
     const oldStatus = match.status;
 
     // 1. Verificar Permissão
-    const isOwner = match.tournament?.createdBy && (match.tournament.createdBy.toString() === req.user._id.toString());
-    const isSuperAdmin = req.user.role === 'superadmin';
-    if (!isOwner && !isSuperAdmin) {
-      return res.status(403).json({ message: 'Apenas o organizador do torneio ou Superadmin podem inserir resultados.' });
+    const tournamentCreatedBy = (match.tournament?.createdBy?._id || match.tournament?.createdBy)?.toString();
+    const isOwner = tournamentCreatedBy && (tournamentCreatedBy === req.user._id.toString());
+    const isSuperAdmin = req.user.role === 'superadmin' || req.user.role === 'admin';
+
+    let isCaptain = false;
+    if (match.homeTeam || match.awayTeam) {
+      const teams = await Team.find({ _id: { $in: [match.homeTeam, match.awayTeam].filter(Boolean) } });
+      const captainIds = teams.flatMap(t => (Array.isArray(t.captains) ? t.captains : [])).map(id => id.toString());
+      if (captainIds.includes(req.user._id.toString())) {
+        isCaptain = true;
+      }
+    }
+
+    if (!isOwner && !isSuperAdmin && !isCaptain) {
+      return res.status(403).json({ message: 'Apenas o organizador do torneio, Superadmin ou capitães das equipas podem inserir resultados.' });
     }
 
     // 2. Bloquear se as equipas ainda não foram apuradas (slots null) em jogos de knockout
@@ -61,71 +73,77 @@ exports.updateResult = async (req, res) => {
     }
 
     // Proceder com a atualização
-    match.homeScore = homeScore;
-    match.awayScore = awayScore;
-    match.events = events;
-    match.referee = referee;
+    match.homeScore = typeof homeScore === 'number' ? homeScore : Number(homeScore ?? 0);
+    match.awayScore = typeof awayScore === 'number' ? awayScore : Number(awayScore ?? 0);
+    
+    if (Array.isArray(events)) {
+      match.events = events
+        .filter(e => e && e.type && e.playerName)
+        .map(e => ({
+          type: e.type,
+          playerName: e.playerName,
+          team: (e.team && mongoose.Types.ObjectId.isValid(e.team)) ? e.team : undefined,
+          minute: e.minute ? Number(e.minute) : undefined
+        }));
+    }
+
+    if (referee !== undefined) match.referee = referee;
     match.status = status || 'finished';
     match.reportedBy = req.user._id;
     
     await match.save();
 
-    // 3. Notificações de Golo / Eventos em Direto
-    if (homeScore > oldHomeScore || awayScore > oldAwayScore) {
-      const scoringTeam = homeScore > oldHomeScore ? 'homeTeam' : 'awayTeam';
-      const populatedMatch = await Match.findById(match._id).populate('homeTeam awayTeam');
-      const teamName = populatedMatch?.[scoringTeam]?.name || (scoringTeam === 'homeTeam' ? 'Equipa Casa' : 'Equipa Fora');
-      
-      // Notificar Seguidores do Torneio (In-app por agora, expansível para WhatsApp)
-      const subscribers = await Subscriber.find({ tournament: match.tournament._id, isActive: true });
-      
-      // Mensagem de Golo
-      const goalMsg = `GOLO da equipa ${teamName}! ⚽ O resultado agora é ${homeScore} - ${awayScore}.`;
-      
-      console.log(`📡 Notificação de Golo: ${goalMsg}`);
-      
-      // Notificação interna para o dono do torneio e capitães das equipas
-      const captains = await Team.find({ _id: { $in: [match.homeTeam, match.awayTeam].filter(Boolean) } }).select('captains');
-      const notifyUsers = [
-        match.tournament?.createdBy,
-        ...captains.flatMap(c => (Array.isArray(c.captains) ? c.captains : []))
-      ].filter(Boolean);
-      const uniqueNotifyUsers = [...new Set(notifyUsers.map(id => id?.toString()).filter(Boolean))];
+    // Notificações de Golo / Eventos em Direto
+    try {
+      if (homeScore > oldHomeScore || awayScore > oldAwayScore) {
+        const scoringTeam = homeScore > oldHomeScore ? 'homeTeam' : 'awayTeam';
+        const populatedMatch = await Match.findById(match._id).populate('homeTeam awayTeam');
+        const teamName = populatedMatch?.[scoringTeam]?.name || (scoringTeam === 'homeTeam' ? 'Equipa Casa' : 'Equipa Fora');
+        const goalMsg = `GOLO da equipa ${teamName}! ⚽ O resultado agora é ${homeScore} - ${awayScore}.`;
+        
+        const captains = await Team.find({ _id: { $in: [match.homeTeam, match.awayTeam].filter(Boolean) } }).select('captains');
+        const notifyUsers = [
+          match.tournament?.createdBy,
+          ...captains.flatMap(c => (Array.isArray(c.captains) ? c.captains : []))
+        ].filter(Boolean);
+        const uniqueNotifyUsers = [...new Set(notifyUsers.map(id => id?.toString()).filter(Boolean))];
 
-      for (const userId of uniqueNotifyUsers) {
-        await createNotification(
-          userId,
-          'GOLO AO VIVO! ⚽',
-          goalMsg,
-          'info',
-          `/dashboard/tournaments/${match.tournament._id}`
-        );
+        for (const userId of uniqueNotifyUsers) {
+          await createNotification(
+            userId,
+            'GOLO AO VIVO! ⚽',
+            goalMsg,
+            'info',
+            `/dashboard/tournaments/${match.tournament._id}`
+          );
+        }
       }
-    }
 
-    // 3.5. Notificação de Jogo Terminado (Final Score)
-    if (match.status === 'finished' && oldStatus !== 'finished') {
-      const populatedMatch = await Match.findById(match._id).populate('homeTeam awayTeam');
-      const homeName = populatedMatch?.homeTeam?.name || 'Equipa A';
-      const awayName = populatedMatch?.awayTeam?.name || 'Equipa B';
-      const finishMsg = `Jogo Terminado: ${homeName} ${homeScore} - ${awayScore} ${awayName}. Placar final confirmado! 🏁`;
+      if (match.status === 'finished' && oldStatus !== 'finished') {
+        const populatedMatch = await Match.findById(match._id).populate('homeTeam awayTeam');
+        const homeName = populatedMatch?.homeTeam?.name || 'Equipa A';
+        const awayName = populatedMatch?.awayTeam?.name || 'Equipa B';
+        const finishMsg = `Jogo Terminado: ${homeName} ${homeScore} - ${awayScore} ${awayName}. Placar final confirmado! 🏁`;
 
-      const captains = await Team.find({ _id: { $in: [match.homeTeam, match.awayTeam].filter(Boolean) } }).select('captains');
-      const notifyUsers = [
-        match.tournament?.createdBy,
-        ...captains.flatMap(c => (Array.isArray(c.captains) ? c.captains : []))
-      ].filter(Boolean);
-      const uniqueNotifyUsers = [...new Set(notifyUsers.map(id => id?.toString()).filter(Boolean))];
+        const captains = await Team.find({ _id: { $in: [match.homeTeam, match.awayTeam].filter(Boolean) } }).select('captains');
+        const notifyUsers = [
+          match.tournament?.createdBy,
+          ...captains.flatMap(c => (Array.isArray(c.captains) ? c.captains : []))
+        ].filter(Boolean);
+        const uniqueNotifyUsers = [...new Set(notifyUsers.map(id => id?.toString()).filter(Boolean))];
 
-      for (const userId of uniqueNotifyUsers) {
-        await createNotification(
-          userId,
-          'Jogo Terminado 🏁',
-          finishMsg,
-          'success',
-          `/dashboard/tournaments/${match.tournament._id}`
-        );
+        for (const userId of uniqueNotifyUsers) {
+          await createNotification(
+            userId,
+            'Jogo Terminado 🏁',
+            finishMsg,
+            'success',
+            `/dashboard/tournaments/${match.tournament._id}`
+          );
+        }
       }
+    } catch (notifErr) {
+      console.warn('⚠️ Erro ao enviar notificações do jogo:', notifErr.message);
     }
     
     // 4. Progressão Automática na Árvore (Mata-Mata)

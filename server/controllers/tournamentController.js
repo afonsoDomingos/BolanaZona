@@ -243,7 +243,7 @@ exports.generateCalendar = async (req, res) => {
     currentDate.setHours(15, 0, 0, 0);
 
 
-    if (tournament.format === 'groups' || tournament.format === 'groups_knockout') {
+    if (tournament.format === 'groups' || tournament.format === 'groups_knockout' || tournament.format === 'league') {
       // Round Robin
       const schedule = generateRoundRobin(teams);
       schedule.forEach((round, roundIdx) => {

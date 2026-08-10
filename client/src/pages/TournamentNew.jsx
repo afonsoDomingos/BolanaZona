@@ -9,6 +9,7 @@ const formatOptions = [
   { value: 'groups', label: '📊 Fase de Grupos', desc: 'Todos jogam entre si. Classificação por pontos.' },
   { value: 'knockout', label: '⚔️ Mata-mata', desc: 'Eliminação direta. Perde e sai.' },
   { value: 'groups_knockout', label: '🏆 Grupos + Mata-mata', desc: 'Fase de grupos seguida de eliminatórias.' },
+  { value: 'league', label: '⚡ Liga / Amigável', desc: 'Jogos individuais ou liga contínua.' },
 ];
 
 export default function TournamentNew() {

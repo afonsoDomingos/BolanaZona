@@ -14,7 +14,7 @@ import { buildTournamentShareText } from '../utils/shareUtils';
 import { showErrorToast, ErrorContactAdminBanner } from '../utils/toastUtils';
 import { useAuth } from '../contexts/AuthContext';
 
-const formatLabel = { groups: 'Todos contra Todos', knockout: 'Mata-mata', groups_knockout: 'Grupos + Eliminatórias' };
+const formatLabel = { groups: 'Todos contra Todos', knockout: 'Mata-mata', groups_knockout: 'Grupos + Eliminatórias', league: 'Liga / Amigável' };
 const statusLabel = { draft: 'Brevemente', registration: 'Inscrições Abertas', active: 'A Decorrer', finished: 'Concluído' };
 
 export default function PublicTournament() {
@@ -1001,7 +1001,8 @@ function PublicResultModal({ match, tournamentId, teams, matches, onClose, onSav
     setSaving(true);
 
     try {
-      await api.put(`/tournaments/${tournamentId}/matches/${match._id}/result`, {
+      const tId = tournamentId || match.tournament?._id || match.tournament;
+      await api.put(`/tournaments/${tId}/matches/${match._id}/result`, {
         homeScore: Number(home),
         awayScore: Number(away),
         events,

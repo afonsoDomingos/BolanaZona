@@ -20,7 +20,7 @@ const matchSchema = new mongoose.Schema({
   events: [{
     type: { type: String, enum: ['goal', 'yellow_card', 'red_card'], required: true },
     playerName: { type: String, required: true },
-    team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team', required: true },
+    team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
     minute: { type: Number }
   }]
 }, { timestamps: true });

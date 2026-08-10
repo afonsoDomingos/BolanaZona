@@ -587,6 +587,9 @@ function AddMatchModal({ tournaments = [], onClose, onMatchAdded }) {
           name: 'Jogos Rápidos & Amigáveis',
           description: 'Desafios amigáveis rápidos agendados entre 2 equipas.',
           format: 'league',
+          location: location.trim() || 'Geral',
+          neighborhood: 'Geral',
+          maxTeams: 2,
           status: 'active'
         });
         targetTournamentId = tRes.data._id;
@@ -601,6 +604,9 @@ function AddMatchModal({ tournaments = [], onClose, onMatchAdded }) {
             name: newTournamentName.trim(),
             description: `Torneio ${newTournamentName.trim()} criado via agendamento.`,
             format: newTournamentFormat || 'groups',
+            location: location.trim() || 'Geral',
+            neighborhood: 'Geral',
+            maxTeams: 16,
             status: 'active'
           });
           targetTournamentId = tRes.data._id;
