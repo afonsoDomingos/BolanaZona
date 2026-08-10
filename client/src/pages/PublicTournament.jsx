@@ -981,22 +981,19 @@ function PublicResultModal({ match, tournamentId, teams, matches, onClose, onSav
   };
   const handleRemoveEvent = (id) => setEvents(events.filter(e => e.id !== id && e._id !== id));
 
-  const handleSave = async (customStatus) => {
+  const handleSave = async (customStatus, skipWarning = false) => {
     if (home === '' || away === '') return toast.error('Insere os dois resultados.');
-    setSaving(true);
 
     const totalGoals = Number(home) + Number(away);
     const registeredGoals = events.filter(e => e.type === 'goal').length;
 
-    if (totalGoals > 0 && registeredGoals < totalGoals) {
-      const confirmSave = window.confirm(
-        `Registaste ${totalGoals} golo(s), mas só adicionaste ${registeredGoals} marcador(es) de golo nos eventos.\n\nRecomendamos associar todos os marcadores para que as estatísticas do campeonato fiquem corretas. Desejas guardar o resultado assim mesmo?`
-      );
-      if (!confirmSave) {
-        setSaving(false);
-        return;
-      }
+    if (!skipWarning && totalGoals > 0 && registeredGoals < totalGoals) {
+      setConfirmGoalWarning({ customStatus, totalGoals, registeredGoals });
+      return;
     }
+
+    setConfirmGoalWarning(null);
+    setSaving(true);
 
     try {
       await api.put(`/tournaments/${tournamentId}/matches/${match._id}/result`, {
@@ -1019,83 +1016,159 @@ function PublicResultModal({ match, tournamentId, teams, matches, onClose, onSav
 
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal animate-slide-up" style={{ maxWidth: 500 }}>
+      <div className="modal animate-slide-up" style={{ maxWidth: 480 }}>
+
+        <div style={{ width: 40, height: 4, borderRadius: 4, background: 'rgba(255,255,255,0.15)', margin: '-4px auto 14px' }} />
+
         <div className="modal-header">
-          <h2 className="modal-title">Registo de Jogo</h2>
+          <h2 className="modal-title">Registo de Jogo Final</h2>
           <button className="modal-close" onClick={onClose}><X size={18} /></button>
         </div>
 
-        {hasNoTeams && (
-          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: '#ef4444', textAlign: 'center', fontWeight: 600 }}>
-            ⚠️ As equipas para este jogo ainda não foram apuradas.
-          </div>
-        )}
-        {hasPendingPrevRound && (
-          <div style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 10, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: '#f59e0b', textAlign: 'center', fontWeight: 600 }}>
-            ⚠️ Há jogos da ronda anterior ainda por terminar.
+        {isBlocked && (
+          <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, padding: '8px 12px', marginBottom: 12, fontSize: 12, color: '#ef4444', textAlign: 'center', fontWeight: 600 }}>
+            ⚠️ As equipas para este jogo ainda não foram apuradas ou há jogos da ronda anterior ainda por terminar.
           </div>
         )}
 
-        <div style={{ marginBottom: 16 }}>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginBottom: 12, textAlign: 'center' }}>
-            {match.homeTeam?.name || '?'} vs {match.awayTeam?.name || '?'}
-          </p>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 16 }}>
+          <div style={{ flex: 1, textAlign: 'center' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {match.homeTeam?.name || 'Casa'}
+            </div>
             <input
-              type="number" min="0" value={home} onChange={e => setHome(e.target.value)}
-              className="form-input" style={{ width: 70, textAlign: 'center', fontSize: 24, fontWeight: 900 }}
-              placeholder="0" disabled={isBlocked}
+              type="number" min="0"
+              className="score-input"
+              value={home}
+              onChange={e => setHome(e.target.value)}
+              disabled={isBlocked}
+              style={{ width: '100%', maxWidth: 72 }}
             />
-            <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-muted)' }}>-</span>
+          </div>
+
+          <div style={{ fontWeight: 700, color: 'var(--text-muted)', fontSize: 20, paddingTop: 26 }}>×</div>
+
+          <div style={{ flex: 1, textAlign: 'center' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {match.awayTeam?.name || 'Fora'}
+            </div>
             <input
-              type="number" min="0" value={away} onChange={e => setAway(e.target.value)}
-              className="form-input" style={{ width: 70, textAlign: 'center', fontSize: 24, fontWeight: 900 }}
-              placeholder="0" disabled={isBlocked}
+              type="number" min="0"
+              className="score-input"
+              value={away}
+              onChange={e => setAway(e.target.value)}
+              disabled={isBlocked}
+              style={{ width: '100%', maxWidth: 72 }}
             />
           </div>
         </div>
 
         <div className="form-group" style={{ marginBottom: 16 }}>
-          <label className="form-label">Árbitro (opcional)</label>
-          <input className="form-input" placeholder="Nome do árbitro" value={referee} onChange={e => setReferee(e.target.value)} />
+          <label className="form-label" style={{ fontSize: 11 }}>Árbitro (opcional)</label>
+          <input
+            className="form-input"
+            style={{ height: 38, fontSize: 13 }}
+            placeholder="Nome do árbitro..."
+            value={referee}
+            onChange={e => setReferee(e.target.value)}
+            disabled={isBlocked}
+          />
         </div>
 
-        <div style={{ marginBottom: 16 }}>
-          <label className="form-label" style={{ marginBottom: 8, display: 'block' }}>Eventos do Jogo</label>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-            <select className="form-input" style={{ flex: '1 1 100px' }} value={newEvent.type} onChange={e => setNewEvent({ ...newEvent, type: e.target.value })}>
-              <option value="goal">⚽ Golo</option>
-              <option value="yellow_card">🟨 Amarelo</option>
-              <option value="red_card">🟥 Vermelho</option>
-            </select>
-            <select className="form-input" style={{ flex: '1 1 100px' }} value={newEvent.team} onChange={e => setNewEvent({ ...newEvent, team: e.target.value, playerName: '' })}>
-              {homeTeamId && <option value={homeTeamId}>{match.homeTeam?.name}</option>}
-              {awayTeamId && <option value={awayTeamId}>{match.awayTeam?.name}</option>}
-            </select>
-            {currentTeamPlayers.length > 0 ? (
-              <select className="form-input" style={{ flex: '2 1 140px' }} value={newEvent.playerName} onChange={e => setNewEvent({ ...newEvent, playerName: e.target.value })}>
-                <option value="">Jogador...</option>
-                {currentTeamPlayers.map((p, i) => <option key={i} value={p.name || p}>{p.name || p}</option>)}
-              </select>
-            ) : (
-              <input className="form-input" style={{ flex: '2 1 140px' }} placeholder="Nome do jogador" value={newEvent.playerName} onChange={e => setNewEvent({ ...newEvent, playerName: e.target.value })} />
-            )}
-            <input type="number" className="form-input" style={{ width: 60 }} placeholder="Min" value={newEvent.minute} onChange={e => setNewEvent({ ...newEvent, minute: e.target.value })} />
-            <button type="button" className="btn btn-secondary btn-sm" onClick={handleAddEvent} style={{ flexShrink: 0 }}>+</button>
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 14, marginBottom: 16 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10, color: 'var(--text-secondary)' }}>
+            Eventos da Partida (Golos &amp; Cartões)
           </div>
-          {events.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
-              {events.map((ev, i) => (
-                <div key={ev._id || ev.id || i} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg-secondary)', borderRadius: 8, padding: '4px 10px', fontSize: 12 }}>
-                  <span>{eventIcons[ev.type]}</span>
-                  <span>{ev.playerName}</span>
-                  {ev.minute && <span style={{ color: 'var(--text-muted)' }}>{ev.minute}'</span>}
-                  <button onClick={() => handleRemoveEvent(ev._id || ev.id)} style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: 14, lineHeight: 1 }}>×</button>
-                </div>
-              ))}
+
+          <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--border)', opacity: isBlocked ? 0.6 : 1 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+              <select className="form-select" style={{ height: 36, fontSize: 12 }} value={newEvent.type} onChange={e => setNewEvent({ ...newEvent, type: e.target.value })} disabled={isBlocked}>
+                <option value="goal">⚽ Golo</option>
+                <option value="yellow_card">🟨 Cartão Amarelo</option>
+                <option value="red_card">🟥 Cartão Vermelho</option>
+              </select>
+              <select className="form-select" style={{ height: 36, fontSize: 12 }} value={newEvent.team} onChange={e => setNewEvent({ ...newEvent, team: e.target.value })} disabled={isBlocked}>
+                {homeTeamId && <option value={homeTeamId}>{match.homeTeam?.name || 'Casa'}</option>}
+                {awayTeamId && <option value={awayTeamId}>{match.awayTeam?.name || 'Fora'}</option>}
+              </select>
             </div>
-          )}
+            <div style={{ display: 'flex', gap: 6 }}>
+              <input
+                type="number"
+                className="form-input"
+                style={{ width: 54, height: 36, fontSize: 12, padding: '0 8px' }}
+                placeholder="Min"
+                value={newEvent.minute}
+                onChange={e => setNewEvent({ ...newEvent, minute: e.target.value })}
+                disabled={isBlocked}
+              />
+              <input
+                list="public-players-list"
+                className="form-input"
+                style={{ flex: 1, height: 36, fontSize: 12 }}
+                placeholder="Nome do jogador..."
+                value={newEvent.playerName}
+                onChange={e => setNewEvent({ ...newEvent, playerName: e.target.value })}
+                disabled={isBlocked}
+              />
+              <datalist id="public-players-list">
+                {currentTeamPlayers.map((p, i) => <option key={i} value={p.name || p} />)}
+              </datalist>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={handleAddEvent}
+                disabled={isBlocked}
+                style={{ height: 36, padding: '0 14px', flexShrink: 0, width: 'auto' }}
+              >
+                Add
+              </button>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 140, overflowY: 'auto', paddingRight: 2, marginTop: 10 }}>
+            {events.length === 0 ? (
+              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12, padding: '10px 0' }}>Sem eventos registados.</p>
+            ) : (
+              events.map((e, i) => (
+                <div key={e.id || e._id || i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.02)', padding: '6px 10px', borderRadius: 8, border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 14 }}>{eventIcons[e.type]}</span>
+                    <div>
+                      <span style={{ fontWeight: 700, fontSize: 13 }}>{e.playerName}</span>
+                      {e.minute && <span style={{ fontSize: 11, color: 'var(--green)', marginLeft: 5 }}>{e.minute}'</span>}
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 6 }}>({e.team === homeTeamId ? (match.homeTeam?.name || 'Casa') : (match.awayTeam?.name || 'Fora')})</span>
+                    </div>
+                  </div>
+                  <button onClick={() => handleRemoveEvent(e.id || e._id)} style={{ background: 'none', color: 'var(--red)', opacity: 0.7, padding: 4 }} disabled={isBlocked}><X size={13} /></button>
+                </div>
+              ))
+            )}
+          </div>
         </div>
+
+        {confirmGoalWarning && (
+          <div style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.35)', borderRadius: 10, padding: '10px 12px', marginBottom: 12 }}>
+            <div style={{ fontSize: 12, color: '#f59e0b', fontWeight: 600, marginBottom: 8, lineHeight: 1.4 }}>
+              ⚠️ Registaste {confirmGoalWarning.totalGoals} golo(s), mas só associaste {confirmGoalWarning.registeredGoals} marcador(es). Guardar sem todos os marcadores?
+            </div>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button
+                className="btn btn-secondary"
+                style={{ height: 32, fontSize: 11, padding: '0 10px' }}
+                onClick={() => setConfirmGoalWarning(null)}
+              >
+                + Adicionar Marcadores
+              </button>
+              <button
+                className="btn btn-primary"
+                style={{ height: 32, fontSize: 11, padding: '0 10px', background: '#f59e0b', borderColor: '#f59e0b', color: '#000' }}
+                onClick={() => handleSave(confirmGoalWarning.customStatus, true)}
+              >
+                Guardar Assim Mesmo
+              </button>
+            </div>
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <button

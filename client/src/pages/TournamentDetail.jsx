@@ -2136,22 +2136,21 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
 
   const handleRemoveEvent = (id) => setEvents(events.filter(e => e.id !== id && e._id !== id));
 
-  const handleSave = async (customStatus) => {
+  const [confirmGoalWarning, setConfirmGoalWarning] = useState(null);
+
+  const handleSave = async (customStatus, skipWarning = false) => {
     if (home === '' || away === '') return toast.error('Insere os dois resultados.');
-    setLoading(true);
 
     const totalGoals = Number(home) + Number(away);
     const registeredGoals = events.filter(e => e.type === 'goal').length;
 
-    if (totalGoals > 0 && registeredGoals < totalGoals) {
-      const confirmSave = window.confirm(
-        `Registaste ${totalGoals} golo(s), mas só adicionaste ${registeredGoals} marcador(es) de golo nos eventos.\n\nRecomendamos associar todos os marcadores para que as estatísticas do campeonato fiquem corretas. Desejas guardar o resultado assim mesmo?`
-      );
-      if (!confirmSave) {
-        setLoading(false);
-        return;
-      }
+    if (!skipWarning && totalGoals > 0 && registeredGoals < totalGoals) {
+      setConfirmGoalWarning({ customStatus, totalGoals, registeredGoals });
+      return;
     }
+
+    setConfirmGoalWarning(null);
+    setLoading(true);
 
     try {
       await api.put(`/tournaments/${tournamentId}/matches/${match._id}/result`, {
@@ -2294,6 +2293,31 @@ function ResultModal({ match, tournamentId, teams, matches, onClose, onSaved }) 
             )}
           </div>
         </div>
+
+        {/* Warning banner when goals lack player events */}
+        {confirmGoalWarning && (
+          <div style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.35)', borderRadius: 10, padding: '10px 12px', marginBottom: 12 }}>
+            <div style={{ fontSize: 12, color: '#f59e0b', fontWeight: 600, marginBottom: 8, lineHeight: 1.4 }}>
+              ⚠️ Registaste {confirmGoalWarning.totalGoals} golo(s), mas só associaste {confirmGoalWarning.registeredGoals} marcador(es). Guardar sem todos os marcadores?
+            </div>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button
+                className="btn btn-secondary"
+                style={{ height: 32, fontSize: 11, padding: '0 10px' }}
+                onClick={() => setConfirmGoalWarning(null)}
+              >
+                + Adicionar Marcadores
+              </button>
+              <button
+                className="btn btn-primary"
+                style={{ height: 32, fontSize: 11, padding: '0 10px', background: '#f59e0b', borderColor: '#f59e0b', color: '#000' }}
+                onClick={() => handleSave(confirmGoalWarning.customStatus, true)}
+              >
+                Guardar Assim Mesmo
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>

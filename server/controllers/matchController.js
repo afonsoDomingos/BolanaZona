@@ -27,7 +27,7 @@ exports.updateResult = async (req, res) => {
     const oldStatus = match.status;
 
     // 1. Verificar Permissão
-    const isOwner = match.tournament.createdBy.toString() === req.user._id.toString();
+    const isOwner = match.tournament?.createdBy && (match.tournament.createdBy.toString() === req.user._id.toString());
     const isSuperAdmin = req.user.role === 'superadmin';
     if (!isOwner && !isSuperAdmin) {
       return res.status(403).json({ message: 'Apenas o organizador do torneio ou Superadmin podem inserir resultados.' });
@@ -74,7 +74,7 @@ exports.updateResult = async (req, res) => {
     if (homeScore > oldHomeScore || awayScore > oldAwayScore) {
       const scoringTeam = homeScore > oldHomeScore ? 'homeTeam' : 'awayTeam';
       const populatedMatch = await Match.findById(match._id).populate('homeTeam awayTeam');
-      const teamName = populatedMatch[scoringTeam].name;
+      const teamName = populatedMatch?.[scoringTeam]?.name || (scoringTeam === 'homeTeam' ? 'Equipa Casa' : 'Equipa Fora');
       
       // Notificar Seguidores do Torneio (In-app por agora, expansível para WhatsApp)
       const subscribers = await Subscriber.find({ tournament: match.tournament._id, isActive: true });
@@ -84,12 +84,15 @@ exports.updateResult = async (req, res) => {
       
       console.log(`📡 Notificação de Golo: ${goalMsg}`);
       
-      // Aqui poderíamos chamar um serviço de WhatsApp para os telefones em subscribers.map(s => s.phone)
-      // Por agora, vamos garantir que a notificação interna chegue ao dono do torneio e capitães
-      const captains = await Team.find({ _id: { $in: [match.homeTeam, match.awayTeam] } }).select('captains');
-      const notifyUsers = [match.tournament.createdBy, ...captains.flatMap(c => c.captains).filter(Boolean)];
+      // Notificação interna para o dono do torneio e capitães das equipas
+      const captains = await Team.find({ _id: { $in: [match.homeTeam, match.awayTeam].filter(Boolean) } }).select('captains');
+      const notifyUsers = [
+        match.tournament?.createdBy,
+        ...captains.flatMap(c => (Array.isArray(c.captains) ? c.captains : []))
+      ].filter(Boolean);
+      const uniqueNotifyUsers = [...new Set(notifyUsers.map(id => id?.toString()).filter(Boolean))];
 
-      for (const userId of notifyUsers) {
+      for (const userId of uniqueNotifyUsers) {
         await createNotification(
           userId,
           'GOLO AO VIVO! ⚽',
@@ -103,13 +106,16 @@ exports.updateResult = async (req, res) => {
     // 3.5. Notificação de Jogo Terminado (Final Score)
     if (match.status === 'finished' && oldStatus !== 'finished') {
       const populatedMatch = await Match.findById(match._id).populate('homeTeam awayTeam');
-      const homeName = populatedMatch.homeTeam?.name || 'Equipa A';
-      const awayName = populatedMatch.awayTeam?.name || 'Equipa B';
+      const homeName = populatedMatch?.homeTeam?.name || 'Equipa A';
+      const awayName = populatedMatch?.awayTeam?.name || 'Equipa B';
       const finishMsg = `Jogo Terminado: ${homeName} ${homeScore} - ${awayScore} ${awayName}. Placar final confirmado! 🏁`;
 
-      const captains = await Team.find({ _id: { $in: [match.homeTeam, match.awayTeam] } }).select('captains');
-      const notifyUsers = [match.tournament.createdBy, ...captains.flatMap(c => c.captains).filter(Boolean)];
-      const uniqueNotifyUsers = [...new Set(notifyUsers.map(id => id.toString()))];
+      const captains = await Team.find({ _id: { $in: [match.homeTeam, match.awayTeam].filter(Boolean) } }).select('captains');
+      const notifyUsers = [
+        match.tournament?.createdBy,
+        ...captains.flatMap(c => (Array.isArray(c.captains) ? c.captains : []))
+      ].filter(Boolean);
+      const uniqueNotifyUsers = [...new Set(notifyUsers.map(id => id?.toString()).filter(Boolean))];
 
       for (const userId of uniqueNotifyUsers) {
         await createNotification(
@@ -165,7 +171,7 @@ exports.update = async (req, res) => {
     const match = await Match.findById(req.params.id).populate('tournament');
     if (!match) return res.status(404).json({ message: 'Jogo não encontrado.' });
 
-    const isOwner = match.tournament.createdBy.toString() === req.user._id.toString();
+    const isOwner = match.tournament?.createdBy && (match.tournament.createdBy.toString() === req.user._id.toString());
     const isSuperAdmin = req.user.role === 'superadmin';
     if (!isOwner && !isSuperAdmin) {
       return res.status(403).json({ message: 'Sem permissão para editar este jogo. Apenas o criador do torneio ou Superadmin.' });

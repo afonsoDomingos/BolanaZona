@@ -331,14 +331,16 @@ exports.updateResult = async (req, res) => {
     await updateSquadStats(challenge.challengedSquad._id);
 
     // Notify the other manager
-    const recipientId = isChallengedManager ? challenge.challengerSquad.manager : challenge.challengedSquad.manager;
-    await Notification.create({
-      user: recipientId,
-      title: 'Resultado de Jogo Registado 🏁',
-      message: `O resultado do jogo entre ${challenge.challengerSquad.name} e ${challenge.challengedSquad.name} foi registado: ${challengerScore} - ${challengedScore}.`,
-      type: 'success',
-      link: '/dashboard/squads'
-    });
+    const recipientId = isChallengedManager ? challenge.challengerSquad?.manager : challenge.challengedSquad?.manager;
+    if (recipientId) {
+      await Notification.create({
+        user: recipientId,
+        title: 'Resultado de Jogo Registado 🏁',
+        message: `O resultado do jogo entre ${challenge.challengerSquad?.name || 'Squad A'} e ${challenge.challengedSquad?.name || 'Squad B'} foi registado: ${challengerScore} - ${challengedScore}.`,
+        type: 'success',
+        link: '/dashboard/squads'
+      });
+    }
 
     console.log('✅ Challenge result updated successfully');
     res.json(challenge);

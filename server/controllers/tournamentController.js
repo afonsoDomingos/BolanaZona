@@ -352,11 +352,15 @@ function generateRoundRobin(teams) {
 function computeStandings(teams, matches) {
   const table = {};
   teams.forEach(t => {
-    table[t._id] = { team: t, played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 };
+    if (t && t._id) {
+      table[t._id] = { team: t, played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, points: 0 };
+    }
   });
-  matches.filter(m => m.status === 'finished' && m.homeScore !== null).forEach(m => {
-    const h = table[m.homeTeam._id || m.homeTeam];
-    const a = table[m.awayTeam._id || m.awayTeam];
+  matches.filter(m => m.status === 'finished' && m.homeScore !== null && m.homeTeam && m.awayTeam).forEach(m => {
+    const homeId = m.homeTeam._id || m.homeTeam;
+    const awayId = m.awayTeam._id || m.awayTeam;
+    const h = table[homeId];
+    const a = table[awayId];
     if (!h || !a) return;
     h.played++; a.played++;
     h.goalsFor += m.homeScore; h.goalsAgainst += m.awayScore;
@@ -376,7 +380,7 @@ exports.createMatch = async (req, res) => {
     if (!tournament) return res.status(404).json({ message: 'Torneio não encontrado.' });
 
     // Verificar Permissão
-    const isOwner = tournament.createdBy.toString() === req.user._id.toString();
+    const isOwner = tournament.createdBy && (tournament.createdBy.toString() === req.user._id.toString());
     const isSuperAdmin = req.user.role === 'superadmin';
     if (!isOwner && !isSuperAdmin) {
       return res.status(403).json({ message: 'Não tens permissão para adicionar jogos a este torneio.' });
