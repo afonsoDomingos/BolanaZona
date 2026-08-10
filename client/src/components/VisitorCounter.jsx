@@ -105,8 +105,8 @@ export default function VisitorCounter({ variant = 'fixed' }) {
         setHighlight(true);
         setTimeout(() => setHighlight(false), 2000);
 
-        // Se for um múltiplo de 10, celebrar!
-        if (visitorNumber % 10 === 0) {
+        // Se for um múltiplo de 5, celebrar!
+        if (visitorNumber % 5 === 0) {
           setMilestoneVisitor(visitorNumber);
           setShowConfetti(true);
           setTimeout(() => setShowConfetti(false), 6000);
